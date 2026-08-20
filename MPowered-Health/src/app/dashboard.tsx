@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
 import { productContent } from '@/constants/product-content';
-import { getCompletedAssessments } from '@/constants/assessment-session';
+import { getCompletedAssessments, getWeeklyStreak } from '@/constants/assessment-session';
 function Assessment({
   title,
   type,
@@ -37,7 +37,8 @@ export default function Home() {
   },[]));
   const done=[...new Set([...completed.split(',').filter(Boolean),...sessionCompleted])];
   const completedValue=done.join(',');
-  return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}><View style={s.banner}><Text style={s.greeting}>Good morning, {name} ☀️</Text><View style={s.bannerTitleRow}><Text style={s.bannerTitle}>Let&apos;s build your</Text><BrandWord/><Text style={s.bannerTitle}>plan.</Text></View><Text style={s.bannerCopy}>{productContent.dashboard.description}</Text></View><View style={s.progressBlock}><View style={s.track}><View style={[s.trackFill,{width:`${done.length*20}%`}]}/></View><View style={s.progressHead}><Text style={s.progressLabel}>{done.length===5?'✨ You completed all tasks':"This week's progress"}</Text><Text style={s.progressCount}>{done.length}/5 assessments</Text></View></View><View style={s.panel}><Text style={s.sectionTitle}>{productContent.dashboard.assessmentTitle}</Text><Assessment title="My Pain" type="pain" completed={completedValue} name={name}/><Assessment title="My Movement" type="movement" completed={completedValue} name={name}/><Assessment title="My Personal Care" type="personal" completed={completedValue} name={name}/><Assessment title="My Social Health" type="social" completed={completedValue} name={name}/><Assessment title="My Management" type="management" completed={completedValue} name={name}/></View><Pressable onPress={() => router.push({
+  const streak=getWeeklyStreak();
+  return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}><View style={s.banner}><Text style={s.greeting}>Good morning, {name} ☀️</Text><View style={s.bannerTitleRow}><Text style={s.bannerTitle}>Let&apos;s build your</Text><BrandWord/><Text style={s.bannerTitle}>plan.</Text></View><Text style={s.bannerCopy}>{productContent.dashboard.description}</Text><View style={s.streak}><View style={s.streakIcon}><Text style={s.streakSpark}>✦</Text></View><View><Text style={s.streakValue}>{streak}-week streak</Text><Text style={s.streakLabel}>Weekly check-ins completed</Text></View><Text style={s.streakEncouragement}>Keep it going</Text></View></View><View style={s.progressBlock}><View style={s.track}><View style={[s.trackFill,{width:`${done.length*20}%`}]}/></View><View style={s.progressHead}><Text style={s.progressLabel}>{done.length===5?'✨ You completed all tasks':"This week's progress"}</Text><Text style={s.progressCount}>{done.length}/5 assessments</Text></View></View><View style={s.panel}><Text style={s.sectionTitle}>{productContent.dashboard.assessmentTitle}</Text><Assessment title="My Pain" type="pain" completed={completedValue} name={name}/><Assessment title="My Movement" type="movement" completed={completedValue} name={name}/><Assessment title="My Personal Care" type="personal" completed={completedValue} name={name}/><Assessment title="My Social Health" type="social" completed={completedValue} name={name}/><Assessment title="My Management" type="management" completed={completedValue} name={name}/></View><Pressable onPress={() => router.push({
           pathname: '/workflow',
           params: {
             flow: 'reflection'
@@ -79,6 +80,49 @@ const s = StyleSheet.create({
   brandWord:{width:69,height:27,position:'relative'},
   brandM:{position:'absolute',left:0,bottom:0,fontSize:24,lineHeight:27,fontWeight:'800',color:palette.text},
   brandPowered:{position:'absolute',left:20,top:0,fontSize:11,lineHeight:13,fontWeight:'800',color:palette.text},
+  streak: {
+    minHeight: 58,
+    marginTop: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: '#D8C7FA',
+    borderRadius: 16,
+    backgroundColor: '#F6F2FF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  streakIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#D8C7FA',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  streakSpark: {
+    fontSize: 19,
+    color: palette.primary
+  },
+  streakValue: {
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '800',
+    color: palette.text
+  },
+  streakLabel: {
+    marginTop: 1,
+    fontSize: 10,
+    lineHeight: 14,
+    color: palette.muted
+  },
+  streakEncouragement: {
+    marginLeft: 'auto',
+    fontSize: 11,
+    fontWeight: '700',
+    color: palette.primary
+  },
   bannerCopy: {
     fontSize: 14,
     lineHeight: 20,
