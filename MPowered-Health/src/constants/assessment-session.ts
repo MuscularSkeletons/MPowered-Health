@@ -1,6 +1,7 @@
 const completedAssessments = new Set<string>();
 export type PainRecord={date:string;score:number};
 const painRecords:PainRecord[]=[{date:'25/05',score:5},{date:'01/06',score:5},{date:'08/06',score:7}];
+const weeklyStreak = 3;
 
 export function markAssessmentCompleted(type: string) {
   completedAssessments.add(type);
@@ -18,4 +19,8 @@ export function addPainRecord(score:number) {
 
 export function getPainRecords() {
   return [...painRecords];
+}
+
+export function getWeeklyStreak() {
+  return weeklyStreak;
 }
