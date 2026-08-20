@@ -1,180 +1,87 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
-
-export default function TabTwoScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
-  const theme = useTheme();
-
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
-  });
-
-  return (
-    <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
-
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
-
-        <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
-          </Collapsible>
-
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
-    </ScrollView>
-  );
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MhaHeader, PageIntro, SectionHeading, SummaryRow, palette } from '@/components/mha-ui';
+const go = (flow: string) => router.push({
+    pathname: '/workflow',
+    params: {
+      flow
+    }
+  }),
+  values = [38, 56, 46, 72, 58, 44, 51];
+export default function Health() {
+  return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><ScrollView contentContainerStyle={s.content}><PageIntro eyebrow="MY HEALTH" title="My Health" description="New insights for your MPowered plan." /><View style={s.metric}><Text style={s.label}>Your average pain increased</Text><Text style={s.value}>7<Text style={s.unit}>/10</Text></Text><View style={s.chart}>{values.map((v, i) => <View key={i} style={[s.bar, {
+            height: `${v}%`
+          }, i === 6 && s.today]} />)}</View><View style={s.days}>{['25/05', '', '', '01/06', '', '', '08/06'].map((d, i) => <Text key={i} style={s.day}>{d}</Text>)}</View><Text onPress={() => go('records')} style={s.link}>Check pain history  →</Text></View><SectionHeading eyebrow="MY HEALTH" title="Health information" /><View style={{
+        gap: 12
+      }}><SummaryRow tone="gold" symbol="◉" title="My MPowered Health Profile" description="Updated by 18 Feb 2026" meta="Open" onPress={() => go('profile')} /><SummaryRow tone="rose" symbol="♥" title="Check Pain Guide" description="" meta="Open" onPress={() => go('tips')} /><SummaryRow tone="violet" symbol="□" title="Plan an appointment with a doctor" description="" meta="Open" onPress={() => router.push('/care')} /><SummaryRow tone="mint" symbol="↗" title="Check my health tracking records" description="" meta="Open" onPress={() => go('records')} /><SummaryRow tone="blue" symbol="＋" title="Check my prescriptions" description="" meta="Open" onPress={() => go('prescriptions')} /><SummaryRow tone="violet" symbol="⚙" title="Settings and privacy" description="Support access, permissions and health data" meta="Open" onPress={() => go('settings')} /></View></ScrollView></SafeAreaView>;
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
+const s = StyleSheet.create({
+  safe: {
     flex: 1,
+    backgroundColor: palette.background
   },
-  contentContainer: {
+  content: {
+    width:'100%',maxWidth:680,alignSelf:'center',paddingHorizontal:24,paddingTop:24,paddingBottom:112
+  },
+  metric: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 24,
+    padding: 20,
+    marginTop: 28,
+    shadowColor: '#2F174A',
+    shadowOpacity: .06,
+    shadowRadius: 14
+  },
+  label: {
+    fontSize: 12,
+    color: palette.muted
+  },
+  value: {
+    fontSize: 38,
+    fontWeight: '800',
+    color: palette.text,
+    marginTop: 2
+  },
+  unit: {
+    fontSize: 13,
+    color: palette.muted
+  },
+  chart: {
+    height: 130,
     flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'flex-end',
+    gap: 11,
+    borderBottomWidth: 1,
+    borderColor: '#E5DFF0',
+    paddingTop: 16
   },
-  container: {
-    maxWidth: MaxContentWidth,
-    flexGrow: 1,
+  bar: {
+    flex: 1,
+    backgroundColor: '#BEA1F7',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6
   },
-  titleContainer: {
-    gap: Spacing.three,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
+  today: {
+    backgroundColor: palette.primary
   },
-  centerText: {
-    textAlign: 'center',
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  linkButton: {
+  days: {
     flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: 'center',
-    gap: Spacing.one,
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8
   },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
+  day: {
+    fontSize: 9,
+    color: '#7B7385'
   },
-  collapsibleContent: {
-    alignItems: 'center',
-  },
-  imageTutorial: {
-    width: '100%',
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
-    marginTop: Spacing.two,
-  },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
-  },
+  link: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: palette.primary,
+    textAlign: 'right',
+    marginTop: 18,
+    paddingVertical: 6
+  }
 });
