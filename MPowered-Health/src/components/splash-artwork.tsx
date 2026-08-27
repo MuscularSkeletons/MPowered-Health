@@ -1,10 +1,7 @@
 import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
 
 const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
-  [
-    require('../../assets/splash/pain-home.png'),
-    require('../../assets/splash/pain-summary.png'),
-  ],
+  [require('../../assets/splash/pain-home.png'), require('../../assets/splash/pain-summary.png')],
   [
     require('../../assets/splash/health-home.png'),
     require('../../assets/splash/health-records.png'),

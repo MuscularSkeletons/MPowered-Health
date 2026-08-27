@@ -15,6 +15,20 @@ const outlineIcons = {
   settings: require('../../assets/icons/iconify-cog-outline.svg'),
 };
 
-export function NavGlyph({ name, color, filled=false }: { name: NavIconName; color: string; filled?: boolean }) {
-  return <Image source={(filled?icons:outlineIcons)[name]} style={{ width: 26, height: 26, tintColor: color }} contentFit="contain" />;
+export function NavGlyph({
+  name,
+  color,
+  filled = false,
+}: {
+  name: NavIconName;
+  color: string;
+  filled?: boolean;
+}) {
+  return (
+    <Image
+      source={(filled ? icons : outlineIcons)[name]}
+      style={{ width: 26, height: 26, tintColor: color }}
+      contentFit="contain"
+    />
+  );
 }

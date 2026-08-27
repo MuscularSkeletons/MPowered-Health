@@ -3,7 +3,13 @@ export const productContent = {
     description: 'Assess your pain intensity and its impacts weekly to create an empowered plan.',
     progressLabel: "This week's progress",
     assessmentTitle: "This week's assessment",
-    assessments: ['My Pain', 'My Movement', 'My Personal Care', 'My Social Health', 'My Management'],
+    assessments: [
+      'My Pain',
+      'My Movement',
+      'My Personal Care',
+      'My Social Health',
+      'My Management',
+    ],
   },
   healthRecords: {
     title: 'My health tracking records',
@@ -13,7 +19,8 @@ export const productContent = {
   },
   care: {
     title: 'Plan your visit with confidence',
-    description: 'Get ready for your visit. Prepare questions, add support people, and keep notes during your appointments.',
+    description:
+      'Get ready for your visit. Prepare questions, add support people, and keep notes during your appointments.',
     questionsAction: 'Explore questions generated for me',
     prepareAction: 'Prepare for my appointment',
     appointmentsTitle: 'My Appointments:',
@@ -27,6 +34,7 @@ export const productContent = {
       'What could be causing pain in my lower back, neck, and knee?',
       'Are these areas related, or are they likely separate issues?',
     ],
-    painIntensity: 'My average pain over the past two weeks has been around 7 — what does this indicate?',
+    painIntensity:
+      'My average pain over the past two weeks has been around 7 — what does this indicate?',
   },
 } as const;
