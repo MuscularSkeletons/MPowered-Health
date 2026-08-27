@@ -244,11 +244,14 @@ function SummaryInsight({summary,tip,url}:{summary:string;tip:string;url:string}
   </View>;
 }
 function ScoreSlider({value,onChange}:{value:number;onChange:(value:number)=>void}) {
-  const width=useRef(1);
+  const trackRef=useRef<View>(null);
+  const metrics=useRef({left:0,width:1,ready:false});
+  const lastValue=useRef(value); lastValue.current=value;
   const onChangeRef=useRef(onChange); onChangeRef.current=onChange;
-  const update=(x:number)=>onChangeRef.current(Math.max(0,Math.min(10,Math.round(x/width.current*10))));
-  const pan=useRef(PanResponder.create({onStartShouldSetPanResponder:()=>true,onMoveShouldSetPanResponder:()=>true,onPanResponderGrant:e=>update(e.nativeEvent.locationX),onPanResponderMove:e=>update(e.nativeEvent.locationX)})).current;
-  return <View style={s.sliderArea}><View onLayout={e=>{width.current=e.nativeEvent.layout.width}} {...pan.panHandlers} style={s.sliderTrack}><View style={[s.sliderFill,{width:`${value*10}%`}]}/><View style={[s.sliderThumb,{left:`${value*10}%`}]}><View style={s.sliderBubble}><Text style={s.sliderBubbleText}>{value}</Text></View></View></View><View style={s.sliderEnds}><Text style={s.sliderEnd}>0</Text><Text style={s.sliderEnd}>10</Text></View></View>
+  const update=(pageX:number)=>{if(!metrics.current.ready)return;const next=Math.max(0,Math.min(10,Math.round((pageX-metrics.current.left)/metrics.current.width*10)));if(next!==lastValue.current){lastValue.current=next;onChangeRef.current(next)}};
+  const measure=(pageX?:number)=>trackRef.current?.measureInWindow((left,_top,width)=>{metrics.current={left,width:Math.max(width,1),ready:true};if(pageX!=null)update(pageX)});
+  const pan=useRef(PanResponder.create({onStartShouldSetPanResponder:()=>true,onMoveShouldSetPanResponder:()=>true,onPanResponderGrant:e=>measure(e.nativeEvent.pageX),onPanResponderMove:e=>update(e.nativeEvent.pageX),onPanResponderTerminationRequest:()=>false})).current;
+  return <View style={s.sliderArea}><View ref={trackRef} collapsable={false} onLayout={()=>measure()} {...pan.panHandlers} style={s.sliderTrack}><View pointerEvents="none" style={[s.sliderFill,{width:`${value*10}%`}]}/><View pointerEvents="none" style={[s.sliderThumb,{left:`${value*10}%`}]}><View style={s.sliderBubble}><Text style={s.sliderBubbleText}>{value}</Text></View></View></View><View style={s.sliderEnds}><Text style={s.sliderEnd}>0</Text><Text style={s.sliderEnd}>10</Text></View></View>
 }
 export default function Assessment() {
   const {
