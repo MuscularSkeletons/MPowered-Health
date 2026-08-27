@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
-import { addPainRecord, markAssessmentCompleted } from '@/constants/assessment-session';
+import { addPainRecord, getAssessmentAnswers, markAssessmentCompleted } from '@/constants/assessment-session';
 type Q = {
   title: string;
   prompt: string;
@@ -17,6 +17,12 @@ const scales = {
   lift: ['I can lift heavy weights without extra pain', 'I can lift heavy weights, but it causes extra pain', 'I struggle to lift heavy weights off the floor, but I can lift them from a table', 'I struggle to lift heavy weights off the floor, but I can lift medium weights from a table', 'I can lift only very light weights', 'I cannot lift or carry anything at all'],
   sit: ['I can sit in any chair as long as I like', 'I can only sit in my favourite chair as long as I like', 'Pain prevents me sitting more than one hour', 'Pain prevents me sitting more than 30 minutes', 'Pain prevents me from sitting more than 10 minutes', 'Pain prevents me from sitting at all'],
   stand: ['I can stand as long as I want without increased pain', 'I can stand as long as I want, but it increases my pain', 'Pain prevents me standing more than one hour', 'Pain prevents me standing more than 30 minutes', 'Pain prevents me from standing more than 10 minutes', 'Pain prevents me from standing at all']
+};
+const tipUrls: Record<string, string> = {
+  movement: 'https://muscha.org/exercise',
+  personal: 'https://muscha.org/living-well-with-a-musculoskeletal-condition',
+  social: 'https://muscha.org/relaxation/',
+  management: 'https://muscha.org/pain-guide/'
 };
 const specs: Record<string, {
   title: string;
@@ -229,10 +235,10 @@ function PainSummaryResults({answers}:{answers:Record<number,string[]>}) {
   </>;
 }
 
-function SummaryInsight({summary,tip}:{summary:string;tip:string}) {
+function SummaryInsight({summary,tip,url}:{summary:string;tip:string;url:string}) {
   return <View style={s.summaryInsight}>
     <View style={s.summaryStatement}><Text style={s.summaryStatementText}>{summary}</Text></View>
-    <Pressable accessibilityRole="button" style={({pressed})=>[s.guideButton,pressed&&s.guidePressed]} onPress={()=>router.push({pathname:'/workflow',params:{flow:'tips'}})}>
+    <Pressable accessibilityRole="link" style={({pressed})=>[s.guideButton,pressed&&s.guidePressed]} onPress={()=>Linking.openURL(url)}>
       <Text style={s.guideIcon}>⌕</Text><Text style={s.guideText}>{tip}</Text><Text style={s.guideArrow}>›</Text>
     </Pressable>
   </View>;
@@ -261,43 +267,45 @@ export default function Assessment() {
   // Expo Router can retain this screen while only changing its route params.
   // Every assessment must therefore start with its own clean recording state.
   useEffect(() => {
+    const savedAnswers=getAssessmentAnswers(type);
     setStep(0);
-    setAnswers({});
-    setDone(false);
+    setAnswers(savedAnswers??{});
+    setDone(Boolean(savedAnswers));
   }, [type]);
   useEffect(() => {
     scrollRef.current?.scrollTo({y:0,animated:false});
   }, [step,type]);
-  const q = spec.questions[step],
-    current = answers[step] ?? [];
+  const activeStep = Math.min(step, spec.questions.length - 1),
+    q = spec.questions[activeStep],
+    current = answers[activeStep] ?? [];
   const valid = q.optional || current.length > 0;
   const select = (v: string) => setAnswers(a => ({
     ...a,
-    [step]: q.kind === 'multi' ? current.includes(v) ? current.filter(x => x !== v) : [...current, v] : [v]
+    [activeStep]: q.kind === 'multi' ? current.includes(v) ? current.filter(x => x !== v) : [...current, v] : [v]
   }));
   const next = () => {
-    if (step < spec.questions.length - 1) {
-      setStep(step + 1);
+    if (activeStep < spec.questions.length - 1) {
+      setStep(activeStep + 1);
       return;
     }
-    markAssessmentCompleted(type);
+    markAssessmentCompleted(type,answers);
     if(type==='pain')addPainRecord(Number(answers[5]?.[0]??answers[2]?.[0]??0));
     setDone(true);
   };
   const result = useMemo(() => Object.values(answers).flat(), [answers]);
   const summarySections=buildSummary(type,answers).filter(section=>section.text).map(section=>({...section,text:asSentence(section.text)}));
   const closeSummary=()=>{const all=[...new Set([...completed.split(',').filter(Boolean),type])].join(',');router.replace({pathname:'/dashboard',params:{completed:all,name}})};
-  if (done) return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><ScrollView contentContainerStyle={s.summary}><Text style={s.summaryTitle}>{spec.title} Summary</Text><Text style={s.summaryCopy}>{type==='pain'?spec.summary:'Your answers help your doctor focus on what matters most to your daily life.'}</Text><View style={s.resultCard}><View style={s.summaryMeta}><Text style={[s.resultHeading,{marginBottom:0,lineHeight:20}]}>{spec.title}</Text><Text style={s.period}>Period: 18–24 May</Text></View>{type!=='pain'?<SummaryInsight summary={spec.summary} tip={spec.tip}/>:null}{type!=='pain'?<Text style={s.resultHeading}>My results:</Text>:null}{type==='pain'?<PainSummaryResults answers={answers}/>:summarySections.map((section,i)=><View key={i} style={s.resultSection}><Text style={s.resultLabel}>{section.title}</Text><Text style={s.result}>{section.text}</Text></View>)}{!result.length ? <Text style={s.result}>No items recorded this week.</Text> : null}</View><View style={s.summaryFooter}><Text style={s.saved}>{type==='pain'?'Saved to My Health':'Saved to Care Journal'}</Text><Pressable accessibilityRole="button" onPress={closeSummary} style={({pressed})=>[s.closeButton,pressed&&s.closePressed]}><Text style={s.closeText}>Close</Text></Pressable></View></ScrollView></SafeAreaView>;
+  if (done) return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><ScrollView contentContainerStyle={s.summary}><Text style={s.summaryTitle}>{spec.title} Summary</Text><Text style={s.summaryCopy}>{type==='pain'?spec.summary:'Your answers help your doctor focus on what matters most to your daily life.'}</Text><View style={s.resultCard}><View style={s.summaryMeta}><Text style={[s.resultHeading,{marginBottom:0,lineHeight:20}]}>{spec.title}</Text><Text style={s.period}>Period: 18–24 May</Text></View>{type!=='pain'?<SummaryInsight summary={spec.summary} tip={spec.tip} url={tipUrls[type]}/>:null}{type!=='pain'?<Text style={[s.resultHeading,s.headingDivider]}>My results:</Text>:null}{type==='pain'?<PainSummaryResults answers={answers}/>:summarySections.map((section,i)=><View key={i} style={s.resultSection}><Text style={section.title.startsWith('My reflections')?[s.resultHeading,s.headingDivider]:s.resultLabel}>{section.title}</Text><Text style={s.result}>{section.text}</Text></View>)}{!result.length ? <Text style={s.result}>No items recorded this week.</Text> : null}</View><View style={s.summaryFooter}><Text style={s.saved}>{type==='pain'?'Saved to My Health':'Saved to Care Journal'}</Text><Pressable accessibilityRole="button" onPress={closeSummary} style={({pressed})=>[s.closeButton,pressed&&s.closePressed]}><Text style={s.closeText}>Close</Text></Pressable></View></ScrollView></SafeAreaView>;
   return <SafeAreaView style={s.safe} edges={['top']}><MhaHeader /><KeyboardAvoidingView style={{
       flex: 1
-    }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView ref={scrollRef} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled"><View style={s.top}><Pressable onPress={() => step ? setStep(step - 1) : router.replace({pathname:'/dashboard',params:{completed,name}})}><Text style={s.back}>‹  Back</Text></Pressable><Text style={s.counter}>{step + 1}/{spec.questions.length}</Text></View><View style={s.track}><View style={[s.fill, {
-            width: `${(step + 1) / spec.questions.length * 100}%`
+    }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView ref={scrollRef} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled"><View style={s.top}><Pressable onPress={() => activeStep ? setStep(activeStep - 1) : router.replace({pathname:'/dashboard',params:{completed,name}})}><Text style={s.back}>‹  Back</Text></Pressable><Text style={s.counter}>{activeStep + 1}/{spec.questions.length}</Text></View><View style={s.track}><View style={[s.fill, {
+            width: `${(activeStep + 1) / spec.questions.length * 100}%`
           }]} /></View><Text style={s.module}>{spec.title}</Text><Text style={s.title}>{q.title}</Text><Text style={s.prompt}>{q.prompt}</Text>{q.kind === 'score' ? <><View style={s.score}><Text style={s.scoreNumber}>{current[0] ?? '0 to 10'}</Text><Text style={s.scoreLabel}>{current.length ? painLabel(Number(current[0])) : 'Slide to select a value'}</Text></View><ScoreSlider value={Number(current[0]??0)} onChange={n=>select(String(n))}/></> : q.kind === 'text' || q.kind === 'number' ? <TextInput value={current[0] ?? ''} onChangeText={select} keyboardType={q.kind === 'number' ? 'numeric' : 'default'} multiline={q.kind === 'text'} placeholder={q.kind === 'number' ? 'input number only' : 'Write your reflection'} placeholderTextColor="#81798A" style={[s.input, q.kind === 'text' && {
           minHeight: 150
         }]} /> : <View style={s.options}>{q.options?.map(o => {
             const on = current.includes(o);
             return <Pressable key={o} onPress={() => select(o)} style={[s.option, on && s.optionOn]}><Text style={[s.optionText, on && s.optionTextOn]}>{asSentence(o)}</Text><View style={[q.kind === 'single' ? s.radio : s.box, on && s.markOn]}><Text style={s.tick}>{on ? '✓' : ''}</Text></View></Pressable>;
-          })}</View>}<View style={s.action}><ActionButton label={step === spec.questions.length - 1 ? 'Review' : 'Record'} disabled={!valid} onPress={next} />{!valid ? <Text style={s.required}>This question is mandatory.</Text> : null}</View>{q.helper?<Text style={s.helper}>{q.helper}</Text>:null}</ScrollView></KeyboardAvoidingView></SafeAreaView>;
+          })}</View>}<View style={s.action}><ActionButton label={activeStep === spec.questions.length - 1 ? 'Review' : 'Record'} disabled={!valid} onPress={next} />{!valid ? <Text style={s.required}>This question is mandatory.</Text> : null}</View>{q.helper?<Text style={s.helper}>{q.helper}</Text>:null}</ScrollView></KeyboardAvoidingView></SafeAreaView>;
 }
 const s = StyleSheet.create({
   safe: {
@@ -522,7 +530,7 @@ const s = StyleSheet.create({
     marginVertical: 24
   },
   summaryMeta:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingBottom:14,marginBottom:8,borderBottomWidth:1,borderBottomColor:palette.line},
-  resultSection:{paddingVertical:10,borderTopWidth:1,borderTopColor:palette.line},
+  resultSection:{paddingVertical:10},
   resultLabel:{fontSize:13,fontWeight:'800',color:palette.text,marginBottom:5},
   painSection:{paddingTop:18,paddingBottom:16,borderTopWidth:1,borderTopColor:palette.line},
   painSectionFirst:{borderTopWidth:0,paddingTop:8},
@@ -548,6 +556,7 @@ const s = StyleSheet.create({
     color: palette.text,
     marginBottom: 10
   },
+  headingDivider:{paddingBottom:10,borderBottomWidth:1,borderBottomColor:palette.line},
   result: {
     fontSize: 13,
     lineHeight: 20,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Alert, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,6 +6,7 @@ import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { AudioModule, RecordingPresets, setAudioModeAsync, useAudioRecorder, useAudioRecorderState } from 'expo-audio';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Image } from 'expo-image';
+import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
 type Step = {
   title: string;
@@ -71,10 +72,6 @@ const flows: Record<string, {
     }, {
       title: 'Thank you, Jane 😃',
       copy: 'Finally, let’s link this information to your account so the next time you open this app, you can just log in',
-      action: 'Continue'
-    }, {
-      title: "You're off to an MPowered start!",
-      copy: 'Next, you’ll complete short questionnaires about how your pain is impacting you.\n\nBased on your answers, this app suggests questions you can ask your doctor.',
       action: 'Continue'
     }]
   },
@@ -277,7 +274,13 @@ function Field({
 }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
+  const isPhoneNumber = label.toLowerCase().includes('phone number');
   if (label === 'Appointment date') {
+    const toIsoDate=(displayDate:string)=>{const [day,month,year]=displayDate.split('/');return year&&month&&day?`${year}-${month}-${day}`:''};
+    const fromIsoDate=(isoDate:string)=>{const [year,month,day]=isoDate.split('-');return year&&month&&day?`${day}/${month}/${year}`:''};
+    const now=new Date();
+    const todayIso=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    if(Platform.OS==='web')return <View style={s.fieldWrap}><Text style={s.fieldLabel}>{label}</Text><View style={s.dateField}>{createElement('input',{type:'date','aria-label':'Select appointment date',value:toIsoDate(value),min:todayIso,onChange:(event:{target:{value:string}})=>set(fromIsoDate(event.target.value)),style:{flex:1,height:54,border:0,outline:'none',backgroundColor:'transparent',fontFamily:'inherit',fontSize:15,fontWeight:600,color:palette.text}})}</View></View>;
     const onDateChange = (_event: DateTimePickerEvent, date?: Date) => {
       if (Platform.OS === 'android') {
         setShowDatePicker(false);
@@ -287,9 +290,9 @@ function Field({
     const selectedDate = value ? new Date(value.split('/').reverse().join('-')) : new Date();
     const openPicker = () => { setDraftDate(selectedDate); setShowDatePicker(true); };
     const saveDate = () => { set(draftDate.toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' })); setShowDatePicker(false); };
-    return <View style={s.fieldWrap}><Text style={s.fieldLabel}>{label}</Text><Pressable accessibilityRole="button" onPress={openPicker} style={s.dateField}><Text style={[s.dateFieldText,!value&&s.datePlaceholder]}>{value || 'Select appointment date'}</Text><Image source={require('../../assets/icons/iconify-calendar.svg')} style={s.calendarIcon} contentFit="contain"/></Pressable>{showDatePicker&&Platform.OS==='ios'?<Modal transparent animationType="fade" onRequestClose={()=>setShowDatePicker(false)}><View style={s.dateModalBackdrop}><View style={s.dateModal}><Text style={s.dateModalTitle}>Select appointment date</Text><DateTimePicker value={draftDate} mode="date" minimumDate={new Date()} display="spinner" onChange={onDateChange}/><View style={s.dateModalActions}><Pressable onPress={()=>setShowDatePicker(false)} style={s.dateModalButton}><Text style={s.dateModalCancel}>Cancel</Text></Pressable><Pressable onPress={saveDate} style={[s.dateModalButton,s.dateModalDone]}><Text style={s.dateModalDoneText}>Done</Text></Pressable></View></View></View></Modal>:showDatePicker?<DateTimePicker value={selectedDate} mode="date" minimumDate={new Date()} display="default" onChange={onDateChange}/>:null}</View>;
+    return <View style={s.fieldWrap}><Text style={s.fieldLabel}>{label}</Text><Pressable accessibilityRole="button" accessibilityLabel="Select appointment date" onPress={openPicker} style={s.dateField}><Text style={[s.dateFieldText,!value&&s.datePlaceholder]}>{value || 'Select appointment date'}</Text><Image pointerEvents="none" source={require('../../assets/icons/iconify-calendar.svg')} style={s.calendarIcon} contentFit="contain"/></Pressable>{showDatePicker&&Platform.OS==='ios'?<Modal transparent presentationStyle="overFullScreen" animationType="fade" onRequestClose={()=>setShowDatePicker(false)}><View style={s.dateModalBackdrop}><View style={s.dateModal}><Text style={s.dateModalTitle}>Select appointment date</Text><DateTimePicker value={draftDate} mode="date" minimumDate={new Date()} display="inline" accentColor={palette.primary} themeVariant="light" onChange={onDateChange}/><View style={s.dateModalActions}><Pressable onPress={()=>setShowDatePicker(false)} style={s.dateModalButton}><Text style={s.dateModalCancel}>Cancel</Text></Pressable><Pressable onPress={saveDate} style={[s.dateModalButton,s.dateModalDone]}><Text style={s.dateModalDoneText}>Done</Text></Pressable></View></View></View></Modal>:showDatePicker?<DateTimePicker value={selectedDate} mode="date" minimumDate={new Date()} display="default" onChange={onDateChange}/>:null}</View>;
   }
-  return <View style={s.fieldWrap}><Text style={s.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={set} placeholder={label} placeholderTextColor="#81798A" style={[s.input, label.includes('Notes') || label.includes('answer') ? {
+  return <View style={s.fieldWrap}><Text style={s.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={text=>set(isPhoneNumber?text.replace(/\D/g,''):text)} keyboardType={isPhoneNumber?'number-pad':'default'} inputMode={isPhoneNumber?'numeric':'text'} placeholder={label} placeholderTextColor="#81798A" style={[s.input, label.includes('Notes') || label.includes('answer') ? {
       minHeight: 130
     } : null]} multiline={label.includes('Notes') || label.includes('answer')} /></View>;
 }
@@ -373,6 +376,10 @@ export default function Workflow() {
   const requiredFields = current.fields?.every(f => fields[`${step}-${f}`]?.trim()) ?? true;
   const ready = current.optional || (!current.options || current.optionsOptional || selected.length > 0) && requiredFields;
   const next = () => {
+    if (flow === 'onboarding' && current.title === 'Thank you, Jane 😃') {
+      router.replace({pathname:'/onboarding-loading',params:{name:userName}});
+      return;
+    }
     if (flow === 'appointment' && current.title === 'Add Questions for My Appointment') {
       const customQuestion=fields['2-Other question']?.trim();
       const groupedQuestions=selected.map(text=>{const index=current.options?.indexOf(text)??-1;return{group:index<2?'Pain location':index<6?'Pain intensity':index<14?'Pain impact':'Management',text}});
@@ -393,14 +400,15 @@ export default function Workflow() {
       };
       Linking.openURL(urls[selected[0]]);
     }
-    if (step < data.steps.length - 1) setStep(step + 1);else if(flow === 'onboarding' || flow === 'login') router.replace({pathname:'/dashboard',params:{name:userName}});else router.replace(flow === 'support' || flow === 'support-detail' || flow === 'archive' || flow === 'join' ? '/support-home' : '/care');
+    if (step < data.steps.length - 1) setStep(step + 1);else if(flow === 'onboarding' || flow === 'login') router.replace({pathname:'/dashboard',params:{name:userName}});else if(flow === 'reflection') router.replace('/dashboard');else router.replace(flow === 'support' || flow === 'support-detail' || flow === 'archive' || flow === 'join' ? '/support-home' : '/care');
   };
   const toggleRecording=async()=>{try{if(recorderState.isRecording){await recorder.stop();await setAudioModeAsync({allowsRecording:false});if(recorder.uri)setRecordedUri(recorder.uri);else Alert.alert('Recording not saved','Please try recording the answer again.');return}const permission=await AudioModule.requestRecordingPermissionsAsync();if(!permission.granted){Alert.alert('Microphone access needed','Enable microphone access in your phone settings to record an answer.');return}await setAudioModeAsync({allowsRecording:true,playsInSilentMode:true});await recorder.prepareToRecordAsync();recorder.record()}catch{Alert.alert('Recording unavailable','Please check microphone access and try again.')}};
   const flowLabel=data.eyebrow?`${data.eyebrow} · `:'';
-  return <Shell title={displayTitle} onBack={flow==='appointment'?()=>step?setStep(step-1):router.replace('/care'):undefined}><Text style={s.flowEyebrow}>{flowLabel}{step + 1}/{data.steps.length}</Text><Text style={s.copy}>{displayCopy}</Text>{current.optionsBeforeFields&&current.options?<Choice options={current.options} value={selected} pick={pick} multi={current.multi}/>:null}{current.fields?.map(f => <Field key={f} label={f} value={fields[`${step}-${f}`] ?? ''} set={v => setFields(x => ({
+  const goBack=flow==='onboarding'?()=>step?setStep(step-1):router.replace('/splash'):flow==='login'?()=>step?setStep(step-1):router.replace('/login'):flow==='appointment'?()=>step?setStep(step-1):router.replace('/care'):undefined;
+  return <><StatusBar hidden={flow==='onboarding'}/><Shell title={displayTitle} onBack={goBack}><Text style={s.flowEyebrow}>{flowLabel}{step + 1}/{data.steps.length}</Text><Text style={s.copy}>{displayCopy}</Text>{current.optionsBeforeFields&&current.options?<Choice options={current.options} value={selected} pick={pick} multi={current.multi}/>:null}{current.fields?.map(f => <Field key={f} label={f} value={fields[`${step}-${f}`] ?? ''} set={v => setFields(x => ({
       ...x,
       [`${step}-${f}`]: v
-    }))} />)}{current.title==='Add doctor’s answer'?<View style={s.voiceWrap}><Pressable accessibilityRole="button" onPress={toggleRecording} style={[s.voiceButton,recorderState.isRecording&&s.voiceButtonOn]}><Text style={s.voiceIcon}>{recorderState.isRecording?'■':'●'}</Text><Text style={s.voiceText}>{recorderState.isRecording?'Stop voice recording':'Start voice recording'}</Text></Pressable>{recordedUri?<Text style={s.recorded}>✓ Voice answer recorded</Text>:null}</View>:flow==='appointment'&&step===2&&current.options?<AppointmentQuestions options={current.options} value={selected} pick={pick} customQuestion={fields['2-Other question']??''} setCustomQuestion={value=>setFields(previous=>({...previous,'2-Other question':value}))}/>:flow==='appointment'&&step===0&&current.options?<CompactSelect title="Health services" options={current.options} value={selected} pick={pick}/>:current.options&&!current.optionsBeforeFields ? <Choice options={current.options} value={selected} pick={pick} multi={current.multi} /> : null}<View style={s.footer}><ActionButton label={current.action ?? (step === data.steps.length - 1 ? 'Save' : 'Continue')} disabled={!ready} onPress={next} />{current.optional && flow !== 'reflection' ? <Pressable onPress={next}><Text style={s.skip}>Skip</Text></Pressable> : !ready ? <Text style={s.required}>Complete the required information to continue.</Text> : null}</View></Shell>;
+    }))} />)}{current.title==='Add doctor’s answer'?<View style={s.voiceWrap}><Pressable accessibilityRole="button" onPress={toggleRecording} style={[s.voiceButton,recorderState.isRecording&&s.voiceButtonOn]}><Text style={s.voiceIcon}>{recorderState.isRecording?'■':'●'}</Text><Text style={s.voiceText}>{recorderState.isRecording?'Stop voice recording':'Start voice recording'}</Text></Pressable>{recordedUri?<Text style={s.recorded}>✓ Voice answer recorded</Text>:null}</View>:flow==='appointment'&&step===2&&current.options?<AppointmentQuestions options={current.options} value={selected} pick={pick} customQuestion={fields['2-Other question']??''} setCustomQuestion={value=>setFields(previous=>({...previous,'2-Other question':value}))}/>:flow==='appointment'&&step===0&&current.options?<CompactSelect title="Health services" options={current.options} value={selected} pick={pick}/>:current.options&&!current.optionsBeforeFields ? <Choice options={current.options} value={selected} pick={pick} multi={current.multi} /> : null}<View style={s.footer}><ActionButton label={current.action ?? (step === data.steps.length - 1 ? 'Save' : 'Continue')} disabled={!ready} onPress={next} />{current.optional && flow !== 'reflection' ? <Pressable onPress={next}><Text style={s.skip}>Skip</Text></Pressable> : !ready ? <Text style={s.required}>Complete the required information to continue.</Text> : null}</View></Shell></>;
 }
 const s = StyleSheet.create({
   safe: {

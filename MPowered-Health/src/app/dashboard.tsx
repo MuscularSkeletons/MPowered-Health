@@ -26,7 +26,7 @@ function Assessment({
     }
   })} style={({
     pressed
-  }) => [s.assessment, pressed && s.pressed]}><View style={s.assessmentCopy}><Text style={s.assessmentTitle}>{title}</Text>{isDone?<Text style={s.updated}>Updated this week</Text>:null}</View><View style={s.record}><Text style={s.recordText}>Record</Text><Text style={s.arrow}>›</Text></View></Pressable>;
+  }) => [s.assessment, pressed && s.pressed]}><View style={s.assessmentCopy}><Text style={s.assessmentTitle}>{title}</Text>{isDone?<Text style={s.updated}>Updated this week</Text>:null}</View><View style={s.record}><Text style={s.recordText}>{isDone?'View summary':'Record'}</Text><Text style={s.arrow}>›</Text></View></Pressable>;
 }
 function BrandWord(){return <View style={s.brandWord}><Text style={s.brandM}>M</Text><Text style={s.brandPowered}>Powered</Text></View>}
 export default function Home() {

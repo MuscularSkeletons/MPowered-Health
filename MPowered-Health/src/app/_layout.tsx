@@ -20,6 +20,7 @@ export default function TabLayout(){return <><StatusBar style="dark"/><Tabs init
   <Tabs.Screen name="detail" options={{href:null}}/>
   <Tabs.Screen name="assessment" options={{href:null}}/>
   <Tabs.Screen name="workflow" options={{href:null}}/>
+  <Tabs.Screen name="onboarding-loading" options={{href:null,tabBarStyle:{display:'none'}}}/>
   <Tabs.Screen name="health-records" options={{href:null}}/>
   <Tabs.Screen name="appointment-review" options={{href:null}}/>
 </Tabs></>}
