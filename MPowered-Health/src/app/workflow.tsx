@@ -28,14 +28,20 @@ import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
 import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
+// Each flow is a sequence of questions rendered by WorkflowForm below. The flow
+// definitions describe content; the form handles answers, validation, and navigation.
 type Step = {
   title: string;
   copy: string;
   fields?: string[];
   options?: string[];
+  // Allow Continue without choosing an option (text fields may still be required).
   optionsOptional?: boolean;
+  // Some questions place choices above their text inputs.
   optionsBeforeFields?: boolean;
+  // Multiple selections use checkboxes; single selections use radio-style circles.
   multi?: boolean;
+  // Offer Skip; see ready below for whether Continue still requires an answer.
   optional?: boolean;
   action?: string;
 };
@@ -359,6 +365,8 @@ const meds = [
   'Vitamin D3 1000 IU — Once daily',
   'Raloxifene 60 mg — Once daily',
 ];
+// This form owns its medication list in memory. Reflection storage is separate;
+// prescriptions are not written to AsyncStorage by this component.
 function Prescriptions() {
   const [list, setList] = useState(meds),
     [adding, setAdding] = useState(false),
@@ -367,6 +375,8 @@ function Prescriptions() {
     [unit, setUnit] = useState('mg'),
     [form, setForm] = useState('Tablet'),
     [repeat, setRepeat] = useState('day');
+  // Reuse these checks for inline messages, the disabled button, and the save guard.
+  // Unit, form, and frequency already have defaults; name and strength need input.
   const validName = validAnswer('Medication name', name);
   const validStrength = validAnswer('Strength', strength);
   const ready = validName && validStrength && !!unit && !!form && !!repeat;
@@ -436,6 +446,8 @@ function Prescriptions() {
     </Shell>
   );
 }
+// Shared page frame: brand header, Back control, title, and scrollable form content.
+// Flows that need a specific return destination supply their own onBack handler.
 function Shell({
   title,
   children,
@@ -458,6 +470,8 @@ function Shell({
     </SafeAreaView>
   );
 }
+// The parent owns the input value and validation message. This component renders
+// a text input, or the platform-specific calendar when the field is an appointment date.
 function Field({
   label,
   value,
@@ -475,6 +489,7 @@ function Field({
   const [draftDate, setDraftDate] = useState(new Date());
   const isPhoneNumber = label.toLowerCase().includes('phone number');
   if (label === 'Appointment date') {
+    // The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
     const toIsoDate = (displayDate: string) => {
       const [day, month, year] = displayDate.split('/');
       return year && month && day ? `${year}-${month}-${day}` : '';
@@ -642,6 +657,8 @@ function Field({
     </View>
   );
 }
+// Present the selected values; the parent decides whether a tap toggles one
+// checkbox or replaces the single selected option.
 function Choice({
   title,
   options,
@@ -685,6 +702,8 @@ function AppointmentQuestions({
   customQuestion: string;
   setCustomQuestion: (value: string) => void;
 }) {
+  // These ranges match the question order in flows.appointment. Keep the ranges
+  // and the grouping in next() aligned when adding or rearranging questions.
   const groups = [
     { title: 'Pain location', items: options.slice(0, 2) },
     { title: 'Pain intensity', items: options.slice(2, 6) },
@@ -717,6 +736,7 @@ function AppointmentQuestions({
     </View>
   );
 }
+// Collapsible single-choice menu used for the optional healthcare service.
 function CompactSelect({
   title,
   options,
@@ -773,7 +793,9 @@ export default function Workflow() {
     step?: string;
     resume?: string;
   }>();
-  // Tabs reuse this route: remount the form before rendering another flow's step.
+  // Tabs reuse this route. Changing the key resets the form before the next render,
+  // so reflection cannot inherit step 10 from onboarding and read a missing title.
+  // A new fresh value also starts a new visit to the same flow.
   return (
     <WorkflowForm
       key={`${params.flow ?? 'onboarding'}:${params.fresh ?? ''}:${params.step ?? '0'}:${params.resume ?? ''}`}
@@ -809,6 +831,8 @@ function WorkflowForm() {
     questions?: string;
   }>();
   const data = flows[flow] ?? flows.settings;
+  // Choices are grouped by step; text fields use step + label to avoid collisions
+  // when different questions use the same field label.
   const [step, setStep] = useState(workflowStep(initialStep, data.steps.length)),
     [values, setValues] = useState<Record<number, string[]>>({}),
     [fields, setFields] = useState<Record<string, string>>({}),
@@ -818,6 +842,7 @@ function WorkflowForm() {
   useEffect(() => {
     if (flow !== 'appointment') return;
     setStep(workflowStep(initialStep, data.steps.length));
+    // Returning from appointment review restores its answers; a new plan starts empty.
     if (resume) {
       setValues({
         0: resumeService && resumeService !== 'Not added' ? [resumeService] : [],
@@ -847,10 +872,13 @@ function WorkflowForm() {
     resumeCustomQuestion,
     resumeQuestions,
   ]);
+  // Keep this draft tied to the week it was opened, even if midnight passes while editing.
   const [week] = useState(() => reflectionWeek());
   const [loadingReflection, setLoadingReflection] = useState(flow === 'reflection');
   const [saving, setSaving] = useState(false);
   const [reflectionError, setReflectionError] = useState('');
+  // Accept only known in-app return screens. Tab history can include sign-in,
+  // so Back and successful saves use this destination instead of router.back().
   const destination =
     returnTo === '/explore' || returnTo === '/care' || returnTo === '/dashboard'
       ? returnTo
@@ -860,6 +888,7 @@ function WorkflowForm() {
   const leaveFlow = useCallback(() => router.replace(destination), [destination]);
   useFocusEffect(
     useCallback(() => {
+      // Match Android's system Back to the visible Back button while this screen is focused.
       if (flow !== 'reflection' && flow !== 'tips') return;
       const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
         leaveFlow();
@@ -870,6 +899,8 @@ function WorkflowForm() {
   );
   useEffect(() => {
     if (flow !== 'reflection') return;
+    // Loading disables editing so stored notes cannot overwrite something just typed.
+    // The cleanup guard prevents a late response from updating an abandoned form.
     let active = true;
     getReflection(week)
       .then((saved) => {
@@ -897,6 +928,7 @@ function WorkflowForm() {
     flow === 'reflection'
       ? `Write down any reflections on your pain experience and management this week. Week beginning ${week}. Your saved notes can be viewed and edited here.`
       : current.copy.replaceAll('Jane', userName);
+  // Store choices for the current question without changing answers to earlier steps.
   const pick = (v: string) => {
     if (flow === 'onboarding' && current.title === 'I am a' && v === 'Support person') {
       router.replace('/support-home');
@@ -913,14 +945,19 @@ function WorkflowForm() {
   };
   const requiredFields =
     current.fields?.every((f) => validAnswer(f, fields[`${step}-${f}`])) ?? true;
+  // Optional onboarding questions still need an answer for Continue; Skip is a
+  // separate action. A reflection must contain notes before it can be saved.
   const ready =
     (current.optional && flow !== 'onboarding' && flow !== 'reflection') ||
     ((!current.options || current.optionsOptional || selected.length > 0) && requiredFields);
+  // Handle flows with special save/navigation behavior first. Remaining flows
+  // advance one question at a time, then return to their destination at the end.
   const next = async () => {
     if (flow === 'reflection') {
       if (!ready || saving || loadingReflection || reflectionError) return;
       setSaving(true);
       try {
+        // Leave only after storage confirms success. On failure, retain the draft for retry.
         await saveReflection(fields['0-Notes'] ?? '', week);
         leaveFlow();
       } catch {
@@ -977,6 +1014,8 @@ function WorkflowForm() {
       router.replace('/care');
       return;
     }
+    // Open the selected resource without advancing away from the in-app guide.
+    // Returning from the browser leaves the user here, with the same Back destination.
     if (flow === 'tips' && step === 0 && selected.length) {
       const urls: Record<string, string> = {
         'Understanding pain': 'https://muscha.org/pain-guide/',
@@ -1002,6 +1041,8 @@ function WorkflowForm() {
           : '/care',
       );
   };
+  // Request microphone access only when recording is started. Stopping finalizes
+  // the file before its URI is kept as the recorded answer.
   const toggleRecording = async () => {
     try {
       if (recorderState.isRecording) {
@@ -1030,6 +1071,8 @@ function WorkflowForm() {
     }
   };
   const flowLabel = data.eyebrow ? `${data.eyebrow} · ` : '';
+  // Multi-step forms go to the previous question first; single-page reflection
+  // and guide flows return directly to the screen that opened them.
   const goBack =
     flow === 'onboarding'
       ? () => (step ? setStep(step - 1) : router.replace('/splash'))
@@ -1117,6 +1160,7 @@ function WorkflowForm() {
             disabled={!ready || saving || loadingReflection || !!reflectionError}
             onPress={next}
           />
+          {/* Skip deliberately bypasses Continue validation for optional questions. */}
           {current.optional && flow !== 'reflection' ? (
             <Pressable onPress={next}>
               <Text style={s.skip}>Skip</Text>

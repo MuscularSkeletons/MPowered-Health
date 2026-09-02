@@ -6,6 +6,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 
+// Load the actual TypeScript helpers without starting Expo. Inject storage in tests
+// so a fresh module load can simulate reopening the app without touching real notes.
 function load(relativePath, imports = {}) {
   const source = fs.readFileSync(path.join(__dirname, '..', relativePath), 'utf8');
   const code = ts.transpileModule(source, {

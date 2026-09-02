@@ -58,9 +58,11 @@ export default function Home() {
   }>();
   const [hasReflection, setHasReflection] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(getCompletedAssessments());
+  // Refresh on every visit so saving a reflection changes Add to View immediately.
   useFocusEffect(
     useCallback(() => {
       setSessionCompleted(getCompletedAssessments());
+      // Ignore a delayed storage response if the user has already left this screen.
       let active = true;
       getReflection()
         .then((saved) => {

@@ -21,6 +21,8 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: '#5E17EB',
           tabBarInactiveTintColor: '#6B5C7A',
+          // Workflow is shared by onboarding and in-app forms. Only onboarding/sign-in
+          // hide the tabs; a missing flow parameter also means onboarding.
           tabBarStyle:
             route.name === 'workflow' &&
             ['onboarding', 'login'].includes(
