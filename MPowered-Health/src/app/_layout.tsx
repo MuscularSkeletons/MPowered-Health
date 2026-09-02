@@ -17,15 +17,21 @@ export default function TabLayout() {
       <StatusBar style="dark" />
       <Tabs
         initialRouteName="index"
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerShown: false,
           tabBarActiveTintColor: '#5E17EB',
           tabBarInactiveTintColor: '#6B5C7A',
-          tabBarStyle: s.tabBar,
+          tabBarStyle:
+            route.name === 'workflow' &&
+            ['onboarding', 'login'].includes(
+              (route.params as { flow?: string } | undefined)?.flow ?? 'onboarding',
+            )
+              ? { display: 'none' }
+              : s.tabBar,
           tabBarItemStyle: s.tabItem,
           tabBarLabelStyle: s.tabLabel,
           tabBarHideOnKeyboard: true,
-        }}
+        })}
       >
         <Tabs.Screen name="index" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen

@@ -142,7 +142,12 @@ export default function Health() {
             </Pressable>
             <Pressable
               style={[s.action, s.actionLast]}
-              onPress={() => router.push({ pathname: '/workflow', params: { flow: 'tips' } })}
+              onPress={() =>
+                router.push({
+                  pathname: '/workflow',
+                  params: { flow: 'tips', returnTo: '/explore' },
+                })
+              }
             >
               <Text style={s.actionText}>Check Pain Guide</Text>
             </Pressable>

@@ -1,6 +1,7 @@
-import { createElement, useEffect, useState } from 'react';
+import { createElement, useCallback, useEffect, useState } from 'react';
 import {
   Alert,
+  BackHandler,
   Linking,
   Modal,
   Platform,
@@ -11,7 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import {
@@ -25,6 +26,8 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
+import { validAnswer, workflowStep } from '@/utils/workflow-validation';
+import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
 type Step = {
   title: string;
   copy: string;
@@ -364,11 +367,24 @@ function Prescriptions() {
     [unit, setUnit] = useState('mg'),
     [form, setForm] = useState('Tablet'),
     [repeat, setRepeat] = useState('day');
+  const validName = validAnswer('Medication name', name);
+  const validStrength = validAnswer('Strength', strength);
+  const ready = validName && validStrength && !!unit && !!form && !!repeat;
   if (adding)
     return (
       <Shell title="Add prescription" onBack={() => setAdding(false)}>
-        <Field label="Medication name" value={name} set={setName} />
-        <Field label="Strength" value={strength} set={setStrength} />
+        <Field
+          label="Medication name"
+          value={name}
+          set={setName}
+          error={!validName ? 'Medication name is required.' : undefined}
+        />
+        <Field
+          label="Strength"
+          value={strength}
+          set={setStrength}
+          error={!validStrength ? 'Enter a strength greater than zero.' : undefined}
+        />
         <Choice
           title="Strength unit"
           options={['mg', 'g', '%', 'μg', 'iu']}
@@ -389,11 +405,13 @@ function Prescriptions() {
         />
         <ActionButton
           label="Save prescription"
+          disabled={!ready}
           onPress={() => {
-            if (name.trim()) {
+            if (ready) {
               setList((v) => [...v, `${name} ${strength} ${unit} — Every ${repeat}`]);
               setAdding(false);
               setName('');
+              setStrength('');
             }
           }}
         />
@@ -440,7 +458,19 @@ function Shell({
     </SafeAreaView>
   );
 }
-function Field({ label, value, set }: { label: string; value: string; set: (v: string) => void }) {
+function Field({
+  label,
+  value,
+  set,
+  error,
+  editable = true,
+}: {
+  label: string;
+  value: string;
+  set: (v: string) => void;
+  error?: string;
+  editable?: boolean;
+}) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
   const isPhoneNumber = label.toLowerCase().includes('phone number');
@@ -576,9 +606,22 @@ function Field({ label, value, set }: { label: string; value: string; set: (v: s
       <Text style={s.fieldLabel}>{label}</Text>
       <TextInput
         value={value}
+        editable={editable}
         onChangeText={(text) => set(isPhoneNumber ? text.replace(/\D/g, '') : text)}
-        keyboardType={isPhoneNumber ? 'number-pad' : 'default'}
-        inputMode={isPhoneNumber ? 'numeric' : 'text'}
+        keyboardType={
+          isPhoneNumber || label === 'Year of birth'
+            ? 'number-pad'
+            : label === 'Strength'
+              ? 'decimal-pad'
+              : 'default'
+        }
+        inputMode={
+          isPhoneNumber || label === 'Year of birth'
+            ? 'numeric'
+            : label === 'Strength'
+              ? 'decimal'
+              : 'text'
+        }
         placeholder={label}
         placeholderTextColor="#81798A"
         style={[
@@ -591,6 +634,11 @@ function Field({ label, value, set }: { label: string; value: string; set: (v: s
         ]}
         multiline={label.includes('Notes') || label.includes('answer')}
       />
+      {error ? (
+        <Text accessibilityLiveRegion="polite" style={s.fieldError}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -719,11 +767,26 @@ function CompactSelect({
   );
 }
 export default function Workflow() {
+  const params = useLocalSearchParams<{
+    flow?: string;
+    fresh?: string;
+    step?: string;
+    resume?: string;
+  }>();
+  // Tabs reuse this route: remount the form before rendering another flow's step.
+  return (
+    <WorkflowForm
+      key={`${params.flow ?? 'onboarding'}:${params.fresh ?? ''}:${params.step ?? '0'}:${params.resume ?? ''}`}
+    />
+  );
+}
+function WorkflowForm() {
   const {
     flow = 'onboarding',
     name: routeName = 'Jane',
     step: initialStep = '0',
     fresh,
+    returnTo,
     resume,
     doctor: resumeDoctor,
     date: resumeDate,
@@ -735,6 +798,7 @@ export default function Workflow() {
     flow: string;
     name?: string;
     step?: string;
+    returnTo?: string;
     fresh?: string;
     resume?: string;
     doctor?: string;
@@ -745,7 +809,7 @@ export default function Workflow() {
     questions?: string;
   }>();
   const data = flows[flow] ?? flows.settings;
-  const [step, setStep] = useState(Number(initialStep) || 0),
+  const [step, setStep] = useState(workflowStep(initialStep, data.steps.length)),
     [values, setValues] = useState<Record<number, string[]>>({}),
     [fields, setFields] = useState<Record<string, string>>({}),
     [recordedUri, setRecordedUri] = useState<string>();
@@ -753,7 +817,7 @@ export default function Workflow() {
   const recorderState = useAudioRecorderState(recorder);
   useEffect(() => {
     if (flow !== 'appointment') return;
-    setStep(Number(initialStep) || 0);
+    setStep(workflowStep(initialStep, data.steps.length));
     if (resume) {
       setValues({
         0: resumeService && resumeService !== 'Not added' ? [resumeService] : [],
@@ -771,6 +835,7 @@ export default function Workflow() {
     }
     setRecordedUri(undefined);
   }, [
+    data.steps.length,
     flow,
     initialStep,
     fresh,
@@ -782,12 +847,56 @@ export default function Workflow() {
     resumeCustomQuestion,
     resumeQuestions,
   ]);
+  const [week] = useState(() => reflectionWeek());
+  const [loadingReflection, setLoadingReflection] = useState(flow === 'reflection');
+  const [saving, setSaving] = useState(false);
+  const [reflectionError, setReflectionError] = useState('');
+  const destination =
+    returnTo === '/explore' || returnTo === '/care' || returnTo === '/dashboard'
+      ? returnTo
+      : flow === 'reflection'
+        ? '/dashboard'
+        : '/care';
+  const leaveFlow = useCallback(() => router.replace(destination), [destination]);
+  useFocusEffect(
+    useCallback(() => {
+      if (flow !== 'reflection' && flow !== 'tips') return;
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        leaveFlow();
+        return true;
+      });
+      return () => subscription.remove();
+    }, [flow, leaveFlow]),
+  );
+  useEffect(() => {
+    if (flow !== 'reflection') return;
+    let active = true;
+    getReflection(week)
+      .then((saved) => {
+        if (active) setFields({ '0-Notes': saved?.notes ?? '' });
+      })
+      .catch(() => {
+        if (active)
+          setReflectionError(
+            'Unable to load your saved reflection. Please reopen this screen to retry.',
+          );
+      })
+      .finally(() => {
+        if (active) setLoadingReflection(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [flow, week]);
   if (flow === 'prescriptions') return <Prescriptions />;
   const current = data.steps[step],
     selected = values[step] ?? [];
   const userName = fields['3-Type your name']?.trim() || routeName || 'Jane';
   const displayTitle = current.title.replace('Jane', userName);
-  const displayCopy = current.copy.replaceAll('Jane', userName);
+  const displayCopy =
+    flow === 'reflection'
+      ? `Write down any reflections on your pain experience and management this week. Week beginning ${week}. Your saved notes can be viewed and edited here.`
+      : current.copy.replaceAll('Jane', userName);
   const pick = (v: string) => {
     if (flow === 'onboarding' && current.title === 'I am a' && v === 'Support person') {
       router.replace('/support-home');
@@ -802,11 +911,25 @@ export default function Workflow() {
         : [v],
     }));
   };
-  const requiredFields = current.fields?.every((f) => fields[`${step}-${f}`]?.trim()) ?? true;
+  const requiredFields =
+    current.fields?.every((f) => validAnswer(f, fields[`${step}-${f}`])) ?? true;
   const ready =
-    current.optional ||
+    (current.optional && flow !== 'onboarding' && flow !== 'reflection') ||
     ((!current.options || current.optionsOptional || selected.length > 0) && requiredFields);
-  const next = () => {
+  const next = async () => {
+    if (flow === 'reflection') {
+      if (!ready || saving || loadingReflection || reflectionError) return;
+      setSaving(true);
+      try {
+        await saveReflection(fields['0-Notes'] ?? '', week);
+        leaveFlow();
+      } catch {
+        Alert.alert('Reflection not saved', 'Your notes are still here. Please try saving again.');
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
     if (flow === 'onboarding' && current.title === 'Thank you, Jane 😃') {
       router.replace({
         pathname: '/onboarding-loading',
@@ -862,12 +985,16 @@ export default function Workflow() {
           'https://muscha.org/living-well-with-a-musculoskeletal-condition',
         'Relaxation and emotions': 'https://muscha.org/relaxation/',
       };
-      Linking.openURL(urls[selected[0]]);
+      try {
+        await Linking.openURL(urls[selected[0]]);
+      } catch {
+        Alert.alert('Unable to open pain guide', 'Please try again.');
+      }
+      return;
     }
     if (step < data.steps.length - 1) setStep(step + 1);
     else if (flow === 'onboarding' || flow === 'login')
       router.replace({ pathname: '/dashboard', params: { name: userName } });
-    else if (flow === 'reflection') router.replace('/dashboard');
     else
       router.replace(
         flow === 'support' || flow === 'support-detail' || flow === 'archive' || flow === 'join'
@@ -910,7 +1037,9 @@ export default function Workflow() {
         ? () => (step ? setStep(step - 1) : router.replace('/login'))
         : flow === 'appointment'
           ? () => (step ? setStep(step - 1) : router.replace('/care'))
-          : undefined;
+          : flow === 'reflection' || flow === 'tips'
+            ? leaveFlow
+            : undefined;
   return (
     <>
       <StatusBar hidden={flow === 'onboarding'} />
@@ -920,6 +1049,8 @@ export default function Workflow() {
           {step + 1}/{data.steps.length}
         </Text>
         <Text style={s.copy}>{displayCopy}</Text>
+        {loadingReflection ? <Text style={s.copy}>Loading reflection…</Text> : null}
+        {reflectionError ? <Text style={s.fieldError}>{reflectionError}</Text> : null}
         {current.optionsBeforeFields && current.options ? (
           <Choice options={current.options} value={selected} pick={pick} multi={current.multi} />
         ) : null}
@@ -927,6 +1058,7 @@ export default function Workflow() {
           <Field
             key={f}
             label={f}
+            editable={!loadingReflection && !saving && !reflectionError}
             value={fields[`${step}-${f}`] ?? ''}
             set={(v) =>
               setFields((x) => ({
@@ -975,8 +1107,14 @@ export default function Workflow() {
         ) : null}
         <View style={s.footer}>
           <ActionButton
-            label={current.action ?? (step === data.steps.length - 1 ? 'Save' : 'Continue')}
-            disabled={!ready}
+            label={
+              saving
+                ? 'Saving…'
+                : flow === 'tips'
+                  ? 'Open pain guide'
+                  : (current.action ?? (step === data.steps.length - 1 ? 'Save' : 'Continue'))
+            }
+            disabled={!ready || saving || loadingReflection || !!reflectionError}
             onPress={next}
           />
           {current.optional && flow !== 'reflection' ? (
@@ -1039,6 +1177,7 @@ const s = StyleSheet.create({
     marginTop: 10,
     marginBottom: 16,
   },
+  fieldError: { color: palette.error, fontSize: 12, marginTop: 6 },
   fieldWrap: {
     marginTop: 14,
   },

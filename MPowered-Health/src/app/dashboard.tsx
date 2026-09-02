@@ -3,6 +3,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
+import { getReflection } from '@/constants/reflections';
 import { productContent } from '@/constants/product-content';
 import { getCompletedAssessments, getWeeklyStreak } from '@/constants/assessment-session';
 function Assessment({
@@ -55,10 +56,22 @@ export default function Home() {
     completed?: string;
     name?: string;
   }>();
+  const [hasReflection, setHasReflection] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(getCompletedAssessments());
   useFocusEffect(
     useCallback(() => {
       setSessionCompleted(getCompletedAssessments());
+      let active = true;
+      getReflection()
+        .then((saved) => {
+          if (active) setHasReflection(!!saved);
+        })
+        .catch(() => {
+          if (active) setHasReflection(false);
+        });
+      return () => {
+        active = false;
+      };
     }, []),
   );
   const done = [...new Set([...completed.split(',').filter(Boolean), ...sessionCompleted])];
@@ -127,13 +140,19 @@ export default function Home() {
               pathname: '/workflow',
               params: {
                 flow: 'reflection',
+                returnTo: '/dashboard',
+                fresh: String(Date.now()),
               },
             })
           }
           style={({ pressed }) => [s.reflection, pressed && s.pressed]}
         >
           <Text style={s.plus}>＋</Text>
-          <Text style={s.reflectionText}>Add a reflection for this week</Text>
+          <Text style={s.reflectionText}>
+            {hasReflection
+              ? 'View your reflection for this week'
+              : 'Add a reflection for this week'}
+          </Text>
         </Pressable>
         <Text style={s.sponsor}>Supported by ABBVIE</Text>
       </ScrollView>

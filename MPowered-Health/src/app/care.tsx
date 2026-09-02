@@ -10,6 +10,7 @@ const go = (flow: string) =>
     pathname: '/workflow',
     params: {
       flow,
+      returnTo: '/care',
     },
   });
 export default function Care() {
