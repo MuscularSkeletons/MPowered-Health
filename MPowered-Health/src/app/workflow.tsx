@@ -24,6 +24,7 @@ import {
 } from 'expo-audio';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Image } from 'expo-image';
+import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
@@ -276,6 +277,7 @@ const meds = [
 function Prescriptions() {
   const [list, setList] = useState(() => (getAccountSnapshot().demo ? meds : [])),
     [adding, setAdding] = useState(false),
+    [editingIndex, setEditingIndex] = useState<number | null>(null),
     [name, setName] = useState(''),
     [strength, setStrength] = useState(''),
     [unit, setUnit] = useState('mg'),
@@ -286,9 +288,38 @@ function Prescriptions() {
   const validName = validAnswer('Medication name', name);
   const validStrength = validAnswer('Strength', strength);
   const ready = validName && validStrength && !!unit && !!form && !!repeat;
+  const openEditor = (medication: string, index: number) => {
+    // Existing demo entries use the same compact format produced by Save. Parse
+    // that format back into the form so editing does not create a duplicate item.
+    const [details, cadence = 'Every day'] = medication.split(' — ');
+    const match = details.match(/^(.*) (\d+(?:\.\d+)?) (mg|g|%|μg|iu)$/);
+    setName(match?.[1] ?? details);
+    setStrength(match?.[2] ?? '');
+    setUnit(match?.[3] ?? 'mg');
+    setRepeat(
+      cadence.replace(/^Every /, '') === 'Once daily' ? 'day' : cadence.replace(/^Every /, ''),
+    );
+    setEditingIndex(index);
+    setAdding(true);
+  };
+  const startAdding = () => {
+    setEditingIndex(null);
+    setName('');
+    setStrength('');
+    setUnit('mg');
+    setForm('Tablet');
+    setRepeat('day');
+    setAdding(true);
+  };
   if (adding)
     return (
-      <Shell title="Add prescription" onBack={() => setAdding(false)}>
+      <Shell
+        title={editingIndex === null ? 'Add prescription' : 'Edit prescription'}
+        onBack={() => {
+          setAdding(false);
+          setEditingIndex(null);
+        }}
+      >
         <Field
           label="Medication name"
           value={name}
@@ -324,8 +355,14 @@ function Prescriptions() {
           disabled={!ready}
           onPress={() => {
             if (ready) {
-              setList((v) => [...v, `${name} ${strength} ${unit} — Every ${repeat}`]);
+              const updated = `${name.trim()} ${strength} ${unit} — Every ${repeat}`;
+              setList((v) =>
+                editingIndex === null
+                  ? [...v, updated]
+                  : v.map((item, index) => (index === editingIndex ? updated : item)),
+              );
               setAdding(false);
+              setEditingIndex(null);
               setName('');
               setStrength('');
             }
@@ -335,20 +372,33 @@ function Prescriptions() {
     );
   return (
     <Shell title="My Prescriptions" onBack={() => router.replace('/explore')}>
-      <Text style={s.copy}>
-        {list.length ? 'Your prescribed medications' : 'Prescription list is empty'}
-      </Text>
+      {!list.length ? <Text style={s.copy}>Prescription list is empty</Text> : null}
       <View style={s.list}>
         {list.map((m, i) => (
           <View key={`${m}${i}`} style={s.med}>
             <Text style={s.medText}>{m}</Text>
-            <Pressable onPress={() => setList((v) => v.filter((_, x) => x !== i))}>
-              <Text style={s.remove}>Remove</Text>
-            </Pressable>
+            <View style={s.medActions}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Edit ${m}`}
+                style={s.iconButton}
+                onPress={() => openEditor(m, i)}
+              >
+                <Feather name="edit-2" size={21} color={palette.primary} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Delete ${m}`}
+                style={s.iconButton}
+                onPress={() => setList((v) => v.filter((_, x) => x !== i))}
+              >
+                <Feather name="trash-2" size={21} color={palette.error} />
+              </Pressable>
+            </View>
           </View>
         ))}
       </View>
-      <ActionButton label="Add prescription" onPress={() => setAdding(true)} />
+      <ActionButton label="Add prescription" onPress={startAdding} />
     </Shell>
   );
 }
@@ -1388,16 +1438,23 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  medActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 8,
+  },
+  iconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   medText: {
     flex: 1,
     fontSize: 13,
     lineHeight: 19,
     color: palette.text,
-  },
-  remove: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FF3131',
-    padding: 8,
   },
 });
