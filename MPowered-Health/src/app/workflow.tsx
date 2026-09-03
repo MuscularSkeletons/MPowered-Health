@@ -76,11 +76,6 @@ const flows: Record<
         fields: ['Type your name'],
       },
       {
-        title: 'I am a',
-        copy: 'Select how you will use Mpowered.',
-        options: ['User', 'Support person'],
-      },
-      {
         title: 'Your sex',
         copy: 'Research shows that people may experience pain differently depending on their sex.',
         options: ['Female', 'Male', 'Intersex', 'Prefer not to say'],
@@ -223,10 +218,9 @@ const flows: Record<
     steps: [
       {
         title: 'Account and privacy',
-        copy: 'Manage your profile, support-person access, permissions, and health information.',
+        copy: 'Manage your profile, permissions, and health information.',
         options: [
           'Personal details',
-          'Support-person access',
           'Contact permission',
           'Recording permission',
           'Privacy Policy',
@@ -238,63 +232,6 @@ const flows: Record<
         copy: 'Review, export, or delete your stored health information.',
         options: ['Export my information', 'Delete my local data'],
         optional: true,
-      },
-    ],
-  },
-  join: {
-    eyebrow: 'CARE PLANNER',
-    steps: [
-      {
-        title: 'Join Appointment',
-        copy: "Enter the 6-digit PIN shared by the person you're supporting to view and add questions for their upcoming visit.",
-        fields: ['6-digit PIN'],
-        action: 'Join',
-      },
-    ],
-  },
-  support: {
-    eyebrow: 'CARE PLANNER',
-    steps: [
-      {
-        title: 'Upcoming Appointments',
-        copy: 'Here are upcoming appointments that you have been nominated as a support person.',
-        options: [
-          'Appointment #1 — 24/06/2026 — John Smith — Dr Jane — General Practitioner (GP)',
-          'Appointment #2 — 02/08/2026 — John Smith — Dr Paul Arm — Physiotherapist',
-        ],
-      },
-      {
-        title: 'Appointment #1',
-        copy: 'Appointment Date: 24/06/2026\nPatient’s Name: John Smith\nDoctor’s Name: Dr Jane\nDoctor Health Services: General Practitioner (GP)\n\nQuestions to ask:\nPain Location\nWhat could be causing pain in my lower back and knee?\nAre these areas related, or are they likely separate issues?\n\nPain Intensity\nMy average pain over the past two weeks has been around 7 - what does that indicate?',
-        action: 'Done',
-      },
-    ],
-  },
-  'support-detail': {
-    eyebrow: 'CARE PLANNER',
-    steps: [
-      {
-        title: 'Appointment #1',
-        copy: 'Appointment Date: 24/06/2026\nPatient’s Name: John Smith\nDoctor’s Name: Dr Jane\nDoctor Health Services: General Practitioner (GP)\n\nQuestions to ask:\n\nPain Location\nWhat could be causing pain in my lower back and knee?\nAre these areas related, or are they likely separate issues?\n\nPain Intensity\nMy average pain over the past two weeks has been around 7 - what does that indicate?',
-        action: 'Done',
-      },
-    ],
-  },
-  archive: {
-    eyebrow: 'CARE PLANNER',
-    steps: [
-      {
-        title: 'Archived Appointments',
-        copy: 'Review appointments that you have been nominated as a support person.',
-        options: [
-          'Archived Appointment #1 — 24/10/2025 — Dr Jane',
-          'Archived Appointment #2 — 02/08/2025 — Dr Paul Arm',
-        ],
-      },
-      {
-        title: 'Archived Appointment #1',
-        copy: 'Appointment Date: 24/10/2025\nPatient’s Name: John Smith\nDoctor’s Name: Dr Jane\nDoctor Health Services: General Practitioner (GP)\n\nQuestions & Answers\nPain Location\nWhat could be causing pain in my lower back and knee?\n[Doctor’s Answer]\n\nPain Intensity\nMy average pain over the past two weeks has been around 7 - what does that indicate?\n[Doctor’s Answer]',
-        action: 'Done',
       },
     ],
   },
@@ -315,15 +252,6 @@ const flows: Record<
           'Orthopaedic surgeon',
           'Occupational Therapist',
         ],
-      },
-      {
-        title: 'Add a Support Person',
-        copy: 'You can nominate someone to help you prepare for your appointment or you can skip below. Maximum two support people.',
-        fields: ['Support person name', 'Phone number', 'Email'],
-        options: ['Add questions', 'Add doctor’s answer'],
-        optionsBeforeFields: true,
-        multi: true,
-        optional: true,
       },
       {
         title: 'Add Questions for My Appointment',
@@ -352,7 +280,7 @@ const flows: Record<
       },
       {
         title: 'Review My Appointment Plan',
-        copy: 'Date: 10 June 2026\nHealth services: General Practitioner (GP)\nDoctor: Dr. Maximiliano Prinzi\nSupport Person: Bron\n\nQuestions to ask\nPain location · Pain intensity · Management',
+        copy: 'Date: 10 June 2026\nHealth services: General Practitioner (GP)\nDoctor: Dr. Maximiliano Prinzi\n\nQuestions to ask\nPain location · Pain intensity · Management',
         action: 'Save plan',
       },
     ],
@@ -794,7 +722,7 @@ export default function Workflow() {
     resume?: string;
   }>();
   // Tabs reuse this route. Changing the key resets the form before the next render,
-  // so reflection cannot inherit step 10 from onboarding and read a missing title.
+  // so reflection cannot inherit a later step from onboarding and read a missing title.
   // A new fresh value also starts a new visit to the same flow.
   return (
     <WorkflowForm
@@ -813,7 +741,6 @@ function WorkflowForm() {
     doctor: resumeDoctor,
     date: resumeDate,
     service: resumeService,
-    support: resumeSupport,
     customQuestion: resumeCustomQuestion,
     questions: resumeQuestions,
   } = useLocalSearchParams<{
@@ -826,7 +753,6 @@ function WorkflowForm() {
     doctor?: string;
     date?: string;
     service?: string;
-    support?: string;
     customQuestion?: string;
     questions?: string;
   }>();
@@ -846,13 +772,12 @@ function WorkflowForm() {
     if (resume) {
       setValues({
         0: resumeService && resumeService !== 'Not added' ? [resumeService] : [],
-        2: resumeQuestions ? (JSON.parse(resumeQuestions) as string[]) : [],
+        1: resumeQuestions ? (JSON.parse(resumeQuestions) as string[]) : [],
       });
       setFields({
         '0-Appointment date': resumeDate ?? '',
         '0-Doctor’s name': resumeDoctor ?? '',
-        '1-Support person name': resumeSupport === 'Not added' ? '' : (resumeSupport ?? ''),
-        '2-Other question': resumeCustomQuestion ?? '',
+        '1-Other question': resumeCustomQuestion ?? '',
       });
     } else {
       setValues({});
@@ -868,7 +793,6 @@ function WorkflowForm() {
     resumeDoctor,
     resumeDate,
     resumeService,
-    resumeSupport,
     resumeCustomQuestion,
     resumeQuestions,
   ]);
@@ -930,10 +854,6 @@ function WorkflowForm() {
       : current.copy.replaceAll('Jane', userName);
   // Store choices for the current question without changing answers to earlier steps.
   const pick = (v: string) => {
-    if (flow === 'onboarding' && current.title === 'I am a' && v === 'Support person') {
-      router.replace('/support-home');
-      return;
-    }
     setValues((a) => ({
       ...a,
       [step]: current.multi
@@ -975,7 +895,7 @@ function WorkflowForm() {
       return;
     }
     if (flow === 'appointment' && current.title === 'Add Questions for My Appointment') {
-      const customQuestion = fields['2-Other question']?.trim();
+      const customQuestion = fields['1-Other question']?.trim();
       const groupedQuestions = selected.map((text) => {
         const index = current.options?.indexOf(text) ?? -1;
         return {
@@ -997,7 +917,6 @@ function WorkflowForm() {
           doctor: fields['0-Doctor’s name']?.trim() || 'Healthcare practitioner',
           date: fields['0-Appointment date'] || 'Date not specified',
           service: values[0]?.[0] || 'Not added',
-          support: fields['1-Support person name']?.trim() || 'Not added',
           customQuestion: customQuestion || '',
           questions: JSON.stringify(selected),
           questionData: JSON.stringify(groupedQuestions),
@@ -1034,12 +953,7 @@ function WorkflowForm() {
     if (step < data.steps.length - 1) setStep(step + 1);
     else if (flow === 'onboarding' || flow === 'login')
       router.replace({ pathname: '/dashboard', params: { name: userName } });
-    else
-      router.replace(
-        flow === 'support' || flow === 'support-detail' || flow === 'archive' || flow === 'join'
-          ? '/support-home'
-          : '/care',
-      );
+    else router.replace('/care');
   };
   // Request microphone access only when recording is started. Stopping finalizes
   // the file before its URI is kept as the recorded answer.
@@ -1125,16 +1039,16 @@ function WorkflowForm() {
             </Pressable>
             {recordedUri ? <Text style={s.recorded}>✓ Voice answer recorded</Text> : null}
           </View>
-        ) : flow === 'appointment' && step === 2 && current.options ? (
+        ) : flow === 'appointment' && step === 1 && current.options ? (
           <AppointmentQuestions
             options={current.options}
             value={selected}
             pick={pick}
-            customQuestion={fields['2-Other question'] ?? ''}
+            customQuestion={fields['1-Other question'] ?? ''}
             setCustomQuestion={(value) =>
               setFields((previous) => ({
                 ...previous,
-                '2-Other question': value,
+                '1-Other question': value,
               }))
             }
           />

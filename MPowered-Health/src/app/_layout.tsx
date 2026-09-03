@@ -75,18 +75,6 @@ export default function TabLayout() {
         />
         <Tabs.Screen name="splash" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="login" options={{ href: null, tabBarStyle: { display: 'none' } }} />
-        <Tabs.Screen
-          name="support-home"
-          options={{ href: null, tabBarStyle: { display: 'none' } }}
-        />
-        <Tabs.Screen
-          name="support-setting"
-          options={{ href: null, tabBarStyle: { display: 'none' } }}
-        />
-        <Tabs.Screen
-          name="support-detail"
-          options={{ href: null, tabBarStyle: { display: 'none' } }}
-        />
         <Tabs.Screen name="detail" options={{ href: null }} />
         <Tabs.Screen name="assessment" options={{ href: null }} />
         <Tabs.Screen name="workflow" options={{ href: null }} />

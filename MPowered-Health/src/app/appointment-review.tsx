@@ -118,7 +118,6 @@ export default function AppointmentReview() {
     doctor,
     date,
     service,
-    support,
     customQuestion,
     questions: questionParam,
     questionData,
@@ -128,7 +127,6 @@ export default function AppointmentReview() {
     doctor?: string;
     date?: string;
     service?: string;
-    support?: string;
     customQuestion?: string;
     questions?: string;
     questionData?: string;
@@ -140,7 +138,6 @@ export default function AppointmentReview() {
         doctor: doctor || 'Healthcare practitioner',
         date: date || 'Date not specified',
         service: service || 'Not added',
-        supportPerson: support || 'Not added',
       }
     : getAppointment(id);
   const selectedQuestions = questionParam ? (JSON.parse(questionParam) as string[]) : [];
@@ -291,12 +288,11 @@ export default function AppointmentReview() {
           pathname: '/workflow',
           params: {
             flow: 'appointment',
-            step: '2',
+            step: '1',
             resume: '1',
             doctor: appointment.doctor,
             date: appointment.date,
             service: appointment.service,
-            support: appointment.supportPerson || '',
             customQuestion: customQuestion || '',
             questions: JSON.stringify(selectedQuestions),
           },
@@ -307,7 +303,6 @@ export default function AppointmentReview() {
       doctor: appointment.doctor,
       date: appointment.date,
       service: appointment.service,
-      supportPerson: appointment.supportPerson,
       questions: displayedQuestions,
     });
     router.replace('/care');
@@ -324,7 +319,7 @@ export default function AppointmentReview() {
           <Text style={s.back}>‹ Back</Text>
         </Pressable>
         <Text style={s.title}>Review My Appointment Plan</Text>
-        {planning ? <Text style={s.step}>CARE PLANNER · 4/4</Text> : null}
+        {planning ? <Text style={s.step}>CARE PLANNER · 3/3</Text> : null}
         <View style={s.plan}>
           <Text style={s.cardTitle}>Appointment overview</Text>
           <View style={s.overview}>
@@ -334,8 +329,6 @@ export default function AppointmentReview() {
             <Text style={s.metaValue}>{appointment.doctor}</Text>
             <Text style={s.metaLabel}>Health services</Text>
             <Text style={s.metaValue}>{appointment.service}</Text>
-            <Text style={s.metaLabel}>Support person</Text>
-            <Text style={s.metaValue}>{appointment.supportPerson || 'Not added'}</Text>
           </View>
           <Text style={s.questionsTitle}>Questions to ask</Text>
           {planning && !displayedQuestions.length ? (

@@ -20,7 +20,7 @@ export const productContent = {
   care: {
     title: 'Plan your visit with confidence',
     description:
-      'Get ready for your visit. Prepare questions, add support people, and keep notes during your appointments.',
+      'Get ready for your visit. Prepare questions and keep notes during your appointments.',
     questionsAction: 'Explore questions generated for me',
     prepareAction: 'Prepare for my appointment',
     appointmentsTitle: 'My Appointments:',

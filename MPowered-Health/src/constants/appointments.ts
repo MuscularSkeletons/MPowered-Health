@@ -4,7 +4,6 @@ export type PlannedAppointment = {
   doctor: string;
   date: string;
   service: string;
-  supportPerson?: string;
   questions?: AppointmentQuestion[];
   signaturePaths?: string[];
 };

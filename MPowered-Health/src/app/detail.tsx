@@ -53,12 +53,7 @@ const configs: Record<string, { prompt: string; options?: string[]; input?: stri
   },
   'Prepare for my appointment': {
     prompt: 'Prepare for my appointment',
-    options: [
-      'Add appointment details',
-      'Explore questions generated for me',
-      'Add support person',
-      'Review My Plan',
-    ],
+    options: ['Add appointment details', 'Explore questions generated for me', 'Review My Plan'],
   },
   'Explore tips': {
     prompt: 'Explore self-management tips for my ongoing pain',

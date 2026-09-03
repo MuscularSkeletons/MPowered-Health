@@ -8,12 +8,6 @@ export default function Settings() {
       <MhaHeader />
       <ScrollView contentContainerStyle={s.content}>
         <PageIntro title="Setting" description="Manage how you use MPowered Health." />
-        <View style={s.role}>
-          <Text style={s.roleTitle}>I am a</Text>
-          <Pressable style={s.roleButton} onPress={() => router.replace('/support-home')}>
-            <Text style={s.roleText}>User support person ›</Text>
-          </Pressable>
-        </View>
         <View style={s.accountActions}>
           <Text style={s.accountHeading}>Account</Text>
           <Pressable
@@ -42,25 +36,6 @@ const s = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 112,
-  },
-  role: {
-    marginTop: 28,
-    backgroundColor: '#F7F4FC',
-    borderRadius: 20,
-    padding: 18,
-  },
-  roleTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: palette.muted,
-  },
-  roleButton: {
-    paddingTop: 10,
-  },
-  roleText: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: palette.primary,
   },
   accountActions: {
     marginTop: 34,
