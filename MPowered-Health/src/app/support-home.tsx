@@ -34,6 +34,7 @@ export default function SupportHome() {
               pathname: '/workflow',
               params: {
                 flow: 'archive',
+                returnTo: '/support-home',
               },
             })
           }

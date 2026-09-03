@@ -59,31 +59,6 @@ export function ActionButton({
     </Pressable>
   );
 }
-export function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <View style={s.section}>
-      <Text style={s.eyebrow}>{eyebrow}</Text>
-      <Text style={s.sectionTitle}>{title}</Text>
-    </View>
-  );
-}
-export function PageIntro({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow?: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <View>
-      {eyebrow ? <Text style={s.eyebrow}>{eyebrow}</Text> : null}
-      <Text style={s.pageTitle}>{title}</Text>
-      <Text style={s.description}>{description}</Text>
-    </View>
-  );
-}
 const tones = {
   rose: ['#F8E1E5', '#94465A'],
   mint: ['#DFF1E9', '#27705A'],
@@ -91,60 +66,6 @@ const tones = {
   gold: ['#F5EBD2', '#83651F'],
   violet: ['#E9DEFF', '#5E17EB'],
 } as const;
-export function HealthCard({
-  tone,
-  symbol,
-  title,
-  description,
-  meta,
-  onPress,
-}: {
-  tone: keyof typeof tones;
-  symbol: string;
-  title: string;
-  description: string;
-  meta: string;
-  onPress: () => void;
-}) {
-  let [c, fg] = tones[tone];
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        s.card,
-        pressed && {
-          transform: [
-            {
-              scale: 0.98,
-            },
-          ],
-        },
-      ]}
-    >
-      <View
-        style={[
-          s.icon,
-          {
-            backgroundColor: c,
-          },
-        ]}
-      >
-        <Text
-          style={{
-            color: fg,
-            fontSize: 19,
-          }}
-        >
-          {symbol}
-        </Text>
-      </View>
-      <Text style={s.cardTitle}>{title}</Text>
-      <Text style={s.cardDescription}>{description}</Text>
-      <Text style={s.meta}>{meta}</Text>
-      <Text style={s.chevron}>›</Text>
-    </Pressable>
-  );
-}
 export function SummaryRow({
   tone,
   symbol,

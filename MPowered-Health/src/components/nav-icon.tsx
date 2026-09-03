@@ -1,16 +1,12 @@
 import { Image } from 'expo-image';
 
-export type NavIconName = 'accessibility' | 'folder' | 'clipboard' | 'settings';
+export type NavIconName = 'clipboard' | 'settings';
 
 const icons = {
-  accessibility: require('../../assets/icons/iconify-human.svg'),
-  folder: require('../../assets/icons/iconify-folder.svg'),
   clipboard: require('../../assets/icons/iconify-clipboard.svg'),
   settings: require('../../assets/icons/iconify-cog.svg'),
 };
 const outlineIcons = {
-  accessibility: require('../../assets/icons/iconify-human.svg'),
-  folder: require('../../assets/icons/iconify-folder-outline.svg'),
   clipboard: require('../../assets/icons/iconify-clipboard-outline.svg'),
   settings: require('../../assets/icons/iconify-cog-outline.svg'),
 };

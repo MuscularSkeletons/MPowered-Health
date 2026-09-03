@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "MPowered-Health",
-    "slug": "MPowered-Health",
+    "name": "MPowered Support Person",
+    "slug": "mpowered-support-person",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mpoweredhealth",
+    "scheme": "mpoweredsupport",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/icon.png"
@@ -32,9 +32,7 @@
           "image": "./assets/images/icon.png",
           "imageWidth": 160
         }
-      ],
-      "expo-audio",
-      "@react-native-community/datetimepicker"
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

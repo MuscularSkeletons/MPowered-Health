@@ -21,6 +21,7 @@ export default function SupportSetting() {
                 pathname: '/workflow',
                 params: {
                   flow: 'join',
+                  returnTo: '/support-setting',
                 },
               })
             }
@@ -36,6 +37,7 @@ export default function SupportSetting() {
                 pathname: '/workflow',
                 params: {
                   flow: 'archive',
+                  returnTo: '/support-setting',
                 },
               })
             }
@@ -51,6 +53,7 @@ export default function SupportSetting() {
                 pathname: '/workflow',
                 params: {
                   flow: 'settings',
+                  returnTo: '/support-setting',
                 },
               })
             }
