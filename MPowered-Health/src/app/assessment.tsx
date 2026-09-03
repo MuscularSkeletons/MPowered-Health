@@ -801,8 +801,13 @@ export default function Assessment() {
           ) : q.kind === 'text' || q.kind === 'number' ? (
             <TextInput
               value={current[0] ?? ''}
-              onChangeText={select}
+              // The movement activity-hours answer is a whole-number field. Filter
+              // pasted and typed input as well as setting the numeric keyboard so
+              // letters, decimals, signs, and spaces can never be recorded.
+              onChangeText={(text) => select(q.kind === 'number' ? text.replace(/\D/g, '') : text)}
               keyboardType={q.kind === 'number' ? 'numeric' : 'default'}
+              inputMode={q.kind === 'number' ? 'numeric' : 'text'}
+              maxLength={q.kind === 'number' ? 2 : undefined}
               multiline={q.kind === 'text'}
               placeholder={q.kind === 'number' ? 'input number only' : 'Write your reflection'}
               placeholderTextColor="#81798A"
