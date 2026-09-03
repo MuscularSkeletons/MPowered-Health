@@ -1,5 +1,7 @@
-import { Tabs } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Tabs, router, usePathname, useGlobalSearchParams } from 'expo-router';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import { getAccountSnapshot, initializeAccount, subscribeAccount } from '@/constants/account';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavGlyph, NavIconName } from '@/components/nav-icon';
 
@@ -12,10 +14,40 @@ function NavIcon({ focused, color, name }: { focused: boolean; color: string; na
 }
 
 export default function TabLayout() {
+  const account = useSyncExternalStore(subscribeAccount, getAccountSnapshot, getAccountSnapshot);
+  const pathname = usePathname();
+  const params = useGlobalSearchParams<{ flow?: string }>();
+  const [startupError, setStartupError] = useState(false);
+  const start = () => {
+    setStartupError(false);
+    initializeAccount().catch(() => setStartupError(true));
+  };
+  useEffect(() => {
+    initializeAccount().catch(() => setStartupError(true));
+  }, []);
+  useEffect(() => {
+    // Deleted accounts cannot reopen old patient screens through tab/browser history.
+    const publicScreen =
+      ['/', '/splash', '/onboarding-loading'].includes(pathname) ||
+      (pathname === '/workflow' && (params.flow ?? 'onboarding') === 'onboarding');
+    if (account.ready && account.deleted && !publicScreen) router.replace('/splash');
+  }, [account.ready, account.deleted, pathname, params.flow]);
+  if (!account.ready)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>{startupError ? 'Unable to load account data.' : 'Loading…'}</Text>
+        {startupError ? (
+          <Pressable accessibilityRole="button" onPress={start}>
+            <Text>Try again</Text>
+          </Pressable>
+        ) : null}
+      </View>
+    );
   return (
     <>
       <StatusBar style="dark" />
       <Tabs
+        key={account.revision}
         initialRouteName="index"
         screenOptions={({ route }) => ({
           headerShown: false,
@@ -75,6 +107,7 @@ export default function TabLayout() {
         />
         <Tabs.Screen name="splash" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="login" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+        <Tabs.Screen name="personal-details" options={{ href: null }} />
         <Tabs.Screen name="detail" options={{ href: null }} />
         <Tabs.Screen name="assessment" options={{ href: null }} />
         <Tabs.Screen name="workflow" options={{ href: null }} />

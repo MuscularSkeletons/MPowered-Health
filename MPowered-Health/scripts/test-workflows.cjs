@@ -98,3 +98,113 @@ test('email requires an address and preserves common address formats', () => {
     assert.equal(validAnswer('Your email address', value), true);
   }
 });
+
+function accountFixture(initial = []) {
+  const stored = new Map(initial);
+  let resets = 0;
+  const storage = {
+    getItem: async (key) => stored.get(key) ?? null,
+    setItem: async (key, value) => stored.set(key, value),
+    removeItem: async (key) => stored.delete(key),
+    getAllKeys: async () => [...stored.keys()],
+    multiRemove: async (keys) => keys.forEach((key) => stored.delete(key)),
+  };
+  const imports = {
+    '@react-native-async-storage/async-storage': { default: storage },
+    '@/utils/workflow-validation': { validAnswer },
+    './profile-options': load('src/constants/profile-options.ts'),
+    './assessment-session': {
+      resetAssessmentSession: () => {
+        resets++;
+      },
+    },
+    './appointments': {
+      resetAppointments: () => {
+        resets++;
+      },
+    },
+  };
+  return {
+    stored,
+    storage,
+    load: () => load('src/constants/account.ts', imports),
+    resets: () => resets,
+  };
+}
+const sampleProfile = {
+  email: 'alex@example.com',
+  name: 'Alex',
+  sex: 'Prefer not to say',
+  birthYear: '',
+  diagnosis: 'No, I haven’t',
+  conditions: [],
+  otherConditions: '',
+};
+
+test('onboarding profile persists and edits preserve optional answers without saving verification codes', async () => {
+  const fixture = accountFixture();
+  const account = fixture.load();
+  const profile = account.profileFromAnswers(
+    {
+      '0-Your email address': 'alex@example.com',
+      '1-Verification code': '1234',
+      '3-Type your name': 'Alex',
+      '5-Year of birth': '1980',
+      '8-Other conditions': 'Example',
+    },
+    { 4: ['Prefer not to say'], 6: ['No, I haven’t'], 7: ['Back pain'] },
+  );
+  await account.saveProfile(profile);
+  assert.equal(JSON.stringify(await account.getProfile()).includes('1234'), false);
+  const reopened = fixture.load();
+  assert.equal((await reopened.getProfile()).name, 'Alex');
+  await reopened.saveProfile({
+    ...profile,
+    name: 'Alex Updated',
+    birthYear: '',
+    conditions: [],
+    otherConditions: '',
+  });
+  const updated = await fixture.load().getProfile();
+  assert.equal(updated.name, 'Alex Updated');
+  assert.equal(updated.birthYear, '');
+  assert.equal(updated.conditions.length, 0);
+  await assert.rejects(reopened.saveProfile({ ...profile, email: 'invalid' }));
+  assert.equal((await reopened.getProfile()).name, 'Alex Updated');
+});
+test('account deletion removes app data, preserves unrelated keys, and resets active screens', async () => {
+  const fixture = accountFixture([
+    ['another-app:key', 'keep'],
+    ['mpowered:reflection:2026-08-31', 'notes'],
+  ]);
+  const account = fixture.load();
+  await account.saveProfile(sampleProfile);
+  await account.deleteLocalAccount();
+  assert.equal(await account.getProfile(), null);
+  assert.equal(fixture.stored.has('mpowered:reflection:2026-08-31'), false);
+  assert.equal(fixture.stored.get('another-app:key'), 'keep');
+  assert.equal(account.getAccountSnapshot().deleted, true);
+  assert.equal(account.getAccountSnapshot().revision, 1);
+  assert.equal(fixture.resets(), 2);
+  const reopened = fixture.load();
+  await reopened.initializeAccount();
+  assert.equal(reopened.getAccountSnapshot().deleted, true);
+  assert.equal(reopened.getAccountSnapshot().demo, false);
+  await reopened.saveProfile(sampleProfile);
+  assert.equal(reopened.getAccountSnapshot().deleted, false);
+});
+test('failed deletion remains retryable and initialization completes interrupted cleanup', async () => {
+  const fixture = accountFixture([['mpowered:profile', JSON.stringify(sampleProfile)]]);
+  const account = fixture.load();
+  const remove = fixture.storage.multiRemove;
+  fixture.storage.multiRemove = async () => {
+    throw new Error('Storage unavailable');
+  };
+  await assert.rejects(account.deleteLocalAccount(), /Storage unavailable/);
+  assert.equal(account.getAccountSnapshot().revision, 0);
+  fixture.storage.multiRemove = remove;
+  const reopened = fixture.load();
+  await reopened.initializeAccount();
+  assert.equal(await reopened.getProfile(), null);
+  assert.equal(reopened.getAccountSnapshot().deleted, true);
+});

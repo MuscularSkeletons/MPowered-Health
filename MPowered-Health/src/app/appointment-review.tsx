@@ -110,6 +110,22 @@ function SignaturePad({
 }
 
 export default function AppointmentReview() {
+  const { id, mode } = useLocalSearchParams<{ id?: string; mode?: string }>();
+  // A deleted account has no appointments; stale links should show an empty state.
+  if (mode !== 'plan' && !getAppointment(id))
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: palette.background }}>
+        <MhaHeader />
+        <View style={{ padding: 24 }}>
+          <Text>This appointment is no longer available.</Text>
+          <ActionButton label="Back to Care Planner" onPress={() => router.replace('/care')} />
+        </View>
+      </SafeAreaView>
+    );
+  return <AppointmentReviewContent />;
+}
+
+function AppointmentReviewContent() {
   const insets = useSafeAreaInsets();
   const reviewScrollRef = useRef<ScrollView>(null);
   const {

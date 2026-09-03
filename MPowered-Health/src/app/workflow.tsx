@@ -28,6 +28,8 @@ import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
 import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
+import { sexOptions, diagnosisOptions, painConditions } from '@/constants/profile-options';
+import { getAccountSnapshot, profileFromAnswers, saveProfile } from '@/constants/account';
 // Each flow is a sequence of questions rendered by WorkflowForm below. The flow
 // definitions describe content; the form handles answers, validation, and navigation.
 type Step = {
@@ -78,7 +80,7 @@ const flows: Record<
       {
         title: 'Your sex',
         copy: 'Research shows that people may experience pain differently depending on their sex.',
-        options: ['Female', 'Male', 'Intersex', 'Prefer not to say'],
+        options: sexOptions,
       },
       {
         title: 'Your year of birth',
@@ -90,36 +92,12 @@ const flows: Record<
         title:
           'Do you have a musculoskeletal (for example arthritis, back pain, gout) or chronic pain diagnosis from your doctor?',
         copy: 'No diagnosis? No problem! You know your body and how you feel so being Health MPowered is for you :)',
-        options: ['Yes, I have', 'No, I haven’t'],
+        options: diagnosisOptions,
       },
       {
         title: 'Tell us about the musculoskeletal or chronic pain you’re experiencing',
         copy: 'You can select multiple conditions',
-        options: [
-          'Arthritis',
-          'Ankylosing spondylitis',
-          'Back pain',
-          'Baker’s cyst',
-          'Bursitis',
-          'Foot related conditions',
-          'Fibromyalgia',
-          'Gout',
-          'Juvenile idiopathic arthritis and conditions',
-          'Lupus',
-          'Neck pain',
-          'Osteoarthritis',
-          'Osteoporosis',
-          'Paget’s disease',
-          'Perthes’ disease',
-          'Polymyalgia rheumatica',
-          'Psoriatic arthritis',
-          'Raynaud’s phenomenon',
-          'Reactive arthritis',
-          'Rheumatoid arthritis',
-          'Scleroderma',
-          'Shoulder pain',
-          'Sjogren’s disease',
-        ],
+        options: painConditions,
         multi: true,
         optional: true,
       },
@@ -296,7 +274,7 @@ const meds = [
 // This form owns its medication list in memory. Reflection storage is separate;
 // prescriptions are not written to AsyncStorage by this component.
 function Prescriptions() {
-  const [list, setList] = useState(meds),
+  const [list, setList] = useState(() => (getAccountSnapshot().demo ? meds : [])),
     [adding, setAdding] = useState(false),
     [name, setName] = useState(''),
     [strength, setStrength] = useState(''),
@@ -880,7 +858,15 @@ function WorkflowForm() {
     ((!current.options || current.optionsOptional || selected.length > 0) && requiredFields);
   // Handle flows with special save/navigation behavior first. Remaining flows
   // advance one question at a time, then return to their destination at the end.
-  const next = async () => {
+  const next = async (skip = false) => {
+    if (saving) return;
+    // Skip must discard an optional answer, including an invalid draft year.
+    if (skip) {
+      setFields((previous) =>
+        Object.fromEntries(Object.entries(previous).filter(([key]) => !key.startsWith(`${step}-`))),
+      );
+      setValues((previous) => ({ ...previous, [step]: [] }));
+    }
     if (flow === 'reflection') {
       if (!ready || saving || loadingReflection || reflectionError) return;
       setSaving(true);
@@ -896,10 +882,19 @@ function WorkflowForm() {
       return;
     }
     if (flow === 'onboarding' && current.title === 'Thank you, Jane 😃') {
-      router.replace({
-        pathname: '/onboarding-loading',
-        params: { name: userName },
-      });
+      setSaving(true);
+      try {
+        // Store profile answers only, never the temporary verification code.
+        await saveProfile(profileFromAnswers(fields, values));
+        router.replace({ pathname: '/onboarding-loading', params: { name: userName } });
+      } catch {
+        Alert.alert(
+          'Profile not saved',
+          'Check your answers and try again. Your answers are still here.',
+        );
+      } finally {
+        setSaving(false);
+      }
       return;
     }
     if (flow === 'appointment' && current.title === 'Add Questions for My Appointment') {
@@ -1091,7 +1086,7 @@ function WorkflowForm() {
           />
           {/* Skip deliberately bypasses Continue validation for optional questions. */}
           {current.optional && flow !== 'reflection' ? (
-            <Pressable onPress={next}>
+            <Pressable disabled={saving} onPress={() => next(true)}>
               <Text style={s.skip}>Skip</Text>
             </Pressable>
           ) : !ready ? (

@@ -7,7 +7,7 @@ const painRecords: PainRecord[] = [
   { date: '01/06', score: 5 },
   { date: '08/06', score: 7 },
 ];
-const weeklyStreak = 3;
+let weeklyStreak = 3;
 
 function cloneAnswers(answers: AssessmentAnswers): AssessmentAnswers {
   return Object.fromEntries(Object.entries(answers).map(([step, values]) => [step, [...values]]));
@@ -39,4 +39,12 @@ export function getPainRecords() {
 
 export function getWeeklyStreak() {
   return weeklyStreak;
+}
+
+// Remove all in-memory health data when the local account is deleted.
+export function resetAssessmentSession() {
+  completedAssessments.clear();
+  assessmentAnswers.clear();
+  painRecords.splice(0);
+  weeklyStreak = 0;
 }

@@ -26,3 +26,7 @@ export const saveAppointmentSignature = (id: string, signaturePaths: string[]) =
     item.id === id ? { ...item, signaturePaths: [...signaturePaths] } : item,
   );
 };
+
+export function resetAppointments() {
+  appointments = [];
+}

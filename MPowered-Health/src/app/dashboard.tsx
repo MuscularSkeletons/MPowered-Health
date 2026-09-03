@@ -3,6 +3,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
+import { getProfile } from '@/constants/account';
 import { getReflection } from '@/constants/reflections';
 import { productContent } from '@/constants/product-content';
 import { getCompletedAssessments, getWeeklyStreak } from '@/constants/assessment-session';
@@ -52,10 +53,12 @@ function BrandWord() {
   );
 }
 export default function Home() {
-  const { completed = '', name = 'Jane' } = useLocalSearchParams<{
+  const { completed = '', name: routeName = 'Jane' } = useLocalSearchParams<{
     completed?: string;
     name?: string;
   }>();
+  const [profileName, setProfileName] = useState<string>();
+  const name = profileName || routeName;
   const [hasReflection, setHasReflection] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(getCompletedAssessments());
   // Refresh on every visit so saving a reflection changes Add to View immediately.
@@ -64,6 +67,11 @@ export default function Home() {
       setSessionCompleted(getCompletedAssessments());
       // Ignore a delayed storage response if the user has already left this screen.
       let active = true;
+      getProfile()
+        .then((profile) => {
+          if (active) setProfileName(profile?.name);
+        })
+        .catch(() => {});
       getReflection()
         .then((saved) => {
           if (active) setHasReflection(!!saved);
