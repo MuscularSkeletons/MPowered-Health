@@ -114,13 +114,8 @@ export default function Settings() {
           <SettingRow
             icon="⌁"
             title="Privacy &amp; permissions"
-            description="Manage how your information is used"
-            onPress={() =>
-              router.push({
-                pathname: '/workflow',
-                params: { flow: 'settings', returnTo: '/settings' },
-              })
-            }
+            description="See how your information is handled and what the app can access"
+            onPress={() => router.push('/privacy-permissions')}
           />
         </View>
         <Text style={s.sectionLabel}>ACCOUNT</Text>

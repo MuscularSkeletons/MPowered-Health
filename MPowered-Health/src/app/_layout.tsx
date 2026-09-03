@@ -108,6 +108,7 @@ export default function TabLayout() {
         <Tabs.Screen name="splash" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="login" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="personal-details" options={{ href: null }} />
+        <Tabs.Screen name="privacy-permissions" options={{ href: null }} />
         <Tabs.Screen name="detail" options={{ href: null }} />
         <Tabs.Screen name="assessment" options={{ href: null }} />
         <Tabs.Screen name="workflow" options={{ href: null }} />
