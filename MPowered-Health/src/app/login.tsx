@@ -11,29 +11,36 @@ import {
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
+import { validAnswer } from '@/utils/workflow-validation';
 
-type Step = 'pin' | 'phone' | 'code';
+type Step = 'pin' | 'email' | 'code';
 export default function Login() {
   const [step, setStep] = useState<Step>('pin'),
     [pin, setPin] = useState(''),
-    [phone, setPhone] = useState(''),
+    [email, setEmail] = useState(''),
     [code, setCode] = useState('');
-  const value = step === 'pin' ? pin : step === 'phone' ? phone : code;
+  const value = step === 'pin' ? pin : step === 'email' ? email : code;
   const ready =
     step === 'pin'
       ? pin.length >= 4
-      : step === 'phone'
-        ? phone.trim().length >= 8
+      : step === 'email'
+        ? validAnswer('Your email address', email)
         : code.length === 4;
-  const setNumericValue = (text: string) => {
+  const setValue = (text: string) => {
+    // Email must retain letters, @, dots, and plus aliases. Only PINs and codes
+    // are restricted to digits.
+    if (step === 'email') {
+      setEmail(text);
+      return;
+    }
     const digits = text.replace(/\D/g, '');
     if (step === 'pin') setPin(digits);
-    else if (step === 'phone') setPhone(digits);
     else setCode(digits);
   };
   const next = () => {
+    if (!ready) return;
     if (step === 'pin') router.replace('/dashboard');
-    else if (step === 'phone') setStep('code');
+    else if (step === 'email') setStep('code');
     else router.replace('/dashboard');
   };
   return (
@@ -48,7 +55,7 @@ export default function Login() {
             <Pressable
               accessibilityRole="button"
               style={s.backButton}
-              onPress={() => setStep(step === 'code' ? 'phone' : 'pin')}
+              onPress={() => setStep(step === 'code' ? 'email' : 'pin')}
             >
               <Text style={s.back}>‹ Back</Text>
             </Pressable>
@@ -58,14 +65,14 @@ export default function Login() {
             <Text style={s.title}>
               {step === 'pin'
                 ? 'Welcome back!'
-                : step === 'phone'
+                : step === 'email'
                   ? 'Please verify this device'
-                  : 'We’re sending a verification code to this number'}
+                  : 'We’re sending a verification code to this email address'}
             </Text>
             <Text style={s.copy}>
               {step === 'pin'
                 ? 'Glad to see you again!'
-                : step === 'phone'
+                : step === 'email'
                   ? 'You are logging in to a new device or different account.'
                   : 'You can resend the code in two minutes.'}
             </Text>
@@ -74,22 +81,26 @@ export default function Login() {
             <Text style={s.label}>
               {step === 'pin'
                 ? 'Enter PIN'
-                : step === 'phone'
-                  ? 'Your phone number'
+                : step === 'email'
+                  ? 'Your email address'
                   : 'Verification code'}
             </Text>
             <TextInput
+              key={step}
               secureTextEntry={step === 'pin'}
-              keyboardType="number-pad"
-              inputMode="numeric"
-              maxLength={step === 'code' ? 4 : step === 'pin' ? 6 : 15}
+              keyboardType={step === 'email' ? 'email-address' : 'number-pad'}
+              inputMode={step === 'email' ? 'email' : 'numeric'}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete={step === 'email' ? 'email' : 'off'}
+              maxLength={step === 'code' ? 4 : step === 'pin' ? 6 : 254}
               value={value}
-              onChangeText={setNumericValue}
+              onChangeText={setValue}
               placeholder={
                 step === 'pin'
                   ? 'Enter PIN'
-                  : step === 'phone'
-                    ? 'Your phone number'
+                  : step === 'email'
+                    ? 'Your email address'
                     : '4-digit code'
               }
               placeholderTextColor="#81798A"
@@ -98,14 +109,23 @@ export default function Login() {
             {step === 'pin' ? (
               <Pressable
                 accessibilityRole="button"
-                onPress={() => setStep('phone')}
+                onPress={() => setStep('email')}
                 style={s.inlineLink}
               >
                 <Text style={s.inlineLinkText}>Forgot PIN?</Text>
               </Pressable>
             ) : null}
-            {step === 'phone' ? (
-              <Text style={s.help}>We’ll send a four-digit verification code to this number.</Text>
+            {step === 'email' ? (
+              <>
+                <Text style={s.help}>
+                  We’ll send a four-digit verification code to this email address.
+                </Text>
+                {email.length > 0 && !ready ? (
+                  <Text accessibilityLiveRegion="polite" style={[s.help, { color: palette.error }]}>
+                    Enter a valid email address.
+                  </Text>
+                ) : null}
+              </>
             ) : null}
             {step === 'code' ? (
               <Pressable accessibilityRole="button" style={s.inlineLink}>
@@ -124,7 +144,7 @@ export default function Login() {
             <View style={s.accountSwitch}>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => setStep('phone')}
+                onPress={() => setStep('email')}
                 style={({ pressed }) => [s.accountButton, pressed && s.accountButtonPressed]}
               >
                 <Text style={s.accountLink}>Log in to a different account</Text>

@@ -56,12 +56,12 @@ const flows: Record<
     eyebrow: '',
     steps: [
       {
-        title: 'Your phone number',
-        copy: 'We will send the four digit verification codes to this number',
-        fields: ['Your phone number'],
+        title: 'Your email address',
+        copy: 'We will send the four digit verification codes to this email address',
+        fields: ['Your email address'],
       },
       {
-        title: 'We’re sending the verification code to this number',
+        title: 'We’re sending the verification code to this email address',
         copy: 'You can resend the codes in two minutes',
         fields: ['Verification code'],
       },
@@ -146,11 +146,11 @@ const flows: Record<
       },
       {
         title: 'Please verify this device',
-        copy: 'You are logging in to a new device or different account.\n\nWe will send the four digit verification codes to this number',
-        fields: ['Your phone number'],
+        copy: 'You are logging in to a new device or different account.\n\nWe will send the four digit verification codes to this email address',
+        fields: ['Your email address'],
       },
       {
-        title: 'We’re sending the verification code to this number',
+        title: 'We’re sending the verification code to this email address',
         copy: 'You can resend the codes in two minutes',
         fields: ['Verification code'],
       },
@@ -415,7 +415,7 @@ function Field({
 }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
-  const isPhoneNumber = label.toLowerCase().includes('phone number');
+  const isEmail = label === 'Your email address';
   if (label === 'Appointment date') {
     // The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
     const toIsoDate = (displayDate: string) => {
@@ -550,20 +550,28 @@ function Field({
       <TextInput
         value={value}
         editable={editable}
-        onChangeText={(text) => set(isPhoneNumber ? text.replace(/\D/g, '') : text)}
+        onChangeText={set}
+        autoCapitalize={isEmail ? 'none' : 'sentences'}
+        autoCorrect={!isEmail}
+        autoComplete={isEmail ? 'email' : 'off'}
+        maxLength={isEmail ? 254 : undefined}
         keyboardType={
-          isPhoneNumber || label === 'Year of birth'
-            ? 'number-pad'
-            : label === 'Strength'
-              ? 'decimal-pad'
-              : 'default'
+          isEmail
+            ? 'email-address'
+            : label === 'Year of birth'
+              ? 'number-pad'
+              : label === 'Strength'
+                ? 'decimal-pad'
+                : 'default'
         }
         inputMode={
-          isPhoneNumber || label === 'Year of birth'
-            ? 'numeric'
-            : label === 'Strength'
-              ? 'decimal'
-              : 'text'
+          isEmail
+            ? 'email'
+            : label === 'Year of birth'
+              ? 'numeric'
+              : label === 'Strength'
+                ? 'decimal'
+                : 'text'
         }
         placeholder={label}
         placeholderTextColor="#81798A"
@@ -1015,6 +1023,13 @@ function WorkflowForm() {
           <Field
             key={f}
             label={f}
+            error={
+              f === 'Your email address' &&
+              fields[`${step}-${f}`] &&
+              !validAnswer(f, fields[`${step}-${f}`])
+                ? 'Enter a valid email address.'
+                : undefined
+            }
             editable={!loadingReflection && !saving && !reflectionError}
             value={fields[`${step}-${f}`] ?? ''}
             set={(v) =>

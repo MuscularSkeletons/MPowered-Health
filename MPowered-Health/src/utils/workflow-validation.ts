@@ -9,6 +9,11 @@ export function workflowStep(value: string, count: number) {
 // fields with numeric meaning also need format and range checks.
 export function validAnswer(label: string, value = '') {
   const answer = value.trim();
+  if (label === 'Your email address') {
+    // Accept ordinary email addresses, including plus aliases, without requiring
+    // delivery verification here; sending and verifying codes belongs to the server.
+    return answer.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(answer);
+  }
   if (label === 'Year of birth') {
     return (
       /^\d{4}$/.test(answer) && Number(answer) >= 1900 && Number(answer) <= new Date().getFullYear()

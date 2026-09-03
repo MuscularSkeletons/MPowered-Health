@@ -42,10 +42,14 @@ test('prescription strength must be a finite positive number', () => {
 });
 test('reflections survive a fresh module load and stay separated by week', async () => {
   const stored = new Map();
-  const imports = { '@react-native-async-storage/async-storage': { default: {
-    getItem: async (key) => stored.get(key) ?? null,
-    setItem: async (key, value) => stored.set(key, value),
-  } } };
+  const imports = {
+    '@react-native-async-storage/async-storage': {
+      default: {
+        getItem: async (key) => stored.get(key) ?? null,
+        setItem: async (key, value) => stored.set(key, value),
+      },
+    },
+  };
   const first = load('src/constants/reflections.ts', imports);
   assert.equal(first.reflectionWeek(new Date(2026, 8, 6)), '2026-08-31');
   assert.equal(first.reflectionWeek(new Date(2026, 8, 7)), '2026-09-07');
@@ -59,9 +63,38 @@ test('reflections survive a fresh module load and stay separated by week', async
 });
 test('storage failures are surfaced instead of reporting a successful save', async () => {
   const reflections = load('src/constants/reflections.ts', {
-    '@react-native-async-storage/async-storage': { default: {
-      setItem: async () => { throw new Error('Storage unavailable'); },
-    } },
+    '@react-native-async-storage/async-storage': {
+      default: {
+        setItem: async () => {
+          throw new Error('Storage unavailable');
+        },
+      },
+    },
   });
   await assert.rejects(reflections.saveReflection('Keep my draft'), /Storage unavailable/);
+});
+
+// Email entry replaces phone entry; shared validation covers onboarding and login.
+test('email requires an address and preserves common address formats', () => {
+  for (const value of [
+    '',
+    '   ',
+    '0412345678',
+    'alex',
+    'alex@',
+    '@example.com',
+    'alex@example',
+    'alex @example.com',
+    'alex@@example.com',
+    'a'.repeat(250) + '@example.com',
+  ]) {
+    assert.equal(validAnswer('Your email address', value), false);
+  }
+  for (const value of [
+    'alex@example.com',
+    'Alex.Smith+health@example.com.au',
+    ' alex@example.com ',
+  ]) {
+    assert.equal(validAnswer('Your email address', value), true);
+  }
 });
