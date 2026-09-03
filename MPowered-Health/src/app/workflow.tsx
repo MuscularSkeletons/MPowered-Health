@@ -30,7 +30,14 @@ import { addAppointment } from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
 import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
 import { sexOptions, diagnosisOptions, painConditions } from '@/constants/profile-options';
-import { getAccountSnapshot, profileFromAnswers, saveProfile } from '@/constants/account';
+import {
+  getAccountSnapshot,
+  getProfile,
+  profileFromAnswers,
+  saveProfile,
+} from '@/constants/account';
+import { getAssessmentAnswers, getLatestAssessmentDate } from '@/constants/assessment-session';
+import { asSentence, buildSummary } from './assessment';
 // Each flow is a sequence of questions rendered by WorkflowForm below. The flow
 // definitions describe content; the form handles answers, validation, and navigation.
 type Step = {
@@ -272,6 +279,127 @@ const meds = [
   'Vitamin D3 1000 IU — Once daily',
   'Raloxifene 60 mg — Once daily',
 ];
+function ProfileSummaryCard({
+  title,
+  subtitle,
+  items,
+}: {
+  title: string;
+  subtitle: string;
+  items: [string, string][];
+}) {
+  return (
+    <View style={s.profileSummaryCard}>
+      <Text style={s.profileSummaryTitle}>{title}</Text>
+      {subtitle ? <Text style={s.profileSummarySubtitle}>{subtitle}</Text> : null}
+      <View style={s.profileSummaryRule} />
+      {items.map(([label, value]) => (
+        <View key={label} style={s.profileSummaryItem}>
+          <Text style={s.profileSummaryLabel}>{label}</Text>
+          <Text style={s.profileSummaryValue}>{value}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+function PainProfileSummary() {
+  const [profile, setProfile] = useState<Awaited<ReturnType<typeof getProfile>>>(null);
+  useEffect(() => {
+    getProfile()
+      .then(setProfile)
+      .catch(() => setProfile(null));
+  }, []);
+  const sources = {
+    pain: getAssessmentAnswers('pain') ?? {},
+    movement: getAssessmentAnswers('movement') ?? {},
+    personal: getAssessmentAnswers('personal') ?? {},
+    social: getAssessmentAnswers('social') ?? {},
+    management: getAssessmentAnswers('management') ?? {},
+  };
+  const rows = (type: string, answers: Record<number, string[]>) => {
+    const indexes: Record<string, number[]> = {
+      pain: [0, 1, 2, 3, 4, 5],
+      movement: [0, 1, 2, 3, 4, 5, 6],
+      personal: [0, 1, 2, 3],
+      social: [0, 1, 2, 3, 4, 6],
+      management: [0, 2, 3],
+    };
+    return buildSummary(type, answers)
+      .filter((item) => !item.title.startsWith('My reflection'))
+      .map(
+        (item, index) =>
+          [item.title, answers[indexes[type][index]]?.length ? asSentence(item.text) : ''] as [
+            string,
+            string,
+          ],
+      );
+  };
+  return (
+    <SafeAreaView style={s.safe} edges={['top']}>
+      <MhaHeader />
+      <ScrollView
+        contentContainerStyle={s.profileSummaryContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Pressable onPress={() => router.replace('/explore')}>
+          <Text style={s.back}>‹ Back</Text>
+        </Pressable>
+        <Text style={s.profileSummaryHeading}>My Pain Profile</Text>
+        <Text style={s.profileSummaryUpdated}>
+          Updated by {getLatestAssessmentDate() || '24 May 2026'}
+        </Text>
+        <Text style={s.profileSummaryIntro}>A summary of your latest completed assessments.</Text>
+        <ProfileSummaryCard
+          title="About me"
+          subtitle=""
+          items={[
+            ['Name', profile?.name || 'Not recorded'],
+            ['Sex', profile?.sex || 'Not recorded'],
+            ['Age group', profile?.birthYear || 'Not recorded'],
+          ]}
+        />
+        <ProfileSummaryCard
+          title="My conditions"
+          subtitle=""
+          items={[
+            ['Primary condition', profile?.diagnosis || 'Not recorded'],
+            [
+              'Other conditions',
+              [...(profile?.conditions ?? []), profile?.otherConditions ?? '']
+                .filter(Boolean)
+                .join(', ') || 'Not recorded',
+            ],
+          ]}
+        />
+        <ProfileSummaryCard
+          title="My Pain"
+          subtitle="Severity, pattern, and location"
+          items={rows('pain', sources.pain)}
+        />
+        <ProfileSummaryCard
+          title="Impacts to Movement"
+          subtitle=""
+          items={rows('movement', sources.movement)}
+        />
+        <ProfileSummaryCard
+          title="Impacts to Personal care"
+          subtitle=""
+          items={rows('personal', sources.personal)}
+        />
+        <ProfileSummaryCard
+          title="Impacts to Social Health"
+          subtitle=""
+          items={rows('social', sources.social)}
+        />
+        <ProfileSummaryCard
+          title="My Current Management"
+          subtitle=""
+          items={rows('management', sources.management)}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 // This form owns its medication list in memory. Reflection storage is separate;
 // prescriptions are not written to AsyncStorage by this component.
 function Prescriptions() {
@@ -880,6 +1008,7 @@ function WorkflowForm() {
     };
   }, [flow, week]);
   if (flow === 'prescriptions') return <Prescriptions />;
+  if (flow === 'profile') return <PainProfileSummary />;
   const current = data.steps[step],
     selected = values[step] ?? [];
   const userName = fields['3-Type your name']?.trim() || routeName || 'Jane';
@@ -1160,6 +1289,41 @@ const s = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 120,
   },
+  profileSummaryContent: {
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 120,
+  },
+  profileSummaryHeading: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '800',
+    color: palette.text,
+    marginTop: 10,
+  },
+  profileSummaryUpdated: { fontSize: 12, color: palette.muted, marginTop: 4 },
+  profileSummaryIntro: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: palette.muted,
+    marginTop: 6,
+    marginBottom: 18,
+  },
+  profileSummaryCard: {
+    backgroundColor: '#F3F1F7',
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 16,
+  },
+  profileSummaryTitle: { fontSize: 20, lineHeight: 26, fontWeight: '700', color: palette.text },
+  profileSummarySubtitle: { fontSize: 12, lineHeight: 18, color: palette.text, marginTop: 3 },
+  profileSummaryRule: { height: 1, backgroundColor: '#D5CFDC', marginVertical: 10 },
+  profileSummaryItem: { marginBottom: 12 },
+  profileSummaryLabel: { fontSize: 11, lineHeight: 16, color: palette.muted, fontWeight: '600' },
+  profileSummaryValue: { fontSize: 14, lineHeight: 20, color: palette.text, marginTop: 1 },
   back: {
     fontSize: 14,
     fontWeight: '700',

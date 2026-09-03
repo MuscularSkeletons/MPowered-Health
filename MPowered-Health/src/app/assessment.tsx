@@ -394,7 +394,7 @@ const scoreImpact = (value: string, subject: string) => {
   if (n <= 8) return `Pain substantially impacts my ${subject}.`;
   return `Pain completely impacts my ${subject}.`;
 };
-const asSentence = (value: string) => {
+export const asSentence = (value: string) => {
   if (!value || /[.!?]$/.test(value)) return value;
   const isCompleteStatement =
     /^(I |My |Pain |Because |Are |What |Is |How |Would |Should |Even |There |It |Last week)/.test(
@@ -402,7 +402,7 @@ const asSentence = (value: string) => {
     );
   return isCompleteStatement ? `${value}.` : value;
 };
-function buildSummary(type: string, answers: Record<number, string[]>) {
+export function buildSummary(type: string, answers: Record<number, string[]>) {
   const a = (i: number) => answers[i] ?? [];
   if (type === 'pain') {
     const painSentence = (value: string, kind: string) => {
