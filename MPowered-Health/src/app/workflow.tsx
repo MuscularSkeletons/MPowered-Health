@@ -38,6 +38,8 @@ import {
 } from '@/constants/account';
 import { getAssessmentAnswers, getLatestAssessmentDate } from '@/constants/assessment-session';
 import { asSentence, buildSummary } from './assessment';
+import { ProfileExportActions } from '@/components/profile-export-actions';
+import { ProfileSection } from '@/utils/pain-profile-report';
 // Each flow is a sequence of questions rendered by WorkflowForm below. The flow
 // definitions describe content; the form handles answers, validation, and navigation.
 type Step = {
@@ -304,11 +306,17 @@ function ProfileSummaryCard({
 }
 function PainProfileSummary() {
   const [profile, setProfile] = useState<Awaited<ReturnType<typeof getProfile>>>(null);
-  useEffect(() => {
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const loadProfile = useCallback(() => {
+    setLoading(true);
+    setLoadError(false);
     getProfile()
       .then(setProfile)
-      .catch(() => setProfile(null));
+      .catch(() => setLoadError(true))
+      .finally(() => setLoading(false));
   }, []);
+  useEffect(loadProfile, [loadProfile]);
   const sources = {
     pain: getAssessmentAnswers('pain') ?? {},
     movement: getAssessmentAnswers('movement') ?? {},
@@ -326,14 +334,46 @@ function PainProfileSummary() {
     };
     return buildSummary(type, answers)
       .filter((item) => !item.title.startsWith('My reflection'))
-      .map(
-        (item, index) =>
-          [item.title, answers[indexes[type][index]]?.length ? asSentence(item.text) : ''] as [
-            string,
-            string,
-          ],
-      );
+      .map((item, index): [string, string] => {
+        const recorded = !!answers[indexes[type][index]]?.length;
+        const title = type === 'pain' && !recorded ? item.title.replace(/: 0$/, '') : item.title;
+        return [title, recorded ? asSentence(item.text) : 'Not recorded'];
+      });
   };
+  const sections: ProfileSection[] = [
+    {
+      title: 'About me',
+      subtitle: '',
+      items: [
+        ['Name', profile?.name || 'Not recorded'],
+        ['Sex', profile?.sex || 'Not recorded'],
+        ['Age group', profile?.birthYear || 'Not recorded'],
+      ],
+    },
+    {
+      title: 'My conditions',
+      subtitle: '',
+      items: [
+        ['Primary condition', profile?.diagnosis || 'Not recorded'],
+        [
+          'Other conditions',
+          [...(profile?.conditions ?? []), profile?.otherConditions ?? '']
+            .filter(Boolean)
+            .join(', ') || 'Not recorded',
+        ],
+      ],
+    },
+    {
+      title: 'My Pain',
+      subtitle: 'Severity, pattern, and location',
+      items: rows('pain', sources.pain),
+    },
+    { title: 'Impacts to Movement', subtitle: '', items: rows('movement', sources.movement) },
+    { title: 'Impacts to Personal care', subtitle: '', items: rows('personal', sources.personal) },
+    { title: 'Impacts to Social Health', subtitle: '', items: rows('social', sources.social) },
+    { title: 'My Current Management', subtitle: '', items: rows('management', sources.management) },
+  ];
+  const report = { updatedAt: getLatestAssessmentDate(), sections };
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />
@@ -344,58 +384,30 @@ function PainProfileSummary() {
         <Pressable onPress={() => router.replace('/explore')}>
           <Text style={s.back}>‹ Back</Text>
         </Pressable>
-        <Text style={s.profileSummaryHeading}>My Pain Profile</Text>
+        <View style={s.profileSummaryHeader}>
+          <Text style={s.profileSummaryHeading} accessibilityRole="header">
+            My Pain Profile
+          </Text>
+          <ProfileExportActions report={report} disabled={loading || loadError} />
+        </View>
         <Text style={s.profileSummaryUpdated}>
-          Updated by {getLatestAssessmentDate() || '24 May 2026'}
+          {report.updatedAt ? `Updated ${report.updatedAt}` : 'No completed assessments yet'}
         </Text>
         <Text style={s.profileSummaryIntro}>A summary of your latest completed assessments.</Text>
-        <ProfileSummaryCard
-          title="About me"
-          subtitle=""
-          items={[
-            ['Name', profile?.name || 'Not recorded'],
-            ['Sex', profile?.sex || 'Not recorded'],
-            ['Age group', profile?.birthYear || 'Not recorded'],
-          ]}
-        />
-        <ProfileSummaryCard
-          title="My conditions"
-          subtitle=""
-          items={[
-            ['Primary condition', profile?.diagnosis || 'Not recorded'],
-            [
-              'Other conditions',
-              [...(profile?.conditions ?? []), profile?.otherConditions ?? '']
-                .filter(Boolean)
-                .join(', ') || 'Not recorded',
-            ],
-          ]}
-        />
-        <ProfileSummaryCard
-          title="My Pain"
-          subtitle="Severity, pattern, and location"
-          items={rows('pain', sources.pain)}
-        />
-        <ProfileSummaryCard
-          title="Impacts to Movement"
-          subtitle=""
-          items={rows('movement', sources.movement)}
-        />
-        <ProfileSummaryCard
-          title="Impacts to Personal care"
-          subtitle=""
-          items={rows('personal', sources.personal)}
-        />
-        <ProfileSummaryCard
-          title="Impacts to Social Health"
-          subtitle=""
-          items={rows('social', sources.social)}
-        />
-        <ProfileSummaryCard
-          title="My Current Management"
-          subtitle=""
-          items={rows('management', sources.management)}
-        />
+        {loading ? <Text style={s.profileSummaryIntro}>Loading profile…</Text> : null}
+        {loadError ? (
+          <View>
+            <Text accessibilityRole="alert" style={s.profileSummaryIntro}>
+              Your profile could not be loaded. Please try again before printing or sharing.
+            </Text>
+            <Pressable accessibilityRole="button" onPress={loadProfile}>
+              <Text style={s.back}>Retry</Text>
+            </Pressable>
+          </View>
+        ) : null}
+        {sections.map((section) => (
+          <ProfileSummaryCard key={section.title} {...section} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -1297,12 +1309,20 @@ const s = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 120,
   },
+  profileSummaryHeader: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 10,
+  },
   profileSummaryHeading: {
     fontSize: 30,
     lineHeight: 36,
     fontWeight: '800',
     color: palette.text,
-    marginTop: 10,
+    flexShrink: 1,
   },
   profileSummaryUpdated: { fontSize: 12, color: palette.muted, marginTop: 4 },
   profileSummaryIntro: {

@@ -6,9 +6,9 @@ import { MhaHeader, palette } from '@/components/mha-ui';
 import { getPainRecords, PainRecord } from '@/constants/assessment-session';
 
 function PainTrend({ records }: { records: PainRecord[] }) {
-  const width = Math.max(310, records.length * 68);
-  const points = records.map((r, i) => ({
-    x: 18 + (records.length === 1 ? 0 : (i * (width - 36)) / (records.length - 1)),
+  const [width, setWidth] = useState(0);
+  const points = (width > 0 ? records : []).map((r, i) => ({
+    x: records.length === 1 ? width / 2 : 24 + (i * (width - 48)) / (records.length - 1),
     y: 82 - r.score * 6,
     ...r,
   }));
@@ -29,43 +29,38 @@ function PainTrend({ records }: { records: PainRecord[] }) {
     };
   };
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={records.length > 4}
-      contentContainerStyle={{ width }}
-    >
-      <View>
-        <View style={[s.chart, { width }]}>
-          {points.slice(0, -1).map((p, i) => (
-            <View key={`line-${i}`} style={segment(p, points[i + 1])} />
-          ))}
-          {points.map((p, i) => (
-            <View
-              key={`${p.date}-${i}`}
-              style={[
-                s.point,
-                { left: p.x - 6, top: p.y - 6 },
-                i === points.length - 1 && s.pointLast,
-              ]}
-            >
-              <Text style={s.number}>{p.score}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={[s.dateCanvas, { width }]}>
-          {points.map((p, i) => (
-            <Text key={`${p.date}-date-${i}`} style={[s.date, { left: p.x - 20 }]}>
-              {p.date}
-            </Text>
-          ))}
-        </View>
+    <View style={s.trend} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
+      <View style={s.chart}>
+        {points.slice(0, -1).map((p, i) => (
+          <View key={`line-${i}`} style={segment(p, points[i + 1])} />
+        ))}
+        {points.map((p, i) => (
+          <View
+            key={`${p.date}-${i}`}
+            style={[
+              s.point,
+              { left: p.x - 6, top: p.y - 6 },
+              i === points.length - 1 && s.pointLast,
+            ]}
+          >
+            <Text style={s.number}>{p.score}</Text>
+          </View>
+        ))}
       </View>
-    </ScrollView>
+      <View style={s.dateCanvas}>
+        {points.map((p, i) => (
+          <Text key={`${p.date}-date-${i}`} style={[s.date, { left: p.x - 20 }]}>
+            {p.date}
+          </Text>
+        ))}
+      </View>
+    </View>
   );
 }
 
 export default function Health() {
   const [records, setRecords] = useState(getPainRecords());
+  const recentRecords = records.slice(-5);
   useFocusEffect(useCallback(() => setRecords(getPainRecords()), []));
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -130,9 +125,9 @@ export default function Health() {
           <Text style={s.insightHeading}>New insights for your MPowered plan.</Text>
           <View style={s.insightMeta}>
             <Text style={s.insightLabel}>Your average pain increased</Text>
-            <Text style={s.recordCount}>{records.length} records</Text>
+            <Text style={s.recordCount}>{recentRecords.length} records</Text>
           </View>
-          <PainTrend records={records} />
+          <PainTrend records={recentRecords} />
           <View style={s.actions}>
             <Pressable style={s.action} onPress={() => router.push('/health-records')}>
               <Text style={s.actionText}>Check pain history</Text>
@@ -328,6 +323,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
+  trend: { width: '100%' },
   chart: {
     height: 88,
     position: 'relative',
