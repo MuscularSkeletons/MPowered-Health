@@ -1,11 +1,11 @@
 import { PainProfileReport, profileReportHtml, profileReportText } from './pain-profile-report';
 
-export function printProfile(report: PainProfileReport): Promise<void> {
+export function printHtml(html: string): Promise<void> {
   // Expo's web printer ignores HTML. Print an isolated document so navigation,
   // buttons and the scroll container never appear in the PDF.
   return new Promise((resolve, reject) => {
     const frame = document.createElement('iframe');
-    frame.title = 'My Pain Profile print document';
+    frame.title = 'Health report print document';
     frame.setAttribute('aria-hidden', 'true');
     Object.assign(frame.style, {
       position: 'fixed',
@@ -42,9 +42,13 @@ export function printProfile(report: PainProfileReport): Promise<void> {
         reject(error);
       }
     };
-    frame.srcdoc = profileReportHtml(report);
+    frame.srcdoc = html;
     document.body.appendChild(frame);
   });
+}
+
+export function printProfile(report: PainProfileReport) {
+  return printHtml(profileReportHtml(report));
 }
 
 export async function shareProfile(report: PainProfileReport): Promise<'done' | 'copy'> {

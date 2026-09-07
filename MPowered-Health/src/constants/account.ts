@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validAnswer } from '@/utils/workflow-validation';
 import { sexOptions, diagnosisOptions, painConditions } from './profile-options';
-import { resetAssessmentSession } from './assessment-session';
+import { markAssessmentCompleted, resetAssessmentSession } from './assessment-session';
+import { finishPainHistoryWrites, getPainHistory, loadPainHistory } from './pain-history';
 import { resetAppointments } from './appointments';
 
 export type Profile = {
@@ -108,6 +109,10 @@ export async function initializeAccount() {
   if (deleted) await removeAccountKeys();
   const demo = !deleted && !(await AsyncStorage.getItem(profileKey));
   if (!demo) clearSession();
+  await loadPainHistory();
+  const latestPain = getPainHistory().at(-1);
+  if (latestPain)
+    markAssessmentCompleted('pain', latestPain.answers, new Date(latestPain.completedAt));
   snapshot = { ...snapshot, ready: true, deleted, demo };
   listeners.forEach((listener) => listener());
 }
@@ -123,6 +128,7 @@ export async function deleteLocalAccount() {
   // Only this app's keys are removed; other apps using the same storage are untouched.
   // Write the deletion marker first so partially failed cleanup can safely be retried.
   await AsyncStorage.setItem(deletedKey, 'true');
+  await finishPainHistoryWrites();
   await removeAccountKeys();
   clearSession();
   snapshot = { ready: true, deleted: true, revision: snapshot.revision + 1, demo: false };

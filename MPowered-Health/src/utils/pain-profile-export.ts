@@ -3,14 +3,18 @@ import * as Sharing from 'expo-sharing';
 import { Share } from 'react-native';
 import { PainProfileReport, profileReportHtml, profileReportText } from './pain-profile-report';
 
-export async function printProfile(report: PainProfileReport): Promise<void> {
+export async function printHtml(html: string): Promise<void> {
   try {
-    await Print.printAsync({ html: profileReportHtml(report) });
+    await Print.printAsync({ html });
   } catch (error) {
     // Expo on iOS rejects with this message when the user dismisses printing.
     if (error instanceof Error && error.message === 'Printing did not complete') return;
     throw error;
   }
+}
+
+export function printProfile(report: PainProfileReport) {
+  return printHtml(profileReportHtml(report));
 }
 
 export async function shareProfile(report: PainProfileReport): Promise<'done' | 'copy'> {

@@ -1,110 +1,49 @@
-import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from 'react-native-svg';
 import { MhaHeader, palette } from '@/components/mha-ui';
-import * as Print from 'expo-print';
-const chart = [5, 4, 5, 5, 5, 7, 8, 8, 7];
-const chartDates = ['', '05/04', '12/04', '19/04', '26/04', '03/05', '10/05', '17/05', '24/05'];
-const initial = [
-  ['18–24 May', '7', '9', '6'],
-  ['11–17 May', '8', '9', '6'],
-  ['04–10 May', '8', '9', '7'],
-  ['27 Apr–3 May', '7', '8', '5'],
-];
-const more = [
-  ['20–26 Apr', '5', '7', '4'],
-  ['13–19 Apr', '5', '7', '4'],
-  ['06–12 Apr', '5', '7', '3'],
-  ['30 Mar–5 Apr', '4', '6', '3'],
-  ['23–29 Mar', '5', '7', '4'],
-];
-function buildHealthRecordsHtml() {
-  // Expo Print renders HTML through WebKit. Keep the report self-contained and use
-  // print-safe SVG/CSS so charts and table rows paginate without being clipped.
-  const rows = [...initial, ...more]
-    .map(
-      (row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`,
-    )
-    .join('');
-  const chartLeft = 42,
-    chartRight = 650,
-    chartTop = 18,
-    chartBottom = 178;
-  const chartX = (index: number) =>
-    chartLeft + (index * (chartRight - chartLeft)) / (chart.length - 1);
-  const chartY = (score: number) => chartBottom - (score / 10) * (chartBottom - chartTop);
-  const chartPoints = chart.map((score, index) => `${chartX(index)},${chartY(score)}`).join(' ');
-  const chartArea = `${chartLeft},${chartBottom} ${chartPoints} ${chartRight},${chartBottom}`;
-  const horizontalGrid = Array.from(
-    { length: 11 },
-    (_, score) =>
-      `<line x1="${chartLeft}" x2="${chartRight}" y1="${chartY(score)}" y2="${chartY(score)}" stroke="#D5CFDC" stroke-width="1" stroke-dasharray="3 4"/><text x="30" y="${chartY(score) + 4}" text-anchor="end" font-size="10" fill="#686173">${score}</text>`,
-  ).join('');
-  const verticalGrid = chart
-    .map(
-      (_, index) =>
-        `<line x1="${chartX(index)}" x2="${chartX(index)}" y1="${chartTop}" y2="${chartBottom}" stroke="#E5DFF0" stroke-width="1" stroke-dasharray="3 4"/>`,
-    )
-    .join('');
-  const chartLabels = chartDates
-    .map((date, index) =>
-      date
-        ? `<text x="${chartX(index)}" y="202" text-anchor="middle" font-size="9" fill="#686173">${date}</text>`
-        : '',
-    )
-    .join('');
-  const chartDots = chart
-    .map(
-      (score, index) =>
-        `<circle cx="${chartX(index)}" cy="${chartY(score)}" r="4" fill="#5E17EB"/>`,
-    )
-    .join('');
-  const chartSvg = `<svg viewBox="0 0 680 215" role="img" aria-label="Average pain intensity chart"><polygon points="${chartArea}" fill="#D8C7FA" fill-opacity="0.48"/>${horizontalGrid}${verticalGrid}<polyline points="${chartPoints}" fill="none" stroke="#8C52FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${chartDots}${chartLabels}</svg>`;
-  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
-    @page{size:A4 portrait;margin:14mm}
-    *{box-sizing:border-box}
-    html,body{width:100%;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#201A2B;font-size:13px;line-height:1.45;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .report{width:100%}
-    .brand{border-bottom:3px solid #D8C7FA;padding-bottom:12px;white-space:nowrap}
-    .m{font-size:36px;font-weight:900}.powered{font-size:14px;font-weight:800;vertical-align:top}.health{font-size:27px;font-weight:900;color:#8C52FF;margin-left:8px}
-    h1{font-size:25px;line-height:1.2;margin:22px 0 5px}.subtitle{color:#686173;margin-bottom:18px}
-    .summary{background:#F3EEFF;border:1px solid #BEA1F7;border-radius:14px;padding:15px;margin-bottom:18px;break-inside:avoid;page-break-inside:avoid}
-    .summary strong{color:#5E17EB;font-size:18px}
-    .chart-card{border:1px solid #E5DFF0;border-radius:14px;padding:13px 14px 8px;margin-bottom:18px;break-inside:avoid;page-break-inside:avoid}
-    .chart-title{font-size:16px;font-weight:800;margin-bottom:2px}.chart-caption{font-size:11px;color:#686173;margin-bottom:5px}.chart-card svg{display:block;width:100%;height:auto;max-height:205px}
-    h2{font-size:16px;margin:0 0 9px;break-after:avoid;page-break-after:avoid}
-    table{width:100%;border-collapse:collapse;table-layout:fixed;border:1px solid #E5DFF0}
-    thead{display:table-header-group}tfoot{display:table-footer-group}
-    tr{break-inside:avoid;page-break-inside:avoid}
-    th{background:#5E17EB;color:#fff;text-align:left;padding:10px;border:1px solid #5E17EB}
-    td{padding:9px 10px;border:1px solid #E5DFF0;word-wrap:break-word}
-    th:first-child,td:first-child{width:40%}tr:nth-child(even) td{background:#F9F8FC}
-    .footer{margin-top:18px;padding-top:10px;border-top:1px solid #E5DFF0;color:#686173;font-size:10px;break-inside:avoid;page-break-inside:avoid}
-  </style></head><body><main class="report"><div class="brand"><span class="m">M</span><sup class="powered">Powered</sup><span class="health">Health</span></div><h1>My health tracking records</h1><div class="subtitle">Pain intensity · Back and knee · All recorded dates</div><div class="summary"><strong>Latest average: 7/10</strong><br>Tracking overview generated from your M Powered Health records.</div><section class="chart-card"><div class="chart-title">Average pain intensity</div><div class="chart-caption">Weekly score from 0 to 10</div>${chartSvg}</section><h2>Recorded periods</h2><table><thead><tr><th>Period</th><th>Average</th><th>Worst</th><th>Mildest</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Generated by M Powered Health · For personal health tracking only.</div></main></body></html>`;
-}
-function TrackingChart({ metric }: { metric: string }) {
-  const values = chart.map((value) =>
-    metric === 'Worst'
-      ? Math.min(10, value + 1)
-      : metric === 'Mildest'
-        ? Math.max(1, value - 1)
-        : value,
-  );
+import {
+  getPainHistory,
+  groupPainHistory,
+  PainAssessmentRecord,
+  PainMetric,
+  painMetricValue,
+  painRecordDate,
+} from '@/constants/pain-history';
+import { buildHealthRecordsHtml } from '@/utils/health-records-report';
+import { printHtml } from '@/utils/pain-profile-export';
+
+function TrackingChart({
+  metric,
+  records,
+}: {
+  metric: PainMetric;
+  records: PainAssessmentRecord[];
+}) {
+  const values = records.map((record) => painMetricValue(record, metric));
+  const chartDates = records.map((record) => painRecordDate(record, true));
   const left = 34,
     right = 354,
     top = 28,
     bottom = 224;
-  const x = (index: number) => left + (index * (right - left)) / (values.length - 1);
+  const x = (index: number) =>
+    values.length === 1
+      ? (left + right) / 2
+      : left + (index * (right - left)) / (values.length - 1);
   const y = (value: number) => bottom - (value / 10) * (bottom - top);
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
-  const area = `${left},${bottom} ${points} ${right},${bottom}`;
+  const area = `${x(0)},${bottom} ${points} ${x(values.length - 1)},${bottom}`;
   return (
     <View style={s.chartFrame}>
-      <Svg width="100%" height={270} viewBox="0 0 370 270">
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
+      <Svg
+        width="100%"
+        height={270}
+        viewBox="0 0 370 270"
+        accessibilityLabel={`${metric} pain for ${records.length} matching assessments`}
+      >
+        {Array.from({ length: 11 }, (_, i) => i).map((value) => (
           <Line
             key={`h-${value}`}
             x1={left}
@@ -128,7 +67,7 @@ function TrackingChart({ metric }: { metric: string }) {
             strokeDasharray="2 3"
           />
         ))}
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
+        {Array.from({ length: 11 }, (_, i) => i).map((value) => (
           <SvgText
             key={`label-${value}`}
             x="24"
@@ -140,7 +79,7 @@ function TrackingChart({ metric }: { metric: string }) {
             {value}
           </SvgText>
         ))}
-        <Polygon points={area} fill="#D8C7FA" fillOpacity="0.46" />
+        {values.length > 1 ? <Polygon points={area} fill="#D8C7FA" fillOpacity="0.46" /> : null}
         <Polyline
           points={points}
           fill="none"
@@ -159,9 +98,9 @@ function TrackingChart({ metric }: { metric: string }) {
           />
         ))}
         {chartDates.map((date, index) =>
-          date ? (
+          index % Math.max(1, Math.ceil(values.length / 7)) === 0 || index === values.length - 1 ? (
             <SvgText
-              key={date}
+              key={records[index].id}
               x={x(index)}
               y="247"
               fontSize="9"
@@ -176,39 +115,76 @@ function TrackingChart({ metric }: { metric: string }) {
     </View>
   );
 }
-function PrintPdfButton() {
+function PrintPdfButton({
+  records,
+  areaLabel,
+  metric,
+}: {
+  records: PainAssessmentRecord[];
+  areaLabel: string;
+  metric: PainMetric;
+}) {
   const [printing, setPrinting] = useState(false);
+  const pending = useRef(false);
+  const [error, setError] = useState('');
   const printPdf = async () => {
-    if (printing) return;
+    if (pending.current || !records.length) return;
+    pending.current = true;
     setPrinting(true);
+    setError('');
     try {
-      await Print.printAsync({ html: buildHealthRecordsHtml() });
+      await printHtml(buildHealthRecordsHtml(records, areaLabel, metric));
     } catch {
-      Alert.alert('PDF unavailable', 'The report could not be opened. Please try again.');
+      setError('The report could not be opened. Please try again.');
     } finally {
+      pending.current = false;
       setPrinting(false);
     }
   };
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Print health tracking PDF"
-      disabled={printing}
-      onPress={printPdf}
-      style={({ pressed }) => [s.print, pressed && s.printPressed, printing && s.printLoading]}
-    >
-      <View style={s.pdfBadge}>
-        <Text style={s.pdfBadgeText}>PDF</Text>
-      </View>
-      <Text style={s.printText}>{printing ? 'Creating…' : 'Print PDF'}</Text>
-    </Pressable>
+    <View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Print health tracking PDF"
+        disabled={printing || !records.length}
+        onPress={printPdf}
+        style={({ pressed }) => [
+          s.print,
+          pressed && s.printPressed,
+          (printing || !records.length) && s.printLoading,
+        ]}
+      >
+        <View style={s.pdfBadge}>
+          <Text style={s.pdfBadgeText}>PDF</Text>
+        </View>
+        <Text style={s.printText}>{printing ? 'Creating…' : 'Print PDF'}</Text>
+      </Pressable>
+      {error ? (
+        <Text accessibilityRole="alert" style={s.printError}>
+          {error}
+        </Text>
+      ) : null}
+    </View>
   );
 }
+
 export default function HealthRecords() {
   const [tab, setTab] = useState<'chart' | 'history'>('chart');
-  const [metric, setMetric] = useState('Average');
+  const [metric, setMetric] = useState<PainMetric>('Average');
   const [expanded, setExpanded] = useState(false);
-  const rows = expanded ? [...initial, ...more] : initial;
+  const [history, setHistory] = useState(getPainHistory);
+  const [selectedKey, setSelectedKey] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      setHistory(getPainHistory());
+    }, []),
+  );
+  const groups = groupPainHistory(history);
+  const selected = groups.find((group) => group.key === selectedKey) ?? groups[0];
+  const records = selected?.records ?? [];
+  const newestFirst = [...records].reverse();
+  const rows = expanded ? newestFirst : newestFirst.slice(0, 4);
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />
@@ -218,84 +194,193 @@ export default function HealthRecords() {
         </Pressable>
         <View style={s.titleRow}>
           <Text style={s.title}>My health tracking records</Text>
-          <PrintPdfButton />
+          <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
         </View>
         <View style={s.tabs}>
-          {['Chart', 'History'].map((x) => (
+          {(['Chart', 'History'] as const).map((label) => (
             <Pressable
-              key={x}
-              style={[s.tab, tab === x.toLowerCase() && s.tabOn]}
-              onPress={() => setTab(x.toLowerCase() as 'chart' | 'history')}
+              key={label}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: tab === label.toLowerCase() }}
+              style={[s.tab, tab === label.toLowerCase() && s.tabOn]}
+              onPress={() => setTab(label.toLowerCase() as 'chart' | 'history')}
             >
-              <Text style={[s.tabText, tab === x.toLowerCase() && s.tabTextOn]}>{x}</Text>
+              <Text style={[s.tabText, tab === label.toLowerCase() && s.tabTextOn]}>{label}</Text>
             </Pressable>
           ))}
         </View>
-        {tab === 'chart' ? (
+        <View style={s.chartHead}>
+          <Text style={s.metricTitle}>Pain intensity</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Pain areas: ${selected?.label ?? 'No assessments yet'}`}
+            accessibilityState={{ expanded: dropdownOpen, disabled: !groups.length }}
+            disabled={!groups.length}
+            style={s.filter}
+            onPress={() => setDropdownOpen(true)}
+          >
+            <Text style={s.filterText}>{selected?.label ?? 'No pain areas yet'} ⌄</Text>
+          </Pressable>
+        </View>
+        {!records.length ? (
+          <View style={s.empty}>
+            <Text style={s.historyDate}>No pain assessments recorded yet</Text>
+            <Text style={s.emptyCopy}>
+              Complete My Pain to see records grouped by the areas you select.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              style={s.more}
+              onPress={() => router.push({ pathname: '/assessment', params: { type: 'pain' } })}
+            >
+              <Text style={s.moreText}>Complete My Pain</Text>
+            </Pressable>
+          </View>
+        ) : tab === 'chart' ? (
           <>
-            <View style={s.chartHead}>
-              <Text style={s.metricTitle}>Pain intensity</Text>
-              <View style={s.filter}>
-                <Text style={s.filterText}>Back, knee⌄</Text>
-              </View>
-            </View>
-            <TrackingChart metric={metric} />
+            <TrackingChart metric={metric} records={records} />
             <View style={s.segment}>
-              {['Average', 'Worst', 'Mildest'].map((x) => (
+              {(['Average', 'Worst', 'Mildest'] as const).map((label) => (
                 <Pressable
-                  key={x}
-                  style={[s.segmentItem, metric === x && s.segmentOn]}
-                  onPress={() => setMetric(x)}
+                  key={label}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: metric === label }}
+                  style={[s.segmentItem, metric === label && s.segmentOn]}
+                  onPress={() => setMetric(label)}
                 >
-                  <Text style={[s.segmentText, metric === x && s.segmentTextOn]}>{x}</Text>
+                  <Text style={[s.segmentText, metric === label && s.segmentTextOn]}>{label}</Text>
                 </Pressable>
               ))}
             </View>
             <View style={s.table}>
-              {rows.map((r, i) => (
-                <View key={r[0]} style={[s.tableRow, i === 0 && s.tableFirst]}>
-                  {r.map((c, j) => (
-                    <Text key={j} style={[s.cell, j === 0 && s.dateCell]}>
-                      {c}
-                    </Text>
-                  ))}
+              <View style={[s.tableRow, s.tableFirst]}>
+                {['Recorded', 'Average', 'Worst', 'Mildest'].map((label, index) => (
+                  <Text key={label} style={[s.cell, s.tableHeading, index === 0 && s.dateCell]}>
+                    {label}
+                  </Text>
+                ))}
+              </View>
+              {rows.map((record) => (
+                <View key={record.id} style={s.tableRow}>
+                  {[painRecordDate(record), record.average, record.worst, record.mildest].map(
+                    (value, index) => (
+                      <Text key={index} style={[s.cell, index === 0 && s.dateCell]}>
+                        {value}
+                      </Text>
+                    ),
+                  )}
                 </View>
               ))}
             </View>
-            <Pressable style={s.more} onPress={() => setExpanded((v) => !v)}>
-              <Text style={s.moreText}>{expanded ? 'Show fewer records' : 'See more records'}</Text>
-            </Pressable>
+            {records.length > 4 ? (
+              <Pressable
+                accessibilityRole="button"
+                style={s.more}
+                onPress={() => setExpanded((value) => !value)}
+              >
+                <Text style={s.moreText}>
+                  {expanded ? 'Show fewer records' : 'See more records'}
+                </Text>
+              </Pressable>
+            ) : null}
           </>
         ) : (
           <View style={s.history}>
-            {['18–24 May', '11–17 May', '04–10 May', '27 Apr–03 May', '20–26 Apr'].map(
-              (date, i) => (
-                <View key={date} style={s.historyGroup}>
-                  <Text style={s.historyDate}>{date}</Text>
-                  {i === 0
-                    ? [
-                        'My Pain',
-                        'My Movement',
-                        'My Personal Care',
-                        'My Social Health',
-                        'My Management',
-                      ].map((x) => (
-                        <Text key={x} style={s.historyItem}>
-                          {x}
-                          <Text style={s.historyArrow}> ›</Text>
-                        </Text>
-                      ))
-                    : null}
-                </View>
-              ),
-            )}
+            {newestFirst.map((record) => (
+              <View key={record.id} style={s.historyGroup}>
+                <Text style={s.historyDate}>{painRecordDate(record)}</Text>
+                <Text style={s.historyItem}>My Pain · {selected?.label}</Text>
+                <Text style={s.emptyCopy}>
+                  Average {record.average}/10 · Worst {record.worst}/10 · Mildest {record.mildest}
+                  /10
+                </Text>
+              </View>
+            ))}
           </View>
         )}
       </ScrollView>
+      <Modal
+        visible={dropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDropdownOpen(false)}
+      >
+        <View style={s.overlay}>
+          <View style={s.dropdown} accessibilityViewIsModal>
+            <Text style={s.historyDate} accessibilityRole="header">
+              Choose pain areas
+            </Text>
+            <Text style={s.emptyCopy}>
+              Each option shows assessments with exactly that combination of areas.
+            </Text>
+            <ScrollView style={s.dropdownList}>
+              {groups.map((group) => (
+                <Pressable
+                  key={group.key}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selected?.key === group.key }}
+                  style={[s.dropdownOption, selected?.key === group.key && s.dropdownSelected]}
+                  onPress={() => {
+                    setSelectedKey(group.key);
+                    setExpanded(false);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <Text style={s.optionLabel}>
+                    {group.label}
+                    {selected?.key === group.key ? ' ✓' : ''}
+                  </Text>
+                  <Text style={s.emptyCopy}>
+                    {group.records.length}{' '}
+                    {group.records.length === 1 ? 'assessment' : 'assessments'}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            <Pressable
+              accessibilityRole="button"
+              style={s.more}
+              onPress={() => setDropdownOpen(false)}
+            >
+              <Text style={s.moreText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 const s = StyleSheet.create({
+  printError: { color: '#A52035', fontSize: 12, maxWidth: 160, marginTop: 6 },
+  empty: { marginTop: 24, paddingVertical: 24 },
+  emptyCopy: { fontSize: 13, lineHeight: 20, color: palette.muted },
+  tableHeading: { fontWeight: '700', backgroundColor: '#F3EEFF' },
+  overlay: {
+    flex: 1,
+    backgroundColor: '#00000066',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  dropdown: {
+    width: '100%',
+    maxWidth: 520,
+    maxHeight: '80%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 20,
+  },
+  dropdownList: { flexShrink: 1, marginTop: 12 },
+  dropdownOption: {
+    minHeight: 58,
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: palette.line,
+  },
+  dropdownSelected: { backgroundColor: '#F3EEFF', borderColor: palette.primary },
+  optionLabel: { color: palette.text, fontSize: 14, fontWeight: '700', lineHeight: 21 },
   chartFrame: {
     marginTop: 14,
     backgroundColor: '#fff',
@@ -394,10 +479,15 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 12,
+    flexWrap: 'wrap',
+    gap: 10,
   },
   metricTitle: { fontSize: 18, fontWeight: '700', color: palette.text },
   filter: {
-    height: 34,
+    minHeight: 44,
+    maxWidth: '100%',
+    flexShrink: 1,
+    paddingVertical: 8,
     borderWidth: 1,
     borderColor: palette.line,
     borderRadius: 17,

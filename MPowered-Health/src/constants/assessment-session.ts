@@ -1,3 +1,5 @@
+import { clearPainHistoryMemory, getPainHistory, painRecordDate } from './pain-history';
+
 const completedAssessments = new Set<string>();
 export type AssessmentAnswers = Record<number, string[]>;
 const assessmentAnswers = new Map<string, AssessmentAnswers>();
@@ -14,9 +16,13 @@ function cloneAnswers(answers: AssessmentAnswers): AssessmentAnswers {
   return Object.fromEntries(Object.entries(answers).map(([step, values]) => [step, [...values]]));
 }
 
-export function markAssessmentCompleted(type: string, answers?: AssessmentAnswers) {
+export function markAssessmentCompleted(
+  type: string,
+  answers?: AssessmentAnswers,
+  completedAt = new Date(),
+) {
   completedAssessments.add(type);
-  assessmentUpdatedAt.set(type, new Date());
+  assessmentUpdatedAt.set(type, completedAt);
   if (answers) assessmentAnswers.set(type, cloneAnswers(answers));
 }
 
@@ -42,13 +48,10 @@ export function getAssessmentAnswers(type: string) {
   return answers ? cloneAnswers(answers) : undefined;
 }
 
-export function addPainRecord(score: number) {
-  const now = new Date();
-  const date = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
-  painRecords.push({ date, score: Math.max(0, Math.min(10, score)) });
-}
-
 export function getPainRecords() {
+  const saved = getPainHistory();
+  if (saved.length)
+    return saved.map((record) => ({ date: painRecordDate(record, true), score: record.average }));
   return [...painRecords];
 }
 
@@ -58,6 +61,7 @@ export function getWeeklyStreak() {
 
 // Remove all in-memory health data when the local account is deleted.
 export function resetAssessmentSession() {
+  clearPainHistoryMemory();
   completedAssessments.clear();
   assessmentAnswers.clear();
   assessmentUpdatedAt.clear();

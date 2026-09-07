@@ -14,11 +14,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
-import {
-  addPainRecord,
-  getAssessmentAnswers,
-  markAssessmentCompleted,
-} from '@/constants/assessment-session';
+import { getPainHistory, painRecordDate, savePainAssessment } from '@/constants/pain-history';
+import { getAssessmentAnswers, markAssessmentCompleted } from '@/constants/assessment-session';
 type Q = {
   title: string;
   prompt: string;
@@ -639,6 +636,9 @@ export default function Assessment() {
     [answers, setAnswers] = useState<Record<number, string[]>>({}),
     [done, setDone] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const savingRef = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   // Expo Router can retain this screen while only changing its route params.
   // Every assessment must therefore start with its own clean recording state.
@@ -665,15 +665,27 @@ export default function Assessment() {
             : [...current, v]
           : [v],
     }));
-  const next = () => {
+  const next = async () => {
+    if (savingRef.current) return;
     if (activeStep < spec.questions.length - 1) {
       setStep(activeStep + 1);
       return;
     }
-    markAssessmentCompleted(type, answers);
-    if (type === 'pain') addPainRecord(Number(answers[5]?.[0] ?? answers[2]?.[0] ?? 0));
-    setDone(true);
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError('');
+    try {
+      if (type === 'pain') await savePainAssessment(answers);
+      markAssessmentCompleted(type, answers);
+      setDone(true);
+    } catch {
+      setSaveError('Your assessment could not be saved. Please try again.');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
   };
+  const latestPain = getPainHistory().at(-1);
   const result = useMemo(() => Object.values(answers).flat(), [answers]);
   const summarySections = buildSummary(type, answers)
     .filter((section) => section.text)
@@ -701,7 +713,13 @@ export default function Assessment() {
               <Text style={[s.resultHeading, { marginBottom: 0, lineHeight: 20 }]}>
                 {spec.title}
               </Text>
-              <Text style={s.period}>Period: 18–24 May</Text>
+              <Text style={s.period}>
+                {type === 'pain'
+                  ? latestPain
+                    ? `Recorded ${painRecordDate(latestPain)}`
+                    : 'My Pain assessment'
+                  : 'Period: 18–24 May'}
+              </Text>
             </View>
             {type !== 'pain' ? (
               <SummaryInsight summary={spec.summary} tip={spec.tip} url={tipUrls[type]} />
@@ -733,6 +751,19 @@ export default function Assessment() {
             <Text style={s.saved}>
               {type === 'pain' ? 'Saved to My Health' : 'Saved to Care Journal'}
             </Text>
+            {type === 'pain' ? (
+              <Pressable
+                accessibilityRole="button"
+                style={s.closeButton}
+                onPress={() => {
+                  setDone(false);
+                  setStep(0);
+                  setSaveError('');
+                }}
+              >
+                <Text style={s.closeText}>Record new assessment</Text>
+              </Pressable>
+            ) : null}
             <Pressable
               accessibilityRole="button"
               onPress={closeSummary}
@@ -835,10 +866,17 @@ export default function Assessment() {
           )}
           <View style={s.action}>
             <ActionButton
-              label={activeStep === spec.questions.length - 1 ? 'Review' : 'Record'}
-              disabled={!valid}
+              label={
+                saving ? 'Saving…' : activeStep === spec.questions.length - 1 ? 'Review' : 'Record'
+              }
+              disabled={!valid || saving}
               onPress={next}
             />
+            {saveError ? (
+              <Text accessibilityRole="alert" style={s.required}>
+                {saveError}
+              </Text>
+            ) : null}
             {!valid ? <Text style={s.required}>This question is mandatory.</Text> : null}
           </View>
           {q.helper ? <Text style={s.helper}>{q.helper}</Text> : null}
@@ -1205,6 +1243,7 @@ const s = StyleSheet.create({
   guideArrow: { fontSize: 22, color: palette.primary },
   summaryFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
