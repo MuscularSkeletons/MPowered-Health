@@ -27,7 +27,11 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { addAppointment } from '@/constants/appointments';
+import {
+  addAppointment,
+  buildAppointmentQuestions,
+  type AppointmentQuestion,
+} from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
 import { isValidPin, pinDigits } from '@/utils/pin-validation';
 import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
@@ -42,6 +46,7 @@ import { getAssessmentAnswers, getLatestAssessmentDate } from '@/constants/asses
 import { asSentence, buildSummary } from './assessment';
 import { ProfileExportActions } from '@/components/profile-export-actions';
 import { ProfileSection } from '@/utils/pain-profile-report';
+import { getPainHistory, painRecordDate } from '@/constants/pain-history';
 // Each flow is a sequence of questions rendered by WorkflowForm below. The flow
 // definitions describe content; the form handles answers, validation, and navigation.
 type Step = {
@@ -252,25 +257,6 @@ const flows: Record<
       {
         title: 'Add Questions for My Appointment',
         copy: 'We have provided some suggested questions to ask your healthcare professional/s.',
-        options: [
-          'What could be causing pain in my lower back, neck, and knee?',
-          'Are these areas related, or are they likely separate issues?',
-          'My average pain over the past two weeks has been around 7 — what does this indicate?',
-          'Even though I don’t have pain right now, I’ve had severe pain at times (up to 9). What could explain these flare-ups?',
-          'Is it normal for pain to vary between mild (2) and very severe (9)?',
-          'What can I do to better manage days when the pain is high?',
-          'What treatments or therapies could help improve my mobility?',
-          'Would physiotherapy or a specific exercise program be appropriate for me?',
-          'Are there movements or activities I should avoid right now?',
-          'My pain is making it hard to take care of myself independently — what can we do to improve this?',
-          'Are there strategies, aids, or supports that could help with daily tasks?',
-          'Should we adjust my treatment plan given how much this is affecting my independence?',
-          'Is this level of impact typical for my condition?',
-          'What options are available to improve my quality of life?',
-          'Are there additional investigations or referrals that might help?',
-          'How can I prevent the pain from becoming severe again?',
-          'What are realistic goals for improving my function and independence?',
-        ],
         multi: true,
         optional: true,
       },
@@ -805,28 +791,34 @@ function Choice({
   );
 }
 function AppointmentQuestions({
-  options,
+  suggestions,
+  assessmentDate,
   value,
   pick,
   customQuestion,
   setCustomQuestion,
 }: {
-  options: string[];
+  suggestions: AppointmentQuestion[];
+  assessmentDate?: string;
   value: string[];
   pick: (v: string) => void;
   customQuestion: string;
   setCustomQuestion: (value: string) => void;
 }) {
-  // These ranges match the question order in flows.appointment. Keep the ranges
-  // and the grouping in next() aligned when adding or rearranging questions.
-  const groups = [
-    { title: 'Pain location', items: options.slice(0, 2) },
-    { title: 'Pain intensity', items: options.slice(2, 6) },
-    { title: 'Pain impact', items: options.slice(6, 14) },
-    { title: 'Management', items: options.slice(14) },
-  ];
+  // Keep the group stored with each question so personalized wording cannot change its section.
+  const groups = ['Pain location', 'Pain intensity', 'Pain impact', 'Management'].map((title) => ({
+    title,
+    items: suggestions
+      .filter((question) => question.group === title)
+      .map((question) => question.text),
+  }));
   return (
     <View style={{ marginTop: 18 }}>
+      <Text style={s.questionSource}>
+        {assessmentDate
+          ? `Based on your latest My Pain assessment from ${assessmentDate}.`
+          : 'Complete My Pain to receive questions based on your latest assessment.'}
+      </Text>
       {groups.map((group) => (
         <Choice
           key={group.title}
@@ -1035,15 +1027,21 @@ function WorkflowForm() {
   }, [flow, week]);
   if (flow === 'prescriptions') return <Prescriptions />;
   if (flow === 'profile') return <PainProfileSummary />;
-  const current = data.steps[step],
+  // Rebuild appointment suggestions from the newest saved pain record whenever this flow opens.
+  const latestPain = getPainHistory().at(-1);
+  const appointmentQuestions = buildAppointmentQuestions(latestPain);
+  const baseCurrent = data.steps[step];
+  const current =
+      flow === 'appointment' && step === 1
+        ? { ...baseCurrent, options: appointmentQuestions.map((question) => question.text) }
+        : baseCurrent,
     selected = values[step] ?? [];
   const enteredName =
     Object.entries(fields)
       .find(([key]) => key.endsWith('-Type your name'))?.[1]
       ?.trim() || registrationFieldsRef.current['3-Type your name']?.trim();
   const userName = enteredName || routeName || 'there';
-  const isRegistrationComplete =
-    flow === 'onboarding' && current.title === 'Registration complete';
+  const isRegistrationComplete = flow === 'onboarding' && current.title === 'Registration complete';
   const displayTitle = isRegistrationComplete ? `Thank you, ${userName} 😃` : current.title;
   const displayCopy =
     flow === 'reflection'
@@ -1138,20 +1136,13 @@ function WorkflowForm() {
     }
     if (flow === 'appointment' && current.title === 'Add Questions for My Appointment') {
       const customQuestion = fields['1-Other question']?.trim();
-      const groupedQuestions = selected.map((text) => {
-        const index = current.options?.indexOf(text) ?? -1;
-        return {
-          group:
-            index < 2
-              ? 'Pain location'
-              : index < 6
-                ? 'Pain intensity'
-                : index < 14
-                  ? 'Pain impact'
-                  : 'Management',
-          text,
-        };
-      });
+      const groupedQuestions = selected.map(
+        (text) =>
+          appointmentQuestions.find((question) => question.text === text) ?? {
+            group: 'Other',
+            text,
+          },
+      );
       router.push({
         pathname: '/appointment-review',
         params: {
@@ -1298,7 +1289,8 @@ function WorkflowForm() {
           </View>
         ) : flow === 'appointment' && step === 1 && current.options ? (
           <AppointmentQuestions
-            options={current.options}
+            suggestions={appointmentQuestions}
+            assessmentDate={latestPain ? painRecordDate(latestPain) : undefined}
             value={selected}
             pick={pick}
             customQuestion={fields['1-Other question'] ?? ''}
@@ -1572,6 +1564,12 @@ const s = StyleSheet.create({
     fontWeight: '800',
     color: palette.text,
     marginBottom: 2,
+  },
+  questionSource: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: palette.muted,
+    marginBottom: 4,
   },
   choice: {
     minHeight: 60,

@@ -23,29 +23,15 @@ import {
   useAudioRecorderState,
 } from 'expo-audio';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
-import { addAppointment, getAppointment, saveAppointmentSignature } from '@/constants/appointments';
+import {
+  addAppointment,
+  buildAppointmentQuestions,
+  getAppointment,
+  saveAppointmentSignature,
+} from '@/constants/appointments';
+import { getPainHistory } from '@/constants/pain-history';
 import Svg, { Path } from 'react-native-svg';
 import { Image } from 'expo-image';
-
-// Use these defaults when a saved appointment does not contain its own questions.
-const questions = [
-  {
-    group: 'Pain location',
-    text: 'What could be causing pain in my lower back, neck, and knee?',
-  },
-  {
-    group: 'Pain location',
-    text: 'Are these areas related, or are they likely separate issues?',
-  },
-  {
-    group: 'Pain intensity',
-    text: 'My average pain over the past two weeks has been around 7 — what does this indicate?',
-  },
-  {
-    group: 'Pain intensity',
-    text: 'What can I do to better manage days when the pain is high?',
-  },
-];
 
 // Convert finger movement into SVG paths so a signature can be shown and saved.
 function SignaturePad({
@@ -174,7 +160,7 @@ function AppointmentReviewContent() {
       }));
   const displayedQuestions = planning
     ? [...routedQuestions, ...(customQuestion ? [{ group: 'Other', text: customQuestion }] : [])]
-    : (appointment.questions ?? questions);
+    : (appointment.questions ?? buildAppointmentQuestions(getPainHistory().at(-1)));
   // Keep modal drafts separate from saved answers so Cancel can discard changes.
   const [activeQuestion, setActiveQuestion] = useState<string>();
   const [answer, setAnswer] = useState('');

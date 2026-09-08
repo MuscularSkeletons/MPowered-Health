@@ -69,6 +69,32 @@ test('each area combination is order-independent and never matches subsets', () 
   assert.notEqual(history.painAreaKey(['Upper Back']), history.painAreaKey(['Lower Back']));
 });
 
+test('appointment questions use the latest pain areas and intensity scores', () => {
+  const { buildAppointmentQuestions } = environment().load('constants/appointments');
+  const questions = buildAppointmentQuestions({
+    areas: ['Lower Back', 'Neck', 'Knee'],
+    current: 0,
+    mildest: 2,
+    worst: 9,
+    average: 7,
+  });
+  assert.equal(
+    questions[0].text,
+    'What could be causing pain in my lower back, neck, and knee?',
+  );
+  assert.ok(questions.some((question) => question.text.includes('average pain last week was 7')));
+  assert.ok(questions.some((question) => question.text.includes('ranged from 2 to 9')));
+  assert.ok(questions.every((question) => !question.text.includes('past two weeks')));
+});
+
+test('appointment questions do not invent assessment values before My Pain is completed', () => {
+  const { buildAppointmentQuestions } = environment().load('constants/appointments');
+  const questions = buildAppointmentQuestions();
+  assert.equal(questions[0].text, 'What could be causing my pain?');
+  assert.ok(questions.some((question) => question.text.includes('track about my pain intensity')));
+  assert.ok(questions.every((question) => !/\b[0-9]+ out of 10\b/.test(question.text)));
+});
+
 // Saved assessments are immutable snapshots even when screens keep editing their drafts.
 test('assessment snapshots survive reload and later answer edits', async () => {
   const env = environment();

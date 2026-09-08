@@ -31,12 +31,7 @@ export const productContent = {
   },
   appointmentQuestions: {
     title: 'Add Questions for My Appointment',
-    generated: 'Generated on 5 May 2026',
-    painLocation: [
-      'What could be causing pain in my lower back, neck, and knee?',
-      'Are these areas related, or are they likely separate issues?',
-    ],
-    painIntensity:
-      'My average pain over the past two weeks has been around 7 — what does this indicate?',
+    description:
+      'Suggested questions use the pain areas and intensity scores from the latest My Pain assessment.',
   },
 } as const;
