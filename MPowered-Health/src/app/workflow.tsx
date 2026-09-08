@@ -127,7 +127,7 @@ const flows: Record<
       {
         title: 'Registration complete',
         copy: 'Finally, let’s link this information to your account so the next time you open this app, you can just log in',
-        action: 'Continue',
+        action: 'Get started',
       },
     ],
   },
@@ -1104,11 +1104,10 @@ function WorkflowForm() {
       }
       return;
     }
-    if (isRegistrationComplete) {
+    if (flow === 'onboarding' && current.title === 'Set up your PIN') {
       const registrationFields = { ...registrationFieldsRef.current, ...fields };
       const pin = registrationFields['9-Create PIN'] ?? '';
       if (!isValidPin(pin)) {
-        setStep(9);
         setRegistrationError('Enter exactly four digits to continue.');
         return;
       }
@@ -1122,12 +1121,16 @@ function WorkflowForm() {
         );
         registrationFieldsRef.current['9-Create PIN'] = '';
         setFields((previous) => ({ ...previous, '9-Create PIN': '' }));
-        router.replace({ pathname: '/dashboard', params: { name: userName } });
+        setStep(step + 1);
       } catch {
         setRegistrationError('Your account could not be saved. Check your answers and try again.');
       } finally {
         setSaving(false);
       }
+      return;
+    }
+    if (isRegistrationComplete) {
+      router.replace({ pathname: '/dashboard', params: { name: userName } });
       return;
     }
     if (flow === 'appointment' && current.title === 'Add Questions for My Appointment') {
