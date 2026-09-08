@@ -109,19 +109,20 @@ test('credential-store failure prevents completing registration; profile failure
   assert.equal((await env.load('constants/pin-auth').verifyAccountPin('0123')).ok, true);
 });
 
-// Lockout state is persistent and expires according to the stored clock time.
-test('five failures temporarily lock PIN attempts, including after restart, then allow retry', async () => {
+// The recovery requirement persists so restarting the app cannot restore PIN attempts.
+test('five failures require email verification, including after restart', async () => {
   const env = environment();
   await env.load('constants/account').registerProfile(profile, '0123');
   const auth = env.load('constants/pin-auth');
   const results = await Promise.all(Array.from({ length: 5 }, () => auth.verifyAccountPin('9999')));
   assert.ok(results.every((result) => !result.ok));
-  assert.match(results[4].message, /60 seconds/);
+  assert.equal(results[3].requiresEmailVerification, undefined);
+  assert.equal(results[4].requiresEmailVerification, true);
+  assert.match(results[4].message, /Verify your email address/);
   const restarted = environment({ storage: env.storage, secure: env.secure });
-  assert.equal((await restarted.load('constants/pin-auth').verifyAccountPin('0123')).ok, false);
-  env.advance(61000);
-  assert.equal((await auth.verifyAccountPin('0123')).ok, true);
-  assert.equal(env.storage.has('mpowered:pin-attempts'), false);
+  const afterRestart = await restarted.load('constants/pin-auth').verifyAccountPin('0123');
+  assert.equal(afterRestart.ok, false);
+  assert.equal(afterRestart.requiresEmailVerification, true);
 });
 
 test('account deletion clears the PIN and failed-attempt state', async () => {

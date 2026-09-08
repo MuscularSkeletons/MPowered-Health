@@ -26,6 +26,7 @@ export default function Login() {
     [code, setCode] = useState('');
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const [emailVerificationRequired, setEmailVerificationRequired] = useState(false);
   const pending = useRef(false);
   const value = step === 'pin' ? pin : step === 'email' ? email : code;
   const ready =
@@ -52,7 +53,11 @@ export default function Login() {
     if (!ready || pending.current) return;
     if (step !== 'pin') {
       // Recovery needs a verified server response; a typed code is not authentication.
-      setError('Email recovery is not connected yet. Please use the PIN saved on this device.');
+      setError(
+        emailVerificationRequired
+          ? 'Email verification could not be started. Please try again later.'
+          : 'Email recovery is not connected yet. Please use the PIN saved on this device.',
+      );
       return;
     }
     pending.current = true;
@@ -63,6 +68,12 @@ export default function Login() {
       if (result.ok) {
         setPin('');
         router.replace('/dashboard');
+      } else if (result.requiresEmailVerification) {
+        // Repeated failures leave PIN entry and show the account email check immediately.
+        setPin('');
+        setEmailVerificationRequired(true);
+        setStep('email');
+        setError(result.message ?? 'Verify your email address to continue.');
       } else setError(result.message ?? 'Incorrect PIN. Please try again.');
     } catch {
       setError('Unable to check your PIN. Please try again.');
@@ -79,7 +90,7 @@ export default function Login() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={s.content}>
-          {step !== 'pin' ? (
+          {step !== 'pin' && !(step === 'email' && emailVerificationRequired) ? (
             <Pressable
               accessibilityRole="button"
               style={s.backButton}
@@ -94,14 +105,18 @@ export default function Login() {
               {step === 'pin'
                 ? 'Welcome back!'
                 : step === 'email'
-                  ? 'Email sign-in'
+                  ? emailVerificationRequired
+                    ? 'Verify your email address'
+                    : 'Email sign-in'
                   : 'We’re sending a verification code to this email address'}
             </Text>
             <Text style={s.copy}>
               {step === 'pin'
                 ? 'Enter your 4-digit PIN to continue.'
                 : step === 'email'
-                  ? 'Email sign-in is not available yet. Use your PIN on this device.'
+                  ? emailVerificationRequired
+                    ? 'Enter the email address linked to your account to continue securely.'
+                    : 'Email sign-in is not available yet. Use your PIN on this device.'
                   : 'You can resend the code in two minutes.'}
             </Text>
           </View>
@@ -148,6 +163,7 @@ export default function Login() {
                 disabled={checking}
                 onPress={() => {
                   setError('');
+                  setEmailVerificationRequired(false);
                   setStep('email');
                 }}
                 style={s.inlineLink}
@@ -192,6 +208,7 @@ export default function Login() {
                 disabled={checking}
                 onPress={() => {
                   setError('');
+                  setEmailVerificationRequired(false);
                   setStep('email');
                 }}
                 style={({ pressed }) => [s.accountButton, pressed && s.accountButtonPressed]}

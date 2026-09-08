@@ -1,11 +1,11 @@
-// This file checks PIN sign-in attempts and temporarily locks repeated failures.
+// This file checks PIN sign-in attempts and requires email verification after repeated failures.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getProfile } from './account';
 import { matchesPinCredential, readPinCredential } from './pin-credential';
 import { isValidPin } from '../utils/pin-validation';
 
 export const pinAttemptsKey = 'mpowered:pin-attempts';
-type Result = { ok: boolean; message?: string };
+type Result = { ok: boolean; message?: string; requiresEmailVerification?: boolean };
 // Queue checks so rapid taps cannot update the failure count at the same time.
 let checking: Promise<unknown> = Promise.resolve();
 
@@ -24,11 +24,13 @@ export function verifyAccountPin(pin: string): Promise<Result> {
         (await AsyncStorage.getItem(pinAttemptsKey)) ?? '{"failures":0,"lockedUntil":0}',
       );
       const now = Date.now();
-      // Preserve a lock across app restarts by storing its absolute expiry time.
-      if (saved.lockedUntil > now)
+      // Preserve the recovery requirement across restarts. Treat an older active lockout
+      // record as requiring email too, so upgrades do not weaken an existing restriction.
+      if (saved.verificationRequired === true || saved.lockedUntil > now)
         return {
           ok: false,
-          message: `Too many incorrect attempts. Try again in ${Math.ceil((saved.lockedUntil - now) / 1000)} seconds.`,
+          requiresEmailVerification: true,
+          message: 'Too many incorrect PIN attempts. Verify your email address to continue.',
         };
       if (await matchesPinCredential(raw, profile.email, pin)) {
         // A successful sign-in clears all earlier failures immediately.
@@ -36,13 +38,17 @@ export function verifyAccountPin(pin: string): Promise<Result> {
         return { ok: true };
       }
       const failures = (saved.lockedUntil ? 0 : Number(saved.failures) || 0) + 1;
-      // Five consecutive failures create a one-minute lock on this device.
-      const lockedUntil = failures >= 5 ? now + 60000 : 0;
-      await AsyncStorage.setItem(pinAttemptsKey, JSON.stringify({ failures, lockedUntil }));
+      // Five consecutive failures switch this device from PIN entry to email recovery.
+      const verificationRequired = failures >= 5;
+      await AsyncStorage.setItem(
+        pinAttemptsKey,
+        JSON.stringify({ failures, verificationRequired }),
+      );
       return {
         ok: false,
-        message: lockedUntil
-          ? 'Too many incorrect attempts. Try again in 60 seconds.'
+        requiresEmailVerification: verificationRequired || undefined,
+        message: verificationRequired
+          ? 'Too many incorrect PIN attempts. Verify your email address to continue.'
           : 'Incorrect PIN. Please try again.',
       };
     });
