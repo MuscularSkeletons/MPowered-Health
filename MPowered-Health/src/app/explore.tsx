@@ -1,3 +1,4 @@
+// This screen gives the user access to health records, profiles, and guidance.
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -5,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
 import { getPainRecords, PainRecord } from '@/constants/assessment-session';
 
+// Turn saved weekly scores into a small trend chart for the health overview.
 function PainTrend({ records }: { records: PainRecord[] }) {
   const [width, setWidth] = useState(0);
   const points = (width > 0 ? records : []).map((r, i) => ({
@@ -12,6 +14,7 @@ function PainTrend({ records }: { records: PainRecord[] }) {
     y: 82 - r.score * 6,
     ...r,
   }));
+  // Rotate and size a view to connect two score points.
   const segment = (a: (typeof points)[number], b: (typeof points)[number]) => {
     const dx = b.x - a.x,
       dy = b.y - a.y,
@@ -58,8 +61,10 @@ function PainTrend({ records }: { records: PainRecord[] }) {
   );
 }
 
+// Refresh health data and link to records, profile, and guidance.
 export default function Health() {
   const [records, setRecords] = useState(getPainRecords());
+  // Limit the graph to five records so its labels stay readable.
   const recentRecords = records.slice(-5);
   useFocusEffect(useCallback(() => setRecords(getPainRecords()), []));
   return (
@@ -154,6 +159,7 @@ export default function Health() {
   );
 }
 
+// Group chart, card, and navigation styles below the screen.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#FFFFFF' },
   content: {

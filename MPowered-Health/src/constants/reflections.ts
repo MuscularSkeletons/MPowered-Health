@@ -1,3 +1,4 @@
+// This file saves and loads the user's weekly reflection notes.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type WeeklyReflection = { week: string; notes: string; savedAt: string };

@@ -1,3 +1,5 @@
+// This file holds reusable product wording shown across the app.
+// Group wording by screen so product text can be reviewed without opening each component.
 export const productContent = {
   dashboard: {
     description: 'Assess your pain intensity and its impacts weekly to create an empowered plan.',

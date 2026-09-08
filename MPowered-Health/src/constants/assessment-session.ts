@@ -1,3 +1,4 @@
+// This file tracks assessment answers and completion during the current app session.
 import { clearPainHistoryMemory, getPainHistory, painRecordDate } from './pain-history';
 
 const completedAssessments = new Set<string>();
@@ -6,6 +7,7 @@ const assessmentAnswers = new Map<string, AssessmentAnswers>();
 const assessmentUpdatedAt = new Map<string, Date>();
 export type PainRecord = { date: string; score: number };
 const painRecords: PainRecord[] = [
+  // These sample points keep the dashboard useful before a person records real results.
   { date: '25/05', score: 5 },
   { date: '01/06', score: 5 },
   { date: '08/06', score: 7 },
@@ -13,6 +15,7 @@ const painRecords: PainRecord[] = [
 let weeklyStreak = 3;
 
 function cloneAnswers(answers: AssessmentAnswers): AssessmentAnswers {
+  // Copy every answer list so screens cannot mutate stored answers by reference.
   return Object.fromEntries(Object.entries(answers).map(([step, values]) => [step, [...values]]));
 }
 
@@ -21,6 +24,7 @@ export function markAssessmentCompleted(
   answers?: AssessmentAnswers,
   completedAt = new Date(),
 ) {
+  // Completion, timestamp, and answers are updated together for consistent summaries.
   completedAssessments.add(type);
   assessmentUpdatedAt.set(type, completedAt);
   if (answers) assessmentAnswers.set(type, cloneAnswers(answers));
@@ -40,15 +44,18 @@ export function getLatestAssessmentDate() {
 }
 
 export function getCompletedAssessments() {
+  // Convert the private Set into a caller-owned list.
   return [...completedAssessments];
 }
 
 export function getAssessmentAnswers(type: string) {
+  // Missing assessments return undefined; completed ones return a safe copy.
   const answers = assessmentAnswers.get(type);
   return answers ? cloneAnswers(answers) : undefined;
 }
 
 export function getPainRecords() {
+  // Real saved history replaces the starter chart as soon as a result exists.
   const saved = getPainHistory();
   if (saved.length)
     return saved.map((record) => ({ date: painRecordDate(record, true), score: record.average }));
@@ -56,6 +63,7 @@ export function getPainRecords() {
 }
 
 export function getWeeklyStreak() {
+  // The dashboard reads the current session value without gaining write access.
   return weeklyStreak;
 }
 

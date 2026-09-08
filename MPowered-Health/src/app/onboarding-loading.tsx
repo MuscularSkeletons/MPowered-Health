@@ -1,3 +1,4 @@
+// This screen explains how the app works before opening the home page.
 import { useEffect, useState } from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -5,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { ActionButton, palette } from '@/components/mha-ui';
 
+// These pages advance in order and pause on the final page until the user continues.
 const pages: { image: ImageSourcePropType; message: string; delay?: number }[] = [
   {
     image: require('../../assets/images/onboarding-launch.png'),
@@ -22,11 +24,13 @@ const pages: { image: ImageSourcePropType; message: string; delay?: number }[] =
   },
 ];
 
+// Advance timed guidance pages and pause on the final Continue action.
 export default function OnboardingLoading() {
   const { name = 'Jane' } = useLocalSearchParams<{ name?: string }>();
   const [page, setPage] = useState(0);
   const current = pages[page];
 
+  // Create one timer for the current page and remove it if the screen changes.
   useEffect(() => {
     if (!current.delay) return;
     const timer = setTimeout(
@@ -78,6 +82,7 @@ export default function OnboardingLoading() {
   );
 }
 
+// Group onboarding progress, artwork, message, and footer styles below.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background, overflow: 'hidden' },
   glowTop: {

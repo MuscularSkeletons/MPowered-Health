@@ -1,3 +1,4 @@
+// This screen provides account, privacy, data export, and deletion settings.
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
@@ -5,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { deleteLocalAccount, getProfile, Profile } from '@/constants/account';
 import { MhaHeader, palette } from '@/components/mha-ui';
 
+// Small local components keep the settings rows consistent and easy to scan.
+// Keep the profile picture placeholder separate from the settings list.
 function ProfileIcon() {
   return (
     <View style={s.profileIcon} accessibilityElementsHidden>
@@ -14,6 +17,7 @@ function ProfileIcon() {
   );
 }
 
+// Reuse one row layout for every settings destination.
 function SettingRow({
   icon,
   title,
@@ -45,11 +49,13 @@ function SettingRow({
   );
 }
 
+// Load account details, open settings pages, and handle local deletion.
 export default function Settings() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  // Read the latest stored profile when the screen first opens.
   useEffect(() => {
     let active = true;
     getProfile()
@@ -63,6 +69,7 @@ export default function Settings() {
       active = false;
     };
   }, []);
+  // Block duplicate presses and close the modal only after deletion succeeds.
   const deleteAccount = async () => {
     if (deleting) return;
     setDeleting(true);
@@ -192,6 +199,7 @@ export default function Settings() {
   );
 }
 
+// Keep settings, modal, and account styles together below the behavior.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   content: {

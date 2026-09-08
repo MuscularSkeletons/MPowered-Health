@@ -1,3 +1,4 @@
+// This test file checks shared workflow validation and navigation rules.
 /* global __dirname */
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
@@ -19,6 +20,7 @@ function load(relativePath, imports = {}) {
 }
 const { validAnswer, workflowStep } = load('src/utils/workflow-validation.ts');
 
+// Basic workflow input rules protect navigation from incomplete or malformed answers.
 test('invalid or stale workflow steps start at the first question', () => {
   for (const value of ['10', '-1', 'NaN', 'Infinity', '1.5']) {
     assert.equal(workflowStep(value, 1), 0);
@@ -100,6 +102,7 @@ test('email requires an address and preserves common address formats', () => {
 });
 
 function accountFixture(initial = []) {
+  // Keep storage in memory and count resets so deletion side effects are observable.
   const stored = new Map(initial);
   let resets = 0;
   const storage = {
@@ -132,6 +135,7 @@ function accountFixture(initial = []) {
   };
 }
 const sampleProfile = {
+  // Reuse one valid profile so each account test focuses on a single behavior.
   email: 'alex@example.com',
   name: 'Alex',
   sex: 'Prefer not to say',
@@ -141,6 +145,7 @@ const sampleProfile = {
   otherConditions: '',
 };
 
+// Account scenarios cover persistence, safe updates, deletion, and interrupted cleanup.
 test('onboarding profile persists and edits preserve optional answers without saving verification codes', async () => {
   const fixture = accountFixture();
   const account = fixture.load();

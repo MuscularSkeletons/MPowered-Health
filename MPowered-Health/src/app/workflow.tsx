@@ -1,3 +1,4 @@
+// This file renders shared multi-step forms for registration and in-app tasks.
 import { createElement, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,

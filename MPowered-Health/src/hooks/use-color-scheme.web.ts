@@ -1,3 +1,4 @@
+// This hook reads and updates the browser's light or dark color setting.
 import { useEffect, useState } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
 

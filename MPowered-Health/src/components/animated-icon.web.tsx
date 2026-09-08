@@ -1,14 +1,18 @@
+// This component displays the animated app icon in web browsers.
 import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import Animated, { Keyframe, Easing } from 'react-native-reanimated';
 
 import classes from './animated-icon.module.css';
+// The web animation uses a shorter duration to keep browser startup responsive.
 const DURATION = 300;
 
+// Web does not need to hide a native splash, so this overlay stays empty.
 export function AnimatedSplashOverlay() {
   return null;
 }
 
+// Define browser movement from the opening icon to the header.
 const keyframe = new Keyframe({
   0: {
     transform: [{ scale: 0 }],
@@ -54,6 +58,7 @@ const glowKeyframe = new Keyframe({
   },
 });
 
+// Run the browser icon, wordmark, and glow animations together.
 export function AnimatedIcon() {
   return (
     <View style={styles.iconContainer}>
@@ -72,6 +77,7 @@ export function AnimatedIcon() {
   );
 }
 
+// Keep browser animation layout and colors in one section.
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',

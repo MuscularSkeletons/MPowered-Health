@@ -1,3 +1,4 @@
+// This file prints, shares, and copies pain-profile reports in web browsers.
 import { PainProfileReport, profileReportHtml, profileReportText } from './pain-profile-report';
 
 export function printHtml(html: string): Promise<void> {
@@ -48,10 +49,12 @@ export function printHtml(html: string): Promise<void> {
 }
 
 export function printProfile(report: PainProfileReport) {
+  // Convert structured profile data before handing it to the isolated print document.
   return printHtml(profileReportHtml(report));
 }
 
 export async function shareProfile(report: PainProfileReport): Promise<'done' | 'copy'> {
+  // Returning "copy" tells the button to show its accessible manual-copy fallback.
   if (typeof navigator.share !== 'function') return 'copy';
   try {
     // Call directly from the click handler to retain browser user activation.
@@ -64,6 +67,7 @@ export async function shareProfile(report: PainProfileReport): Promise<'done' | 
 }
 
 export async function copyProfile(text: string): Promise<boolean> {
+  // Modern browsers can write directly when the page is secure and permission is granted.
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);
@@ -73,6 +77,7 @@ export async function copyProfile(text: string): Promise<boolean> {
     // Older/insecure browsers can still copy from a selected text field.
   }
   const field = document.createElement('textarea');
+  // The hidden selected field supports older browsers that still expose execCommand.
   const previousFocus = document.activeElement as HTMLElement | null;
   field.value = text;
   Object.assign(field.style, { position: 'fixed', left: '-10000px' });

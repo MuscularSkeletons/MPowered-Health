@@ -1,3 +1,4 @@
+// This hook returns the correct app color for the current theme.
 /**
  * Learn more about light and dark modes:
  * https://docs.expo.dev/guides/color-schemes/

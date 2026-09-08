@@ -1,3 +1,4 @@
+// This screen groups saved pain assessments and displays recent pain trends.
 import { useCallback, useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
@@ -15,6 +16,8 @@ import {
 import { buildHealthRecordsHtml } from '@/utils/health-records-report';
 import { printHtml } from '@/utils/pain-profile-export';
 
+// Draw only the selected records and metric so the chart matches the current filters.
+// Plot the selected pain metric across records in date order.
 function TrackingChart({
   metric,
   records,
@@ -22,6 +25,7 @@ function TrackingChart({
   metric: PainMetric;
   records: PainAssessmentRecord[];
 }) {
+  // Convert values to coordinates on the fixed zero-to-ten chart.
   const values = records.map((record) => painMetricValue(record, metric));
   const chartDates = records.map((record) => painRecordDate(record, true));
   const left = 34,
@@ -115,6 +119,7 @@ function TrackingChart({
     </View>
   );
 }
+// Keep printing state and errors inside the print control.
 function PrintPdfButton({
   records,
   areaLabel,
@@ -127,6 +132,7 @@ function PrintPdfButton({
   const [printing, setPrinting] = useState(false);
   const pending = useRef(false);
   const [error, setError] = useState('');
+  // Build the filtered report before opening the platform print dialog.
   const printPdf = async () => {
     if (pending.current || !records.length) return;
     pending.current = true;
@@ -168,6 +174,7 @@ function PrintPdfButton({
   );
 }
 
+// Coordinate filters, chart/history tabs, record groups, and printing.
 export default function HealthRecords() {
   const [tab, setTab] = useState<'chart' | 'history'>('chart');
   const [metric, setMetric] = useState<PainMetric>('Average');
@@ -180,10 +187,12 @@ export default function HealthRecords() {
       setHistory(getPainHistory());
     }, []),
   );
+  // Keep the selected group when it exists, or use the first group.
   const groups = groupPainHistory(history);
   const selected = groups.find((group) => group.key === selectedKey) ?? groups[0];
   const records = selected?.records ?? [];
   const newestFirst = [...records].reverse();
+  // Show recent records first and reveal older ones only on request.
   const rows = expanded ? newestFirst : newestFirst.slice(0, 4);
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -350,6 +359,7 @@ export default function HealthRecords() {
     </SafeAreaView>
   );
 }
+// Group chart, filter, history, and modal styles in one section.
 const s = StyleSheet.create({
   printError: { color: '#A52035', fontSize: 12, maxWidth: 160, marginTop: 6 },
   empty: { marginTop: 24, paddingVertical: 24 },

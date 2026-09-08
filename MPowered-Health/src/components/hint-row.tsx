@@ -1,3 +1,4 @@
+// This component lays out a small visual hint beside related content.
 import type { ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
 
@@ -6,11 +7,13 @@ import { ThemedView } from './themed-view';
 
 import { Spacing } from '@/constants/theme';
 
+// Optional text values let callers reuse the row without repeating the layout.
 type HintRowProps = {
   title?: string;
   hint?: ReactNode;
 };
 
+// Show a short label and code hint with consistent spacing.
 export function HintRow({ title = 'Try editing', hint = 'app/index.tsx' }: HintRowProps) {
   return (
     <View style={styles.stepRow}>
@@ -22,6 +25,7 @@ export function HintRow({ title = 'Try editing', hint = 'app/index.tsx' }: HintR
   );
 }
 
+// Keep this small reusable row's styles next to it.
 const styles = StyleSheet.create({
   stepRow: {
     flexDirection: 'row',

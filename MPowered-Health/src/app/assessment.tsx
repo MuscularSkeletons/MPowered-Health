@@ -1,3 +1,4 @@
+// This screen guides the user through health assessments and saves their answers.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -16,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { getPainHistory, painRecordDate, savePainAssessment } from '@/constants/pain-history';
 import { getAssessmentAnswers, markAssessmentCompleted } from '@/constants/assessment-session';
+// A question describes its prompt, choices, and special input behavior.
 type Q = {
   title: string;
   prompt: string;
@@ -24,6 +26,7 @@ type Q = {
   optional?: boolean;
   helper?: string;
 };
+// Reuse ordered answer scales across questions that measure similar impacts.
 const scales = {
   walk: [
     'Pain does not prevent me walking any distance',
@@ -58,12 +61,14 @@ const scales = {
     'Pain prevents me from standing at all',
   ],
 };
+// Link each summary to the matching trusted pain-management guide.
 const tipUrls: Record<string, string> = {
   movement: 'https://muscha.org/exercise',
   personal: 'https://muscha.org/living-well-with-a-musculoskeletal-condition',
   social: 'https://muscha.org/relaxation/',
   management: 'https://muscha.org/pain-guide/',
 };
+// Define each assessment here while sharing the same screen engine below.
 const specs: Record<
   string,
   {
@@ -371,6 +376,7 @@ const specs: Record<
     ],
   },
 };
+// Translate numeric pain scores into plain words for the summary.
 const painLabel = (n: number) =>
   n === 0
     ? 'I have no pain at all'
@@ -383,6 +389,7 @@ const painLabel = (n: number) =>
           : n === 9
             ? 'The pain is extremely severe'
             : 'The pain is the worst imaginable';
+// Group a zero-to-ten impact score into a short, readable sentence.
 const scoreImpact = (value: string, subject: string) => {
   const n = Number(value);
   if (n === 0) return `Pain does not impact my ${subject} at all.`;
@@ -391,6 +398,7 @@ const scoreImpact = (value: string, subject: string) => {
   if (n <= 8) return `Pain substantially impacts my ${subject}.`;
   return `Pain completely impacts my ${subject}.`;
 };
+// Add punctuation only when the supplied text does not already have it.
 export const asSentence = (value: string) => {
   if (!value || /[.!?]$/.test(value)) return value;
   const isCompleteStatement =
@@ -399,6 +407,7 @@ export const asSentence = (value: string) => {
     );
   return isCompleteStatement ? `${value}.` : value;
 };
+// Convert stored answer indexes into labelled sections for the final summary.
 export function buildSummary(type: string, answers: Record<number, string[]>) {
   const a = (i: number) => answers[i] ?? [];
   if (type === 'pain') {
@@ -498,6 +507,7 @@ export function buildSummary(type: string, answers: Record<number, string[]>) {
   ];
 }
 
+// Present the main pain scores together so they are easy to compare.
 function PainSummaryResults({ answers }: { answers: Record<number, string[]> }) {
   const value = (index: number) => answers[index]?.[0] ?? '0';
   const statement = (index: number, kind: 'current' | 'mildest' | 'worst' | 'average') => {
@@ -546,6 +556,7 @@ function PainSummaryResults({ answers }: { answers: Record<number, string[]> }) 
   );
 }
 
+// Pair a result with one practical tip and an optional trusted resource.
 function SummaryInsight({ summary, tip, url }: { summary: string; tip: string; url: string }) {
   return (
     <View style={s.summaryInsight}>
@@ -564,8 +575,10 @@ function SummaryInsight({ summary, tip, url }: { summary: string; tip: string; u
     </View>
   );
 }
+// Support taps and drags while keeping the score between zero and ten.
 function ScoreSlider({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const trackRef = useRef<View>(null);
+  // Cache the track position so pointer movement can become a score.
   const metrics = useRef({ left: 0, width: 1, ready: false });
   const lastValue = useRef(value);
   lastValue.current = value;
@@ -573,6 +586,7 @@ function ScoreSlider({ value, onChange }: { value: number; onChange: (value: num
   onChangeRef.current = onChange;
   // Screen coordinates stay stable while the thumb moves beneath the user's finger.
   // Using locationX here causes the score to jump when the touch target changes.
+  // Clamp the pointer to the track and round to a whole-number score.
   const updateFromPageX = (pageX: number) => {
     if (!metrics.current.ready) return;
     const next = Math.max(
@@ -589,6 +603,7 @@ function ScoreSlider({ value, onChange }: { value: number; onChange: (value: num
       metrics.current = { left, width: Math.max(width, 1), ready: true };
       if (pageX != null) updateFromPageX(pageX);
     });
+  // Keep one gesture responder for the full drag.
   const pan = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -621,6 +636,7 @@ function ScoreSlider({ value, onChange }: { value: number; onChange: (value: num
     </View>
   );
 }
+// Run one assessment from its first question through saving and summary.
 export default function Assessment() {
   const {
     type = 'pain',
@@ -631,6 +647,7 @@ export default function Assessment() {
     completed?: string;
     name?: string;
   }>();
+  // Use the pain assessment if a route contains an unknown type.
   const spec = specs[type] ?? specs.pain;
   const [step, setStep] = useState(0),
     [answers, setAnswers] = useState<Record<number, string[]>>({}),
@@ -654,6 +671,7 @@ export default function Assessment() {
   const activeStep = Math.min(step, spec.questions.length - 1),
     q = spec.questions[activeStep],
     current = answers[activeStep] ?? [];
+  // Required questions block Continue until the user provides an answer.
   const valid = q.optional || current.length > 0;
   const select = (v: string) =>
     setAnswers((a) => ({
@@ -665,6 +683,7 @@ export default function Assessment() {
             : [...current, v]
           : [v],
     }));
+  // Advance through questions first, then save once on the final step.
   const next = async () => {
     if (savingRef.current) return;
     if (activeStep < spec.questions.length - 1) {
@@ -675,6 +694,7 @@ export default function Assessment() {
     setSaving(true);
     setSaveError('');
     try {
+      // Pain answers also create a dated history record before completion.
       if (type === 'pain') await savePainAssessment(answers);
       markAssessmentCompleted(type, answers);
       setDone(true);
@@ -685,11 +705,13 @@ export default function Assessment() {
       setSaving(false);
     }
   };
+  // Build results from the answers and the latest dated pain record.
   const latestPain = getPainHistory().at(-1);
   const result = useMemo(() => Object.values(answers).flat(), [answers]);
   const summarySections = buildSummary(type, answers)
     .filter((section) => section.text)
     .map((section) => ({ ...section, text: asSentence(section.text) }));
+  // Return to the requested page with the updated completion list.
   const closeSummary = () => {
     const all = [...new Set([...completed.split(',').filter(Boolean), type])].join(',');
     router.replace({
@@ -697,6 +719,7 @@ export default function Assessment() {
       params: { completed: all, name },
     });
   };
+  // Show read-only results after the save has finished.
   if (done)
     return (
       <SafeAreaView style={s.safe} edges={['top']}>
@@ -885,6 +908,7 @@ export default function Assessment() {
     </SafeAreaView>
   );
 }
+// Keep visual rules below the assessment behavior so the flow is easy to follow.
 const s = StyleSheet.create({
   safe: {
     flex: 1,

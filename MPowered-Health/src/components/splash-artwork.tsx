@@ -1,5 +1,7 @@
+// This component displays the artwork used on the opening screens.
 import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
 
+// Each splash page uses a back preview and a front preview to create depth.
 const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
   [require('../../assets/splash/pain-home.png'), require('../../assets/splash/pain-summary.png')],
   [
@@ -12,6 +14,7 @@ const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
   ],
 ];
 
+// Give the front phone preview stronger styling to create depth.
 function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?: boolean }) {
   return (
     <View style={[styles.phoneShadow, front ? styles.front : styles.back]}>
@@ -22,6 +25,7 @@ function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?:
   );
 }
 
+// Pick the artwork pair that belongs to the current splash page.
 export function SplashArtwork({ page }: { page: number }) {
   const [back, front] = previewPairs[page] ?? previewPairs[0];
 
@@ -34,6 +38,7 @@ export function SplashArtwork({ page }: { page: number }) {
   );
 }
 
+// Keep phone positions and decorative shapes in one section.
 const styles = StyleSheet.create({
   canvas: {
     width: '100%',

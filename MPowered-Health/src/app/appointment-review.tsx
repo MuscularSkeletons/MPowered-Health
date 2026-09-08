@@ -1,3 +1,4 @@
+// This screen lets the user review and update a planned healthcare appointment.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
@@ -26,6 +27,7 @@ import { addAppointment, getAppointment, saveAppointmentSignature } from '@/cons
 import Svg, { Path } from 'react-native-svg';
 import { Image } from 'expo-image';
 
+// Use these defaults when a saved appointment does not contain its own questions.
 const questions = [
   {
     group: 'Pain location',
@@ -45,6 +47,7 @@ const questions = [
   },
 ];
 
+// Convert finger movement into SVG paths so a signature can be shown and saved.
 function SignaturePad({
   paths,
   setPaths,
@@ -52,7 +55,9 @@ function SignaturePad({
   paths: string[];
   setPaths: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
+  // Remember which stroke is active while the user drags across the pad.
   const activePath = useRef(-1);
+  // Build the gesture responder once and append points to the current stroke.
   const responder = useMemo(
     () =>
       PanResponder.create({
@@ -109,6 +114,7 @@ function SignaturePad({
   );
 }
 
+// Reject stale appointment links before the detailed review reads missing data.
 export default function AppointmentReview() {
   const { id, mode } = useLocalSearchParams<{ id?: string; mode?: string }>();
   // A deleted account has no appointments; stale links should show an empty state.
@@ -125,6 +131,7 @@ export default function AppointmentReview() {
   return <AppointmentReviewContent />;
 }
 
+// Manage review, consent, written answers, recordings, and saving in one screen.
 function AppointmentReviewContent() {
   const insets = useSafeAreaInsets();
   const reviewScrollRef = useRef<ScrollView>(null);
@@ -147,6 +154,7 @@ function AppointmentReviewContent() {
     questions?: string;
     questionData?: string;
   }>();
+  // Planning uses route data; an existing appointment uses its stored record.
   const planning = mode === 'plan';
   const appointment = planning
     ? {
@@ -156,6 +164,7 @@ function AppointmentReviewContent() {
         service: service || 'Not added',
       }
     : getAppointment(id);
+  // Rebuild routed questions so selected and custom questions keep their groups.
   const selectedQuestions = questionParam ? (JSON.parse(questionParam) as string[]) : [];
   const routedQuestions = questionData
     ? (JSON.parse(questionData) as { group: string; text: string }[])
@@ -166,6 +175,7 @@ function AppointmentReviewContent() {
   const displayedQuestions = planning
     ? [...routedQuestions, ...(customQuestion ? [{ group: 'Other', text: customQuestion }] : [])]
     : (appointment.questions ?? questions);
+  // Keep modal drafts separate from saved answers so Cancel can discard changes.
   const [activeQuestion, setActiveQuestion] = useState<string>();
   const [answer, setAnswer] = useState('');
   const [consentOpen, setConsentOpen] = useState(false);
@@ -180,12 +190,14 @@ function AppointmentReviewContent() {
   const player = useAudioPlayer();
   const playerState = useAudioPlayerStatus(player);
   useEffect(() => {
+    // Start playback only after the new recording is loaded.
     if (playbackPending && playerState.isLoaded) {
       player.play();
       setPlaybackPending(false);
     }
   }, [playbackPending, playerState.isLoaded, player]);
   useEffect(() => {
+    // Reload consent and clear temporary answers when the appointment changes.
     const savedAppointment = getAppointment(id);
     setSignaturePaths(savedAppointment?.signaturePaths ?? []);
     setConsented(Boolean(savedAppointment?.signaturePaths?.length));
@@ -195,6 +207,7 @@ function AppointmentReviewContent() {
     setRecordedAnswers({});
     setAnswer('');
   }, [id]);
+  // Open consent with the latest stored signature.
   const openConsent = () => {
     const saved = getAppointment(appointment.id)?.signaturePaths ?? signaturePaths;
     setSignaturePaths([...saved]);
@@ -204,6 +217,7 @@ function AppointmentReviewContent() {
     setConsentOpen(false);
     requestAnimationFrame(() => reviewScrollRef.current?.scrollTo({ y: 0, animated: false }));
   };
+  // Ask for microphone access only when recording starts.
   const startRecording = async () => {
     setRecordingStarting(true);
     try {
@@ -230,6 +244,7 @@ function AppointmentReviewContent() {
       setRecordingStarting(false);
     }
   };
+  // The same button starts recording and saves it on the next press.
   const handleRecording = async () => {
     if (recordingStarting) return;
     if (recorderState.isRecording) {
@@ -249,6 +264,7 @@ function AppointmentReviewContent() {
     }
     await startRecording();
   };
+  // Pause active playback or load the current answer before playing it.
   const playRecording = async () => {
     if (!activeQuestion || playbackPending) return;
     const uri = recordedAnswers[activeQuestion];
@@ -272,6 +288,7 @@ function AppointmentReviewContent() {
       );
     }
   };
+  // Remove only this question's recording before making a replacement.
   const recordAgain = async () => {
     if (!activeQuestion) return;
     setPlaybackPending(false);
@@ -283,12 +300,14 @@ function AppointmentReviewContent() {
     });
     await startRecording();
   };
+  // Require a drawn signature before marking consent complete.
   const saveConsent = async () => {
     if (!signaturePaths.length) return;
     saveAppointmentSignature(appointment.id, signaturePaths);
     setConsented(true);
     closeConsent();
   };
+  // Prefer typed text and keep a marker when the answer is voice-only.
   const saveAnswer = () => {
     if (activeQuestion && (answer.trim() || recordedAnswers[activeQuestion]))
       setSavedAnswers((v) => ({
@@ -298,6 +317,7 @@ function AppointmentReviewContent() {
     setAnswer('');
     setActiveQuestion(undefined);
   };
+  // Drafts return to question selection; saved plans return to Care Planner.
   const backFromReview = () =>
     planning
       ? router.replace({
@@ -314,6 +334,7 @@ function AppointmentReviewContent() {
           },
         })
       : router.replace('/care');
+  // Store the reviewed draft and then leave the planning screen.
   const savePlan = () => {
     addAppointment({
       doctor: appointment.doctor,
@@ -591,6 +612,7 @@ function AppointmentReviewContent() {
           </ScrollView>
         </View>
       </Modal>
+      {/* Keep consent full-screen so the signature pad has enough room. */}
       <Modal visible={consentOpen} animationType="slide" onRequestClose={closeConsent}>
         <SafeAreaView style={s.consentScreen} edges={['top', 'bottom']}>
           <Pressable
@@ -638,6 +660,7 @@ function AppointmentReviewContent() {
   );
 }
 
+// Keep visual rules together so the review steps above remain readable.
 const s = StyleSheet.create({
   detailRow: {
     minHeight: 66,

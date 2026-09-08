@@ -1,3 +1,4 @@
+// This test file checks printing, sharing, copying, and report error handling.
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const fs = require('node:fs');
@@ -5,6 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 
+// Load each export module with controlled platform tools instead of opening real dialogs.
 function load(name, mocks = {}, globals = {}) {
   const source = fs.readFileSync(path.join(__dirname, '../src/utils', name + '.ts'), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
@@ -17,6 +19,7 @@ function load(name, mocks = {}, globals = {}) {
   return exports;
 }
 const report = { updatedAt: '7 September 2026', sections: [
+  // Include every profile section plus characters and line breaks that need special handling.
   { title: 'About me', subtitle: '', items: [['Name', 'Test <script>alert(1)</script> & "Person"']] },
   { title: 'My conditions', subtitle: '', items: [['Primary condition', 'Arthritis']] },
   { title: 'My Pain', subtitle: 'Severity, pattern, and location', items: [['Current pain: 5', 'Moderate pain.']] },
@@ -26,6 +29,7 @@ const report = { updatedAt: '7 September 2026', sections: [
   { title: 'My Current Management', subtitle: '', items: [['Exercise', '30 minutes']] },
 ] };
 
+// Report builders must preserve content while keeping generated HTML safe.
 test('HTML and text contain every section, date and answer; HTML escapes user content', () => {
   const { profileReportHtml, profileReportText } = load('pain-profile-report');
   const html = profileReportHtml(report), text = profileReportText(report);
@@ -44,6 +48,7 @@ test('HTML and text contain every section, date and answer; HTML escapes user co
   assert.ok(profileReportHtml({ ...report, updatedAt: '' }).includes('No completed assessments yet'));
 });
 
+// Native action tests replace operating-system print and share dialogs with call logs.
 test('native printing receives the full report and sharing receives a PDF file', async () => {
   const calls = [];
   const api = load('pain-profile-export', {
@@ -85,6 +90,7 @@ test('PDF generation failures propagate so the UI can show an error and retry', 
   await assert.rejects(api.shareProfile(report), /Disk full/);
 });
 
+// Web action tests exercise supported APIs as well as every documented fallback.
 test('web sharing uses the report text, with unsupported, rejected and cancelled outcomes', async () => {
   let shared;
   const navigator = {};
@@ -152,6 +158,7 @@ test('copy uses clipboard, falls back to selection, and reports failures honestl
   assert.equal(await api.copyProfile('Manual copy'), false);
 });
 
+// Cancellation is expected user behavior; real printer failures must still reach the screen.
 test('dismissing iOS printing is quiet while printer failures still propagate', async () => {
   let message = 'Printing did not complete';
   const api = load('pain-profile-export', {

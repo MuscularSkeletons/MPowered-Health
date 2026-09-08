@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// This script resets the starter project so development can begin from a clean state.
 
 /**
  * This script is used to reset the project to a blank state.

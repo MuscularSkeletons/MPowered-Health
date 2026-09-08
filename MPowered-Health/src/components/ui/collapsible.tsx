@@ -1,3 +1,4 @@
+// This component shows content that the user can expand or collapse.
 import { SymbolView } from 'expo-symbols';
 import { PropsWithChildren, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
@@ -8,6 +9,8 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
+// Tapping the heading changes local open state and shows or hides the child content.
+// Keep open state local so each section works independently.
 export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
@@ -41,6 +44,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
   );
 }
 
+// Group heading, icon, and content spacing below.
 const styles = StyleSheet.create({
   heading: {
     flexDirection: 'row',

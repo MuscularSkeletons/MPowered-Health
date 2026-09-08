@@ -1,3 +1,4 @@
+// This component displays the animated app icon on native devices.
 import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
 import { useState } from 'react';
@@ -5,9 +6,11 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+// Scale the opening mark to the device height before animating it into place.
 const INITIAL_SCALE_FACTOR = Dimensions.get('screen').height / 90;
 const DURATION = 600;
 
+// Remove Expo's static splash only after the animated overlay is ready.
 export function AnimatedSplashOverlay() {
   const [animate, setAnimate] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -61,6 +64,7 @@ export function AnimatedSplashOverlay() {
   );
 }
 
+// Move the icon from a large center mark into its final header position.
 const keyframe = new Keyframe({
   0: {
     transform: [{ scale: INITIAL_SCALE_FACTOR }],
@@ -97,6 +101,7 @@ const glowKeyframe = new Keyframe({
   },
 });
 
+// Run the icon, wordmark, and glow animations together on native devices.
 export function AnimatedIcon() {
   return (
     <View style={styles.iconContainer}>
@@ -112,6 +117,7 @@ export function AnimatedIcon() {
   );
 }
 
+// Keep animation positions and colors in one visual section.
 const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',

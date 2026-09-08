@@ -1,3 +1,4 @@
+// This screen lets the user view and edit their saved personal details.
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -6,12 +7,15 @@ import { ActionButton, MhaHeader, PageIntro, palette } from '@/components/mha-ui
 import { emptyProfile, getProfile, Profile, profileErrors, saveProfile } from '@/constants/account';
 import { diagnosisOptions, painConditions, sexOptions } from '@/constants/profile-options';
 
+// Load stored details on entry, validate edits, and save only when every field is valid.
+// Load the profile, validate edits, and save only complete valid details.
 export default function PersonalDetails() {
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [saveError, setSaveError] = useState('');
+  // Reload values when the user returns so this form never shows stale details.
   useFocusEffect(
     useCallback(() => {
       let active = true;
@@ -39,6 +43,7 @@ export default function PersonalDetails() {
     setProfile((previous) => ({ ...previous, [key]: value }));
     setSaveError('');
   };
+  // Validate locally first, then wait for storage before leaving the screen.
   const save = async () => {
     if (disabled || Object.keys(errors).length) return;
     setSaving(true);
@@ -167,6 +172,7 @@ export default function PersonalDetails() {
     </SafeAreaView>
   );
 }
+// Keep form field, validation, and action styles in one section.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   content: { width: '100%', maxWidth: 680, alignSelf: 'center', padding: 24, paddingBottom: 112 },

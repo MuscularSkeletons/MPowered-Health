@@ -1,3 +1,4 @@
+// This screen shows care-planning tools, appointments, and questions for clinicians.
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -5,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, PageIntro, palette } from '@/components/mha-ui';
 import { productContent } from '@/constants/product-content';
 import { getAppointments } from '@/constants/appointments';
+// Every care card opens the shared workflow with a fresh form state.
 const go = (flow: string) =>
   router.push({
     pathname: '/workflow',
@@ -13,6 +15,7 @@ const go = (flow: string) =>
       returnTo: '/care',
     },
   });
+// Refresh appointments on focus and open each care-planning tool.
 export default function Care() {
   const [appointments, setAppointments] = useState(getAppointments());
   useFocusEffect(useCallback(() => setAppointments(getAppointments()), []));
@@ -73,6 +76,7 @@ export default function Care() {
     </SafeAreaView>
   );
 }
+// Keep care cards and appointment list styles below the screen behavior.
 const s = StyleSheet.create({
   safe: {
     flex: 1,

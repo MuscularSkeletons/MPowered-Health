@@ -1,13 +1,16 @@
+// This component applies the current app theme to text.
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
 import { Fonts, ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
+// Callers choose a text role while this component supplies the matching theme styles.
 export type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle' | 'link' | 'linkPrimary' | 'code';
   themeColor?: ThemeColor;
 };
 
+// Resolve a text role into the correct color, font, and size.
 export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
 
@@ -30,6 +33,7 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
   );
 }
 
+// Define every supported text role in one style map.
 const styles = StyleSheet.create({
   small: {
     fontSize: 14,

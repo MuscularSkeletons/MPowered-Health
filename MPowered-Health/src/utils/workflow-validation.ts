@@ -1,3 +1,4 @@
+// This file validates shared form answers and keeps workflow steps in range.
 import { isValidPin } from './pin-validation';
 
 // Route parameters can be stale or malformed. Fall back to the first step rather

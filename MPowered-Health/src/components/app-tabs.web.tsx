@@ -1,3 +1,4 @@
+// This component defines the app tab bar for web browsers.
 import {
   Tabs,
   TabList,
@@ -15,6 +16,8 @@ import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
+// Web tabs use Expo Router triggers so each button stays linked to its route.
+// Build the four destinations with web-friendly router tabs.
 export default function AppTabs() {
   return (
     <Tabs>
@@ -33,6 +36,7 @@ export default function AppTabs() {
   );
 }
 
+// Apply focused styles without changing router behavior.
 export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
@@ -48,6 +52,7 @@ export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps
   );
 }
 
+// Place buttons in a fixed bottom bar above page content.
 export function CustomTabList(props: TabListProps) {
   const scheme = useColorScheme();
   const colors = Colors[scheme ?? 'light'];
@@ -72,6 +77,7 @@ export function CustomTabList(props: TabListProps) {
   );
 }
 
+// Group web tab spacing, colors, and active states below.
 const styles = StyleSheet.create({
   tabListContainer: {
     position: 'absolute',

@@ -1,3 +1,4 @@
+// This screen is the app home page and shows weekly assessment progress.
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -7,6 +8,7 @@ import { getProfile } from '@/constants/account';
 import { getReflection } from '@/constants/reflections';
 import { productContent } from '@/constants/product-content';
 import { getCompletedAssessments, getWeeklyStreak } from '@/constants/assessment-session';
+// One row decides whether to offer Record or View summary.
 function Assessment({
   title,
   type,
@@ -44,6 +46,7 @@ function Assessment({
     </Pressable>
   );
 }
+// Separate brand text keeps the logo styling consistent.
 function BrandWord() {
   return (
     <View style={s.brandWord}>
@@ -52,6 +55,7 @@ function BrandWord() {
     </View>
   );
 }
+// Refresh the account and weekly activity whenever Home becomes active.
 export default function Home() {
   const { completed = '', name: routeName = 'Jane' } = useLocalSearchParams<{
     completed?: string;
@@ -84,6 +88,7 @@ export default function Home() {
       };
     }, []),
   );
+  // Merge route and session results without counting an assessment twice.
   const done = [...new Set([...completed.split(',').filter(Boolean), ...sessionCompleted])];
   const completedValue = done.join(',');
   const streak = getWeeklyStreak();
@@ -169,6 +174,7 @@ export default function Home() {
     </SafeAreaView>
   );
 }
+// Keep greeting, progress, card, and footer styles below the logic.
 const s = StyleSheet.create({
   safe: {
     flex: 1,

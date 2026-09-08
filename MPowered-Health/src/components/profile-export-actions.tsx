@@ -1,3 +1,4 @@
+// This component lets the user print, share, or copy their pain profile.
 import { useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -5,6 +6,7 @@ import { palette } from './mha-ui';
 import { copyProfile, printProfile, shareProfile } from '@/utils/pain-profile-export';
 import { PainProfileReport, profileReportText } from '@/utils/pain-profile-report';
 
+// Coordinate print and share actions while preventing duplicate requests.
 export function ProfileExportActions({
   report,
   disabled,
@@ -18,6 +20,7 @@ export function ProfileExportActions({
   const [shareText, setShareText] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
   const [sharingMore, setSharingMore] = useState(false);
+  // Web sharing may show a preview before copy or system sharing.
   const run = async (action: 'print' | 'share') => {
     if (pending.current || disabled) return;
     if (action === 'share' && Platform.OS === 'web') {
@@ -156,6 +159,7 @@ export function ProfileExportActions({
   );
 }
 
+// Group export buttons, messages, and preview-modal styles below.
 const s = StyleSheet.create({
   container: { flexShrink: 1, maxWidth: '100%', marginLeft: 'auto' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8 },

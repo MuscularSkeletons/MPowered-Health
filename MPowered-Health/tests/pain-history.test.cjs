@@ -1,3 +1,4 @@
+// This test file checks pain-history storage, grouping, and report behavior.
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const fs = require('node:fs');
@@ -5,7 +6,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 
+// Build an isolated storage environment so each test can control saved history safely.
 function environment(storage = new Map()) {
+  // Toggle write failures to check that disk errors never look like successful saves.
   let failWrite = false;
   const cache = new Map();
   const asyncStorage = {
@@ -15,6 +18,7 @@ function environment(storage = new Map()) {
     multiRemove: async (keys) => keys.forEach((key) => storage.delete(key)),
   };
   function load(relative) {
+    // Run production TypeScript with an in-memory storage replacement.
     if (cache.has(relative)) return cache.get(relative);
     const exports = {};
     cache.set(relative, exports);
@@ -37,6 +41,7 @@ const answers = (areas, average = 5, worst = 9, mildest = 2) => ({
 });
 const date = (day) => new Date(`2026-06-${String(day).padStart(2, '0')}T02:00:00.000Z`);
 
+// Grouping scenarios prove that the full combination, rather than one area, selects records.
 test('weeks 1 and 3 share one exact combination; week 2 stays separate', async () => {
   const { load } = environment();
   const history = load('constants/pain-history');
@@ -64,6 +69,7 @@ test('each area combination is order-independent and never matches subsets', () 
   assert.notEqual(history.painAreaKey(['Upper Back']), history.painAreaKey(['Lower Back']));
 });
 
+// Saved assessments are immutable snapshots even when screens keep editing their drafts.
 test('assessment snapshots survive reload and later answer edits', async () => {
   const env = environment();
   const history = env.load('constants/pain-history');
@@ -80,6 +86,7 @@ test('assessment snapshots survive reload and later answer edits', async () => {
   assert.equal(reloaded.getPainHistory()[0].answers[5][0], '6');
 });
 
+// Write failures preserve prior history and leave the queue ready for another attempt.
 test('failed saves do not report success, discard older history, or block retry', async () => {
   const env = environment();
   const history = env.load('constants/pain-history');
@@ -92,6 +99,7 @@ test('failed saves do not report success, discard older history, or block retry'
   assert.equal(history.getPainHistory().length, 2);
 });
 
+// Concurrent submissions serialize safely, and zero remains a valid pain score.
 test('queued submissions retain both records and zero scores are valid', async () => {
   const history = environment().load('constants/pain-history');
   await Promise.all([
@@ -105,6 +113,7 @@ test('queued submissions retain both records and zero scores are valid', async (
   await assert.rejects(history.savePainAssessment(answers(['Back'], 11)), /Complete all pain/);
 });
 
+// Printed reports must follow the selected area group and metric exactly.
 test('filtered PDFs contain only selected assessments and use actual metrics', async () => {
   const { load } = environment();
   const history = load('constants/pain-history');
@@ -124,6 +133,7 @@ test('filtered PDFs contain only selected assessments and use actual metrics', a
   assert.ok(!single.includes('NaN') && !single.includes('Infinity'));
 });
 
+// Startup reconnects persisted history to the session; deletion clears both copies.
 test('account startup restores pain answers and deleting the account removes history', async () => {
   const env = environment();
   const history = env.load('constants/pain-history');

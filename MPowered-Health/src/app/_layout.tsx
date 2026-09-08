@@ -1,3 +1,4 @@
+// This file sets up the app routes, bottom tabs, and account startup behavior.
 import { Tabs, router, usePathname, useGlobalSearchParams } from 'expo-router';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { getAccountSnapshot, initializeAccount, subscribeAccount } from '@/constants/account';
@@ -5,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavGlyph, NavIconName } from '@/components/nav-icon';
 
+// Wrap each icon so its active background and filled state change together.
 function NavIcon({ focused, color, name }: { focused: boolean; color: string; name: NavIconName }) {
   return (
     <View style={[s.iconPill, focused && s.iconPillActive]}>
@@ -13,11 +15,13 @@ function NavIcon({ focused, color, name }: { focused: boolean; color: string; na
   );
 }
 
+// Initialize account data before showing private routes and the main tabs.
 export default function TabLayout() {
   const account = useSyncExternalStore(subscribeAccount, getAccountSnapshot, getAccountSnapshot);
   const pathname = usePathname();
   const params = useGlobalSearchParams<{ flow?: string }>();
   const [startupError, setStartupError] = useState(false);
+  // Retry startup after a storage error without restarting the app.
   const start = () => {
     setStartupError(false);
     initializeAccount().catch(() => setStartupError(true));
@@ -121,6 +125,7 @@ export default function TabLayout() {
   );
 }
 
+// Keep tab sizing and active-state styles separate from route rules.
 const s = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',

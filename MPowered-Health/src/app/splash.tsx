@@ -1,3 +1,4 @@
+// This screen introduces the app and starts registration or sign-in.
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View, ViewToken } from 'react-native';
 import { router } from 'expo-router';
@@ -5,17 +6,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
 import { SplashArtwork } from '@/components/splash-artwork';
 
+// The user can swipe through these messages before choosing registration or sign-in.
 const pages = [
   { title: 'Track your pain and its impacts weekly' },
   { title: 'Easily share your pain logs to your healthcare professionals' },
   { title: 'Get tailored questions to assist your medical consultation' },
 ];
 
+// Track the visible introduction page and offer registration or sign-in.
 export default function Splash() {
   const [index, setIndex] = useState(0);
   const currentIndex = useRef(0);
   const ref = useRef<FlatList<(typeof pages)[number]>>(null);
   const width = Dimensions.get('window').width;
+  // Update the active dot when a new page becomes mostly visible.
   const changed = useRef(
     ({ viewableItems }: { viewableItems: ViewToken<(typeof pages)[number]>[] }) => {
       if (viewableItems[0]?.index != null) {
@@ -24,6 +28,7 @@ export default function Splash() {
       }
     },
   ).current;
+  // Advance messages automatically while still allowing manual swipes.
   useEffect(() => {
     const timer = setInterval(() => {
       const next = (currentIndex.current + 1) % pages.length;
@@ -93,6 +98,7 @@ export default function Splash() {
   );
 }
 
+// Keep carousel, action, and support-logo styles below the behavior.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#fff' },
   page: { paddingHorizontal: 24 },

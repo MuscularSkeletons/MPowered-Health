@@ -1,10 +1,13 @@
+// This screen explains privacy choices and lets the user open related settings.
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MhaHeader, palette } from '@/components/mha-ui';
 
+// Keep the official privacy source in one place so every link opens the same page.
 const oaicUrl = 'https://www.oaic.gov.au/privacy/australian-privacy-principles';
 
+// Reuse one heading and spacing pattern for each policy topic.
 function PolicySection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={s.section}>
@@ -14,6 +17,7 @@ function PolicySection({ title, children }: { title: string; children: React.Rea
   );
 }
 
+// Show a permission's purpose and whether the user has enabled it.
 function PermissionRow({
   icon,
   title,
@@ -39,6 +43,7 @@ function PermissionRow({
   );
 }
 
+// Explain privacy choices and link to the relevant device or public settings.
 export default function PrivacyPermissions() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -142,6 +147,7 @@ export default function PrivacyPermissions() {
   );
 }
 
+// Group policy and permission styles below the readable content structure.
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   content: {
