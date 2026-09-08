@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,6 +12,8 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { validAnswer } from '@/utils/workflow-validation';
+import { isValidPin, pinDigits } from '@/utils/pin-validation';
+import { verifyAccountPin } from '@/constants/pin-auth';
 
 type Step = 'pin' | 'email' | 'code';
 export default function Login() {
@@ -19,14 +21,18 @@ export default function Login() {
     [pin, setPin] = useState(''),
     [email, setEmail] = useState(''),
     [code, setCode] = useState('');
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState('');
+  const pending = useRef(false);
   const value = step === 'pin' ? pin : step === 'email' ? email : code;
   const ready =
     step === 'pin'
-      ? pin.length >= 4
+      ? isValidPin(pin)
       : step === 'email'
         ? validAnswer('Your email address', email)
         : code.length === 4;
   const setValue = (text: string) => {
+    setError('');
     // Email must retain letters, @, dots, and plus aliases. Only PINs and codes
     // are restricted to digits.
     if (step === 'email') {
@@ -34,14 +40,31 @@ export default function Login() {
       return;
     }
     const digits = text.replace(/\D/g, '');
-    if (step === 'pin') setPin(digits);
+    if (step === 'pin') setPin(pinDigits(text));
     else setCode(digits);
   };
-  const next = () => {
-    if (!ready) return;
-    if (step === 'pin') router.replace('/dashboard');
-    else if (step === 'email') setStep('code');
-    else router.replace('/dashboard');
+  const next = async () => {
+    if (!ready || pending.current) return;
+    if (step !== 'pin') {
+      // Recovery needs a verified server response; a typed code is not authentication.
+      setError('Email recovery is not connected yet. Please use the PIN saved on this device.');
+      return;
+    }
+    pending.current = true;
+    setChecking(true);
+    setError('');
+    try {
+      const result = await verifyAccountPin(pin);
+      if (result.ok) {
+        setPin('');
+        router.replace('/dashboard');
+      } else setError(result.message ?? 'Incorrect PIN. Please try again.');
+    } catch {
+      setError('Unable to check your PIN. Please try again.');
+    } finally {
+      pending.current = false;
+      setChecking(false);
+    }
   };
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -66,14 +89,14 @@ export default function Login() {
               {step === 'pin'
                 ? 'Welcome back!'
                 : step === 'email'
-                  ? 'Please verify this device'
+                  ? 'Email sign-in'
                   : 'We’re sending a verification code to this email address'}
             </Text>
             <Text style={s.copy}>
               {step === 'pin'
-                ? 'Glad to see you again!'
+                ? 'Enter your 4-digit PIN to continue.'
                 : step === 'email'
-                  ? 'You are logging in to a new device or different account.'
+                  ? 'Email sign-in is not available yet. Use your PIN on this device.'
                   : 'You can resend the code in two minutes.'}
             </Text>
           </View>
@@ -93,7 +116,15 @@ export default function Login() {
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete={step === 'email' ? 'email' : 'off'}
-              maxLength={step === 'code' ? 4 : step === 'pin' ? 6 : 254}
+              maxLength={step === 'email' ? 254 : 4}
+              editable={!checking}
+              accessibilityLabel={
+                step === 'pin'
+                  ? 'Enter 4-digit PIN'
+                  : step === 'email'
+                    ? 'Your email address'
+                    : 'Verification code'
+              }
               value={value}
               onChangeText={setValue}
               placeholder={
@@ -109,7 +140,11 @@ export default function Login() {
             {step === 'pin' ? (
               <Pressable
                 accessibilityRole="button"
-                onPress={() => setStep('email')}
+                disabled={checking}
+                onPress={() => {
+                  setError('');
+                  setStep('email');
+                }}
                 style={s.inlineLink}
               >
                 <Text style={s.inlineLinkText}>Forgot PIN?</Text>
@@ -118,7 +153,7 @@ export default function Login() {
             {step === 'email' ? (
               <>
                 <Text style={s.help}>
-                  We’ll send a four-digit verification code to this email address.
+                  Use the PIN you created during registration to sign in on this device.
                 </Text>
                 {email.length > 0 && !ready ? (
                   <Text accessibilityLiveRegion="polite" style={[s.help, { color: palette.error }]}>
@@ -132,10 +167,15 @@ export default function Login() {
                 <Text style={s.inlineLinkText}>Resend the verification code</Text>
               </Pressable>
             ) : null}
+            {error ? (
+              <Text accessibilityRole="alert" style={[s.help, { color: palette.error }]}>
+                {error}
+              </Text>
+            ) : null}
             <View style={s.action}>
               <ActionButton
-                label={step === 'code' ? 'Verify' : 'Continue'}
-                disabled={!ready}
+                label={checking ? 'Checking…' : step === 'code' ? 'Verify' : 'Continue'}
+                disabled={!ready || checking}
                 onPress={next}
               />
             </View>
@@ -144,7 +184,11 @@ export default function Login() {
             <View style={s.accountSwitch}>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => setStep('email')}
+                disabled={checking}
+                onPress={() => {
+                  setError('');
+                  setStep('email');
+                }}
                 style={({ pressed }) => [s.accountButton, pressed && s.accountButtonPressed]}
               >
                 <Text style={s.accountLink}>Log in to a different account</Text>

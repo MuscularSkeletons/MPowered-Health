@@ -1,4 +1,4 @@
-import { createElement, useCallback, useEffect, useState } from 'react';
+import { createElement, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   BackHandler,
@@ -12,7 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import {
@@ -28,13 +28,14 @@ import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { addAppointment } from '@/constants/appointments';
 import { validAnswer, workflowStep } from '@/utils/workflow-validation';
+import { isValidPin, pinDigits } from '@/utils/pin-validation';
 import { getReflection, reflectionWeek, saveReflection } from '@/constants/reflections';
 import { sexOptions, diagnosisOptions, painConditions } from '@/constants/profile-options';
 import {
   getAccountSnapshot,
   getProfile,
   profileFromAnswers,
-  saveProfile,
+  registerProfile,
 } from '@/constants/account';
 import { getAssessmentAnswers, getLatestAssessmentDate } from '@/constants/assessment-session';
 import { asSentence, buildSummary } from './assessment';
@@ -118,7 +119,13 @@ const flows: Record<
         optional: true,
       },
       {
-        title: 'Thank you, Jane 😃',
+        title: 'Set up your PIN',
+        copy: 'Choose a 4-digit PIN to log in quickly next time on this device.',
+        fields: ['Create PIN'],
+        action: 'Continue',
+      },
+      {
+        title: 'Registration complete',
         copy: 'Finally, let’s link this information to your account so the next time you open this app, you can just log in',
         action: 'Continue',
       },
@@ -584,6 +591,7 @@ function Field({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
   const isEmail = label === 'Your email address';
+  const isPin = label === 'Create PIN' || label === 'Enter PIN';
   if (label === 'Appointment date') {
     // The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
     const toIsoDate = (displayDate: string) => {
@@ -718,15 +726,17 @@ function Field({
       <TextInput
         value={value}
         editable={editable}
-        onChangeText={set}
-        autoCapitalize={isEmail ? 'none' : 'sentences'}
-        autoCorrect={!isEmail}
+        onChangeText={(text) => set(isPin ? pinDigits(text) : text)}
+        secureTextEntry={isPin}
+        accessibilityLabel={label}
+        autoCapitalize={isEmail || isPin ? 'none' : 'sentences'}
+        autoCorrect={!isEmail && !isPin}
         autoComplete={isEmail ? 'email' : 'off'}
-        maxLength={isEmail ? 254 : undefined}
+        maxLength={isPin ? 4 : isEmail ? 254 : undefined}
         keyboardType={
           isEmail
             ? 'email-address'
-            : label === 'Year of birth'
+            : isPin || label === 'Year of birth'
               ? 'number-pad'
               : label === 'Strength'
                 ? 'decimal-pad'
@@ -735,7 +745,7 @@ function Field({
         inputMode={
           isEmail
             ? 'email'
-            : label === 'Year of birth'
+            : isPin || label === 'Year of birth'
               ? 'numeric'
               : label === 'Strength'
                 ? 'decimal'
@@ -900,6 +910,7 @@ export default function Workflow() {
   // Tabs reuse this route. Changing the key resets the form before the next render,
   // so reflection cannot inherit a later step from onboarding and read a missing title.
   // A new fresh value also starts a new visit to the same flow.
+  if (params.flow === 'login') return <Redirect href="/login" />;
   return (
     <WorkflowForm
       key={`${params.flow ?? 'onboarding'}:${params.fresh ?? ''}:${params.step ?? '0'}:${params.resume ?? ''}`}
@@ -909,7 +920,7 @@ export default function Workflow() {
 function WorkflowForm() {
   const {
     flow = 'onboarding',
-    name: routeName = 'Jane',
+    name: routeName,
     step: initialStep = '0',
     fresh,
     returnTo,
@@ -939,6 +950,7 @@ function WorkflowForm() {
     [values, setValues] = useState<Record<number, string[]>>({}),
     [fields, setFields] = useState<Record<string, string>>({}),
     [recordedUri, setRecordedUri] = useState<string>();
+  const registrationFieldsRef = useRef<Record<string, string>>({});
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   useEffect(() => {
@@ -977,6 +989,7 @@ function WorkflowForm() {
   const [loadingReflection, setLoadingReflection] = useState(flow === 'reflection');
   const [saving, setSaving] = useState(false);
   const [reflectionError, setReflectionError] = useState('');
+  const [registrationError, setRegistrationError] = useState('');
   // Accept only known in-app return screens. Tab history can include sign-in,
   // so Back and successful saves use this destination instead of router.back().
   const destination =
@@ -1023,8 +1036,14 @@ function WorkflowForm() {
   if (flow === 'profile') return <PainProfileSummary />;
   const current = data.steps[step],
     selected = values[step] ?? [];
-  const userName = fields['3-Type your name']?.trim() || routeName || 'Jane';
-  const displayTitle = current.title.replace('Jane', userName);
+  const enteredName =
+    Object.entries(fields)
+      .find(([key]) => key.endsWith('-Type your name'))?.[1]
+      ?.trim() || registrationFieldsRef.current['3-Type your name']?.trim();
+  const userName = enteredName || routeName || 'there';
+  const isRegistrationComplete =
+    flow === 'onboarding' && current.title === 'Registration complete';
+  const displayTitle = isRegistrationComplete ? `Thank you, ${userName} 😃` : current.title;
   const displayCopy =
     flow === 'reflection'
       ? `Write down any reflections on your pain experience and management this week. Week beginning ${week}. Your saved notes can be viewed and edited here.`
@@ -1050,9 +1069,22 @@ function WorkflowForm() {
   // Handle flows with special save/navigation behavior first. Remaining flows
   // advance one question at a time, then return to their destination at the end.
   const next = async (skip = false) => {
-    if (saving) return;
+    if (saving || (!skip && !ready)) return;
+    if (flow === 'onboarding' && !skip) {
+      current.fields?.forEach((field) => {
+        const key = `${step}-${field}`;
+        registrationFieldsRef.current[key] = fields[key] ?? '';
+      });
+    }
     // Skip must discard an optional answer, including an invalid draft year.
     if (skip) {
+      if (flow === 'onboarding') {
+        registrationFieldsRef.current = Object.fromEntries(
+          Object.entries(registrationFieldsRef.current).filter(
+            ([key]) => !key.startsWith(`${step}-`),
+          ),
+        );
+      }
       setFields((previous) =>
         Object.fromEntries(Object.entries(previous).filter(([key]) => !key.startsWith(`${step}-`))),
       );
@@ -1072,17 +1104,27 @@ function WorkflowForm() {
       }
       return;
     }
-    if (flow === 'onboarding' && current.title === 'Thank you, Jane 😃') {
+    if (isRegistrationComplete) {
+      const registrationFields = { ...registrationFieldsRef.current, ...fields };
+      const pin = registrationFields['9-Create PIN'] ?? '';
+      if (!isValidPin(pin)) {
+        setStep(9);
+        setRegistrationError('Enter exactly four digits to continue.');
+        return;
+      }
       setSaving(true);
+      setRegistrationError('');
       try {
         // Store profile answers only, never the temporary verification code.
-        await saveProfile(profileFromAnswers(fields, values));
-        router.replace({ pathname: '/onboarding-loading', params: { name: userName } });
-      } catch {
-        Alert.alert(
-          'Profile not saved',
-          'Check your answers and try again. Your answers are still here.',
+        await registerProfile(
+          profileFromAnswers({ ...registrationFields, '3-Type your name': userName }, values),
+          pin,
         );
+        registrationFieldsRef.current['9-Create PIN'] = '';
+        setFields((previous) => ({ ...previous, '9-Create PIN': '' }));
+        router.replace({ pathname: '/dashboard', params: { name: userName } });
+      } catch {
+        setRegistrationError('Your account could not be saved. Check your answers and try again.');
       } finally {
         setSaving(false);
       }
@@ -1202,6 +1244,11 @@ function WorkflowForm() {
         <Text style={s.copy}>{displayCopy}</Text>
         {loadingReflection ? <Text style={s.copy}>Loading reflection…</Text> : null}
         {reflectionError ? <Text style={s.fieldError}>{reflectionError}</Text> : null}
+        {registrationError ? (
+          <Text accessibilityRole="alert" style={s.fieldError}>
+            {registrationError}
+          </Text>
+        ) : null}
         {current.optionsBeforeFields && current.options ? (
           <Choice options={current.options} value={selected} pick={pick} multi={current.multi} />
         ) : null}
@@ -1210,20 +1257,23 @@ function WorkflowForm() {
             key={f}
             label={f}
             error={
-              f === 'Your email address' &&
-              fields[`${step}-${f}`] &&
-              !validAnswer(f, fields[`${step}-${f}`])
-                ? 'Enter a valid email address.'
-                : undefined
+              f === 'Create PIN' && fields[`${step}-${f}`] && !isValidPin(fields[`${step}-${f}`])
+                ? 'Enter exactly four digits to continue.'
+                : f === 'Your email address' &&
+                    fields[`${step}-${f}`] &&
+                    !validAnswer(f, fields[`${step}-${f}`])
+                  ? 'Enter a valid email address.'
+                  : undefined
             }
             editable={!loadingReflection && !saving && !reflectionError}
             value={fields[`${step}-${f}`] ?? ''}
-            set={(v) =>
+            set={(v) => {
+              if (flow === 'onboarding') registrationFieldsRef.current[`${step}-${f}`] = v;
               setFields((x) => ({
                 ...x,
                 [`${step}-${f}`]: v,
-              }))
-            }
+              }));
+            }}
           />
         ))}
         {current.title === 'Add doctor’s answer' ? (

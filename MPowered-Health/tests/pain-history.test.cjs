@@ -22,6 +22,7 @@ function environment(storage = new Map()) {
     const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
     vm.runInNewContext(code, { exports, Date, Error, require: (name) => {
       if (name === '@react-native-async-storage/async-storage') return { default: asyncStorage };
+      if (name === './pin-credential') return { writePinCredential: async () => {} };
       if (name === './appointments') return { resetAppointments() {} };
       if (name === './profile-options') return {};
       if (name === '@/utils/workflow-validation') return {};

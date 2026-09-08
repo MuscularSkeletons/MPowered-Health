@@ -1,3 +1,5 @@
+import { isValidPin } from './pin-validation';
+
 // Route parameters can be stale or malformed. Fall back to the first step rather
 // than indexing outside the current flow’s questions.
 export function workflowStep(value: string, count: number) {
@@ -8,6 +10,7 @@ export function workflowStep(value: string, count: number) {
 // Shared by onboarding and prescriptions. Whitespace alone is never an answer;
 // fields with numeric meaning also need format and range checks.
 export function validAnswer(label: string, value = '') {
+  if (label === 'Create PIN' || label === 'Enter PIN') return isValidPin(value);
   const answer = value.trim();
   if (label === 'Your email address') {
     // Accept ordinary email addresses, including plus aliases, without requiring

@@ -1,3 +1,5 @@
+import { createPinCredential, readPinCredential, writePinCredential } from './pin-credential';
+import { isValidPin } from '../utils/pin-validation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validAnswer } from '@/utils/workflow-validation';
 import { sexOptions, diagnosisOptions, painConditions } from './profile-options';
@@ -45,9 +47,10 @@ export function profileFromAnswers(
   fields: Record<string, string>,
   choices: Record<number, string[]>,
 ): Profile {
+  const name = Object.entries(fields).find(([key]) => key.endsWith('-Type your name'))?.[1] ?? '';
   return {
     email: fields['0-Your email address'] ?? '',
-    name: fields['3-Type your name'] ?? '',
+    name,
     sex: choices[4]?.[0] ?? '',
     birthYear: fields['5-Year of birth'] ?? '',
     diagnosis: choices[6]?.[0] ?? '',
@@ -87,6 +90,22 @@ export async function saveProfile(profile: Profile) {
   listeners.forEach((listener) => listener());
 }
 
+// Registration requires a PIN; editing profile details does not replace it.
+export async function registerProfile(profile: Profile, pin: string) {
+  if (!isValidPin(pin) || Object.keys(profileErrors(profile)).length)
+    throw new Error('Complete your profile and four-digit PIN.');
+  const credential = await createPinCredential(profile.email, pin);
+  const previous = await readPinCredential();
+  await writePinCredential(credential);
+  try {
+    await saveProfile(profile);
+    await AsyncStorage.removeItem('mpowered:pin-attempts');
+  } catch (error) {
+    await writePinCredential(previous);
+    throw error;
+  }
+}
+
 // Remount navigation after deletion to discard drafts, route parameters, recordings,
 // and component-local state. The marker also prevents demo data returning on reload.
 let snapshot = { ready: false, deleted: false, revision: 0, demo: true };
@@ -106,7 +125,10 @@ export async function initializeAccount() {
   const deleted = (await AsyncStorage.getItem(deletedKey)) === 'true';
   // If the previous deletion was interrupted, finish removing remaining data
   // before any account screen can mount.
-  if (deleted) await removeAccountKeys();
+  if (deleted) {
+    await writePinCredential(null);
+    await removeAccountKeys();
+  }
   const demo = !deleted && !(await AsyncStorage.getItem(profileKey));
   if (!demo) clearSession();
   await loadPainHistory();
@@ -128,6 +150,7 @@ export async function deleteLocalAccount() {
   // Only this app's keys are removed; other apps using the same storage are untouched.
   // Write the deletion marker first so partially failed cleanup can safely be retried.
   await AsyncStorage.setItem(deletedKey, 'true');
+  await writePinCredential(null);
   await finishPainHistoryWrites();
   await removeAccountKeys();
   clearSession();
