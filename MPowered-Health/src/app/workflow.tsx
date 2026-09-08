@@ -1079,15 +1079,17 @@ function WorkflowForm() {
     // Skip must discard an optional answer, including an invalid draft year.
     if (skip) {
       if (flow === 'onboarding') {
-        registrationFieldsRef.current = Object.fromEntries(
-          Object.entries(registrationFieldsRef.current).filter(
-            ([key]) => !key.startsWith(`${step}-`),
-          ),
-        );
+        current.fields?.forEach((field) => {
+          delete registrationFieldsRef.current[`${step}-${field}`];
+        });
       }
-      setFields((previous) =>
-        Object.fromEntries(Object.entries(previous).filter(([key]) => !key.startsWith(`${step}-`))),
-      );
+      setFields((previous) => {
+        const nextFields = { ...previous };
+        current.fields?.forEach((field) => {
+          delete nextFields[`${step}-${field}`];
+        });
+        return nextFields;
+      });
       setValues((previous) => ({ ...previous, [step]: [] }));
     }
     if (flow === 'reflection') {
@@ -1326,7 +1328,7 @@ function WorkflowForm() {
                   : (current.action ?? (step === data.steps.length - 1 ? 'Save' : 'Continue'))
             }
             disabled={!ready || saving || loadingReflection || !!reflectionError}
-            onPress={next}
+            onPress={() => next()}
           />
           {/* Skip deliberately bypasses Continue validation for optional questions. */}
           {current.optional && flow !== 'reflection' ? (
