@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { 
     Text, 
     TextInput,
@@ -5,54 +6,66 @@ import {
     StyleSheet, 
     KeyboardAvoidingView, 
     Platform, 
-    TouchableOpacity 
+    TouchableOpacity
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
 
 export default function Login() {
-  return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
-            <View style={styles.content}>
-                <Text style={styles.title}>SIGN IN</Text>
-                <View style={styles.form}>
-                    <TextInput 
-                        placeholder="Email"
-                        placeholderTextColor={"#999"}
-                        keyboardType="email-address"
-                        inputMode="email"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        autoComplete="email"
-                        style={styles.input}
-                    />
-                    <TextInput 
-                        placeholder="PIN"
-                        placeholderTextColor={"#999"}
-                        keyboardType="number-pad"
-                        inputMode="numeric"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        autoComplete="password"
-                        secureTextEntry
-                        style={styles.input}
-                    />
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>LOGIN</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.link}>
-                        <Text style={styles.linkText}>Log in to a different account</Text>
-                    </TouchableOpacity>
+    // keep track of what user typing
+    const [email, setEmail] = useState("");
+    const [pin, setPin] = useState("");
+
+    // routing info
+    const router = useRouter();
+    
+    return (
+        <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
+                <View style={styles.content}>
+                    <Text style={styles.title}>SIGN IN</Text>
+                    <View style={styles.form}>
+                        <TextInput 
+                            placeholder="Email"
+                            placeholderTextColor={"#999"}
+                            keyboardType="email-address"
+                            inputMode="email"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            autoComplete="email"
+                            value={email}
+                            onChangeText={setEmail}
+                            style={styles.input}
+                        />
+                        <TextInput 
+                            placeholder="PIN"
+                            placeholderTextColor={"#999"}
+                            keyboardType="number-pad"
+                            inputMode="numeric"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            autoComplete="password"
+                            value={pin}
+                            onChangeText={setPin}
+                            secureTextEntry
+                            style={styles.input}
+                        />
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}>LOGIN</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.link} onPress={() => router.push("/(auth)/signup")}>
+                            <Text style={styles.linkText}>Sign up</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
                 </View>
-
-
-            </View>
-        </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
