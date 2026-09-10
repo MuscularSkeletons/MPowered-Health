@@ -15,7 +15,6 @@ export interface User {
   email: string;
   birthsex?: string;
   birthyear?: number;
-  onboardingCompleted?: boolean; // optional field: have they completed onboarding
 }
 
 interface AuthContextType {
@@ -31,6 +30,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  // get the user information from supabase for the user with that userId (check if user authenticated)
+  const fetchUserProfile = async (userId: string): Promise<User | null> => {
+    try {
+      const { data, error } = await supabase
+        .from("User")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+      
+        if (error) {
+          console.error("Error fetching user profile:", error);
+          return null; // abort function early
+        }
+
+        if (!data) {
+          console.error("User profile data not found");
+          return null; // abort function early
+        }
+
+        const authUser = await supabase.auth.getUser(); // gets info about a user currentlly logged in
+        if (!authUser.data.user) {
+          console.error("No authenticated user found");
+          return null; // abort function early
+        }
+
+        // return the user
+        return {
+          id: data.user_id,
+          name: data.name,
+          email: authUser.data.user.email || "",
+          birthsex: data.sex,
+          birthyear: data.birth_year,
+        };
+
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  }
+
   const signIn = async (email: string, password: string) => {
   };
 
@@ -40,10 +79,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password,
     });
 
+    console.log("User signed up");
+
     if (error) throw error;
 
     if (data.user) {
-        console.log(user); // TODO: temp
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
     }
   };
 
@@ -56,11 +99,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // values that we pass from user data field
       const updateData: any = {};
       // only update data if the data to update is defined
-      if (userData.email !== undefined) updateData.email = userData.email;
+      if (userData.email !== undefined) updateData.email_address = userData.email;
       if (userData.name !== undefined) updateData.name = userData.name;
-      if (userData.birthsex !== undefined) updateData.birthsex = userData.birthsex;
-      if (userData.birthyear !== undefined) updateData.birthyear = userData.birthyear;
-      if (userData.onboardingCompleted !== undefined) updateData.onboardingCompleted = userData.onboardingCompleted;
+      if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
+      if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
 
       const { error } = await supabase
         .from("User")

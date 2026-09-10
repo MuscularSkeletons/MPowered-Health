@@ -29,7 +29,6 @@ export default function Onboarding() {
     try {
         await updateUser({
             name,
-            onboardingCompleted: true,
         });
         router.push("/(tabs)");        
     } catch (error) {

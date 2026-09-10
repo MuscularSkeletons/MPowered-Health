@@ -41,7 +41,11 @@ export default function Signup() {
         setIsLoading(true);
         try {
             // check email unique
-            const { data: existingUser } = await supabase.from("User").select("email").eq("email", email).single();
+            const { data: existingUser } = await supabase
+                .from("User")
+                .select("email_address")
+                .eq("email_address", email)
+                .single();
             if (existingUser) {
                 Alert.alert(
                     "Error",
