@@ -1,6 +1,6 @@
 // This screen provides account, privacy, data export, and deletion settings.
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { deleteLocalAccount, getProfile, Profile } from '@/constants/account';
@@ -53,6 +53,8 @@ function SettingRow({
 export default function Settings() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<'warning' | 'email'>('warning');
+  const [verificationEmail, setVerificationEmail] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   // Read the latest stored profile when the screen first opens.
@@ -75,6 +77,15 @@ export default function Settings() {
     setDeleting(true);
     setDeleteError('');
     try {
+      const currentProfile = await getProfile();
+      if (
+        !currentProfile ||
+        verificationEmail.trim().toLowerCase() !== currentProfile.email.trim().toLowerCase()
+      ) {
+        setDeleteError('Enter the email address linked to this account.');
+        setDeleting(false);
+        return;
+      }
       await deleteLocalAccount();
       router.replace('/splash');
     } catch {
@@ -143,6 +154,8 @@ export default function Settings() {
             danger
             onPress={() => {
               setDeleteError('');
+              setDeleteStep('warning');
+              setVerificationEmail('');
               setConfirmDelete(true);
             }}
           />
@@ -154,7 +167,10 @@ export default function Settings() {
         transparent
         animationType="fade"
         onRequestClose={() => {
-          if (!deleting) setConfirmDelete(false);
+          if (!deleting) {
+            setConfirmDelete(false);
+            setVerificationEmail('');
+          }
         }}
       >
         <View style={s.backdrop}>
@@ -162,14 +178,43 @@ export default function Settings() {
             <View style={s.dialogIcon}>
               <Text style={s.dialogIconText}>!</Text>
             </View>
-            <Text style={s.dialogTitle}>Delete account?</Text>
-            <Text style={s.dialogCopy}>
-              This permanently removes your profile, saved reflections, assessments, prescriptions,
-              and appointments from this device.
+            <Text style={s.dialogTitle}>
+              {deleteStep === 'warning' ? 'Delete My Account?' : 'Verify your email address'}
             </Text>
-            <Text style={s.dialogNote}>
-              This cannot be undone. The app currently stores account data on this device only.
-            </Text>
+            {deleteStep === 'warning' ? (
+              <>
+                <Text style={s.dialogCopy}>
+                  This permanently removes your profile, saved reflections, assessments,
+                  prescriptions, and appointments from this device.
+                </Text>
+                <Text style={s.dialogNote}>Deleting the account cannot be undone.</Text>
+              </>
+            ) : (
+              <>
+                <Text style={s.dialogCopy}>
+                  Enter the email address linked to your account before it is permanently deleted.
+                </Text>
+                <Text style={s.inputLabel}>Email address</Text>
+                <TextInput
+                  accessibilityLabel="Email address for account deletion"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  autoCorrect={false}
+                  editable={!deleting}
+                  inputMode="email"
+                  keyboardType="email-address"
+                  maxLength={254}
+                  onChangeText={(value) => {
+                    setVerificationEmail(value);
+                    setDeleteError('');
+                  }}
+                  placeholder="you@example.com"
+                  placeholderTextColor="#81798A"
+                  style={s.input}
+                  value={verificationEmail}
+                />
+              </>
+            )}
             {deleteError ? (
               <Text accessibilityLiveRegion="polite" style={s.error}>
                 {deleteError}
@@ -178,18 +223,36 @@ export default function Settings() {
             <Pressable
               accessibilityRole="button"
               disabled={deleting}
-              onPress={() => setConfirmDelete(false)}
+              onPress={() => {
+                setConfirmDelete(false);
+                setVerificationEmail('');
+              }}
             >
-              <Text style={s.cancel}>Keep my account</Text>
+              <Text style={s.cancel}>Cancel</Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              disabled={deleting}
-              style={s.deleteButton}
-              onPress={deleteAccount}
+              disabled={deleting || (deleteStep === 'email' && !verificationEmail.trim())}
+              style={[
+                s.deleteButton,
+                (deleting || (deleteStep === 'email' && !verificationEmail.trim())) &&
+                  s.deleteButtonDisabled,
+              ]}
+              onPress={() => {
+                if (deleteStep === 'warning') {
+                  setDeleteStep('email');
+                  setDeleteError('');
+                } else {
+                  void deleteAccount();
+                }
+              }}
             >
               <Text style={s.deleteText}>
-                {deleting ? 'Deleting…' : 'Delete account permanently'}
+                {deleting
+                  ? 'Deleting…'
+                  : deleteStep === 'warning'
+                    ? 'Confirm'
+                    : 'Verify and delete'}
               </Text>
             </Pressable>
           </View>
@@ -358,8 +421,26 @@ const s = StyleSheet.create({
   dialogTitle: { fontSize: 25, fontWeight: '800', color: palette.text },
   dialogCopy: { fontSize: 14, lineHeight: 21, color: palette.muted, marginTop: 13 },
   dialogNote: { fontSize: 12, lineHeight: 18, color: palette.muted, marginTop: 10 },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: palette.text,
+    marginTop: 18,
+    marginBottom: 8,
+  },
+  input: {
+    height: 54,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: palette.accent,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: palette.text,
+  },
   error: { color: palette.error, fontSize: 12, marginTop: 12 },
   cancel: { textAlign: 'center', color: palette.primary, fontWeight: '800', padding: 17 },
   deleteButton: { backgroundColor: palette.error, borderRadius: 17, padding: 16 },
+  deleteButtonDisabled: { opacity: 0.45 },
   deleteText: { textAlign: 'center', color: '#fff', fontWeight: '800' },
 });
