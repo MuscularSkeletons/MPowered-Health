@@ -24,7 +24,7 @@ export default function StoreBirthSex() {
   const handleComplete = async () => {
     // optional value so can just continue to next screen
     if (birthsex === "") {
-        router.push("/(tabs)");
+        router.push("/(auth)/(onboarding)/birthyear");
         return;
     }
 
@@ -39,7 +39,7 @@ export default function StoreBirthSex() {
             birthsex,
         });
         console.log("birth sex updated to db");
-        router.push("/(tabs)");        
+        router.push("/(auth)/(onboarding)/birthyear");        
     } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to complete. Please try again.");
