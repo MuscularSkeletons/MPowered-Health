@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   StyleSheet,
@@ -15,6 +16,7 @@ import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { validAnswer } from '@/utils/workflow-validation';
 import { isValidPin, pinDigits } from '@/utils/pin-validation';
 import { verifyAccountPin } from '@/constants/pin-auth';
+import { wasLocalAccountDeleted } from '@/constants/account';
 
 // Try the quick PIN first, then verify by email when needed.
 type Step = 'pin' | 'email' | 'code';
@@ -26,6 +28,7 @@ export default function Login() {
     [code, setCode] = useState('');
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const [deletedAccountPrompt, setDeletedAccountPrompt] = useState(false);
   const [emailVerificationRequired, setEmailVerificationRequired] = useState(false);
   const pending = useRef(false);
   const value = step === 'pin' ? pin : step === 'email' ? email : code;
@@ -51,7 +54,30 @@ export default function Login() {
   // Email screens advance locally; PIN sign-in checks stored credentials.
   const next = async () => {
     if (!ready || pending.current) return;
-    if (step !== 'pin') {
+    if (step === 'email' && !emailVerificationRequired) {
+      pending.current = true;
+      setChecking(true);
+      setError('');
+      try {
+        if (await wasLocalAccountDeleted()) {
+          setDeletedAccountPrompt(true);
+        } else {
+          setCode('');
+          setStep('code');
+        }
+      } catch {
+        setError('Unable to check this account. Please try again.');
+      } finally {
+        pending.current = false;
+        setChecking(false);
+      }
+      return;
+    }
+    if (step === 'code' && !emailVerificationRequired) {
+      router.replace('/dashboard');
+      return;
+    }
+    if (emailVerificationRequired) {
       // Recovery needs a verified server response; a typed code is not authentication.
       setError(
         emailVerificationRequired
@@ -219,6 +245,26 @@ export default function Login() {
           ) : null}
         </View>
       </KeyboardAvoidingView>
+      <Modal visible={deletedAccountPrompt} transparent animationType="fade">
+        <View style={s.modalBackdrop}>
+          <View accessibilityViewIsModal style={s.dialog}>
+            <Text style={s.dialogTitle}>Account not found</Text>
+            <Text accessibilityRole="alert" style={s.dialogCopy}>
+              An account with this email address does not exist
+            </Text>
+            <ActionButton
+              label="Register"
+              onPress={() => {
+                setDeletedAccountPrompt(false);
+                router.replace({
+                  pathname: '/workflow',
+                  params: { flow: 'onboarding', fresh: Date.now().toString() },
+                });
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -294,4 +340,14 @@ const s = StyleSheet.create({
   },
   accountButtonPressed: { backgroundColor: palette.surfaceSoft },
   accountLink: { fontSize: 12.5, fontWeight: '600', color: palette.muted },
+  modalBackdrop: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: 'rgba(32,26,43,0.52)',
+  },
+  dialog: { width: '100%', maxWidth: 440, borderRadius: 24, padding: 24, backgroundColor: '#fff' },
+  dialogTitle: { fontSize: 24, fontWeight: '800', color: palette.text },
+  dialogCopy: { fontSize: 15, lineHeight: 22, color: palette.muted, marginVertical: 18 },
 });

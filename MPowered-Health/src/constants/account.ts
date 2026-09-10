@@ -126,6 +126,11 @@ export const subscribeAccount = (listener: () => void) => {
     listeners.delete(listener);
   };
 };
+
+export async function wasLocalAccountDeleted() {
+  return (await AsyncStorage.getItem(deletedKey)) === 'true';
+}
+
 const clearSession = () => {
   // Clear data held by modules as well as data persisted by AsyncStorage.
   resetAssessmentSession();
