@@ -1,5 +1,5 @@
 // This screen signs an existing user in with their four-digit PIN.
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -16,7 +16,11 @@ import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { validAnswer } from '@/utils/workflow-validation';
 import { isValidPin, pinDigits } from '@/utils/pin-validation';
 import { verifyAccountPin } from '@/constants/pin-auth';
-import { completeDifferentAccountSignIn, wasLocalAccountDeleted } from '@/constants/account';
+import {
+  completeDifferentAccountSignIn,
+  getProfile,
+  wasLocalAccountDeleted,
+} from '@/constants/account';
 
 // Try the quick PIN first, then verify by email when needed.
 type Step = 'pin' | 'email' | 'code';
@@ -30,7 +34,28 @@ export default function Login() {
   const [error, setError] = useState('');
   const [deletedAccountPrompt, setDeletedAccountPrompt] = useState(false);
   const [emailVerificationRequired, setEmailVerificationRequired] = useState(false);
+  const [hasLocalProfile, setHasLocalProfile] = useState<boolean | null>(null);
   const pending = useRef(false);
+  useEffect(() => {
+    let active = true;
+    getProfile()
+      .then((profile) => {
+        if (!active) return;
+        const exists = !!profile;
+        setHasLocalProfile(exists);
+        if (!exists) setStep('email');
+      })
+      .catch(() => {
+        if (active) {
+          setHasLocalProfile(false);
+          setStep('email');
+          setError('Unable to load the saved account. You can still sign in with email.');
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const value = step === 'pin' ? pin : step === 'email' ? email : code;
   const ready =
     step === 'pin'
@@ -122,6 +147,16 @@ export default function Login() {
       setChecking(false);
     }
   };
+  if (hasLocalProfile === null) {
+    return (
+      <SafeAreaView style={s.safe} edges={['top']}>
+        <MhaHeader />
+        <View style={s.center}>
+          <Text style={s.loading}>Loading sign-in…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />
@@ -130,7 +165,9 @@ export default function Login() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={s.content}>
-          {step !== 'pin' && !(step === 'email' && emailVerificationRequired) ? (
+          {step !== 'pin' &&
+          !(step === 'email' && emailVerificationRequired) &&
+          !(step === 'email' && hasLocalProfile === false) ? (
             <Pressable
               accessibilityRole="button"
               style={s.backButton}
@@ -156,7 +193,7 @@ export default function Login() {
                 : step === 'email'
                   ? emailVerificationRequired
                     ? 'Enter the email address linked to your account to continue securely.'
-                    : 'Email sign-in is not available yet. Use your PIN on this device.'
+                    : 'Enter your email address to sign in on this device.'
                   : 'You can resend the code in two minutes.'}
             </Text>
           </View>
@@ -214,7 +251,7 @@ export default function Login() {
             {step === 'email' ? (
               <>
                 <Text style={s.help}>
-                  Use the PIN you created during registration to sign in on this device.
+                  We’ll send a four-digit verification code to this email address.
                 </Text>
                 {email.length > 0 && !ready ? (
                   <Text accessibilityLiveRegion="polite" style={[s.help, { color: palette.error }]}>
@@ -286,6 +323,7 @@ export default function Login() {
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   center: { flex: 1, justifyContent: 'center' },
+  loading: { textAlign: 'center', fontSize: 15, color: palette.muted },
   content: {
     width: '100%',
     maxWidth: 520,
