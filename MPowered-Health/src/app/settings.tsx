@@ -102,7 +102,6 @@ export default function Settings() {
             <Text style={s.eyebrow}>YOUR ACCOUNT</Text>
             <Text style={s.title}>Settings</Text>
           </View>
-          <View style={s.headingDot} />
         </View>
         <View style={s.profileCard}>
           <View style={s.avatar}>
@@ -292,13 +291,6 @@ const s = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -1,
     color: palette.text,
-  },
-  headingDot: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: palette.light,
-    marginBottom: 4,
   },
   profileCard: {
     backgroundColor: palette.primary,
