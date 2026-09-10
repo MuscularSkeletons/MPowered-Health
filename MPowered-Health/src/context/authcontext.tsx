@@ -13,13 +13,15 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  birthsex?: string;
+  birthyear?: number;
   onboardingCompleted?: boolean; // optional field: have they completed onboarding
 }
 
 interface AuthContextType {
   user: User | null;
   signUp: (email: string, password: string) => Promise<void>;
-  
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,9 +47,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // update user info in supabase - partial so can accept some of fields in user
+  const updateUser = async (userData: Partial<User>) => {
+    // check user logged in
+    if (!user) return;
+
+    try {
+      // values that we pass from user data field
+      const updateData: any = {};
+      // only update data if the data to update is defined
+      if (userData.email !== undefined) updateData.email = userData.email;
+      if (userData.name !== undefined) updateData.name = userData.name;
+      if (userData.birthsex !== undefined) updateData.birthsex = userData.birthsex;
+      if (userData.birthyear !== undefined) updateData.birthyear = userData.birthyear;
+      if (userData.onboardingCompleted !== undefined) updateData.onboardingCompleted = userData.onboardingCompleted;
+
+      const { error } = await supabase
+        .from("User")
+        .update(updateData)
+        .eq("user_id", user.id);
+      if (error) throw error;
+
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider 
-        value={{ user, signUp }}
+        value={{ user, signUp, updateUser }}
     >
         {children}
     </AuthContext.Provider>

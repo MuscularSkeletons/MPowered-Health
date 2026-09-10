@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
+import { supabase } from "@/lib/supabase/client";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
@@ -25,7 +26,7 @@ export default function Signup() {
 
     // routing info
     const router = useRouter();
-    const { signUp } = useAuth();
+    const { signUp, user, updateUser } = useAuth();
 
     // validate sign in
     const handleSignUp = async () => {
@@ -39,8 +40,25 @@ export default function Signup() {
 
         setIsLoading(true);
         try {
+            // check email unique
+            const { data: existingUser } = await supabase.from("User").select("email").eq("email", email).single();
+            if (existingUser) {
+                Alert.alert(
+                    "Error",
+                    "Email already exists. Please use a different email.",
+                );
+                setIsLoading(false);
+                return;
+            }
+
             await signUp(email, pin);
-            router.push("/(auth)/onboarding");
+            
+            // store email and pin
+            await updateUser({
+                email,
+            });
+
+            router.push("/(auth)/(onboarding)/onboarding");
         } catch (error) {
             console.error(error);
             Alert.alert("Error", "Failed to sign up. Please try again.");
