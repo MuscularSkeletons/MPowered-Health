@@ -16,7 +16,7 @@ import { ActionButton, MhaHeader, palette } from '@/components/mha-ui';
 import { validAnswer } from '@/utils/workflow-validation';
 import { isValidPin, pinDigits } from '@/utils/pin-validation';
 import { verifyAccountPin } from '@/constants/pin-auth';
-import { wasLocalAccountDeleted } from '@/constants/account';
+import { completeDifferentAccountSignIn, wasLocalAccountDeleted } from '@/constants/account';
 
 // Try the quick PIN first, then verify by email when needed.
 type Step = 'pin' | 'email' | 'code';
@@ -74,7 +74,21 @@ export default function Login() {
       return;
     }
     if (step === 'code' && !emailVerificationRequired) {
-      router.replace('/dashboard');
+      pending.current = true;
+      setChecking(true);
+      setError('');
+      try {
+        if (!(await completeDifferentAccountSignIn(email))) {
+          setDeletedAccountPrompt(true);
+          return;
+        }
+        router.replace('/dashboard');
+      } catch {
+        setError('Unable to complete sign in. Please try again.');
+      } finally {
+        pending.current = false;
+        setChecking(false);
+      }
       return;
     }
     if (emailVerificationRequired) {

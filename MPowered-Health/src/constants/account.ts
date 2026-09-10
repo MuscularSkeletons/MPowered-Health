@@ -129,9 +129,17 @@ export const subscribeAccount = (listener: () => void) => {
 };
 
 export async function wasLocalAccountDeleted(email: string) {
-  if ((await AsyncStorage.getItem(deletedKey)) !== 'true') return false;
   const deletedEmail = await AsyncStorage.getItem(deletedEmailKey);
   return deletedEmail === email.trim().toLowerCase();
+}
+
+export async function completeDifferentAccountSignIn(email: string) {
+  // Recheck after verification so a deletion that happened during sign-in cannot be bypassed.
+  if (await wasLocalAccountDeleted(email)) return false;
+  await AsyncStorage.removeItem(deletedKey);
+  snapshot = { ...snapshot, ready: true, deleted: false, demo: true };
+  listeners.forEach((listener) => listener());
+  return true;
 }
 
 const clearSession = () => {
