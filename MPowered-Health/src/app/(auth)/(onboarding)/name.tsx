@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
 
-export default function Onboarding() {
+export default function StoreName() {
   // information to store
   const [name, setName] = useState("");
 
@@ -35,7 +35,8 @@ export default function Onboarding() {
         await updateUser({
             name,
         });
-        router.push("/(tabs)");        
+        console.log("name updated to db");
+        router.push("/(auth)/(onboarding)/birthsex");        
     } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to complete. Please try again.");
@@ -73,7 +74,7 @@ export default function Onboarding() {
           ) : (
               <Text style={styles.buttonText}>SUBMIT</Text>
           )}
-      </TouchableOpacity>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
     
