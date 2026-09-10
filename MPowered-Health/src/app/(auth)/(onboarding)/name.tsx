@@ -22,11 +22,16 @@ export default function Onboarding() {
 
   const handleComplete = async () => {
     if (!name) {
-
+        Alert.alert("Error", "mandatory field missing");
     }
 
     setIsLoading(true);
     try {
+        // confirm user authenticated
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
+        // update profile with name
         await updateUser({
             name,
         });
