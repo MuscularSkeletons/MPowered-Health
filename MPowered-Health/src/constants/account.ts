@@ -30,6 +30,7 @@ export const emptyProfile: Profile = {
 };
 const profileKey = 'mpowered:profile';
 const deletedKey = 'mpowered:account-deleted';
+const deletedEmailKey = 'mpowered:deleted-account-email';
 
 // The editor and onboarding use the same validation and option lists.
 export function profileErrors(profile: Profile) {
@@ -92,7 +93,7 @@ export async function saveProfile(profile: Profile) {
     ]),
   );
   await AsyncStorage.setItem(profileKey, JSON.stringify(clean));
-  if (snapshot.deleted) await AsyncStorage.removeItem(deletedKey);
+  if (snapshot.deleted) await AsyncStorage.multiRemove([deletedKey, deletedEmailKey]);
   snapshot = { ...snapshot, deleted: false, demo: false };
   listeners.forEach((listener) => listener());
 }
@@ -127,8 +128,10 @@ export const subscribeAccount = (listener: () => void) => {
   };
 };
 
-export async function wasLocalAccountDeleted() {
-  return (await AsyncStorage.getItem(deletedKey)) === 'true';
+export async function wasLocalAccountDeleted(email: string) {
+  if ((await AsyncStorage.getItem(deletedKey)) !== 'true') return false;
+  const deletedEmail = await AsyncStorage.getItem(deletedEmailKey);
+  return deletedEmail === email.trim().toLowerCase();
 }
 
 const clearSession = () => {
@@ -159,7 +162,7 @@ export async function initializeAccount() {
 async function removeAccountKeys() {
   // The shared prefix lets deletion find current and future MPowered data keys.
   const keys = (await AsyncStorage.getAllKeys()).filter(
-    (key) => key.startsWith('mpowered:') && key !== deletedKey,
+    (key) => key.startsWith('mpowered:') && key !== deletedKey && key !== deletedEmailKey,
   );
   await AsyncStorage.multiRemove(keys);
 }
@@ -167,7 +170,9 @@ async function removeAccountKeys() {
 export async function deleteLocalAccount() {
   // Only this app's keys are removed; other apps using the same storage are untouched.
   // Write the deletion marker first so partially failed cleanup can safely be retried.
+  const profile = await getProfile();
   await AsyncStorage.setItem(deletedKey, 'true');
+  if (profile) await AsyncStorage.setItem(deletedEmailKey, profile.email.trim().toLowerCase());
   await writePinCredential(null);
   await finishPainHistoryWrites();
   await removeAccountKeys();

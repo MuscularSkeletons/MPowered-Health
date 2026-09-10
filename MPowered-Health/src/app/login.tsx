@@ -59,7 +59,7 @@ export default function Login() {
       setChecking(true);
       setError('');
       try {
-        if (await wasLocalAccountDeleted()) {
+        if (await wasLocalAccountDeleted(email)) {
           setDeletedAccountPrompt(true);
         } else {
           setCode('');
