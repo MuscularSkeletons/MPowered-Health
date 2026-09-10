@@ -23,7 +23,12 @@ export default function StoreBirthYear() {
 
   const handleComplete = async () => {
     if (birthyearstr === "") {
-        Alert.alert("Error", "mandatory field missing");
+        Alert.alert("Error", "no input detected");
+        return;
+    }
+    if (birthyearstr.length != 4) {
+        Alert.alert("Error", "invalid year entered");
+        return
     }
 
     // convert to numeric stype not string

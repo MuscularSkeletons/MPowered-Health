@@ -33,6 +33,7 @@ export default function Signup() {
         // any field empty
         if (!email || !pin) {
             Alert.alert("Error", "Please fill in all fields");
+            return;
         }
 
         // TODO: implement more validation rules (e.g., email format, pin length, etc.)

@@ -23,6 +23,7 @@ export default function StoreName() {
   const handleComplete = async () => {
     if (!name) {
         Alert.alert("Error", "mandatory field missing");
+        return;
     }
 
     setIsLoading(true);
