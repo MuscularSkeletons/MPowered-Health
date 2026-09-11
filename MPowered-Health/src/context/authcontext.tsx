@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // get the user information from supabase for the user with that userId (check if user authenticated)
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
+      // fetch all user info from db for the given user id
       const { data, error } = await supabase
         .from("User")
         .select("*")
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return null; // abort function early
         }
 
-        const authUser = await supabase.auth.getUser(); // gets info about a user currentlly logged in
+        const authUser = await supabase.auth.getUser(); // gets info about a user currently logged in
         if (!authUser.data.user) {
           console.error("No authenticated user found");
           return null; // abort function early
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return {
           id: data.user_id,
           name: data.name,
-          email: authUser.data.user.email || "",
+          email: authUser.data.user.email || "", // get the email used for authentication
           birthsex: data.sex,
           birthyear: data.birth_year,
         };
@@ -70,18 +71,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  // TODO: implement sign in using email and password
   const signIn = async (email: string, password: string) => {
   };
 
+  // handles user sign up using an email and pasword authentication method
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    console.log("User signed up");
+    if (error) throw error; // TO DO: try-catch block? maybe??
 
-    if (error) throw error;
+    console.log("User signed up");
 
     if (data.user) {
       const userProfile = await fetchUserProfile(data.user.id);
@@ -90,13 +93,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // update user info in supabase - partial so can accept some of fields in user
+  // update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
     // check user logged in
     if (!user) return;
 
     try {
-      // values that we pass from user data field
+      // the values we want to update
       const updateData: any = {};
       // only update data if the data to update is defined
       if (userData.email !== undefined) updateData.email_address = userData.email;
@@ -104,10 +107,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
       if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
 
+      // update values in db
       const { error } = await supabase
         .from("User")
         .update(updateData)
         .eq("user_id", user.id);
+        
       if (error) throw error;
 
     } catch (error) {

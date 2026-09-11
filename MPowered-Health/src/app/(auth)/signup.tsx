@@ -37,7 +37,7 @@ export default function Signup() {
         }
 
         // TODO: implement more validation rules (e.g., email format, pin length, etc.)
-        // note: when testing, email must be in correct format and password nust be at least 6 characters long
+        // note: when testing, supabase requires that email must be in correct format and password nust be at least 6 characters long
 
         setIsLoading(true);
         try {
@@ -58,7 +58,7 @@ export default function Signup() {
 
             await signUp(email, pin);
             
-            // store email and pin
+            // store email and todo: pin
             await updateUser({
                 email,
             });
