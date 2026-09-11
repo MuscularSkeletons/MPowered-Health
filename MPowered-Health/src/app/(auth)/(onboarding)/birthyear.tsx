@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
+import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
 
 export default function StoreBirthYear() {
   // information to store
@@ -27,11 +28,17 @@ export default function StoreBirthYear() {
     }
     if (birthyearstr.length != 4) {
         Alert.alert("Error", "invalid year entered");
-        return
+        return;
     }
 
     // convert string to numeric type
     const numericBirthYear = Number(birthyearstr.replace(/[^0-9]/g, ""));
+
+    // verify birth year within a valid time frame
+    if ((numericBirthYear < BIRTH_YEAR_RANGE.LOWER_BOUND) || (numericBirthYear > BIRTH_YEAR_RANGE.UPPER_BOUND)) {
+        Alert.alert("Error", "please enter a valid years");
+        return;
+    }
 
     setIsLoading(true);
     try {
@@ -42,6 +49,7 @@ export default function StoreBirthYear() {
         // update profile with name
         await updateUser({
             birthyear: numericBirthYear,
+            onboardingComplete: true,
         });
         console.log("birth year updated to db", {numericBirthYear});
         router.push("/(tabs)");        

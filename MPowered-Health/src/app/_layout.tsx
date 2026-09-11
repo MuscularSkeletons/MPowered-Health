@@ -11,6 +11,7 @@ function RouteGuard() {
   const segments = useSegments(); // use to determine at what screen/screen group at
   const inAuthSection = segments[0] === "(auth)";
   const inTabsSection = segments[0] === "(tabs)";
+  const inOnboardingSection = segments[1] === "(onboarding)";
 
   // check if user authenticated and determines what screene to be in
   useEffect(() => {
@@ -18,6 +19,10 @@ function RouteGuard() {
       // if in authentication screens already, do not need to redirect
       if (!inAuthSection) {
         router.replace("/(auth)/login");
+      }
+    } else if (!user.onboardingComplete) {
+      if (!inOnboardingSection) {
+        router.replace("/(auth)/(onboarding)/onboarding");
       }
     } else {
       if (!inTabsSection) {

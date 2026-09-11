@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
-import { sexOptions } from "@/constants/profile-options";
+import { sexOptions } from "@/constants/profile/profile-options";
 
 export default function StoreBirthSex() {
   // information to store

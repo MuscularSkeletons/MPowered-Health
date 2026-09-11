@@ -15,6 +15,7 @@ export interface User {
   email: string;
   birthsex?: string;
   birthyear?: number;
+  onboardingComplete?: boolean;
 }
 
 interface AuthContextType {
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: authUser.data.user.email || "", // get the email used for authentication
           birthsex: data.sex,
           birthyear: data.birth_year,
+          onboardingComplete: data.onboarding_complete,
         };
 
     } catch (error) {
@@ -125,14 +127,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userData.name !== undefined) updateData.name = userData.name;
       if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
       if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
+      if (userData.onboardingComplete !== undefined) updateData.onboarding_complete = userData.onboardingComplete;
 
       // update values in db
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from("User")
         .update(updateData)
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // update the change here
+      if (data) {
+        console.log(data);
+        const userProfile = await fetchUserProfile(data.user_id);
+        setUser(userProfile);
+        console.log("updated change locally (?)");
+      }
 
     } catch (error) {
       console.error("Error updating user:", error);

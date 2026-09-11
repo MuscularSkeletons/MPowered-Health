@@ -26,6 +26,14 @@ export default function StoreName() {
         return;
     }
 
+    // don't allow trailing/preceding white space
+    const trimmedName = name.trim();
+    // don't allow only white space
+    if (!trimmedName) {
+        Alert.alert("Error", "white space only is not allowed");
+        return;
+    }
+
     setIsLoading(true);
     try {
         // confirm user authenticated
@@ -34,7 +42,7 @@ export default function StoreName() {
         }
         // update profile with name
         await updateUser({
-            name,
+            name: trimmedName,
         });
         console.log("name updated to db");
         router.push("/(auth)/(onboarding)/birthsex");        
