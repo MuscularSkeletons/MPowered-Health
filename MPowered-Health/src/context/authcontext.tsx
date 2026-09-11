@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) throw error; // TO DO: try-catch block? maybe??
 
-    console.log("User signed up");
+    console.log("User signed in");
 
     if (data.user) {
       const userProfile = await fetchUserProfile(data.user.id);
