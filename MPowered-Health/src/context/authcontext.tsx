@@ -29,9 +29,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
 
-  const [isLoading, setIsLoading] = useState(true);
+  // run checkSession when first render the app
+  useEffect(() => {
+    checkSession();
+  }, []);
 
   // get the user information from supabase for the user with that userId (check if user authenticated)
+  // checks if user information exists when they sign-in/sign-up
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
       // fetch all user info from db for the given user id
@@ -135,6 +139,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+
+  // check if there is an existing session - automatically runs when open the app
+  const checkSession = async () => {
+    // tries to get a session from supabase to see if user logged in
+    try {
+      const { data: { session }} = await supabase.auth.getSession();
+
+      if (session?.user) {
+        const userProfile = await fetchUserProfile(session.user.id);
+        setUser(userProfile);
+        console.log("User profile information fetched and set"); 
+      } else {
+        setUser(null); // user is not logged in
+      }
+    } catch (error) {
+      console.error("Error checking session", error);
+      setUser(null);
+    }
+  }; 
 
   return (
     <AuthContext.Provider 
