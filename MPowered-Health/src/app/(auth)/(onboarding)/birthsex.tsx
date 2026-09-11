@@ -22,9 +22,8 @@ export default function StoreBirthSex() {
   const { user, updateUser } = useAuth();
 
   const handleComplete = async () => {
-    // optional value so can just continue to next screen
-    if (birthsex === "") {
-        router.push("/(auth)/(onboarding)/birthyear");
+    if (!birthsex) {
+        Alert.alert("Error", "please select an option");
         return;
     }
 

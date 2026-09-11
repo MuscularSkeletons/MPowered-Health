@@ -21,7 +21,7 @@ export default function StoreBirthYear() {
   const { user, updateUser } = useAuth();
 
   const handleComplete = async () => {
-    if (birthyearstr === "") {
+    if (!birthyearstr) {
         Alert.alert("Error", "no input detected");
         return;
     }
