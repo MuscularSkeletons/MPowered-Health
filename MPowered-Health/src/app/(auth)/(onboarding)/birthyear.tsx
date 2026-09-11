@@ -15,7 +15,6 @@ import { useAuth } from "@/context/authcontext";
 export default function StoreBirthYear() {
   // information to store
   const [birthyearstr, setBirthYearStr] = useState("");
-  const [birthyear, setBirthYear] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -31,12 +30,8 @@ export default function StoreBirthYear() {
         return
     }
 
-    // convert to numeric stype not string
-    const numericBirthYear = birthyearstr.replace(/[^0-9]/g, ""); // remove non number letters
-
-    setBirthYearStr(numericBirthYear); // store state
-
-    setBirthYear(Number(birthyearstr)); // convert to numeric and store
+    // convert string to numeric type
+    const numericBirthYear = Number(birthyearstr.replace(/[^0-9]/g, ""));
 
     setIsLoading(true);
     try {
@@ -46,9 +41,9 @@ export default function StoreBirthYear() {
         }
         // update profile with name
         await updateUser({
-            birthyear,
+            birthyear: numericBirthYear,
         });
-        console.log("birth year updated to db", {birthyear});
+        console.log("birth year updated to db", {numericBirthYear});
         router.push("/(tabs)");        
     } catch (error) {
         console.error(error);
