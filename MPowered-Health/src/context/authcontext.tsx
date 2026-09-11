@@ -23,12 +23,14 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
+  const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
 
   // run checkSession when first render the app
   useEffect(() => {
@@ -155,6 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // check if there is an existing session - automatically runs when open the app
   const checkSession = async () => {
+    setIsLoading(true);
     // tries to get a session from supabase to see if user logged in
     try {
       const { data: { session }} = await supabase.auth.getSession();
@@ -169,12 +172,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error checking session", error);
       setUser(null);
+    } finally {
+      setIsLoading(false); // finished checking session so can proceed
     }
   }; 
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, updateUser }}
+        value={{ user, signIn, signUp, updateUser, isLoading }}
     >
         {children}
     </AuthContext.Provider>

@@ -1,11 +1,12 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/context/authcontext";
+import { Text, View, StyleSheet } from "react-native";
 
 // anything in here has access to authentication
 function RouteGuard() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // display login screen if not authenticated
   const segments = useSegments(); // use to determine at what screen/screen group at
@@ -15,6 +16,7 @@ function RouteGuard() {
 
   // check if user authenticated and determines what screene to be in
   useEffect(() => {
+    if (isLoading) return; // do not determine user authentication state whilst still checking session
     if (!user) {
       // if in authentication screens already, do not need to redirect
       if (!inAuthSection) {
@@ -29,7 +31,15 @@ function RouteGuard() {
         router.replace("/(tabs)");
       }
     }
-  }, [user, segments, router]); // run this effect if any of these values change
+  }, [user, segments, router, isLoading]); // run this effect if any of these values change
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>temporary loading screen.</Text>
+      </View>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false}}>
@@ -48,3 +58,11 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
