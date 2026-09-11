@@ -19,6 +19,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
 }
@@ -73,6 +74,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // TODO: implement sign in using email and password
   const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
+      email,
+      password,
+    });
+
+    if (error) throw error; // TO DO: try-catch block? maybe??
+
+    console.log("User signed up");
+
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
   };
 
   // handles user sign up using an email and pasword authentication method
@@ -112,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from("User")
         .update(updateData)
         .eq("user_id", user.id);
-        
+
       if (error) throw error;
 
     } catch (error) {
@@ -123,7 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signUp, updateUser }}
+        value={{ user, signIn, signUp, updateUser }}
     >
         {children}
     </AuthContext.Provider>
