@@ -40,7 +40,7 @@ export default function Login() {
         setIsLoading(true);
         try {
             await signIn(email, pin);
-            router.push("/(tabs)");
+            router.replace("/(tabs)");
         } catch (error) {
             console.error(error);
             Alert.alert("Error", "Failed to sign in. Please check your password/email is correct.");
