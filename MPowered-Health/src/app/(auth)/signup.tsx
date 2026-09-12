@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
 import { supabase } from "@/lib/supabase/client";
+import { Ionicons } from "@expo/vector-icons";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
@@ -22,6 +23,7 @@ export default function Signup() {
     // keep track of what user typing
     const [email, setEmail] = useState("");
     const [pin, setPin] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // keep track of loading state
 
     // routing info
@@ -72,6 +74,11 @@ export default function Signup() {
         }
     };
 
+    // toggle password/pin visibility
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    }
+
     return (
         <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
@@ -100,8 +107,15 @@ export default function Signup() {
                             autoComplete="password"
                             value={pin}
                             onChangeText={setPin}
-                            secureTextEntry
+                            secureTextEntry={!showPassword}
                             style={styles.input}
+                        />
+                        <Ionicons
+                            name={showPassword ? 'eye-off' : 'eye'}
+                            size={24}
+                            color="#aaa"
+                            style={styles.icon}
+                            onPress={toggleShowPassword}
                         />
                         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                             {/*if loading, replace button with loading indicator */}
@@ -173,5 +187,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '700',
         textDecorationLine: 'underline',
+    },
+    icon: {
+        marginLeft: 10,
     },
 });

@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
+import { Ionicons } from "@expo/vector-icons";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
@@ -21,6 +22,7 @@ export default function Login() {
     // keep track of what user typing
     const [email, setEmail] = useState("");
     const [pin, setPin] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // keep track of loading state
 
     // routing info
@@ -46,6 +48,11 @@ export default function Login() {
             setIsLoading(false);
         }
     };
+
+    // toggle password/pin visibility
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    }
     
     return (
         <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
@@ -75,9 +82,17 @@ export default function Login() {
                             autoComplete="password"
                             value={pin}
                             onChangeText={setPin}
-                            secureTextEntry
+                            secureTextEntry={!showPassword}
                             style={styles.input}
                         />
+                        <Ionicons
+                            name={showPassword ? 'eye-off' : 'eye'}
+                            size={24}
+                            color="#aaa"
+                            style={styles.icon}
+                            onPress={toggleShowPassword}
+                        />
+                    
                         <TouchableOpacity style={styles.button} onPress={handleLogin}>
                             {/*if loading, replace button with loading indicator */}
                             {isLoading ? (
@@ -90,7 +105,6 @@ export default function Login() {
                             <Text style={styles.linkText}>Sign up</Text>
                         </TouchableOpacity>
                     </View>
-
 
                 </View>
             </KeyboardAvoidingView>
@@ -148,5 +162,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '700',
         textDecorationLine: 'underline',
+    },
+    icon: {
+        marginLeft: 10,
     },
 });
