@@ -1,12 +1,22 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { palette } from "@/constants/profile/ui";
 
 // Specifies layout for tabs 
 // TODO: change placeholder icons to actual icons for each tab
 
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false}}>
+    <Tabs screenOptions={{ 
+            headerShown: false,
+            tabBarStyle: {
+                paddingTop: 10,
+                backgroundColor: palette.surfaceSoft, 
+            },
+            tabBarInactiveTintColor: palette.accent,
+            tabBarActiveTintColor: palette.secondary,
+        }}>
+
         <Tabs.Screen 
             name="index" 
             options={{
