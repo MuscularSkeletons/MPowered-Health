@@ -13,7 +13,7 @@ export default function TabsLayout() {
                 title: 'Pain Tracker',
                 tabBarIcon: ({ color, size, focused }) => (
                 <Ionicons 
-                    name={focused ? "home" : "home-outline"}
+                    name={focused ? "accessibility" : "accessibility-outline"}
                     color={color}
                     size={size}  
                 />
@@ -26,7 +26,7 @@ export default function TabsLayout() {
                 title: 'My Health',
                 tabBarIcon: ({ color, size, focused }) => (
                 <Ionicons 
-                    name={focused ? "home" : "home-outline"}
+                    name={focused ? "folder" : "folder-outline"}
                     color={color}
                     size={size}  
                 />
@@ -39,7 +39,7 @@ export default function TabsLayout() {
                 title: 'Care Planner',
                 tabBarIcon: ({ color, size, focused }) => (
                 <Ionicons 
-                    name={focused ? "home" : "home-outline"}
+                    name={focused ? "clipboard" : "clipboard-outline"}
                     color={color}
                     size={size}  
                 />
@@ -52,7 +52,7 @@ export default function TabsLayout() {
                 title: 'Settings',
                 tabBarIcon: ({ color, size, focused }) => (
                 <Ionicons 
-                    name={focused ? "home" : "home-outline"}
+                    name={focused ? "settings" : "settings-outline"}
                     color={color}
                     size={size}  
                 />
