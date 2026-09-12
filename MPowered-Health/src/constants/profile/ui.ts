@@ -1,4 +1,4 @@
-// UI features for consistency
+// UI constant features for consistency
 export const palette = {
   primary: '#5E17EB',
   secondary: '#8C52FF',
@@ -27,12 +27,3 @@ export const layout = {
 };
 
 export const radius = { sm: 12, md: 16, lg: 20, xl: 24, pill: 999 };
-
-// ? what is this for?
-const tones = {
-  rose: ['#F8E1E5', '#94465A'],
-  mint: ['#DFF1E9', '#27705A'],
-  blue: ['#E1EBF7', '#3C648E'],
-  gold: ['#F5EBD2', '#83651F'],
-  violet: ['#E9DEFF', '#5E17EB'],
-} as const;
