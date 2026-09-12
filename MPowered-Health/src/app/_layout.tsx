@@ -20,7 +20,7 @@ function RouteGuard() {
     if (!user) {
       // if in authentication screens already, do not need to redirect
       if (!inAuthSection) {
-        router.replace("/(auth)/login");
+        router.replace("/(auth)/splashscreen");
       }
     } else if (!user.onboardingComplete) {
       if (!inOnboardingSection) {
