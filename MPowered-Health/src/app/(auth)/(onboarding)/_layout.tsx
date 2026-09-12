@@ -4,9 +4,16 @@ import { Stack } from "expo-router";
 
 export default function OnboardingLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false}}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="name" />
+    <Stack 
+      screenOptions={{ 
+        headerShown: true,
+        headerBackTitle: 'Back',
+        headerTitle: 'MPowered Health',
+      }}>
+        <Stack.Screen name="onboarding"
+        />
+        <Stack.Screen name="name"
+        />
         <Stack.Screen name="birthsex" />
         <Stack.Screen name="birthyear" />
         <Stack.Screen name="diagnosis" />

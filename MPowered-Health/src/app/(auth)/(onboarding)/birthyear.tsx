@@ -61,6 +61,26 @@ export default function StoreBirthYear() {
     }
   };
 
+  // if question skipped, still need to mark onboarding as complete
+  const handleIncomplete = async () => {
+    try {
+        // confirm user authenticated
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
+        // update profile with name
+        await updateUser({
+            onboardingComplete: true,
+        });
+        router.push("/(tabs)");        
+    } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to complete. Please try again.");
+    } finally {
+        setIsLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
       <View style={styles.content}>
@@ -91,8 +111,13 @@ export default function StoreBirthYear() {
                 <Text style={styles.buttonText}>SUBMIT</Text>
             )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)")}>
-            <Text style={styles.buttonText}>SKIP</Text>
+        <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
+            {/*if loading, replace button with loading indicator */}
+            {isLoading ? (
+                <ActivityIndicator size={24} color="#fff" />
+            ) : (
+                <Text style={styles.buttonText}>SKIP</Text>
+            )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
