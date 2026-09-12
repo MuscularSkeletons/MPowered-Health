@@ -22,6 +22,7 @@ interface AuthContextType {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
@@ -116,6 +117,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  }
+
   // update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
     // check user logged in
@@ -179,7 +185,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, updateUser, isLoading }}
+        value={{ user, signIn, signUp, signOut, updateUser, isLoading }}
     >
         {children}
     </AuthContext.Provider>
@@ -188,7 +194,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 };
 
-
+// allows easy access to functions defined here
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
