@@ -17,41 +17,21 @@ export default function StoreBirthSex() {
   // information to store
   const [birthsex, setBirthSex] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
 
   const handleComplete = async () => {
     if (!birthsex) {
         Alert.alert("Error", "please select an option");
         return;
     }
-    
+
     // confirm user authenticated
     if (!user) {
         throw new Error("User not authenticated");
     }
     user.birthsex = birthsex;
     router.push("/(auth)/(onboarding)/birthyear");
-
-    /*setIsLoading(true);
-    try {
-        // confirm user authenticated
-        if (!user) {
-            throw new Error("User not authenticated");
-        }
-        // update profile with birth sex
-        await updateUser({
-            birthsex,
-        });
-        console.log("birth sex updated to db");
-        router.push("/(auth)/(onboarding)/birthyear");        
-    } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to complete. Please try again.");
-    } finally {
-        setIsLoading(false);
-    }*/
   };
 
   return (
@@ -74,17 +54,11 @@ export default function StoreBirthSex() {
             <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[3])}>
                 <Text style={styles.buttonText}>{sexOptions[3]}</Text>
             </TouchableOpacity>
-        </View>
-        
+        </View>        
         
         {/* buttons */}
         <TouchableOpacity style={styles.button} onPress={handleComplete}>
-          {/*if loading, replace button with loading indicator */}
-          {isLoading ? (
-              <ActivityIndicator size={24} color="#fff" />
-          ) : (
-              <Text style={styles.buttonText}>Continue</Text>
-          )}
+            <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

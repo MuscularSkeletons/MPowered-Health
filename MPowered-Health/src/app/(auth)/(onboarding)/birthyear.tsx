@@ -17,9 +17,8 @@ export default function StoreBirthYear() {
   // information to store
   const [birthyearstr, setBirthYearStr] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
 
   const handleComplete = async () => {
     if (!birthyearstr) {
@@ -46,46 +45,15 @@ export default function StoreBirthYear() {
     }
     user.birthyear = numericBirthYear;
     router.push("/(auth)/(onboarding)/completed");
-
-    /*setIsLoading(true);
-    try {
-        // confirm user authenticated
-        if (!user) {
-            throw new Error("User not authenticated");
-        }
-        // update profile with name
-        await updateUser({
-            birthyear: numericBirthYear,
-            //onboardingComplete: true,
-        });
-        console.log("birth year updated to db", {numericBirthYear});
-        router.push("/(auth)/(onboarding)/completed");        
-    } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to complete. Please try again.");
-    } finally {
-        setIsLoading(false);
-    }*/
   };
 
   // if question skipped, still need to mark onboarding as complete
   const handleIncomplete = async () => {
-    try {
-        // confirm user authenticated
-        if (!user) {
-            throw new Error("User not authenticated");
-        }
-        // update profile with name
-        /*await updateUser({
-            //onboardingComplete: true,
-        });*/
-        router.push("/(auth)/(onboarding)/completed");     
-    } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to complete. Please try again.");
-    } finally {
-        setIsLoading(false);
+    // confirm user authenticated
+    if (!user) {
+        throw new Error("User not authenticated");
     }
+    router.push("/(auth)/(onboarding)/completed");   
   }
 
   return (
@@ -111,20 +79,10 @@ export default function StoreBirthYear() {
         
         {/* buttons */}
         <TouchableOpacity style={styles.button} onPress={handleComplete}>
-            {/*if loading, replace button with loading indicator */}
-            {isLoading ? (
-                <ActivityIndicator size={24} color="#fff" />
-            ) : (
-                <Text style={styles.buttonText}>SUBMIT</Text>
-            )}
+            <Text style={styles.buttonText}>SUBMIT</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
-            {/*if loading, replace button with loading indicator */}
-            {isLoading ? (
-                <ActivityIndicator size={24} color="#fff" />
-            ) : (
-                <Text style={styles.buttonText}>SKIP</Text>
-            )}
+            <Text style={styles.buttonText}>SKIP</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

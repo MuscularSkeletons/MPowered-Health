@@ -16,9 +16,8 @@ export default function StoreName() {
   // information to store
   const [name, setName] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
 
   const handleComplete = async () => {
     if (!name) {
@@ -41,24 +40,6 @@ export default function StoreName() {
     user.name = name;
     router.push("/(auth)/(onboarding)/birthsex");
 
-    /*setIsLoading(true);
-    try {
-        // confirm user authenticated
-        if (!user) {
-            throw new Error("User not authenticated");
-        }
-        // update profile with name
-        await updateUser({
-            name: trimmedName,
-        });
-        console.log("name updated to db");
-        router.push("/(auth)/(onboarding)/birthsex");        
-    } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to complete. Please try again.");
-    } finally {
-        setIsLoading(false);
-    }*/
   };
 
   return (
@@ -84,12 +65,7 @@ export default function StoreName() {
         
         {/* buttons */}
         <TouchableOpacity style={styles.button} onPress={handleComplete}>
-          {/*if loading, replace button with loading indicator */}
-          {isLoading ? (
-              <ActivityIndicator size={24} color="#fff" />
-          ) : (
-              <Text style={styles.buttonText}>SUBMIT</Text>
-          )}
+            <Text style={styles.buttonText}>SUBMIT</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
