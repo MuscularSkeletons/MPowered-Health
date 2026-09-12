@@ -58,7 +58,7 @@ export default function Login() {
         <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
                 <View style={styles.content}>
-                    <Text style={styles.title}>SIGN IN</Text>
+                    <Text style={styles.title}>Welcome back! Glad to see you again!</Text>
                     <View style={styles.form}>
                         <TextInput 
                             placeholder="Email"
@@ -101,6 +101,7 @@ export default function Login() {
                                 <Text style={styles.buttonText}>LOGIN</Text>
                             )}
                         </TouchableOpacity>
+                        <Text>Forgot PIN?</Text>
                         <TouchableOpacity style={styles.link} onPress={() => router.push("/(auth)/signup")}>
                             <Text style={styles.linkText}>Sign up</Text>
                         </TouchableOpacity>

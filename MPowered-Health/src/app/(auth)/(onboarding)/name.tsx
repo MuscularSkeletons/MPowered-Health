@@ -34,7 +34,14 @@ export default function StoreName() {
         return;
     }
 
-    setIsLoading(true);
+    // confirm user authenticated
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
+    user.name = name;
+    router.push("/(auth)/(onboarding)/birthsex");
+
+    /*setIsLoading(true);
     try {
         // confirm user authenticated
         if (!user) {
@@ -51,7 +58,7 @@ export default function StoreName() {
         Alert.alert("Error", "Failed to complete. Please try again.");
     } finally {
         setIsLoading(false);
-    }
+    }*/
   };
 
   return (

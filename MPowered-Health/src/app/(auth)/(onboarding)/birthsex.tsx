@@ -26,8 +26,15 @@ export default function StoreBirthSex() {
         Alert.alert("Error", "please select an option");
         return;
     }
+    
+    // confirm user authenticated
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
+    user.birthsex = birthsex;
+    router.push("/(auth)/(onboarding)/birthyear");
 
-    setIsLoading(true);
+    /*setIsLoading(true);
     try {
         // confirm user authenticated
         if (!user) {
@@ -44,7 +51,7 @@ export default function StoreBirthSex() {
         Alert.alert("Error", "Failed to complete. Please try again.");
     } finally {
         setIsLoading(false);
-    }
+    }*/
   };
 
   return (

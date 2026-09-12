@@ -40,7 +40,14 @@ export default function StoreBirthYear() {
         return;
     }
 
-    setIsLoading(true);
+    // confirm user authenticated
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
+    user.birthyear = numericBirthYear;
+    router.push("/(auth)/(onboarding)/completed");
+
+    /*setIsLoading(true);
     try {
         // confirm user authenticated
         if (!user) {
@@ -49,16 +56,16 @@ export default function StoreBirthYear() {
         // update profile with name
         await updateUser({
             birthyear: numericBirthYear,
-            onboardingComplete: true,
+            //onboardingComplete: true,
         });
         console.log("birth year updated to db", {numericBirthYear});
-        router.push("/(tabs)");        
+        router.push("/(auth)/(onboarding)/completed");        
     } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to complete. Please try again.");
     } finally {
         setIsLoading(false);
-    }
+    }*/
   };
 
   // if question skipped, still need to mark onboarding as complete
@@ -69,10 +76,10 @@ export default function StoreBirthYear() {
             throw new Error("User not authenticated");
         }
         // update profile with name
-        await updateUser({
-            onboardingComplete: true,
-        });
-        router.push("/(tabs)");        
+        /*await updateUser({
+            //onboardingComplete: true,
+        });*/
+        router.push("/(auth)/(onboarding)/completed");     
     } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to complete. Please try again.");

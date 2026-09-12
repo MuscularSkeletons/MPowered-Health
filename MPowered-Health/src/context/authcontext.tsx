@@ -173,6 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(userProfile);
         console.log("User profile information fetched and set"); 
       } else {
+        console.log("User not logged in");
         setUser(null); // user is not logged in
       }
     } catch (error) {
