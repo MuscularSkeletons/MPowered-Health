@@ -1,23 +1,15 @@
-import { useState } from "react";
 import { 
     Text, 
-    TextInput,
     View, 
     StyleSheet, 
     KeyboardAvoidingView, 
     Platform, 
     TouchableOpacity,
-    Alert,
-    ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function SplashScreen() {
-    const [isLoading, setIsLoading] = useState(false); // keep track of loading state
-
     // routing info
     const router = useRouter();
 
@@ -27,11 +19,10 @@ export default function SplashScreen() {
                 <View style={styles.content}>
                     <Text style={styles.title}>Splash Screen</Text>
                     <View style={styles.form}>
-                    
-                        <TouchableOpacity style={styles.button} onPress={() => router.push("/(auth)/signup")}>
+                        <TouchableOpacity style={styles.button} onPress={() => router.replace("/(auth)/signup")}>
                             <Text style={styles.buttonText}>Get Started</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.link} onPress={() => router.push("/(auth)/login")}>
+                        <TouchableOpacity style={styles.link} onPress={() => router.replace("/(auth)/login")}>
                             <Text style={styles.linkText}>Sign in</Text>
                         </TouchableOpacity>
                     </View>
@@ -64,14 +55,6 @@ const styles = StyleSheet.create({
     form: {
         width: '100%',
     },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
     button: {
         minHeight: 40,
         paddingHorizontal: 16,
@@ -92,8 +75,5 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '700',
         textDecorationLine: 'underline',
-    },
-    icon: {
-        marginLeft: 10,
     },
 });

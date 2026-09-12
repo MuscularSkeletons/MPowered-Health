@@ -65,7 +65,7 @@ export default function Signup() {
                 email,
             });
 
-            router.push("/(auth)/(onboarding)/onboarding");
+            router.replace("/(auth)/(onboarding)/onboarding");
         } catch (error) {
             console.error(error);
             Alert.alert("Error", "Failed to sign up. Please try again.");
