@@ -74,8 +74,7 @@ export default function StoreBirthYear() {
                 onChangeText={setBirthYearStr}
                 style={styles.input}
             />
-        </View>
-        
+        </View>        
         
         {/* buttons */}
         <TouchableOpacity style={styles.button} onPress={handleComplete}>

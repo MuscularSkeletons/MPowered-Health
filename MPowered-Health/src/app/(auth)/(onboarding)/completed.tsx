@@ -30,10 +30,9 @@ export default function CompleteOnboarding() {
             birthsex: user.birthsex,
             birthyear: user.birthyear,
             onboardingComplete: true,
-
         });
         console.log("information uploaded");
-        router.push("/(tabs)");        
+        router.replace("/(tabs)");        
     } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to complete. Please try again.");
