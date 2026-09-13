@@ -1,0 +1,35 @@
+import { palette } from '@/shared/ui/mha-ui';
+import { StyleSheet } from 'react-native';
+export const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: palette.background },
+  content: { width: '100%', maxWidth: 680, alignSelf: 'center', padding: 24, paddingBottom: 112 },
+  back: { color: palette.primary, fontWeight: '700', paddingVertical: 14 },
+  field: { marginTop: 22 },
+  label: { fontSize: 14, fontWeight: '700', color: palette.text, marginBottom: 8 },
+  input: {
+    minHeight: 56,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: '#fff',
+    padding: 15,
+    fontSize: 15,
+    color: palette.text,
+  },
+  choice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 17,
+    backgroundColor: '#fff',
+    marginTop: 8,
+  },
+  selected: { backgroundColor: '#F3EEFF', borderColor: '#BEA1F7' },
+  choiceText: { flex: 1, color: palette.text, fontSize: 14 },
+  check: { color: palette.primary, marginLeft: 12 },
+  error: { color: palette.error, fontSize: 12, marginTop: 8 },
+  help: { color: palette.muted, fontSize: 13, marginTop: 8, lineHeight: 20 },
+  footer: { marginTop: 28 },
+});
