@@ -1,19 +1,14 @@
-import { useState } from "react";
 import { 
   Text, 
   View, 
   StyleSheet,
   TouchableOpacity,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 export default function Onboarding() {
   // information to store
-
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   return (
@@ -25,12 +20,7 @@ export default function Onboarding() {
         
         {/* buttons */}
         <TouchableOpacity style={styles.button} onPress={() => router.push("/(auth)/(onboarding)/name")}>
-          {/*if loading, replace button with loading indicator */}
-          {isLoading ? (
-              <ActivityIndicator size={24} color="#fff" />
-          ) : (
-              <Text style={styles.buttonText}>CONTINUE</Text>
-          )}
+            <Text style={styles.buttonText}>CONTINUE</Text>
       </TouchableOpacity>
       </View>
     </SafeAreaView>
