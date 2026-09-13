@@ -21,7 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Login() {
     // keep track of what user typing
     const [email, setEmail] = useState("");
-    const [pin, setPin] = useState("");
+    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // keep track of loading state
 
@@ -32,14 +32,14 @@ export default function Login() {
     // validate login
     const handleLogin = async () => {
         // any field empty
-        if (!email || !pin) {
+        if (!email || !password) {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
         
         setIsLoading(true);
         try {
-            await signIn(email, pin);
+            await signIn(email, password);
             router.replace("/(tabs)");
         } catch (error) {
             console.error(error);
@@ -49,7 +49,7 @@ export default function Login() {
         }
     };
 
-    // toggle password/pin visibility
+    // toggle password visibility
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     }
@@ -73,15 +73,15 @@ export default function Login() {
                             style={styles.input}
                         />
                         <TextInput 
-                            placeholder="PIN"
+                            placeholder="Password"
                             placeholderTextColor={"#999"}
-                            keyboardType="number-pad"
-                            inputMode="numeric"
+                            keyboardType="default"
+                            inputMode="text"
                             autoCapitalize="none"
                             autoCorrect={false}
                             autoComplete="password"
-                            value={pin}
-                            onChangeText={setPin}
+                            value={password}
+                            onChangeText={setPassword}
                             secureTextEntry={!showPassword}
                             style={styles.input}
                         />
@@ -101,7 +101,7 @@ export default function Login() {
                                 <Text style={styles.buttonText}>LOGIN</Text>
                             )}
                         </TouchableOpacity>
-                        <Text>Forgot PIN?</Text>
+                        <Text>Forgot Password?</Text>
                         <TouchableOpacity style={styles.link} onPress={() => router.push("/(auth)/signup")}>
                             <Text style={styles.linkText}>Sign up</Text>
                         </TouchableOpacity>
