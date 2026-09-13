@@ -22,8 +22,15 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Signup() {
     // keep track of what user typing
     const [email, setEmail] = useState("");
+
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    // confirm password
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const isEqualPasswords = confirmPassword === password;
+
     const [isLoading, setIsLoading] = useState(false); // keep track of loading state
 
     // routing info
@@ -33,7 +40,7 @@ export default function Signup() {
     // validate sign in
     const handleSignUp = async () => {
         // any field empty
-        if (!email || !password) {
+        if (!email || !password || !confirmPassword) {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
@@ -41,6 +48,12 @@ export default function Signup() {
         // TODO: implement more validation rules (e.g., email format, password length, etc.)
         // note: when testing, supabase requires that email must be in correct format and password nust be at least 6 characters long
 
+        // check wrote same password twice
+        if (password !== confirmPassword) {
+            Alert.alert("Error", "Please enter the same password");
+            return;
+        }
+        
         setIsLoading(true);
         try {
             // check email unique
@@ -77,7 +90,12 @@ export default function Signup() {
     // toggle password visibility
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
-    }
+    };
+
+    // toggle confirm password visibility
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
 
     return (
         <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
@@ -117,6 +135,33 @@ export default function Signup() {
                             style={styles.icon}
                             onPress={toggleShowPassword}
                         />
+                        <Text>Confirm Password</Text>
+                        <TextInput 
+                            placeholder="Confirm Password"
+                            placeholderTextColor={"#999"}
+                            keyboardType="default"
+                            inputMode="text"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            autoComplete="password"
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            secureTextEntry={!showConfirmPassword}
+                            style={styles.input}
+                        />
+                        <Ionicons
+                            name={showConfirmPassword ? 'eye-off' : 'eye'}
+                            size={24}
+                            color="#aaa"
+                            style={styles.icon}
+                            onPress={toggleShowConfirmPassword}
+                        />
+                        {/*when confirming password, display text is password not the same */}
+                        {(confirmPassword && !isEqualPasswords) ? (
+                            <Text>Passwords are not equal</Text>
+                        ) : (
+                            <Text></Text>
+                        )}
                         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                             {/*if loading, replace button with loading indicator */}
                             {isLoading ? (
