@@ -1,59 +1,81 @@
-# MPowered Health — feature architecture
+# Finding code in MPowered Health
 
-This second pass organizes both routes and implementation by ownership. Only reusable UI, form primitives, navigation helpers, theme and document IO belong in `shared`.
+Start with the app section, then the task. A small feature stays flat. When a feature contains several screens or activities, each gets a folder with its own screen and controls. Shared state lives beside those activities in `state/`; components used only by one activity stay with that activity.
+
+## Product sections
+
+`src/features` contains `pain-tracker`, `my-health`, `care-planner`, `settings`, `auth` and `account`. App-wide UI, input primitives, navigation, printing and theme live in `src/shared`.
+
+Pain Tracker contains My Pain, My Movement, My Personal Care, My Social Health, My Management, Reflection and Overview. Settings contains Overview, Personal Details and Privacy Permissions. These small features keep their screen, styles and domain files together.
+
+## Inside larger features
 
 ```text
-src/app/
-  _layout.tsx                  Application navigation and account boundary
-  (auth)/                     Splash, login, onboarding and loading
-    _layout.tsx
-    onboarding/_layout.tsx
-    onboarding/[step].tsx
-  (main)/
-    _layout.tsx                Four-tab navigation only
-    (pain)/                   Dashboard, assessment, reflection
-    (health)/                 Health overview, records, profile, guide, prescriptions
-    (care)/                   Care planner, appointment draft, saved consultation
-    (account)/                Settings, personal details, permissions
-  (legacy)/                   Redirects for existing workflow URLs
+care-planner/appointment-planning/
+  details/
+    screen.tsx                Date, doctor and service entry
+    DateField.tsx
+    PractitionerSelect.tsx
+  questions/
+    screen.tsx
+    QuestionPicker.tsx        Suggested/custom question selection
+    styles.ts
+  review/
+    screen.tsx                Review the draft before saving
+  state/
+    draft.ts                  Named fields, state transitions and plan builder
+    DraftProvider.tsx         Shares that draft across the three screens
+  usePlanNavigation.ts        Navigation between planning steps
+  legacy-params.ts            Reads old appointment links
 
-src/features/
-  account/                    Account boundary, profile model, persistence, account screens
-  auth/                       Registration state/models/translation, PIN services, auth UI
-  appointments/               Named draft model/provider, planning, consultation, audio/consent
-  assessment/                 Assessment definitions, state, summaries and controls
-  health/                     Record filters, chart, printing and overview
-  medications/                Typed medication model, store, editor hook and screens
-  pain/                       Dashboard, pain history and feature content
-  profile/                    Report model/builders, export actions and screen
-  reflection/                 Reflection lifecycle, persistence and screen
+care-planner/consultation/
+  screen.tsx
+  answers/                    Answer input and its hook
+  recording/                  Recording controls, consent and signature pad
 
-src/shared/
-  ui/                         Branding and common buttons
-  forms/                      Reusable text/choice controls and basic form styling
-  navigation/                 Tab visuals, return navigation and stable visit identity
-  export/                     Platform-specific HTML printing, sharing and copying
-  theme/                      Shared theme
+my-health/prescriptions/
+  list/                       List screen and its styles
+  editor/                     Add/edit screen and its draft hook
+  state/                      Medication rules, shared store and sample records
+
+my-health/pain-profile/
+  screen.tsx
+  styles.ts
+  options.ts
+  sharing/                    Report formatting and print/share/copy UI
+
+auth/onboarding/
+  screen.tsx                  Coordinates the question sequence
+  questions/                  Fields, wording, question types and validation
+  state/                      Draft rules and provider
+  introduction/               Introductory loading pages and their styles
+  to-profile.ts               Converts answers to the stored profile
+
+pain-tracker/shared/assessment/
+  screen.tsx                  Question flow layout and navigation
+  styles.ts
+  types.ts                    Shared assessment contracts
+  inputs/                     Question input and score slider
+  summary/                    Result layout, insight and text formatting
+  state/                      Draft transitions, completed answers and flow hook
 ```
 
-Each main feature route group has its own `_layout.tsx`. Parenthesized groups preserve the established dashboard/explore/care/settings URLs. Authentication is outside the tab navigator, eliminating conditional tab hiding. Compatibility redirects preserve previous `/workflow/...` links.
+## Naming and merging rules
 
-## Responsibility boundaries
+Use the folder for context: `details/DateField.tsx`, not `AppointmentDateField.tsx`; `state/draft.ts`, not `appointment-draft.ts`. Use names that explain the role, not vague duplicate domain labels. Exported domain types can keep explicit names such as `AppointmentDraft` so imports are understandable elsewhere.
 
-- Appointment drafts use named date, doctor, service, questions and custom-question fields. A pure reducer and plan builder define state transitions and conversion to a stored plan. Internal navigation carries visit identity only; personal answers stay in context.
-- Planning review is separate from saved consultation review. Saved review delegates answer input, audio controls, recording consent and signature drawing to components and a consultation hook. The screen is now 89 lines, down from 647 at the start of this pass.
-- Registration has its own provider and models. Translating numbered registration answers into a profile belongs to authentication; profile shape and validation belong to the account model.
-- Prescription state contains typed medication records with stable identities. The editor hook owns a local draft. Save/update/validation live in the medication model, not in display strings or JSX. Storage remains in memory, matching the prototype.
-- Health records delegate filtering to a hook, chart rendering to a component and printing to a control/service. The screen is now 195 lines, down from 604.
-- Feature-specific styles, product copy, report builders and date-picker UI sit beside their owners. `shared` does not import features.
-- Platform document IO accepts title, HTML and text, so it no longer depends on the profile domain.
-- Account startup/deletion handling is isolated from tab presentation. Stable visit identity avoids resetting inactive feature drafts when another tab changes search parameters.
-- There are no added classes or duplicated feature implementations. Route files are thin entry points or compatibility redirects.
+Keep one screen's small static content with that screen. The appointment details screen now owns its copy and practitioner options; the old unused general appointment configuration is removed. The profile export adapter had one consumer, so its small action functions now live with the export UI. Report formatting remains separate because other consumers need it.
 
-## Validation and limits
+Do not merge draft rules with the provider: the former is pure, testable domain behavior, while the latter controls React state lifetime. Do not create a new directory for every small component. Small features remain flat; larger activities are grouped where that makes related files easier to find.
 
-Run `npm run typecheck`, `npm run lint`, `npm run format:check` and `npm test`. The test runner covers storage, registration mapping, reducer isolation/skip behavior, route parsing, named appointment drafts and structured medication edits. Native/web export checks use `npx expo export --platform all`.
+## Routing and responsibility boundaries
 
-Storage keys and platform-specific PIN implementations remain unchanged. Appointments/prescriptions retain the existing in-memory persistence behavior. Native recording, signatures, date pickers and share dialogs still need device smoke testing. The prior Expo Doctor run reported 18 patch-version mismatches; dependencies were not upgraded during this refactor. This second pass has not repeated the earlier interactive browser smoke suite.
+`src/app` contains Expo Router entry points, layouts and compatibility redirects. The main tab groups are `(pain-tracker)`, `(my-health)`, `(care-planner)` and `(settings)`, with nested providers/layouts for onboarding, appointment planning and prescriptions. Public URLs stay unchanged by implementation-file moves.
 
-Completed checks: TypeScript, lint and formatting passed; all 18 tests passed; iOS, Android and web export succeeded; `git diff --check` passed.
+Individual assessment screens supply definitions, summary functions, persistence and presentation to a generic flow. Shared assessment code does not import individual assessments. Pure reducers describe draft transitions; hooks coordinate state and asynchronous work; UI components handle presentation. Pain Tracker's public `session.ts` coordinates resets and `summaries.ts` composes report summaries. Account lifecycle coordination remains separate from Settings screens.
+
+## Checks and limits
+
+Use `npm run typecheck`, `npm run lint`, `npm test`, `npm run format:check` and `npx expo export --platform all`. The 27 tests cover data behavior, workflow edge cases and dependency boundaries. Implementation moves update tests and imports together.
+
+This organization preserves existing UI, routes and behavior. Native recording/sharing/date-picker flows still need device testing. Existing prototype storage and fixed demo copy are unchanged. Dependency upgrades were outside this refactor.

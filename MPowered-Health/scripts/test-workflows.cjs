@@ -69,11 +69,11 @@ test('reflections survive a fresh module load and stay separated by week', async
       },
     },
   };
-  const first = load('src/features/reflection/services/reflections.ts', imports);
+  const first = load('src/features/pain-tracker/reflection/repository.ts', imports);
   assert.equal(first.reflectionWeek(new Date(2026, 8, 6)), '2026-08-31');
   assert.equal(first.reflectionWeek(new Date(2026, 8, 7)), '2026-09-07');
   await first.saveReflection(' First week ', '2026-08-31');
-  const reopened = load('src/features/reflection/services/reflections.ts', imports);
+  const reopened = load('src/features/pain-tracker/reflection/repository.ts', imports);
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
   await reopened.saveReflection('Second week', '2026-09-07');
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
@@ -81,7 +81,7 @@ test('reflections survive a fresh module load and stay separated by week', async
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
 });
 test('storage failures are surfaced instead of reporting a successful save', async () => {
-  const reflections = load('src/features/reflection/services/reflections.ts', {
+  const reflections = load('src/features/pain-tracker/reflection/repository.ts', {
     '@react-native-async-storage/async-storage': {
       default: {
         setItem: async () => {
@@ -132,25 +132,25 @@ function accountFixture(initial = []) {
   const imports = {
     '@react-native-async-storage/async-storage': { default: storage },
     '@/shared/forms/validation': { validAnswer },
-    '@/features/auth/models/pin-validation': load('src/features/auth/models/pin-validation.ts'),
-    '@/features/auth/services/pin-credential': {
+    '@/features/auth/shared/pin-validation': load('src/features/auth/shared/pin-validation.ts'),
+    '@/features/auth/shared/pin-credential': {
       writePinCredential: async () => {},
       readPinCredential: async () => null,
     },
-    '@/features/pain/services/pain-history': {
+    '@/features/pain-tracker/my-pain/history': {
       finishPainHistoryWrites: async () => {},
       loadPainHistory: async () => {},
       getPainHistory: () => [],
     },
-    '@/features/profile/models/profile-options': load(
-      'src/features/profile/models/profile-options.ts',
+    '@/features/my-health/pain-profile/options': load(
+      'src/features/my-health/pain-profile/options.ts',
     ),
-    '@/features/assessment/state/assessment-session': {
+    '@/features/pain-tracker/session': {
       resetAssessmentSession: () => {
         resets++;
       },
     },
-    '@/features/appointments/services/appointments': {
+    '@/features/care-planner/shared/repository': {
       resetAppointments: () => {
         resets++;
       },
@@ -159,7 +159,7 @@ function accountFixture(initial = []) {
   return {
     stored,
     storage,
-    load: () => load('src/features/account/services/account.ts', imports),
+    load: () => load('src/features/account/repository.ts', imports),
     resets: () => resets,
   };
 }
@@ -178,7 +178,7 @@ const sampleProfile = {
 test('onboarding profile persists and edits preserve optional answers without saving verification codes', async () => {
   const fixture = accountFixture();
   const account = fixture.load();
-  const profile = load('src/features/auth/services/registration-profile.ts').profileFromAnswers(
+  const profile = load('src/features/auth/onboarding/to-profile.ts').profileFromAnswers(
     {
       '0-Your email address': 'alex@example.com',
       '1-Verification code': '1234',
@@ -244,9 +244,9 @@ test('failed deletion remains retryable and initialization completes interrupted
 });
 
 const { registrationReducer: draftReducer } = load(
-  'src/features/auth/models/registration-draft.ts',
+  'src/features/auth/onboarding/state/draft.ts',
 );
-const { isStepReady } = load('src/features/auth/services/registration-validation.ts', {
+const { isStepReady } = load('src/features/auth/onboarding/questions/validation.ts', {
   '@/shared/forms/validation': { validAnswer },
 });
 test('shared draft preserves earlier fields and selections across steps', () => {
@@ -281,7 +281,7 @@ test('multiple choices toggle without affecting other steps', () => {
   assert.equal(draft.values[1].join(','), 'Two');
   assert.equal(draft.values[0][0], 'General Practitioner');
 });
-const { parseQuestions } = load('src/features/appointments/services/route-params.ts');
+const { parseQuestions } = load('src/features/care-planner/appointment-planning/legacy-params.ts');
 test('malformed appointment links cannot crash or inject non-string answers', () => {
   for (const value of [undefined, '{', 'null', '{}', '[1]', '["ok",{}]'])
     assert.equal(parseQuestions(value).length, 0);
@@ -302,7 +302,9 @@ test('optional choices do not bypass required fields', () => {
   );
 });
 
-const appointmentDraft = load('src/features/appointments/models/appointment-draft.ts');
+const appointmentDraft = load(
+  'src/features/care-planner/appointment-planning/state/draft.ts',
+);
 test('appointment drafts retain named fields and selected questions independently', () => {
   let draft = appointmentDraft.emptyAppointmentDraft();
   draft = appointmentDraft.appointmentDraftReducer(draft, {
@@ -341,7 +343,7 @@ test('new visits clear appointment drafts and legacy resumes validate their ques
   assert.equal(draft.questions.length, 0);
   assert.equal(draft.service, '');
 });
-const medications = load('src/features/medications/models/medication.ts');
+const medications = load('src/features/my-health/prescriptions/state/model.ts');
 test('medication edits replace one identity and retain structured form data', () => {
   const draft = { ...medications.emptyMedication(), name: ' Test ', strength: '1' };
   const list = medications.saveMedication([], draft, 'test');
@@ -355,4 +357,96 @@ test('medication edits replace one identity and retain structured form data', ()
   assert.equal(list[0].strength, '1');
   assert.equal(medications.medicationLabel(edited[0]), 'Test 2 mg — Every day');
   assert.equal(medications.saveMedication(edited, { ...draft, strength: '0' }, 'test'), edited);
+});
+
+const assessmentRoutes = load('src/features/pain-tracker/routes.ts');
+test('assessment links resolve to product routes and reject inherited or unknown names', () => {
+  const expected = {
+    pain: '/my-pain',
+    movement: '/my-movement',
+    personal: '/my-personal-care',
+    social: '/my-social-health',
+    management: '/my-management',
+  };
+  for (const [id, route] of Object.entries(expected)) {
+    assert.equal(assessmentRoutes.resolveAssessmentId(id), id);
+    assert.equal(assessmentRoutes.assessmentRoutes[id], route);
+  }
+  for (const value of [undefined, '', 'unknown', 'constructor', '__proto__'])
+    assert.equal(assessmentRoutes.resolveAssessmentId(value), 'pain');
+});
+const { buildSummary } = load('src/features/pain-tracker/summaries.ts');
+test('social summaries preserve impact thresholds and the optional reflection fallback', () => {
+  const sections = buildSummary('social', {
+    2: ['3'],
+    3: ['6'],
+    4: ['8'],
+    5: ['Earlier reflection'],
+  });
+  assert.equal(sections[2].text, 'Pain slightly affects my mood.');
+  assert.equal(sections[3].text, 'Pain moderately affects my relationships with others.');
+  assert.equal(sections[4].text, 'Pain substantially impacts my ability to enjoy life.');
+  assert.equal(sections[5].text, 'Earlier reflection');
+  assert.equal(buildSummary('social', { 5: ['Earlier'], 6: ['Latest'] })[5].text, 'Latest');
+});
+
+const assessmentDraft = load(
+  'src/features/pain-tracker/shared/assessment/state/draft.ts',
+);
+test('assessment drafts preserve earlier answers, toggle choices, and clamp navigation', () => {
+  const initial = assessmentDraft.createAssessmentDraft();
+  const reduce = assessmentDraft.assessmentDraftReducer;
+  let draft = reduce(initial, { type: 'select', value: 'Back', multiple: true });
+  draft = reduce(draft, { type: 'select', value: 'Neck', multiple: true });
+  draft = reduce(draft, { type: 'select', value: 'Back', multiple: true });
+  draft = reduce(draft, { type: 'advance', questionCount: 2, fromStep: draft.step });
+  draft = reduce(draft, { type: 'select', value: '0', multiple: false });
+  draft = reduce(draft, { type: 'advance', questionCount: 2, fromStep: draft.step });
+  assert.equal(draft.step, 1);
+  assert.equal(draft.answers[0].join(','), 'Neck');
+  assert.equal(draft.answers[1][0], '0');
+  assert.equal(Object.keys(initial.answers).length, 0);
+  draft = reduce(reduce(draft, { type: 'back' }), { type: 'back' });
+  assert.equal(draft.step, 0);
+});
+test('saving locks a draft and a failed save preserves retryable answers', () => {
+  const reduce = assessmentDraft.assessmentDraftReducer;
+  let draft = reduce(assessmentDraft.createAssessmentDraft(), {
+    type: 'select',
+    value: 'Back',
+    multiple: true,
+  });
+  draft = reduce(draft, { type: 'saving' });
+  for (const action of [
+    { type: 'select', value: 'Neck', multiple: true },
+    { type: 'back' },
+    { type: 'restart' },
+  ])
+    assert.equal(reduce(draft, action), draft);
+  draft = reduce(draft, { type: 'failed', message: 'Retry' });
+  assert.equal(draft.status, 'answering');
+  assert.equal(draft.answers[0][0], 'Back');
+  draft = reduce(reduce(draft, { type: 'saving' }), { type: 'saved' });
+  assert.equal(draft.status, 'complete');
+  draft = reduce(draft, { type: 'restart' });
+  assert.equal(draft.status, 'answering');
+  assert.equal(draft.error, '');
+  assert.equal(draft.answers[0][0], 'Back');
+});
+test('required assessment input rejects blank values while zero scores and optional skips remain valid', () => {
+  const q = { title: 'Question', prompt: 'Prompt', kind: 'text' };
+  for (const values of [[], [''], ['  ']])
+    assert.equal(assessmentDraft.questionAnswered(q, values), false);
+  assert.equal(assessmentDraft.questionAnswered({ ...q, optional: true }, []), true);
+  assert.equal(assessmentDraft.questionAnswered({ ...q, kind: 'score' }, ['0']), true);
+  assert.equal(assessmentDraft.questionAnswered({ ...q, kind: 'score' }, ['11']), false);
+  assert.equal(assessmentDraft.questionAnswered({ ...q, kind: 'number' }, ['2.5']), false);
+  assert.equal(assessmentDraft.questionAnswered({ ...q, kind: 'number' }, ['24']), true);
+});
+
+test('rapid repeated Continue actions cannot skip an unanswered assessment question', () => {
+  const draft = assessmentDraft.createAssessmentDraft();
+  const action = { type: 'advance', questionCount: 6, fromStep: 0 };
+  const next = assessmentDraft.assessmentDraftReducer(draft, action);
+  assert.equal(assessmentDraft.assessmentDraftReducer(next, action).step, 1);
 });

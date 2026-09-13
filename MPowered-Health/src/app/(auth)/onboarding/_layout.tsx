@@ -1,4 +1,4 @@
-import { RegistrationProvider } from '@/features/auth/state/RegistrationProvider';
+import { RegistrationProvider } from '@/features/auth/onboarding/state/DraftProvider';
 import { useRouteVisit } from '@/shared/navigation/useRouteVisit';
 import { Stack } from 'expo-router';
 export default function OnboardingLayout() {

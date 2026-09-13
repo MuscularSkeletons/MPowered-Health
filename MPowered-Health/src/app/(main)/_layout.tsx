@@ -4,7 +4,7 @@ import { Tabs } from 'expo-router';
 export default function MainTabs() {
   return (
     <Tabs
-      initialRouteName="(pain)"
+      initialRouteName="(pain-tracker)"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#5E17EB',
@@ -16,7 +16,7 @@ export default function MainTabs() {
       }}
     >
       <Tabs.Screen
-        name="(pain)"
+        name="(pain-tracker)"
         options={{
           title: 'Pain Tracker',
           href: '/dashboard',
@@ -26,7 +26,7 @@ export default function MainTabs() {
         }}
       />
       <Tabs.Screen
-        name="(health)"
+        name="(my-health)"
         options={{
           title: 'My Health',
           href: '/explore',
@@ -36,7 +36,7 @@ export default function MainTabs() {
         }}
       />
       <Tabs.Screen
-        name="(care)"
+        name="(care-planner)"
         options={{
           title: 'Care Planner',
           href: '/care',
@@ -46,7 +46,7 @@ export default function MainTabs() {
         }}
       />
       <Tabs.Screen
-        name="(account)"
+        name="(settings)"
         options={{
           title: 'Settings',
           href: '/settings',
