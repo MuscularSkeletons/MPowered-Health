@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,     // allow token to automatically refresh
-    persistSession: true,       //  if user closes and reopens app, they are still logged in
+    persistSession: true,       // if user closes and reopens app, they are still logged in
     detectSessionInUrl: false,
   },
 });

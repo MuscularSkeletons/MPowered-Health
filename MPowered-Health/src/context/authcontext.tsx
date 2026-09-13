@@ -29,6 +29,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// defines all functions related to authentication
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app

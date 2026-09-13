@@ -20,6 +20,7 @@ export default function StoreBirthYear() {
   const router = useRouter();
   const { user } = useAuth();
 
+  // store birth year value and proceed to next screen
   const handleComplete = async () => {
     if (!birthyearstr) {
         Alert.alert("Error", "no input detected");
@@ -47,7 +48,7 @@ export default function StoreBirthYear() {
     router.push("/(auth)/(onboarding)/completed");
   };
 
-  // if question skipped, still need to mark onboarding as complete
+  // if question skipped, proceede to next page without storing any value
   const handleIncomplete = async () => {
     // confirm user authenticated
     if (!user) {
