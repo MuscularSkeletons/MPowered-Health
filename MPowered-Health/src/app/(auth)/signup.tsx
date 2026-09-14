@@ -49,16 +49,7 @@ export default function Signup() {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
-
-        // TODO: implement more validation rules (e.g., email format, password length, etc.)
-        // note: when testing, supabase requires that email must be in correct format and password nust be at least 6 characters long
-        // email_address_invalid
-        // email_exists
-        // over_request_rate_limit
-        // user_already_exists
-        // weak_password
-        // over_email_send_rate_limit
-
+        
         // check wrote same password twice
         if (password !== confirmPassword) {
             Alert.alert("Error", "Please enter the same password");
