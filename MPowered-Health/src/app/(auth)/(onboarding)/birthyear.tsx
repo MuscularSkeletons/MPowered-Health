@@ -7,6 +7,8 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -59,32 +61,34 @@ export default function StoreBirthYear() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Birth Year</Text>
-        </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
+            <View style={styles.content}>
+                <View style={styles.header}>
+                <Text style={styles.title}>Birth Year</Text>
+                </View>
 
-        <View style={styles.form}>
-            <TextInput 
-                placeholder="YYYY"
-                placeholderTextColor={"#999"}
-                keyboardType="number-pad"
-                inputMode="numeric"
-                autoCorrect={false}
-                value={birthyearstr}
-                onChangeText={setBirthYearStr}
-                style={styles.input}
-            />
-        </View>        
-        
-        {/* buttons */}
-        <TouchableOpacity style={styles.button} onPress={handleComplete}>
-            <Text style={styles.buttonText}>SUBMIT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
-            <Text style={styles.buttonText}>SKIP</Text>
-        </TouchableOpacity>
-      </View>
+                <View style={styles.form}>
+                    <TextInput 
+                        placeholder="YYYY"
+                        placeholderTextColor={"#999"}
+                        keyboardType="number-pad"
+                        inputMode="numeric"
+                        autoCorrect={false}
+                        value={birthyearstr}
+                        onChangeText={setBirthYearStr}
+                        style={styles.input}
+                    />
+                </View>        
+                
+                {/* buttons */}
+                <TouchableOpacity style={styles.button} onPress={handleComplete}>
+                    <Text style={styles.buttonText}>SUBMIT</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
+                    <Text style={styles.buttonText}>SKIP</Text>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     </SafeAreaView>
     
   );

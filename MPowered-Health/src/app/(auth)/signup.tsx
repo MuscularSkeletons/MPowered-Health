@@ -49,7 +49,7 @@ export default function Signup() {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
-        
+
         // check wrote same password twice
         if (password !== confirmPassword) {
             Alert.alert("Error", "Please enter the same password");
@@ -163,8 +163,6 @@ export default function Signup() {
                             <Text style={styles.linkText}>Log in to a different account</Text>
                         </TouchableOpacity>
                     </View>
-
-
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>

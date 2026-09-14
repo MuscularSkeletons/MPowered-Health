@@ -7,6 +7,8 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -44,30 +46,31 @@ export default function StoreName() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Name</Text>
-        </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
+            <View style={styles.content}>
+                <View style={styles.header}>
+                <Text style={styles.title}>Name</Text>
+                </View>
 
-        <View style={styles.form}>
-            <TextInput 
-                placeholder="Name"
-                placeholderTextColor={"#999"}
-                inputMode="text"
-                autoCapitalize="words"
-                autoCorrect={false}
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-            />
-        </View>
-        
-        
-        {/* buttons */}
-        <TouchableOpacity style={styles.button} onPress={handleComplete}>
-            <Text style={styles.buttonText}>SUBMIT</Text>
-        </TouchableOpacity>
-      </View>
+                <View style={styles.form}>
+                    <TextInput 
+                        placeholder="Name"
+                        placeholderTextColor={"#999"}
+                        inputMode="text"
+                        autoCapitalize="words"
+                        autoCorrect={false}
+                        value={name}
+                        onChangeText={setName}
+                        style={styles.input}
+                    />
+                </View>
+                
+                {/* buttons */}
+                <TouchableOpacity style={styles.button} onPress={handleComplete}>
+                    <Text style={styles.buttonText}>SUBMIT</Text>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     </SafeAreaView>
     
   );

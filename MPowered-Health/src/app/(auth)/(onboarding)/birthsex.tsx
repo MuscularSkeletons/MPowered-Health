@@ -36,31 +36,31 @@ export default function StoreBirthSex() {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Birth Sex</Text>
-        </View>
+        <View style={styles.content}>
+            <View style={styles.header}>
+            <Text style={styles.title}>Birth Sex</Text>
+            </View>
 
-        <View style={styles.form}>
-            <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[0])}>
-                <Text style={styles.buttonText}>{sexOptions[0]}</Text>
+            <View style={styles.form}>
+                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[0])}>
+                    <Text style={styles.buttonText}>{sexOptions[0]}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[1])}>
+                    <Text style={styles.buttonText}>{sexOptions[1]}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[2])}>
+                    <Text style={styles.buttonText}>{sexOptions[2]}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[3])}>
+                    <Text style={styles.buttonText}>{sexOptions[3]}</Text>
+                </TouchableOpacity>
+            </View>        
+            
+            {/* buttons */}
+            <TouchableOpacity style={styles.button} onPress={handleComplete}>
+                <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[1])}>
-                <Text style={styles.buttonText}>{sexOptions[1]}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[2])}>
-                <Text style={styles.buttonText}>{sexOptions[2]}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[3])}>
-                <Text style={styles.buttonText}>{sexOptions[3]}</Text>
-            </TouchableOpacity>
-        </View>        
-        
-        {/* buttons */}
-        <TouchableOpacity style={styles.button} onPress={handleComplete}>
-            <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
-      </View>
+        </View>
     </SafeAreaView>
     
   );
