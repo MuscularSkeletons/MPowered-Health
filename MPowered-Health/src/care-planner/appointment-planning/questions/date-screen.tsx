@@ -1,16 +1,14 @@
-import { s } from '../questions/styles';
+import { useAppointmentDraft } from '../appointment-draft/DraftProvider';
+import { s } from '../form-styles';
 import { palette } from '@/shared/ui/mha-ui';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Image } from 'expo-image';
 import { createElement, useState } from 'react';
 import { Modal, Platform, Pressable, Text, View } from 'react-native';
-export function AppointmentDateField({
-  value,
-  set,
-}: {
-  value: string;
-  set: (value: string) => void;
-}) {
+export function AppointmentDateField() {
+  const { draft, dispatch } = useAppointmentDraft();
+  const value = draft.date;
+  const set = (value: string) => dispatch({ type: 'field', field: 'date', value });
   const label = 'Appointment date';
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());

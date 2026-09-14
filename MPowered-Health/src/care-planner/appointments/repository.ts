@@ -3,7 +3,6 @@ import { registerAccountCleanup } from '@/shared/account/repository';
 
 // Appointment records stay in memory and are copied when read to prevent accidental edits.
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
-export type { AppointmentQuestion, PlannedAppointment } from '@/care-planner/appointments/types';
 let appointments: PlannedAppointment[] = [
   // Keep one example appointment so the unfinished prototype has useful content.
   {

@@ -13,8 +13,8 @@ src/
     my-social-health/
     my-management/
     reflection/
-    assessment/route.tsx       Compatibility redirect
-    shared/assessment/        Reusable assessment engine
+    assessment-route.tsx       Compatibility redirect
+    shared/        Reusable assessment engine
     route-paths.json
   my-health/
     _layout.tsx
@@ -33,10 +33,12 @@ src/
     overview/
     appointment-planning/
       _layout.tsx
-      details/
       questions/
+        provider-screen.tsx
+        date-screen.tsx
+        doctor-questions-screen.tsx
       review/
-      state/
+      appointment-draft/
     appointments/
       route.tsx               Handles historical planning links
       screen.tsx
@@ -44,7 +46,7 @@ src/
       types.ts                Appointment contracts
       answers/
       recording/
-    shared/
+    shared/      Summary components shared by planning and saved appointments
     route-paths.json
   settings/
     _layout.tsx
@@ -99,3 +101,15 @@ Cross-tab profile and health-history contracts belong to shared services. Appoin
 ## Validation
 
 Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:features`, and `npm run export`. Regression tests cover module boundaries, route compatibility, activation screens, draft transitions, account cleanup, and persistence. Exports validate bundling for iOS, Android, and web; they do not replace device interaction testing.
+
+## Care Planner naming and ownership
+
+`overview/` displays the appointment list. `appointment-planning/` owns the three-step preparation flow: date/provider and doctor-question screens inside `questions/`, followed by `review/`. Its `appointment-draft/` keeps the draft model, provider, and validation of historical links together. `usePlanningNavigation.ts` preserves flow parameters between steps, and `form-styles.ts` belongs to the planning flow rather than to one particular step.
+
+`appointments/` owns saved appointment records, domain types, question suggestions, and the appointment screen. `answers/` owns answer editing; `recording/` owns voice controls and recording consent. Their styles live beside their controls. `shared/` contains the summary and question-list components reused by planning and appointment viewing, plus their common presentation styles. This shared folder is scoped to Care Planner; app-wide shared services remain in `src/shared/`.
+
+File and exported component names agree: `HealthServiceSelect`, `QuestionPicker`, `AppointmentSummary`, `VoiceRecordingControls`, `RecordingConsentModal`, and `useAppointmentAnswers`. Domain types are imported from `types.ts` directly rather than through the storage repository. Only navigation entries are included in the route manifest; public URLs remain unchanged.
+
+The planning questions folder keeps its two screens together. The service selector and question picker are private components inside their respective screens; the platform-specific date picker remains in `date-screen.tsx`.
+
+My Pain and My Movement each contain only `questions.ts` and `screen.tsx`. Pain result rendering is a private component in its screen; movement answer scales are private data alongside the questions. Neither is shared because each has only one feature consumer.

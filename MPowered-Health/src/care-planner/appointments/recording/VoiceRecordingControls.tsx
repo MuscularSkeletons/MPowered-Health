@@ -1,14 +1,14 @@
-import { s } from '@/care-planner/shared/review-styles';
+import { s } from './styles';
 // This screen lets the user review and update a planned healthcare appointment.
 import { palette } from '@/shared/ui/mha-ui';
 import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
-import { useConsultationAnswers } from '../answers/useAnswers';
+import { useAppointmentAnswers } from '../answers/useAppointmentAnswers';
 export function VoiceRecordingControls({
   controller,
 }: {
-  controller: ReturnType<typeof useConsultationAnswers>;
+  controller: ReturnType<typeof useAppointmentAnswers>;
 }) {
   const {
     activeQuestion,

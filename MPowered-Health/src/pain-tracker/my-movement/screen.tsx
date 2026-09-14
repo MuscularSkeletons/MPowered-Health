@@ -1,4 +1,4 @@
-import AssessmentScreen from '@/pain-tracker/shared/assessment/screen';
+import AssessmentScreen from '@/pain-tracker/shared/screen';
 import { definition } from './questions';
 import { summarize } from '@/shared/health-records/summaries/movement';
 const presentation = {

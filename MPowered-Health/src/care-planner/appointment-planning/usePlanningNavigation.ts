@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-export function useAppointmentNavigation() {
+export function usePlanningNavigation() {
   const { fresh, resume } = useLocalSearchParams<{ fresh?: string; resume?: string }>();
   const params = { fresh, resume };
   return {

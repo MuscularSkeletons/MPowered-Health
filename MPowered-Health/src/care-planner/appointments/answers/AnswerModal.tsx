@@ -1,14 +1,14 @@
-import { s } from '@/care-planner/shared/review-styles';
-import { VoiceRecordingControls } from '../recording/Controls';
+import { s } from './styles';
+import { VoiceRecordingControls } from '../recording/VoiceRecordingControls';
 // This screen lets the user review and update a planned healthcare appointment.
 import { ActionButton, palette } from '@/shared/ui/mha-ui';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
-import { useConsultationAnswers } from './useAnswers';
+import { useAppointmentAnswers } from './useAppointmentAnswers';
 export function AnswerModal({
   controller,
 }: {
-  controller: ReturnType<typeof useConsultationAnswers>;
+  controller: ReturnType<typeof useAppointmentAnswers>;
 }) {
   const { activeQuestion, setActiveQuestion, answer, setAnswer, recordedAnswers, saveAnswer } =
     controller;

@@ -1,4 +1,4 @@
-import { s } from './review-styles';
+import { s } from './styles';
 // This screen lets the user review and update a planned healthcare appointment.
 import { Pressable, Text, View } from 'react-native';
 

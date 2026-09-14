@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
-import { s } from './review-styles';
-export function AppointmentOverview({
+import { s } from './styles';
+export function AppointmentSummary({
   appointment,
 }: {
   appointment: Pick<PlannedAppointment, 'date' | 'doctor' | 'service'>;

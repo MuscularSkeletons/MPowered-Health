@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
-export function useConsultationAnswers() {
+export function useAppointmentAnswers() {
   // Keep modal drafts separate from saved answers so Cancel can discard changes.
   const [activeQuestion, setActiveQuestion] = useState<string>();
   const [answer, setAnswer] = useState('');

@@ -5,15 +5,15 @@ import { useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnswerModal } from './answers/AnswerModal';
-import { AppointmentOverview } from '@/care-planner/shared/OverviewCard';
-import { AppointmentQuestionList } from '@/care-planner/shared/QuestionList';
-import { s } from '@/care-planner/shared/review-styles';
-import { RecordingConsentModal } from './recording/ConsentModal';
-import { useConsultationAnswers } from './answers/useAnswers';
+import { AppointmentSummary } from '@/care-planner/shared/AppointmentSummary';
+import { AppointmentQuestionList } from '@/care-planner/shared/AppointmentQuestionList';
+import { s } from '@/care-planner/shared/styles';
+import { RecordingConsentModal } from './recording/RecordingConsentModal';
+import { useAppointmentAnswers } from './answers/useAppointmentAnswers';
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
 import { getAppointment } from '@/care-planner/appointments/repository';
-import { buildAppointmentQuestions } from '@/care-planner/shared/suggestions';
-export default function AppointmentReviewScreen() {
+import { buildAppointmentQuestions } from '@/care-planner/appointments/question-suggestions';
+export default function AppointmentScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const appointment = getAppointment(id);
   if (!appointment)
@@ -26,11 +26,11 @@ export default function AppointmentReviewScreen() {
         </View>
       </SafeAreaView>
     );
-  return <Consultation key={id} appointment={appointment} />;
+  return <AppointmentContent key={id} appointment={appointment} />;
 }
-function Consultation({ appointment }: { appointment: PlannedAppointment }) {
+function AppointmentContent({ appointment }: { appointment: PlannedAppointment }) {
   const scroll = useRef<ScrollView>(null);
-  const controller = useConsultationAnswers();
+  const controller = useAppointmentAnswers();
   const [consentOpen, setConsentOpen] = useState(false);
   const [consented, setConsented] = useState(!!appointment.signaturePaths?.length);
   const questions = appointment.questions ?? buildAppointmentQuestions(getPainHistory().at(-1));
@@ -51,7 +51,7 @@ function Consultation({ appointment }: { appointment: PlannedAppointment }) {
         </Pressable>
         <Text style={s.title}>Review My Appointment Plan</Text>
         <View style={s.plan}>
-          <AppointmentOverview appointment={appointment} />
+          <AppointmentSummary appointment={appointment} />
           <Text style={s.questionsTitle}>Questions to ask</Text>
           <Pressable onPress={() => setConsentOpen(true)} style={[s.consentRow, s.consentRowOn]}>
             <View style={s.consentCopy}>

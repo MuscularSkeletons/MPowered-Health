@@ -1,4 +1,4 @@
-import { parseQuestions } from '../legacy-params';
+import { parseQuestions } from './legacy-link-parser';
 import type { AppointmentQuestion } from '@/care-planner/appointments/types';
 export interface AppointmentDraft {
   date: string;

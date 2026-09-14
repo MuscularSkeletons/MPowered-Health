@@ -1,4 +1,4 @@
-import { s } from '@/care-planner/shared/review-styles';
+import { s } from './styles';
 // This screen lets the user review and update a planned healthcare appointment.
 import { palette } from '@/shared/ui/mha-ui';
 import { useRef, useState } from 'react';

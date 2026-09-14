@@ -54,7 +54,7 @@ test('shared source modules never import a tab implementation', () => {
     }
 });
 test('reusable assessment engine only imports its own code and shared contracts', () => {
-  const engine = path.join(src, 'pain-tracker/shared/assessment');
+  const engine = path.join(src, 'pain-tracker/shared');
   for (const file of files(engine))
     for (const dependency of dependencies(file))
       assert.ok(
@@ -124,7 +124,6 @@ test('renamed route sources retain existing public links and merged entry aliase
   for (const [url, feature] of [
     ['(main)/(my-health)/profile.tsx', 'pain-profile'],
     ['(main)/(my-health)/tips.tsx', 'pain-guide'],
-    ['(main)/(care-planner)/appointment/details.tsx', 'appointment-planning/details'],
     ['(auth)/login.tsx', 'sign-in'],
   ])
     assert.ok(routes.get(url)?.includes(`/${feature}/screen`), url);
@@ -132,6 +131,7 @@ test('renamed route sources retain existing public links and merged entry aliase
     routes.get('(main)/(care-planner)/appointment-review.tsx'),
     /@\/care-planner\/appointments\/route/,
   );
+  assert.ok(routes.get('(main)/(care-planner)/appointment/details.tsx').includes('/appointment-planning/questions/provider-screen'));
   assert.equal(routes.get('(auth)/index.tsx'), routes.get('(auth)/splash.tsx'));
   assert.equal(
     routes.get('(main)/(my-health)/prescriptions/new.tsx'),

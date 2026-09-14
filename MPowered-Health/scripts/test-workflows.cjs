@@ -279,7 +279,7 @@ test('multiple choices toggle without affecting other steps', () => {
   assert.equal(draft.values[1].join(','), 'Two');
   assert.equal(draft.values[0][0], 'General Practitioner');
 });
-const { parseQuestions } = load('src/care-planner/appointment-planning/legacy-params.ts');
+const { parseQuestions } = load('src/care-planner/appointment-planning/appointment-draft/legacy-link-parser.ts');
 test('malformed appointment links cannot crash or inject non-string answers', () => {
   for (const value of [undefined, '{', 'null', '{}', '[1]', '["ok",{}]'])
     assert.equal(parseQuestions(value).length, 0);
@@ -300,7 +300,7 @@ test('optional choices do not bypass required fields', () => {
   );
 });
 
-const appointmentDraft = load('src/care-planner/appointment-planning/state/draft.ts');
+const appointmentDraft = load('src/care-planner/appointment-planning/appointment-draft/draft.ts');
 test('appointment drafts retain named fields and selected questions independently', () => {
   let draft = appointmentDraft.emptyAppointmentDraft();
   draft = appointmentDraft.appointmentDraftReducer(draft, {
@@ -386,7 +386,7 @@ test('social summaries preserve impact thresholds and the optional reflection fa
   assert.equal(buildSummary('social', { 5: ['Earlier'], 6: ['Latest'] })[5].text, 'Latest');
 });
 
-const assessmentDraft = load('src/pain-tracker/shared/assessment/state/draft.ts');
+const assessmentDraft = load('src/pain-tracker/shared/state/draft.ts');
 test('assessment drafts preserve earlier answers, toggle choices, and clamp navigation', () => {
   const initial = assessmentDraft.createAssessmentDraft();
   const reduce = assessmentDraft.assessmentDraftReducer;

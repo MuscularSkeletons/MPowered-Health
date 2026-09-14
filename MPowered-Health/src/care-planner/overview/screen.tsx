@@ -28,7 +28,7 @@ const content = {
   date: 'Date: 10 June 2026',
 } as const;
 
-export default function Care() {
+export default function CarePlannerScreen() {
   const [appointments, setAppointments] = useState(getAppointments());
   useFocusEffect(useCallback(() => setAppointments(getAppointments()), []));
   return (
