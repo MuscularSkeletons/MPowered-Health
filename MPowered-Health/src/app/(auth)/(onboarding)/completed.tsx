@@ -28,6 +28,9 @@ export default function CompleteOnboarding() {
             name: user.name,
             birthsex: user.birthsex,
             birthyear: user.birthyear,
+            formalDiagnosis: user.formalDiagnosis,
+            painConditions: user.painConditions,
+            otherCondition: user.otherCondition,
             onboardingComplete: true,
         });
         console.log("information uploaded");

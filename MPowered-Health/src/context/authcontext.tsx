@@ -15,6 +15,9 @@ export interface User {
   email: string;
   birthsex?: string;
   birthyear?: number;
+  formalDiagnosis?: boolean;
+  painConditions?: string[];
+  otherCondition?: string;
   onboardingComplete?: boolean;
 }
 
@@ -73,6 +76,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: authUser.data.user.email || "", // get the email used for authentication
           birthsex: data.sex,
           birthyear: data.birth_year,
+          formalDiagnosis: data.formal_diagnosis,
+          painConditions: data.pain_conditions,
+          otherCondition: data.other_condition,
           onboardingComplete: data.onboarding_complete,
         };
 
@@ -135,6 +141,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userData.name !== undefined) updateData.name = userData.name;
       if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
       if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
+      if (userData.formalDiagnosis !== undefined) updateData.formal_diagnosis = userData.formalDiagnosis;
+      if (userData.painConditions !== undefined) updateData.pain_conditions = userData.painConditions;
+      if (userData.otherCondition !== undefined) updateData.other_condition = userData.otherCondition;
       if (userData.onboardingComplete !== undefined) updateData.onboarding_complete = userData.onboardingComplete;
 
       // update values in db
@@ -190,9 +199,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     >
         {children}
     </AuthContext.Provider>
-
   );
-
 };
 
 // allows easy access to functions defined here

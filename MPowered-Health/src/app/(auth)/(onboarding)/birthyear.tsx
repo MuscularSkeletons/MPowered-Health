@@ -22,7 +22,7 @@ export default function StoreBirthYear() {
   const router = useRouter();
   const { user } = useAuth();
 
-  // store birth year value and proceed to next screen
+  // store birth year value if present and proceed to next screen
   const handleComplete = async () => {
     if (!birthyearstr) {
         Alert.alert("Error", "no input detected");
@@ -47,16 +47,16 @@ export default function StoreBirthYear() {
         throw new Error("User not authenticated");
     }
     user.birthyear = numericBirthYear;
-    router.push("/(auth)/(onboarding)/completed");
+    router.push("/(auth)/(onboarding)/diagnosis");
   };
 
-  // if question skipped, proceede to next page without storing any value
+  // if question skipped, proceed to next page without storing any value
   const handleIncomplete = async () => {
     // confirm user authenticated
     if (!user) {
         throw new Error("User not authenticated");
     }
-    router.push("/(auth)/(onboarding)/completed");   
+    router.push("/(auth)/(onboarding)/diagnosis");   
   }
 
   return (
