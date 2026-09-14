@@ -15,6 +15,8 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
 import { supabase } from "@/lib/supabase/client";
 import { Ionicons } from "@expo/vector-icons";
+import { toUserError, type AuthUserError } from "@/constants/profile/autherror";
+import { palette } from "@/constants/profile/ui";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
@@ -36,6 +38,9 @@ export default function Signup() {
     // routing info
     const router = useRouter();
     const { signUp, user, updateUser } = useAuth();
+
+    // error handling
+    const [authError, setAuthError] = useState<AuthUserError | null>(null);
 
     // validate sign in
     const handleSignUp = async () => {
@@ -61,31 +66,18 @@ export default function Signup() {
         }
         
         setIsLoading(true);
+        setAuthError(null);
+
         try {
-            // check email unique
-            const { data: existingUser } = await supabase
-                .from("User")
-                .select("email_address")
-                .eq("email_address", email)
-                .single();
-            if (existingUser) {
-                Alert.alert(
-                    "Error",
-                    "Email already exists. Please use a different email.",
-                );
-                setIsLoading(false);
-                return;
-            }
-
             await signUp(email, password);
-
             router.replace("/(auth)/(onboarding)/onboarding");
         } catch (error) {
-            console.error(error);
-
             // handle errors
-
-            Alert.alert("Error", "Failed to sign up. Please try again.");
+            console.log(error);
+            const userError = toUserError(error);
+            setAuthError(userError);
+            Alert.alert("Error", userError.message); // better to do alert message or just show text?
+            return;
         } finally {
             setIsLoading(false);
         }
@@ -106,6 +98,8 @@ export default function Signup() {
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
                 <View style={styles.content}>
                     <Text style={styles.title}>SIGN UP</Text>
+                    {/*display authentication error
+                    <Text>{authError?.message}</Text>*/}
                     <View style={styles.form}>
                         <TextInput 
                             placeholder="Email"
@@ -239,5 +233,8 @@ const styles = StyleSheet.create({
     },
     icon: {
         marginLeft: 10,
+    },
+    errorMsg: {
+        color: palette.error,
     },
 });
