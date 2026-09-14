@@ -14,7 +14,7 @@ function RouteGuard() {
   const inTabsSection = segments[0] === "(tabs)";
   const inOnboardingSection = segments[1] === "(onboarding)";
 
-  // check if user authenticated and determines what screene to be in
+  // check if user authenticated and determines what screen to be in
   useEffect(() => {
     if (isLoading) return; // do not determine user authentication state whilst still checking session
     if (!user) {

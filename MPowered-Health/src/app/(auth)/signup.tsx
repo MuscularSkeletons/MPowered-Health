@@ -47,6 +47,12 @@ export default function Signup() {
 
         // TODO: implement more validation rules (e.g., email format, password length, etc.)
         // note: when testing, supabase requires that email must be in correct format and password nust be at least 6 characters long
+        // email_address_invalid
+        // email_exists
+        // over_request_rate_limit
+        // user_already_exists
+        // weak_password
+        // over_email_send_rate_limit
 
         // check wrote same password twice
         if (password !== confirmPassword) {
@@ -72,15 +78,13 @@ export default function Signup() {
             }
 
             await signUp(email, password);
-            
-            // email is already stored in authentication table in supabase
-            await updateUser({
-                email,
-            });
 
             router.replace("/(auth)/(onboarding)/onboarding");
         } catch (error) {
             console.error(error);
+
+            // handle errors
+
             Alert.alert("Error", "Failed to sign up. Please try again.");
         } finally {
             setIsLoading(false);
@@ -156,7 +160,7 @@ export default function Signup() {
                             style={styles.icon}
                             onPress={toggleShowConfirmPassword}
                         />
-                        {/*when confirming password, display text is password not the same */}
+                        {/*when confirming password, display text if password not the same */}
                         {(confirmPassword && !isEqualPasswords) ? (
                             <Text>Passwords are not equal</Text>
                         ) : (

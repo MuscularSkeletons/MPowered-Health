@@ -36,6 +36,11 @@ export default function Login() {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
+
+        // TODO implement error handling
+        // user_not_found - e.g. if user account deleted/does not exist
+        // user_banned ?
+        // over_request_rate_limit
         
         setIsLoading(true);
         try {

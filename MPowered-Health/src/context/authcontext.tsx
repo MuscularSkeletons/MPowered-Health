@@ -132,7 +132,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // the values we want to update
       const updateData: any = {};
       // only update data if the data to update is defined
-      if (userData.email !== undefined) updateData.email_address = userData.email;
       if (userData.name !== undefined) updateData.name = userData.name;
       if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
       if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
