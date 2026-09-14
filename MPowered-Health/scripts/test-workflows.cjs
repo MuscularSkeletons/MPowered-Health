@@ -69,11 +69,11 @@ test('reflections survive a fresh module load and stay separated by week', async
       },
     },
   };
-  const first = load('src/features/pain-tracker/reflection/repository.ts', imports);
+  const first = load('src/pain-tracker/reflection/repository.ts', imports);
   assert.equal(first.reflectionWeek(new Date(2026, 8, 6)), '2026-08-31');
   assert.equal(first.reflectionWeek(new Date(2026, 8, 7)), '2026-09-07');
   await first.saveReflection(' First week ', '2026-08-31');
-  const reopened = load('src/features/pain-tracker/reflection/repository.ts', imports);
+  const reopened = load('src/pain-tracker/reflection/repository.ts', imports);
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
   await reopened.saveReflection('Second week', '2026-09-07');
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
@@ -81,7 +81,7 @@ test('reflections survive a fresh module load and stay separated by week', async
   assert.equal((await reopened.getReflection('2026-08-31')).notes, 'First week');
 });
 test('storage failures are surfaced instead of reporting a successful save', async () => {
-  const reflections = load('src/features/pain-tracker/reflection/repository.ts', {
+  const reflections = load('src/pain-tracker/reflection/repository.ts', {
     '@react-native-async-storage/async-storage': {
       default: {
         setItem: async () => {
@@ -132,26 +132,18 @@ function accountFixture(initial = []) {
   const imports = {
     '@react-native-async-storage/async-storage': { default: storage },
     '@/shared/forms/validation': { validAnswer },
-    '@/features/auth/shared/pin-validation': load('src/features/auth/shared/pin-validation.ts'),
-    '@/features/auth/shared/pin-credential': {
+    '@/shared/account/security/pin-credential': {
       writePinCredential: async () => {},
       readPinCredential: async () => null,
     },
-    '@/features/pain-tracker/my-pain/history': {
+    '@/shared/health-records/pain-history': {
       finishPainHistoryWrites: async () => {},
       loadPainHistory: async () => {},
       getPainHistory: () => [],
     },
-    '@/features/my-health/pain-profile/options': load(
-      'src/features/my-health/pain-profile/options.ts',
-    ),
-    '@/features/pain-tracker/session': {
+    '@/shared/account/profile-options': load('src/shared/account/profile-options.ts'),
+    '@/shared/health-records/session': {
       resetAssessmentSession: () => {
-        resets++;
-      },
-    },
-    '@/features/care-planner/shared/repository': {
-      resetAppointments: () => {
         resets++;
       },
     },
@@ -159,7 +151,13 @@ function accountFixture(initial = []) {
   return {
     stored,
     storage,
-    load: () => load('src/features/account/repository.ts', imports),
+    load: () => {
+      const account = load('src/shared/account/repository.ts', imports);
+      account.registerAccountCleanup('test.feature', () => {
+        resets++;
+      });
+      return account;
+    },
     resets: () => resets,
   };
 }
@@ -178,7 +176,7 @@ const sampleProfile = {
 test('onboarding profile persists and edits preserve optional answers without saving verification codes', async () => {
   const fixture = accountFixture();
   const account = fixture.load();
-  const profile = load('src/features/auth/onboarding/to-profile.ts').profileFromAnswers(
+  const profile = load('src/auth/get-started/to-profile.ts').profileFromAnswers(
     {
       '0-Your email address': 'alex@example.com',
       '1-Verification code': '1234',
@@ -244,9 +242,9 @@ test('failed deletion remains retryable and initialization completes interrupted
 });
 
 const { registrationReducer: draftReducer } = load(
-  'src/features/auth/onboarding/state/draft.ts',
+  'src/auth/get-started/form-data/draft.ts',
 );
-const { isStepReady } = load('src/features/auth/onboarding/questions/validation.ts', {
+const { isStepReady } = load('src/auth/get-started/questions/validation.ts', {
   '@/shared/forms/validation': { validAnswer },
 });
 test('shared draft preserves earlier fields and selections across steps', () => {
@@ -281,7 +279,7 @@ test('multiple choices toggle without affecting other steps', () => {
   assert.equal(draft.values[1].join(','), 'Two');
   assert.equal(draft.values[0][0], 'General Practitioner');
 });
-const { parseQuestions } = load('src/features/care-planner/appointment-planning/legacy-params.ts');
+const { parseQuestions } = load('src/care-planner/appointment-planning/legacy-params.ts');
 test('malformed appointment links cannot crash or inject non-string answers', () => {
   for (const value of [undefined, '{', 'null', '{}', '[1]', '["ok",{}]'])
     assert.equal(parseQuestions(value).length, 0);
@@ -302,9 +300,7 @@ test('optional choices do not bypass required fields', () => {
   );
 });
 
-const appointmentDraft = load(
-  'src/features/care-planner/appointment-planning/state/draft.ts',
-);
+const appointmentDraft = load('src/care-planner/appointment-planning/state/draft.ts');
 test('appointment drafts retain named fields and selected questions independently', () => {
   let draft = appointmentDraft.emptyAppointmentDraft();
   draft = appointmentDraft.appointmentDraftReducer(draft, {
@@ -343,7 +339,7 @@ test('new visits clear appointment drafts and legacy resumes validate their ques
   assert.equal(draft.questions.length, 0);
   assert.equal(draft.service, '');
 });
-const medications = load('src/features/my-health/prescriptions/state/model.ts');
+const medications = load('src/my-health/prescriptions/state/model.ts');
 test('medication edits replace one identity and retain structured form data', () => {
   const draft = { ...medications.emptyMedication(), name: ' Test ', strength: '1' };
   const list = medications.saveMedication([], draft, 'test');
@@ -359,7 +355,7 @@ test('medication edits replace one identity and retain structured form data', ()
   assert.equal(medications.saveMedication(edited, { ...draft, strength: '0' }, 'test'), edited);
 });
 
-const assessmentRoutes = load('src/features/pain-tracker/routes.ts');
+const assessmentRoutes = load('src/pain-tracker/routes.ts');
 test('assessment links resolve to product routes and reject inherited or unknown names', () => {
   const expected = {
     pain: '/my-pain',
@@ -375,7 +371,7 @@ test('assessment links resolve to product routes and reject inherited or unknown
   for (const value of [undefined, '', 'unknown', 'constructor', '__proto__'])
     assert.equal(assessmentRoutes.resolveAssessmentId(value), 'pain');
 });
-const { buildSummary } = load('src/features/pain-tracker/summaries.ts');
+const { buildSummary } = load('src/shared/health-records/summaries.ts');
 test('social summaries preserve impact thresholds and the optional reflection fallback', () => {
   const sections = buildSummary('social', {
     2: ['3'],
@@ -390,9 +386,7 @@ test('social summaries preserve impact thresholds and the optional reflection fa
   assert.equal(buildSummary('social', { 5: ['Earlier'], 6: ['Latest'] })[5].text, 'Latest');
 });
 
-const assessmentDraft = load(
-  'src/features/pain-tracker/shared/assessment/state/draft.ts',
-);
+const assessmentDraft = load('src/pain-tracker/shared/assessment/state/draft.ts');
 test('assessment drafts preserve earlier answers, toggle choices, and clamp navigation', () => {
   const initial = assessmentDraft.createAssessmentDraft();
   const reduce = assessmentDraft.assessmentDraftReducer;
@@ -449,4 +443,39 @@ test('rapid repeated Continue actions cannot skip an unanswered assessment quest
   const action = { type: 'advance', questionCount: 6, fromStep: 0 };
   const next = assessmentDraft.assessmentDraftReducer(draft, action);
   assert.equal(assessmentDraft.assessmentDraftReducer(next, action).step, 1);
+});
+
+test('account deletion clears the feature-owned appointment store through registered cleanup', async () => {
+  const fixture = accountFixture();
+  const account = fixture.load();
+  const plans = load('src/care-planner/appointments/repository.ts', {
+    '@/shared/account/repository': account,
+  });
+  plans.addAppointment({ doctor: 'Test', date: '01/10/2026', service: 'GP' });
+  assert.ok(plans.getAppointments().length > 0);
+  await account.deleteLocalAccount();
+  assert.equal(plans.getAppointments().length, 0);
+  const reopened = load('src/care-planner/appointments/repository.ts', {
+    '@/shared/account/repository': account,
+  });
+  assert.equal(reopened.getAppointments().length, 0);
+});
+test('cleanup registrations replace the same owner without affecting other feature owners', async () => {
+  const account = accountFixture().load();
+  let replaced = 0,
+    current = 0,
+    another = 0;
+  account.registerAccountCleanup('one', () => {
+    replaced++;
+  });
+  account.registerAccountCleanup('one', () => {
+    current++;
+  });
+  account.registerAccountCleanup('two', () => {
+    another++;
+  });
+  await account.deleteLocalAccount();
+  assert.equal(replaced, 0);
+  assert.equal(current, 1);
+  assert.equal(another, 1);
 });

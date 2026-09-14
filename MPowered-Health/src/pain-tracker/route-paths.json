@@ -1,0 +1,11 @@
+{
+  "my-personal-care/screen.tsx": ["my-personal-care.tsx"],
+  "my-social-health/screen.tsx": ["my-social-health.tsx"],
+  "reflection/screen.tsx": ["reflection.tsx"],
+  "my-pain/screen.tsx": ["my-pain.tsx"],
+  "overview/screen.tsx": ["dashboard.tsx"],
+  "assessment/route.tsx": ["assessment.tsx"],
+  "my-management/screen.tsx": ["my-management.tsx"],
+  "_layout.tsx": ["_layout.tsx"],
+  "my-movement/screen.tsx": ["my-movement.tsx"]
+}

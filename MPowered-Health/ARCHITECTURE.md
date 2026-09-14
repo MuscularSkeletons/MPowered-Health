@@ -1,81 +1,101 @@
-# Finding code in MPowered Health
+# MPowered Health: product-owned modules
 
-Start with the app section, then the task. A small feature stays flat. When a feature contains several screens or activities, each gets a folder with its own screen and controls. Shared state lives beside those activities in `state/`; components used only by one activity stay with that activity.
-
-## Product sections
-
-`src/features` contains `pain-tracker`, `my-health`, `care-planner`, `settings`, `auth` and `account`. App-wide UI, input primitives, navigation, printing and theme live in `src/shared`.
-
-Pain Tracker contains My Pain, My Movement, My Personal Care, My Social Health, My Management, Reflection and Overview. Settings contains Overview, Personal Details and Privacy Permissions. These small features keep their screen, styles and domain files together.
-
-## Inside larger features
+Each product module contains its screens, layouts, components, state, and domain services together. There are no separate `app/` and `features/` directories inside modules. Authentication remains separate; shared code contains only capabilities used across modules. Branches retain the complete application and change one module at a time.
 
 ```text
-care-planner/appointment-planning/
-  details/
-    screen.tsx                Date, doctor and service entry
-    DateField.tsx
-    PractitionerSelect.tsx
-  questions/
-    screen.tsx
-    QuestionPicker.tsx        Suggested/custom question selection
-    styles.ts
-  review/
-    screen.tsx                Review the draft before saving
-  state/
-    draft.ts                  Named fields, state transitions and plan builder
-    DraftProvider.tsx         Shares that draft across the three screens
-  usePlanNavigation.ts        Navigation between planning steps
-  legacy-params.ts            Reads old appointment links
-
-care-planner/consultation/
-  screen.tsx
-  answers/                    Answer input and its hook
-  recording/                  Recording controls, consent and signature pad
-
-my-health/prescriptions/
-  list/                       List screen and its styles
-  editor/                     Add/edit screen and its draft hook
-  state/                      Medication rules, shared store and sample records
-
-my-health/pain-profile/
-  screen.tsx
-  styles.ts
-  options.ts
-  sharing/                    Report formatting and print/share/copy UI
-
-auth/onboarding/
-  screen.tsx                  Coordinates the question sequence
-  questions/                  Fields, wording, question types and validation
-  state/                      Draft rules and provider
-  introduction/               Introductory loading pages and their styles
-  to-profile.ts               Converts answers to the stored profile
-
-pain-tracker/shared/assessment/
-  screen.tsx                  Question flow layout and navigation
-  styles.ts
-  types.ts                    Shared assessment contracts
-  inputs/                     Question input and score slider
-  summary/                    Result layout, insight and text formatting
-  state/                      Draft transitions, completed answers and flow hook
+src/
+  pain-tracker/
+    _layout.tsx
+    overview/
+    my-pain/
+    my-movement/
+    my-personal-care/
+    my-social-health/
+    my-management/
+    reflection/
+    assessment/route.tsx       Compatibility redirect
+    shared/assessment/        Reusable assessment engine
+    route-paths.json
+  my-health/
+    _layout.tsx
+    overview/
+    health-records/
+    pain-profile/
+    pain-guide/
+    prescriptions/
+      _layout.tsx
+      list/
+      editor/
+      state/
+    route-paths.json
+  care-planner/
+    _layout.tsx
+    overview/
+    appointment-planning/
+      _layout.tsx
+      details/
+      questions/
+      review/
+      state/
+    appointments/
+      route.tsx               Handles historical planning links
+      screen.tsx
+      repository.ts           Appointment storage
+      types.ts                Appointment contracts
+      answers/
+      recording/
+    shared/
+    route-paths.json
+  settings/
+    _layout.tsx
+    overview/
+    personal-details/
+    privacy-permissions/
+    route-paths.json
+  auth/
+    _layout.tsx
+    welcome/
+    sign-in/
+    get-started/
+      _layout.tsx
+      questions/
+        route.tsx             Static question route parameters
+        screen.tsx
+      form-data/
+      activation-screens/
+    route-paths.json
+  shared/
+    account/
+    health-records/
+    navigation/
+    forms/
+    ui/
+    export/
+    theme/
+app/                          Generated Expo Router root, ignored by Git
+scripts/                      Generation, validation and regression tests
 ```
 
-## Naming and merging rules
+## File responsibilities
 
-Use the folder for context: `details/DateField.tsx`, not `AppointmentDateField.tsx`; `state/draft.ts`, not `appointment-draft.ts`. Use names that explain the role, not vague duplicate domain labels. Exported domain types can keep explicit names such as `AppointmentDraft` so imports are understandable elsewhere.
+`screen.tsx` composes the UI for its product area. Supporting components, hooks, styles, draft state, and domain rules live beside that screen or in a meaningful subfolder. `_layout.tsx` configures navigation and provider lifetimes. A `route.tsx` is retained only where navigation requires extra behavior such as a compatibility redirect or static route parameters. Simple screen re-export wrappers have been removed.
 
-Keep one screen's small static content with that screen. The appointment details screen now owns its copy and practitioner options; the old unused general appointment configuration is removed. The profile export adapter had one consumer, so its small action functions now live with the export UI. Report formatting remains separate because other consumers need it.
+Physical proximity does not merge responsibilities: repositories own persistence, reducers own state transitions, providers own state lifetime, and screens compose the interaction. Domain types and interfaces describe contracts without introducing unnecessary classes.
 
-Do not merge draft rules with the provider: the former is pure, testable domain behavior, while the latter controls React state lifetime. Do not create a new directory for every small component. Small features remain flat; larger activities are grouped where that makes related files easier to find.
+## Navigation and existing links
 
-## Routing and responsibility boundaries
+Expo Router reads the root `app/` generated by `scripts/sync-routes.cjs`. Each module's `route-paths.json` explicitly maps a source screen, route, or layout to its existing public route filenames. Supporting files are never discovered as routes. Mappings are validated and duplicate destinations rejected. Shared navigation supplies the root layout, tabs, and historical workflow redirects.
 
-`src/app` contains Expo Router entry points, layouts and compatibility redirects. The main tab groups are `(pain-tracker)`, `(my-health)`, `(care-planner)` and `(settings)`, with nested providers/layouts for onboarding, appointment planning and prescriptions. Public URLs stay unchanged by implementation-file moves.
+All 51 public route entries remain available, including existing dashboard, profile, appointment, authentication, and legacy links. Layout placements and provider lifetimes remain unchanged even when source files move. Named exports such as static parameters are preserved. Welcome serves both existing welcome URLs; the prescription editor serves both new and edit URLs.
 
-Individual assessment screens supply definitions, summary functions, persistence and presentation to a generic flow. Shared assessment code does not import individual assessments. Pure reducers describe draft transitions; hooks coordinate state and asynchronous work; UI components handle presentation. Pain Tracker's public `session.ts` coordinates resets and `summaries.ts` composes report summaries. Account lifecycle coordination remains separate from Settings screens.
+Generation runs after installation and before normal start, test, lint, typecheck, and feature checks. Run `npm run routes` after changing the route list during development. Use `npm run export` for production exports. Do not edit or commit the generated root `app/` directory.
 
-## Checks and limits
+## Module boundaries and branch ownership
 
-Use `npm run typecheck`, `npm run lint`, `npm test`, `npm run format:check` and `npx expo export --platform all`. The 27 tests cover data behavior, workflow edge cases and dependency boundaries. Implementation moves update tests and imports together.
+Each tab and Auth imports only itself and shared capabilities. Shared code cannot import product modules. No source module imports generated routes. These boundaries are tested, including compiling each module with the other modules' source files unavailable.
 
-This organization preserves existing UI, routes and behavior. Native recording/sharing/date-picker flows still need device testing. Existing prototype storage and fixed demo copy are unchanged. Dependency upgrades were outside this refactor.
+Cross-tab profile and health-history contracts belong to shared services. Appointment records belong to Care Planner; its repository registers an account-cleanup callback. The shared account service does not import Care Planner. Feature branches retain the full app; changes to their module and route manifest stay together. Shared changes require coordination between branch owners.
+
+## Validation
+
+Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:features`, and `npm run export`. Regression tests cover module boundaries, route compatibility, activation screens, draft transitions, account cleanup, and persistence. Exports validate bundling for iOS, Android, and web; they do not replace device interaction testing.

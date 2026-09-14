@@ -1,0 +1,8 @@
+{
+  "sign-in/screen.tsx": ["login.tsx"],
+  "_layout.tsx": ["_layout.tsx"],
+  "welcome/screen.tsx": ["index.tsx", "splash.tsx"],
+  "get-started/_layout.tsx": ["get-started/_layout.tsx"],
+  "get-started/activation-screens/screen.tsx": ["get-started-loading.tsx"],
+  "get-started/questions/route.tsx": ["get-started/[step].tsx"]
+}

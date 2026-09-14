@@ -1,0 +1,9 @@
+{
+  "appointments/route.tsx": ["appointment-review.tsx"],
+  "overview/screen.tsx": ["care.tsx"],
+  "_layout.tsx": ["_layout.tsx"],
+  "appointment-planning/details/screen.tsx": ["appointment/details.tsx"],
+  "appointment-planning/questions/screen.tsx": ["appointment/questions.tsx"],
+  "appointment-planning/review/screen.tsx": ["appointment/review.tsx"],
+  "appointment-planning/_layout.tsx": ["appointment/_layout.tsx"]
+}

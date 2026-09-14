@@ -1,0 +1,10 @@
+{
+  "overview/screen.tsx": ["explore.tsx"],
+  "pain-guide/screen.tsx": ["tips.tsx"],
+  "pain-profile/screen.tsx": ["profile.tsx"],
+  "_layout.tsx": ["_layout.tsx"],
+  "health-records/screen.tsx": ["health-records.tsx"],
+  "prescriptions/list/screen.tsx": ["prescriptions/index.tsx"],
+  "prescriptions/editor/screen.tsx": ["prescriptions/edit.tsx", "prescriptions/new.tsx"],
+  "prescriptions/_layout.tsx": ["prescriptions/_layout.tsx"]
+}
