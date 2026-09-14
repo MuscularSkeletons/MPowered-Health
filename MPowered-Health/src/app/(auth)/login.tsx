@@ -14,6 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/authcontext";
 import { Ionicons } from "@expo/vector-icons";
+import { toUserError, type AuthUserError } from "@/constants/profile/autherror";
+import { palette } from "@/constants/profile/ui";
 
 // login screen for existing user
 // TODO: integrate UI from front-end branch
@@ -29,6 +31,9 @@ export default function Login() {
     const router = useRouter();
     const { signIn } = useAuth();
 
+    // error handling
+    const [authError, setAuthError] = useState<AuthUserError | null>(null);
+
     // validate login
     const handleLogin = async () => {
         // any field empty
@@ -43,12 +48,17 @@ export default function Login() {
         // over_request_rate_limit
         
         setIsLoading(true);
+        setAuthError(null);
+
         try {
             await signIn(email, password);
             router.replace("/(tabs)");
         } catch (error) {
-            console.error(error);
-            Alert.alert("Error", "Failed to sign in. Please check your password/email is correct.");
+            console.log(error);
+            const userError = toUserError(error);
+            setAuthError(userError);
+            Alert.alert("Error", userError.message); // better to do alert message or just show text?
+            return;
         } finally {
             setIsLoading(false);
         }

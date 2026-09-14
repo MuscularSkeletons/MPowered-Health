@@ -16,6 +16,7 @@ export const AUTH_ERROR_CODES = [
   'user_already_exists',
   'session_expired',
   'refresh_token_not_found',
+  'validation_failed',
 ] as const;
  
 export type AuthErrorCode = typeof AUTH_ERROR_CODES[number];
@@ -88,6 +89,10 @@ const ERRORS: Record<AuthErrorCode, AuthUserError> = {
   },
   refresh_token_not_found: {
     message: 'Your session expired. Please sign in again.',
+  },
+  validation_failed: {
+    message: 'That email address looks invalid. Double-check the format.',
+    field: 'email',
   },
 };
  
