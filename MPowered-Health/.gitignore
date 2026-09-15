@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Expo route bridge generated from product route manifests and shared navigation
+/app/

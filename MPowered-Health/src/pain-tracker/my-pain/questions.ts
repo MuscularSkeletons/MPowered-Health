@@ -1,0 +1,68 @@
+/** Defines the question wording and answer choices used by Pain Tracker / My Pain. */
+import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
+export const definition: AssessmentDefinition = {
+  title: 'My Pain',
+  tip: 'Check Pain Guide',
+  summary: 'This helps guide your treatment and support your recovery.',
+  questions: [
+    {
+      title: 'Pain location',
+      prompt: 'I have had pain in these areas last week.',
+      kind: 'multi',
+      options: [
+        'Head',
+        'Neck',
+        'Shoulder',
+        'Upper Back',
+        'Lower Back',
+        'Leg',
+        'Hip',
+        'Buttock',
+        'Knee',
+        'Other',
+      ],
+    },
+    {
+      title: 'Pain characteristics',
+      prompt: 'For each of the following words, select the adjectives that apply to your pain.',
+      kind: 'multi',
+      options: [
+        'Aching',
+        'Throbbing',
+        'Shooting',
+        'Stabbing',
+        'Gnawing',
+        'Sharp',
+        'Tender',
+        'Burning',
+        'Exhausting',
+        'Tiring',
+        'Penetrating',
+        'Nagging',
+        'Numb',
+        'Miserable',
+        'Unbearable',
+      ],
+    },
+    {
+      title: 'Pain intensity',
+      prompt: 'My current pain is',
+      kind: 'score',
+    },
+    {
+      title: 'Pain intensity',
+      prompt: 'My mildest pain last week was',
+      kind: 'score',
+    },
+    {
+      title: 'Pain intensity',
+      prompt: 'My worst pain last week was',
+      kind: 'score',
+    },
+    {
+      title: 'Pain intensity',
+      prompt: 'My overall average pain last week was',
+      kind: 'score',
+    },
+  ],
+};

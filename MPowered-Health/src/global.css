@@ -1,3 +1,4 @@
+/* Defines app-wide browser fonts and base page styling. */
 :root {
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,

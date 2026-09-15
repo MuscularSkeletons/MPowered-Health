@@ -1,0 +1,96 @@
+/** Provides browser printing, document sharing, and clipboard helpers. */
+// This file prints, shares, and copies pain-profile reports in web browsers.
+
+/** Opens a printable document from HTML using this platform’s printing support. */
+export function printHtml(html: string): Promise<void> {
+  // Expo's web printer ignores HTML. Print an isolated document so navigation,
+  // buttons and the scroll container never appear in the PDF.
+  return new Promise((resolve, reject) => {
+    const frame = document.createElement('iframe');
+    frame.title = 'Health report print document';
+    frame.setAttribute('aria-hidden', 'true');
+    Object.assign(frame.style, {
+      position: 'fixed',
+      left: '-10000px',
+      width: '800px',
+      height: '1px',
+      border: '0',
+    });
+    const timeout = setTimeout(() => {
+      frame.remove();
+      reject(new Error('The print document could not be loaded. Please try again.'));
+    }, 15000);
+    frame.onload = () => {
+      clearTimeout(timeout);
+      try {
+        const printWindow = frame.contentWindow;
+        if (!printWindow) throw new Error('The print window is unavailable.');
+        // Some browsers return immediately from print(); retain the document
+        // until their print dialog closes, with a cleanup fallback.
+        const cleanup = setTimeout(() => frame.remove(), 300000);
+        printWindow.addEventListener(
+          'afterprint',
+          () => {
+            clearTimeout(cleanup);
+            frame.remove();
+          },
+          { once: true },
+        );
+        printWindow.focus();
+        printWindow.print();
+        resolve();
+      } catch (error) {
+        frame.remove();
+        reject(error);
+      }
+    };
+    frame.srcdoc = html;
+    document.body.appendChild(frame);
+  });
+}
+
+/** Shares a document using this platform’s available sharing support. */
+export async function shareDocument(report: {
+  title: string;
+  html: string;
+  text: string;
+}): Promise<'done' | 'copy'> {
+  // Returning "copy" tells the button to show its accessible manual-copy fallback.
+  if (typeof navigator.share !== 'function') return 'copy';
+  try {
+    // Call directly from the click handler to retain browser user activation.
+    await navigator.share({ title: report.title, text: report.text });
+    return 'done';
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') return 'done';
+    return 'copy';
+  }
+}
+
+/** Copies text to the clipboard. */
+export async function copyText(text: string): Promise<boolean> {
+  // Modern browsers can write directly when the page is secure and permission is granted.
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Older/insecure browsers can still copy from a selected text field.
+  }
+  const field = document.createElement('textarea');
+  // The hidden selected field supports older browsers that still expose execCommand.
+  const previousFocus = document.activeElement as HTMLElement | null;
+  field.value = text;
+  Object.assign(field.style, { position: 'fixed', left: '-10000px' });
+  document.body.appendChild(field);
+  try {
+    field.select();
+    return document.execCommand('copy');
+  } catch {
+    return false;
+  } finally {
+    field.remove();
+    previousFocus?.focus();
+  }
+}

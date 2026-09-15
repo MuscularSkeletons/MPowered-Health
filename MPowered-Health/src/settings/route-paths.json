@@ -1,0 +1,6 @@
+{
+  "overview/screen.tsx": ["settings.tsx"],
+  "_layout.tsx": ["_layout.tsx"],
+  "privacy-permissions/screen.tsx": ["privacy-permissions.tsx"],
+  "personal-details/screen.tsx": ["personal-details.tsx"]
+}
