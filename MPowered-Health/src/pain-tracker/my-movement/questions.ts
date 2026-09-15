@@ -1,3 +1,4 @@
+/** Defines the question wording and answer choices used by Pain Tracker / My Movement. */
 import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
 const scales = {
   walk: [

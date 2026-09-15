@@ -1,5 +1,8 @@
+/** Displays a list of answer choices with single- or multiple-selection behavior. */
 import { s } from '@/shared/forms/styles';
 import { Pressable, Text, View } from 'react-native';
+
+/** Displays a list of answer choices with single- or multiple-selection behavior. */
 export function Choice({
   title,
   options,

@@ -1,3 +1,4 @@
+/** Displays the provider fields and date control for the first appointment-planning step. */
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';
 import { s } from '@/shared/forms/styles';
@@ -19,6 +20,8 @@ const practitioners = [
   'Orthopaedic surgeon',
   'Occupational Therapist',
 ];
+
+/** Displays the provider fields and date control for the first appointment-planning step. */
 export default function AppointmentProviderScreen() {
   const navigation = usePlanningNavigation();
   const { draft, dispatch } = useAppointmentDraft();
@@ -51,6 +54,7 @@ export default function AppointmentProviderScreen() {
   );
 }
 
+/** Displays a menu of health services and reports the selected option. */
 function HealthServiceSelect({
   title,
   options,

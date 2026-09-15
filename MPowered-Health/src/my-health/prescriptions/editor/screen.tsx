@@ -1,3 +1,4 @@
+/** Displays the fields for adding or editing a prescription. */
 import { Choice } from '@/shared/forms/Choice';
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';
@@ -5,10 +6,14 @@ import { ActionButton } from '@/shared/ui/mha-ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
 import { useMedicationEditor } from './useEditor';
+
+/** Displays the fields for adding or editing a prescription. */
 export default function PrescriptionEditorScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   return <Editor key={id ?? 'new'} id={id} />;
 }
+
+/** Displays the prescription fields and save controls using the editor’s current values. */
 function Editor({ id }: { id?: string }) {
   const { draft, change, validName, validStrength, ready, save, missing } = useMedicationEditor(id);
   const { name, strength, unit, form, repeat } = draft;

@@ -1,3 +1,4 @@
+/** Keeps assessment answers and completion information for the current app session. */
 import { getPainHistory, painRecordDate, clearPainHistoryMemory } from './pain-history';
 // This file tracks assessment answers and completion during the current app session.
 import type { AssessmentAnswers, AssessmentId } from '@/shared/health-records/assessment-types';
@@ -6,11 +7,13 @@ const assessmentAnswers = new Map<AssessmentId, AssessmentAnswers>();
 const assessmentUpdatedAt = new Map<AssessmentId, Date>();
 let weeklyStreak = 3;
 
+/** Copies each answer list so callers cannot alter the saved answers. */
 function cloneAnswers(answers: AssessmentAnswers): AssessmentAnswers {
   // Copy every answer list so screens cannot mutate stored answers by reference.
   return Object.fromEntries(Object.entries(answers).map(([step, values]) => [step, [...values]]));
 }
 
+/** Records completion and keeps a copy of the assessment answers. */
 export function markAssessmentCompleted(
   type: AssessmentId,
   answers?: AssessmentAnswers,
@@ -23,6 +26,7 @@ export function markAssessmentCompleted(
 }
 
 // Return the date of the most recently completed assessment for profile headers.
+/** Returns the most recent completion date across all assessments. */
 export function getLatestAssessmentDate() {
   const dates = [...assessmentUpdatedAt.values()];
   if (!dates.length) return '';
@@ -35,23 +39,27 @@ export function getLatestAssessmentDate() {
     });
 }
 
+/** Returns the assessment types completed in the current session. */
 export function getCompletedAssessments() {
   // Convert the private Set into a caller-owned list.
   return [...completedAssessments];
 }
 
+/** Returns the saved answers for an assessment. */
 export function getAssessmentAnswers(type: AssessmentId) {
   // Missing assessments return undefined; completed ones return a safe copy.
   const answers = assessmentAnswers.get(type);
   return answers ? cloneAnswers(answers) : undefined;
 }
 
+/** Returns the current prototype streak value; this does not calculate a streak from history. */
 export function getWeeklyStreak() {
   // The dashboard reads the current session value without gaining write access.
   return weeklyStreak;
 }
 
 // Remove all in-memory health data when the local account is deleted.
+/** Clears assessment answers and completion information held in memory. */
 export function resetAssessmentSession() {
   clearPainHistoryMemory();
   painRecords.splice(0);
@@ -68,6 +76,8 @@ const painRecords: PainRecord[] = [
   { date: '01/06', score: 5 },
   { date: '08/06', score: 7 },
 ];
+
+/** Returns the pain records used by the session summaries. */
 export function getPainRecords() {
   // Real saved history replaces the starter chart as soon as a result exists.
   const saved = getPainHistory();

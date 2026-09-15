@@ -1,3 +1,4 @@
+/** Provides example prescriptions used to show the initial prototype list. */
 import type { Medication } from './model';
 export const demoMedications: Medication[] = [
   ['Perindopril arginine', '5', 'mg'],

@@ -1,3 +1,4 @@
+/** Shows PIN sign-in and the prototype email sign-in steps. */
 import { s } from './styles';
 // This screen signs an existing user in with their four-digit PIN.
 import {
@@ -24,7 +25,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Try the quick PIN first, then verify by email when needed.
 type Step = 'pin' | 'email' | 'code';
+
 // Manage sign-in steps while keeping one clear validation message.
+/** Shows PIN sign-in and the prototype email sign-in steps. */
 export default function Login() {
   const [step, setStep] = useState<Step>('pin'),
     [pin, setPin] = useState(''),
@@ -63,7 +66,9 @@ export default function Login() {
       : step === 'email'
         ? validAnswer('Your email address', email)
         : code.length === 4;
+
   // Send typed text to the field used by the current step.
+  /** Updates the active sign-in field, keeping email text intact and limiting PINs to digits. */
   const setValue = (text: string) => {
     setError('');
     // Email must retain letters, @, dots, and plus aliases. Only PINs and codes
@@ -76,7 +81,9 @@ export default function Login() {
     if (step === 'pin') setPin(pinDigits(text));
     else setCode(digits);
   };
+
   // Email screens advance locally; PIN sign-in checks stored credentials.
+  /** Validates the current sign-in step; email/code steps are local prototype behavior, while PIN checks use the stored credential. */
   const next = async () => {
     if (!ready || pending.current) return;
     if (step === 'email' && !emailVerificationRequired) {
@@ -147,6 +154,7 @@ export default function Login() {
       setChecking(false);
     }
   };
+
   if (hasLocalProfile === null) {
     return (
       <SafeAreaView style={s.safe} edges={['top']}>

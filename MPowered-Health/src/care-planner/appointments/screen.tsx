@@ -1,3 +1,4 @@
+/** Shows a saved appointment, its questions, answers, and recording consent. */
 import { getPainHistory } from '@/shared/health-records/pain-history';
 import { ActionButton, MhaHeader, palette } from '@/shared/ui/mha-ui';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -13,6 +14,8 @@ import { useAppointmentAnswers } from './answers/useAppointmentAnswers';
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
 import { getAppointment } from '@/care-planner/appointments/repository';
 import { buildAppointmentQuestions } from '@/care-planner/appointments/question-suggestions';
+
+/** Shows a saved appointment, its questions, answers, and recording consent. */
 export default function AppointmentScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const appointment = getAppointment(id);
@@ -28,16 +31,21 @@ export default function AppointmentScreen() {
     );
   return <AppointmentContent key={id} appointment={appointment} />;
 }
+
+/** Displays one appointment’s details, answers, and recording consent controls. */
 function AppointmentContent({ appointment }: { appointment: PlannedAppointment }) {
   const scroll = useRef<ScrollView>(null);
   const controller = useAppointmentAnswers();
   const [consentOpen, setConsentOpen] = useState(false);
   const [consented, setConsented] = useState(!!appointment.signaturePaths?.length);
   const questions = appointment.questions ?? buildAppointmentQuestions(getPainHistory().at(-1));
+
+  /** Closes the consent dialog and returns the appointment view to the top. */
   const closeConsent = () => {
     setConsentOpen(false);
     requestAnimationFrame(() => scroll.current?.scrollTo({ y: 0, animated: false }));
   };
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />

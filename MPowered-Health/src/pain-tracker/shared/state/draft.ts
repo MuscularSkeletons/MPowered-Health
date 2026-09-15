@@ -1,3 +1,4 @@
+/** Defines assessment answers, progress, and save-status changes. */
 import type {
   AssessmentAnswers,
   AssessmentQuestion,
@@ -18,10 +19,12 @@ export type AssessmentAction =
   | { type: 'failed'; message: string }
   | { type: 'restart' };
 
+/** Creates an assessment draft from any previously saved answers. */
 export function createAssessmentDraft(answers?: AssessmentAnswers): AssessmentDraft {
   return { step: 0, answers: answers ?? {}, status: answers ? 'complete' : 'answering', error: '' };
 }
 
+/** Updates answers, the active question, and save status without changing the old draft. */
 export function assessmentDraftReducer(
   state: AssessmentDraft,
   action: AssessmentAction,
@@ -55,6 +58,11 @@ export function assessmentDraftReducer(
   }
 }
 
+/**
+ * Checks whether the current question has a valid answer.
+ *
+ * @returns Whether the answer satisfies the question’s required-input rule.
+ */
 export function questionAnswered(question: AssessmentQuestion, values: string[]): boolean {
   if (question.optional) return true;
   if (!values.length || values.some((value) => !value.trim())) return false;

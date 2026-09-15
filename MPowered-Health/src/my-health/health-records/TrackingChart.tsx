@@ -1,4 +1,5 @@
-// This screen groups saved pain assessments and displays recent pain trends.
+/** Displays pain-history scores as a chart with selectable metrics. */
+// This hook prepares the history groups and selections used by the records screen.
 import {
   PainAssessmentRecord,
   PainMetric,
@@ -10,6 +11,8 @@ import { View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from 'react-native-svg';
 
 import { s } from './styles';
+
+/** Draws a chart of the selected pain-history records. */
 export function TrackingChart({
   metric,
   records,
@@ -24,11 +27,16 @@ export function TrackingChart({
     right = 354,
     top = 28,
     bottom = 224;
+
+  /** Converts a record position into a horizontal chart coordinate. */
   const x = (index: number) =>
     values.length === 1
       ? (left + right) / 2
       : left + (index * (right - left)) / (values.length - 1);
+
+  /** Converts a score into a vertical chart coordinate. */
   const y = (value: number) => bottom - (value / 10) * (bottom - top);
+
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
   const area = `${x(0)},${bottom} ${points} ${x(values.length - 1)},${bottom}`;
   return (

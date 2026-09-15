@@ -1,3 +1,4 @@
+/** Displays the weekly reflection form and its save feedback. */
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';
 import { s } from '@/shared/forms/styles';
@@ -5,6 +6,8 @@ import { useReturnDestination } from '@/shared/navigation/useReturnDestination';
 import { ActionButton } from '@/shared/ui/mha-ui';
 import { Text, View } from 'react-native';
 import { useReflection } from './useReflection';
+
+/** Displays the weekly reflection form and its save feedback. */
 export default function ReflectionScreen() {
   const leave = useReturnDestination('/dashboard');
   const form = useReflection(leave);

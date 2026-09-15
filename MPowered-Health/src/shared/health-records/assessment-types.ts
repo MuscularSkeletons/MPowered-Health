@@ -1,3 +1,4 @@
+/** Defines the data shapes used by health records; this file does not run a screen. */
 export type AssessmentId = 'pain' | 'movement' | 'personal' | 'social' | 'management';
 export type AssessmentAnswers = Record<number, string[]>;
 export interface AssessmentQuestion {

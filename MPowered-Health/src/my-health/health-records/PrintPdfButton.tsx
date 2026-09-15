@@ -1,4 +1,5 @@
-// This screen groups saved pain assessments and displays recent pain trends.
+/** Connects the health-record report to the print button and error feedback. */
+// This hook prepares the history groups and selections used by the records screen.
 import { buildHealthRecordsHtml } from './report';
 import { PainAssessmentRecord, PainMetric } from '@/shared/health-records/pain-history';
 import { printHtml } from '@/shared/export/document-export';
@@ -6,6 +7,8 @@ import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { s } from './styles';
+
+/** Displays the button that prints the health-record report. */
 export function PrintPdfButton({
   records,
   areaLabel,
@@ -18,7 +21,9 @@ export function PrintPdfButton({
   const [printing, setPrinting] = useState(false);
   const pending = useRef(false);
   const [error, setError] = useState('');
+
   // Build the filtered report before opening the platform print dialog.
+  /** Builds the health-record report and opens the print dialog. */
   const printPdf = async () => {
     if (pending.current || !records.length) return;
     pending.current = true;
@@ -33,6 +38,7 @@ export function PrintPdfButton({
       setPrinting(false);
     }
   };
+
   return (
     <View>
       <Pressable

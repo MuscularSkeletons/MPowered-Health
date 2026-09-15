@@ -1,8 +1,10 @@
-// This screen groups saved pain assessments and displays recent pain trends.
+/** Loads the selected health history and prepares the values shown by the records screen. */
+// This hook prepares the history groups and selections used by the records screen.
 import { getPainHistory, groupPainHistory, PainMetric } from '@/shared/health-records/pain-history';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
+/** Loads the selected health history and prepares the values shown by the records screen. */
 export function useHealthRecords() {
   const [tab, setTab] = useState<'chart' | 'history'>('chart');
   const [metric, setMetric] = useState<PainMetric>('Average');

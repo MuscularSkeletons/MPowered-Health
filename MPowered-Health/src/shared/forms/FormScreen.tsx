@@ -1,8 +1,11 @@
+/** Wraps a form in the shared page layout and back navigation. */
 import { s } from '@/shared/forms/styles';
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+/** Wraps a form in the shared page layout and back navigation. */
 export function Shell({
   title,
   children,

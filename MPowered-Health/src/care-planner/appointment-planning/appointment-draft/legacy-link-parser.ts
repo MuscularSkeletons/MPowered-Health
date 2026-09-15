@@ -1,3 +1,5 @@
+/** Reads a list of question text from a link, returning an empty list for invalid data. */
+/** Reads a list of question text from a link, returning an empty list for invalid data. */
 export function parseQuestions(value?: string): string[] {
   try {
     const parsed: unknown = JSON.parse(value ?? '[]');

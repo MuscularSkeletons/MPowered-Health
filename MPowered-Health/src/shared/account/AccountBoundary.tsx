@@ -1,3 +1,4 @@
+/** Controls account startup, retry feedback, and access to private screens after deletion. */
 import { router, useGlobalSearchParams, usePathname } from 'expo-router';
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -6,16 +7,21 @@ import {
   initializeAccount,
   subscribeAccount,
 } from '@/shared/account/repository';
+
+/** Waits for account startup and prevents deleted accounts from reopening private screens. */
 export function AccountBoundary({ children }: { children: ReactNode }) {
   const account = useSyncExternalStore(subscribeAccount, getAccountSnapshot, getAccountSnapshot);
   const pathname = usePathname();
   const params = useGlobalSearchParams<{ flow?: string }>();
   const [startupError, setStartupError] = useState(false);
+
   // Retry startup after a storage error without restarting the app.
+  /** Retries account initialization after a startup error. */
   const start = () => {
     setStartupError(false);
     initializeAccount().catch(() => setStartupError(true));
   };
+
   useEffect(() => {
     initializeAccount().catch(() => setStartupError(true));
   }, []);

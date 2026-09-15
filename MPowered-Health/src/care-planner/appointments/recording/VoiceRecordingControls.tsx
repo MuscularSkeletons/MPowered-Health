@@ -1,10 +1,13 @@
+/** Displays recording and playback buttons using the current audio state. */
 import { s } from './styles';
-// This screen lets the user review and update a planned healthcare appointment.
+// Keeps appointment answer drafts and recording state together.
 import { palette } from '@/shared/ui/mha-ui';
 import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
 import { useAppointmentAnswers } from '../answers/useAppointmentAnswers';
+
+/** Displays recording and playback buttons using the current audio state. */
 export function VoiceRecordingControls({
   controller,
 }: {

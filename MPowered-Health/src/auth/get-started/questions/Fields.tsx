@@ -1,8 +1,11 @@
+/** Displays the input fields required by the current registration question. */
 import { Choice } from '@/shared/forms/Choice';
 import { Field } from '@/shared/forms/Field';
 import { validAnswer } from '@/shared/forms/validation';
 import { Step } from './types';
 import { useRegistration } from '../form-data/DraftProvider';
+
+/** Displays the input fields required by the current registration question. */
 export function QuestionFields({
   question,
   step,

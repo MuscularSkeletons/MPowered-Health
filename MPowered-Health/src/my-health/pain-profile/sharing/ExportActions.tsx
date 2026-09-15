@@ -1,3 +1,4 @@
+/** Provides the profile print and share controls with feedback when an action fails. */
 import { copyText, printHtml, shareDocument } from '@/shared/export/document-export';
 // This component lets the user print, share, or copy their pain profile.
 import { PainProfileReport, profileReportText, profileReportHtml } from './report';
@@ -6,16 +7,21 @@ import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+/** Opens the profile report using the platform printing helper. */
 const printProfile = (report: PainProfileReport) => printHtml(profileReportHtml(report));
+
+/** Shares the profile report using the available platform tools. */
 const shareProfile = (report: PainProfileReport) =>
   shareDocument({
     title: 'My Pain Profile',
     html: profileReportHtml(report),
     text: profileReportText(report),
   });
+
 const copyProfile = copyText;
 
 // Coordinate print and share actions while preventing duplicate requests.
+/** Displays the controls for printing and sharing the profile report. */
 export function ProfileExportActions({
   report,
   disabled,
@@ -29,7 +35,9 @@ export function ProfileExportActions({
   const [shareText, setShareText] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
   const [sharingMore, setSharingMore] = useState(false);
+
   // Web sharing may show a preview before copy or system sharing.
+  /** Runs the selected export action and handles any failure shown to the user. */
   const run = async (action: 'print' | 'share') => {
     if (pending.current || disabled) return;
     if (action === 'share' && Platform.OS === 'web') {
@@ -60,6 +68,7 @@ export function ProfileExportActions({
       setBusy(null);
     }
   };
+
   return (
     <View style={s.container}>
       <View style={s.actions}>

@@ -1,3 +1,4 @@
+/** Handles appointment date input on web, iOS, and Android and writes the selected date to the draft. */
 import { useAppointmentDraft } from '../appointment-draft/DraftProvider';
 import { s } from '../form-styles';
 import { palette } from '@/shared/ui/mha-ui';
@@ -5,22 +6,32 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { Image } from 'expo-image';
 import { createElement, useState } from 'react';
 import { Modal, Platform, Pressable, Text, View } from 'react-native';
+
+/** Displays the platform date picker and keeps the chosen appointment date in the draft. */
 export function AppointmentDateField() {
   const { draft, dispatch } = useAppointmentDraft();
   const value = draft.date;
+
+  /** Writes the chosen date into the appointment draft. */
   const set = (value: string) => dispatch({ type: 'field', field: 'date', value });
+
   const label = 'Appointment date';
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
+
   // The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
+  /** Converts the displayed date into the format required by the web date input. */
   const toIsoDate = (displayDate: string) => {
     const [day, month, year] = displayDate.split('/');
     return year && month && day ? `${year}-${month}-${day}` : '';
   };
+
+  /** Converts the web input date into the day/month/year display format. */
   const fromIsoDate = (isoDate: string) => {
     const [year, month, day] = isoDate.split('-');
     return year && month && day ? `${day}/${month}/${year}` : '';
   };
+
   const now = new Date();
   const todayIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   if (Platform.OS === 'web')
@@ -50,6 +61,8 @@ export function AppointmentDateField() {
         </View>
       </View>
     );
+
+  /** Applies a date-picker change using the behavior expected on each mobile platform. */
   const onDateChange = (_event: DateTimePickerEvent, date?: Date) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
@@ -63,11 +76,16 @@ export function AppointmentDateField() {
         );
     } else if (date) setDraftDate(date);
   };
+
   const selectedDate = value ? new Date(value.split('/').reverse().join('-')) : new Date();
+
+  /** Loads the selected date into the picker and opens it. */
   const openPicker = () => {
     setDraftDate(selectedDate);
     setShowDatePicker(true);
   };
+
+  /** Saves the chosen date and closes the picker. */
   const saveDate = () => {
     set(
       draftDate.toLocaleDateString('en-AU', {
@@ -78,6 +96,7 @@ export function AppointmentDateField() {
     );
     setShowDatePicker(false);
   };
+
   return (
     <View style={s.fieldWrap}>
       <Text style={s.fieldLabel}>{label}</Text>

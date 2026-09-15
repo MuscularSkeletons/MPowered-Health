@@ -1,3 +1,4 @@
+/** Keeps one appointment draft available across the planning steps. */
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import {
   appointmentDraftReducer,
@@ -9,6 +10,8 @@ const Context = createContext<{
   draft: AppointmentDraft;
   dispatch: React.Dispatch<AppointmentDraftAction>;
 } | null>(null);
+
+/** Keeps one appointment draft available across the planning steps. */
 export function AppointmentDraftProvider({
   children,
   initial,
@@ -19,6 +22,8 @@ export function AppointmentDraftProvider({
   const [draft, dispatch] = useReducer(appointmentDraftReducer, initial ?? emptyAppointmentDraft());
   return <Context.Provider value={{ draft, dispatch }}>{children}</Context.Provider>;
 }
+
+/** Reads the appointment draft and its update actions. */
 export function useAppointmentDraft() {
   const value = useContext(Context);
   if (!value) throw new Error('AppointmentDraftProvider is required');

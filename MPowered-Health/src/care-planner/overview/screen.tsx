@@ -1,3 +1,4 @@
+/** Lists planned appointments and provides the entry point for a new plan. */
 import { s } from './styles';
 // This screen shows care-planning tools, appointments, and questions for clinicians.
 import { getAppointments } from '@/care-planner/appointments/repository';
@@ -6,7 +7,9 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 // Every care card opens the shared workflow with a fresh form state.
+/** Opens the selected Care Planner destination. */
 const go = (flow: string) =>
   router.push({
     pathname: flow === 'appointment' ? '/appointment/details' : '/tips',
@@ -16,6 +19,7 @@ const go = (flow: string) =>
       returnTo: '/care',
     },
   });
+
 // Refresh appointments on focus and open each care-planning tool.
 const content = {
   title: 'Plan your visit with confidence',
@@ -28,6 +32,7 @@ const content = {
   date: 'Date: 10 June 2026',
 } as const;
 
+/** Lists planned appointments and provides the entry point for a new plan. */
 export default function CarePlannerScreen() {
   const [appointments, setAppointments] = useState(getAppointments());
   useFocusEffect(useCallback(() => setAppointments(getAppointments()), []));

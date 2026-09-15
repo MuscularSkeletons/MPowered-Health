@@ -1,10 +1,13 @@
+/** Displays the typed-answer editor and the recording controls for one question. */
 import { s } from './styles';
 import { VoiceRecordingControls } from '../recording/VoiceRecordingControls';
-// This screen lets the user review and update a planned healthcare appointment.
+// Keeps appointment answer drafts and recording state together.
 import { ActionButton, palette } from '@/shared/ui/mha-ui';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { useAppointmentAnswers } from './useAppointmentAnswers';
+
+/** Displays the typed-answer editor and the recording controls for one question. */
 export function AnswerModal({
   controller,
 }: {

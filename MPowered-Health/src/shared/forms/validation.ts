@@ -1,8 +1,16 @@
+/** Validates shared form fields and checks route question indexes. */
 // This file validates shared form answers and keeps workflow steps in range.
 import { isFourDigits as isValidPin } from './input-format';
 
 // Route parameters can be stale or malformed. Fall back to the first step rather
 // than indexing outside the current flow’s questions.
+/**
+ * Converts a route value into a valid question index.
+ *
+ * @param value - Question index received from a route.
+ * @param count - Number of questions in the flow.
+ * @returns A valid index, or zero when the value is invalid or outside the flow.
+ */
 export function workflowStep(value: string, count: number) {
   const step = Number(value);
   return Number.isInteger(step) && step >= 0 && step < count ? step : 0;
@@ -10,6 +18,7 @@ export function workflowStep(value: string, count: number) {
 
 // Shared by onboarding and prescriptions. Whitespace alone is never an answer;
 // fields with numeric meaning also need format and range checks.
+/** Checks an entered value using the rules for its field. */
 export function validAnswer(label: string, value = '') {
   if (label === 'Create PIN' || label === 'Enter PIN') return isValidPin(value);
   const answer = value.trim();

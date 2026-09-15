@@ -1,3 +1,4 @@
+/** Stores and verifies salted PIN hashes using browser storage and cryptography. */
 // This file stores and verifies a protected PIN value in web browsers.
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -5,11 +6,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const key = 'mpowered:pin-credential:v1';
 // Derive a slow salted hash so the browser never stores the four PIN digits directly.
 const iterations = 600000;
+
+/** Converts bytes into hexadecimal text for storage. */
 const hex = (bytes: Uint8Array) =>
   Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+
+/** Converts stored hexadecimal text back into bytes. */
 const unhex = (value: string) =>
   Uint8Array.from(value.match(/.{2}/g) ?? [], (byte) => parseInt(byte, 16));
 
+/** Derives verification bytes from a PIN and salt using the browser cryptography API. */
 async function derive(pin: string, salt: Uint8Array) {
   // PBKDF2 deliberately makes each PIN guess expensive while remaining widely supported.
   if (!globalThis.crypto?.subtle) throw new Error('PIN sign-in requires HTTPS or localhost.');
@@ -28,6 +34,7 @@ async function derive(pin: string, salt: Uint8Array) {
   return hex(new Uint8Array(bits));
 }
 
+/** Creates the stored values used to verify a PIN without saving the PIN itself. */
 export async function createPinCredential(email: string, pin: string) {
   // A fresh random salt makes identical PINs produce different stored hashes.
   if (!isValidPin(pin)) throw new Error('Enter exactly four digits.');
@@ -40,15 +47,21 @@ export async function createPinCredential(email: string, pin: string) {
     hash: await derive(pin, salt),
   });
 }
+
+/** Reads the saved PIN credential for this platform. */
 export function readPinCredential() {
   // Browser storage receives only the salt, hash, version, and normalized email.
   return AsyncStorage.getItem(key);
 }
+
+/** Stores the PIN credential, or removes it when given null. */
 export async function writePinCredential(value: string | null) {
   // Use the same null-as-delete contract as the native credential module.
   if (value === null) await AsyncStorage.removeItem(key);
   else await AsyncStorage.setItem(key, value);
 }
+
+/** Checks whether an entered PIN matches the stored credential. */
 export async function matchesPinCredential(raw: string, email: string, pin: string) {
   // Validate structure before doing the deliberately expensive hash calculation.
   if (!isValidPin(pin)) return false;

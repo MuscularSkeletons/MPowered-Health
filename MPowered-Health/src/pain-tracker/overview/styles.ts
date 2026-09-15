@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by Pain Tracker / overview. */
 import { palette } from '@/shared/ui/mha-ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({

@@ -1,3 +1,4 @@
+/** Manages question progress and saves the completed assessment before showing results. */
 import { useReducer, useRef } from 'react';
 import type {
   AssessmentId,
@@ -17,6 +18,13 @@ export interface AssessmentFlowOptions {
 }
 
 // Owns one mounted assessment's draft; presentation and storage policy are supplied by its feature.
+/**
+ * Manages question progress and saves the completed assessment before showing results.
+ *
+ * @param options - Assessment questions, summary builder, and optional save function.
+ * @returns Current answers, progress, validation, and actions for the screen.
+ * A failed save leaves answers available for retry; repeated Continue taps cannot start another save.
+ */
 export function useAssessmentFlow({
   assessmentId,
   definition,
@@ -31,6 +39,8 @@ export function useAssessmentFlow({
   const question = definition.questions[activeStep];
   const current = draft.answers[activeStep] ?? [];
   const valid = questionAnswered(question, current);
+
+  /** Advances one answered question, or saves the completed assessment while blocking duplicate submissions. */
   const next = async () => {
     if (savingRef.current || !valid) return;
     if (activeStep < definition.questions.length - 1) {
@@ -56,6 +66,7 @@ export function useAssessmentFlow({
       savingRef.current = false;
     }
   };
+
   return {
     activeStep,
     question,

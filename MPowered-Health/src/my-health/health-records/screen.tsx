@@ -1,8 +1,9 @@
+/** Displays recorded pain history and the controls for filtering and exporting it. */
 import { PrintPdfButton } from './PrintPdfButton';
 import { TrackingChart } from './TrackingChart';
 import { useHealthRecords } from './useRecords';
 import { s } from './styles';
-// This screen groups saved pain assessments and displays recent pain trends.
+// This hook prepares the history groups and selections used by the records screen.
 import { painRecordDate } from '@/shared/health-records/pain-history';
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';
@@ -10,6 +11,7 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Coordinate filters, chart/history tabs, record groups, and printing.
+/** Displays recorded pain history and the controls for filtering and exporting it. */
 export default function HealthRecords() {
   const {
     tab,

@@ -1,6 +1,9 @@
+/** Converts a touch position into a score along the slider. */
 import { s } from '../styles';
 import { useEffect, useRef, useState } from 'react';
 import { PanResponder, Text, View } from 'react-native';
+
+/** Displays a draggable score input and converts touch positions into values. */
 export function ScoreSlider({
   value,
   onChange,
@@ -19,9 +22,11 @@ export function ScoreSlider({
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
+
   // Screen coordinates stay stable while the thumb moves beneath the user's finger.
   // Using locationX here causes the score to jump when the touch target changes.
   // Clamp the pointer to the track and round to a whole-number score.
+  /** Converts a touch position into a score along the slider. */
   const updateFromPageX = (pageX: number) => {
     if (!metrics.current.ready) return;
     const next = Math.max(
@@ -33,11 +38,14 @@ export function ScoreSlider({
       onChangeRef.current(next);
     }
   };
+
+  /** Measures the slider position so touch coordinates map to the right score. */
   const measureTrack = (pageX?: number) =>
     trackRef.current?.measureInWindow((left, _top, width) => {
       metrics.current = { left, width: Math.max(width, 1), ready: true };
       if (pageX != null) updateFromPageX(pageX);
     });
+
   // Keep one gesture responder for the full drag.
   // PanResponder stores these callbacks; refs are read only during a gesture.
   // eslint-disable-next-line react-hooks/refs

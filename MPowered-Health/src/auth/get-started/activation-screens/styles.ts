@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by account setup / Get Started / activation slides. */
 import { palette } from '@/shared/ui/mha-ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({

@@ -1,3 +1,4 @@
+/** Keeps the prescription form values and save actions together. */
 import { useState } from 'react';
 import {
   emptyMedication,
@@ -6,6 +7,8 @@ import {
   type MedicationDraft,
 } from '../state/model';
 import { useMedications } from '../state/StoreProvider';
+
+/** Keeps the prescription form values and save actions together. */
 export function useMedicationEditor(id?: string) {
   const store = useMedications();
   const existing = store.list.find((item) => item.id === id);
@@ -20,8 +23,11 @@ export function useMedicationEditor(id?: string) {
         }
       : emptyMedication(),
   );
+
+  /** Updates one prescription field without changing the others. */
   const change = (field: keyof MedicationDraft, value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
+
   return {
     draft,
     change,

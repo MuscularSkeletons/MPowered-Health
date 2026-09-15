@@ -1,3 +1,4 @@
+/** Defines the data shapes used by account setup / Get Started / questions; this file does not run a screen. */
 export type Step = {
   title: string;
   copy: string;

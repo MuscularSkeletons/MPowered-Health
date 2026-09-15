@@ -1,5 +1,6 @@
+/** Displays recording consent and collects a signature before recording is enabled. */
 import { s } from './styles';
-// This screen lets the user review and update a planned healthcare appointment.
+// Keeps appointment answer drafts and recording state together.
 import { saveAppointmentSignature } from '@/care-planner/appointments/repository';
 import { ActionButton } from '@/shared/ui/mha-ui';
 import { useState } from 'react';
@@ -8,6 +9,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
 import { SignaturePad } from './SignaturePad';
+
+/** Displays the recording consent text and saves the entered signature. */
 export function RecordingConsentModal({
   open,
   appointment,
@@ -21,12 +24,15 @@ export function RecordingConsentModal({
 }) {
   const insets = useSafeAreaInsets();
   const [signaturePaths, setSignaturePaths] = useState(appointment.signaturePaths ?? []);
+
+  /** Saves the consent signature and closes the dialog. */
   const save = () => {
     if (!signaturePaths.length) return;
     saveAppointmentSignature(appointment.id, signaturePaths);
     onSaved();
     onClose();
   };
+
   return (
     <Modal visible={open} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={s.consentScreen} edges={['top', 'bottom']}>

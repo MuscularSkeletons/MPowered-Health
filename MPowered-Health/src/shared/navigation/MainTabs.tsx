@@ -1,6 +1,9 @@
+/** Defines the main tabs and their labels, icons, and shared appearance. */
 import { NavIcon } from '@/shared/navigation/TabIcon';
 import { s } from '@/shared/navigation/tab-styles';
 import { Tabs } from 'expo-router';
+
+/** Defines the main tabs and their labels, icons, and shared appearance. */
 export default function MainTabs() {
   return (
     <Tabs

@@ -1,3 +1,4 @@
+/** Shows the welcome page and the choices to sign in or get started. */
 import { s } from './styles';
 // This screen introduces the app and starts registration or sign-in.
 import { SplashArtwork } from './Artwork';
@@ -15,6 +16,7 @@ const pages = [
 ];
 
 // Track the visible introduction page and offer registration or sign-in.
+/** Shows the welcome page and the choices to sign in or get started. */
 export default function Splash() {
   const [index, setIndex] = useState(0);
   const currentIndex = useRef(0);

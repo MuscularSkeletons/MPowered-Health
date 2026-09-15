@@ -1,3 +1,4 @@
+/** Shows the current Get Started question and handles its Continue or Skip action. */
 // Shows the current question and input fields.
 // Handles Continue, Back and Skip.
 // Checks required answers.
@@ -18,6 +19,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { profileFromAnswers } from '../to-profile';
+
+/** Shows the current Get Started question and handles its Continue or Skip action. */
 export default function GetStartedScreen() {
   const params = useLocalSearchParams<{ step: string; name?: string; fresh?: string }>();
   const step = workflowStep(params.step, getStarted.steps.length);
@@ -29,11 +32,15 @@ export default function GetStartedScreen() {
   const name = draft.fields['3-Type your name']?.trim() || params.name || 'there';
   const complete = step === 10;
   const ready = isStepReady(question, step, draft);
+
+  /** Opens the requested Get Started question while preserving the current route parameters. */
   const navigate = (next: number) =>
     router.push({
       pathname: '/get-started/[step]',
       params: { ...params, step: String(next) },
     });
+
+  /** Checks the current step, saves registration when needed, and advances to the next screen. */
   const next = async (skip = false) => {
     if (busy.current || (!skip && !ready)) return;
     if (skip) dispatch({ type: 'skip', step, fields: question.fields });
@@ -57,6 +64,7 @@ export default function GetStartedScreen() {
     } else if (complete) router.replace({ pathname: '/get-started-loading', params: { name } });
     else navigate(step + 1);
   };
+
   return (
     <>
       <StatusBar hidden />

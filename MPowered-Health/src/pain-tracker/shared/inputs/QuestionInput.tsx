@@ -1,8 +1,11 @@
+/** Turns a pain score into the label shown beside the input. */
 import type { AssessmentQuestion } from '@/shared/health-records/assessment-types';
 import { asSentence } from '@/shared/health-records/format';
 import { ScoreSlider } from './ScoreSlider';
 import { s } from '../styles';
 import { Pressable, Text, TextInput, View } from 'react-native';
+
+/** Turns a pain score into the label shown beside the input. */
 const painLabel = (n: number) =>
   n === 0
     ? 'I have no pain at all'
@@ -15,6 +18,8 @@ const painLabel = (n: number) =>
           : n === 9
             ? 'The pain is extremely severe'
             : 'The pain is the worst imaginable';
+
+/** Chooses the appropriate input control for the current assessment question. */
 export function QuestionInput({
   question: q,
   value: current,

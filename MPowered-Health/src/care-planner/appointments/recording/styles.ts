@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by Care Planner / saved appointments / recording and consent. */
 import { palette } from '@/shared/ui/mha-ui';
 import { StyleSheet } from 'react-native';
 import { s as shared } from '@/care-planner/shared/styles';

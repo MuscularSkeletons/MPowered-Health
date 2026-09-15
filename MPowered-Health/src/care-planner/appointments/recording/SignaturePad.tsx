@@ -1,10 +1,12 @@
+/** Captures and clears signature strokes for appointment recording consent. */
 import { s } from './styles';
-// This screen lets the user review and update a planned healthcare appointment.
+// Keeps appointment answer drafts and recording state together.
 import { palette } from '@/shared/ui/mha-ui';
 import { useRef, useState } from 'react';
 import { PanResponder, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+/** Captures finger-drawn signature strokes and provides a clear action. */
 export function SignaturePad({
   paths,
   setPaths,
@@ -45,7 +47,10 @@ export function SignaturePad({
       },
     }),
   );
+
+  /** Removes the current signature strokes. */
   const clear = () => setPaths([]);
+
   return (
     <View>
       <View style={s.signaturePad} {...responder.panHandlers}>

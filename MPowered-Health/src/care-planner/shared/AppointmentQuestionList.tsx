@@ -1,8 +1,11 @@
+/** Displays appointment questions by category, with answer editing when enabled. */
 import { s } from './styles';
-// This screen lets the user review and update a planned healthcare appointment.
+// Keeps appointment answer drafts and recording state together.
 import { Pressable, Text, View } from 'react-native';
 
 import type { AppointmentQuestion } from '@/care-planner/appointments/types';
+
+/** Displays appointment questions by category, with answer editing when enabled. */
 export function AppointmentQuestionList({
   questions,
   savedAnswers = {},

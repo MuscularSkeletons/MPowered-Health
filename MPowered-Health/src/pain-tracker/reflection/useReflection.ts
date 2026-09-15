@@ -1,6 +1,9 @@
+/** Loads and edits the current reflection, including save feedback. */
 import { getReflection, reflectionWeek, saveReflection } from './repository';
 import { useEffect, useRef, useState } from 'react';
 import { Alert } from 'react-native';
+
+/** Loads and edits the current reflection, including save feedback. */
 export function useReflection(onSaved: () => void) {
   const [week] = useState(reflectionWeek);
   const [notes, setNotes] = useState('');
@@ -25,6 +28,8 @@ export function useReflection(onSaved: () => void) {
       active = false;
     };
   }, [week]);
+
+  /** Saves the reflection and reports whether the write succeeded. */
   const save = async () => {
     if (!notes.trim() || loading || error || busy.current) return;
     busy.current = true;
@@ -39,5 +44,6 @@ export function useReflection(onSaved: () => void) {
       setSaving(false);
     }
   };
+
   return { week, notes, setNotes, loading, saving, error, save };
 }

@@ -1,3 +1,4 @@
+/** Connects the My pain questions and summary to the shared assessment screen. */
 import { s } from '@/pain-tracker/shared/styles';
 import { Text, View } from 'react-native';
 import AssessmentScreen from '@/pain-tracker/shared/screen';
@@ -19,6 +20,8 @@ const presentation: SummaryPresentation = {
   repeatable: true,
   renderResults: (answers) => <PainSummaryResults answers={answers} />,
 };
+
+/** Connects the My pain questions and summary to the shared assessment screen. */
 export default function Screen() {
   return (
     <AssessmentScreen
@@ -31,8 +34,12 @@ export default function Screen() {
   );
 }
 
+/** Displays the recorded pain locations, characteristics, and intensity descriptions. */
 function PainSummaryResults({ answers }: { answers: Record<number, string[]> }) {
+  /** Reads the first answer for a question, using zero when none was recorded. */
   const value = (index: number) => answers[index]?.[0] ?? '0';
+
+  /** Turns a pain score into the sentence shown in the results. */
   const statement = (index: number, kind: 'current' | 'mildest' | 'worst' | 'average') => {
     const score = Number(value(index));
     if (score === 0)
@@ -45,6 +52,7 @@ function PainSummaryResults({ answers }: { answers: Record<number, string[]> }) 
     if (kind === 'worst') return `My worst pain was ${level}.`;
     return `I have experienced ${level} pain.`;
   };
+
   const intensity = [
     { label: 'Current pain', index: 2, kind: 'current' as const },
     { label: 'Mildest pain', index: 3, kind: 'mildest' as const },

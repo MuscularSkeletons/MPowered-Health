@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by My Health / pain profile. */
 import { s as common } from '@/shared/forms/styles';
 import { palette } from '@/shared/ui/mha-ui';
 import { StyleSheet } from 'react-native';

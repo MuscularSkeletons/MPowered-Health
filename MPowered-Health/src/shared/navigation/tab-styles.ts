@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by navigation. */
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
   tabBar: {

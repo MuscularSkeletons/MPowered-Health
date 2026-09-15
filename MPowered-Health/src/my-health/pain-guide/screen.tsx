@@ -1,3 +1,4 @@
+/** Displays pain guidance and links to further reading. */
 import { Choice } from '@/shared/forms/Choice';
 import { Shell } from '@/shared/forms/FormScreen';
 import { s } from '@/shared/forms/styles';
@@ -28,10 +29,13 @@ const tips = {
   ],
 };
 
+/** Displays pain guidance and its related links. */
 export default function PainGuideScreen() {
   const leave = useReturnDestination('/care');
   const [selected, setSelected] = useState<string[]>([]);
   const question = tips.steps[0];
+
+  /** Opens the selected guidance link. */
   const open = async () => {
     if (!selected[0]) return;
     try {
@@ -40,6 +44,7 @@ export default function PainGuideScreen() {
       Alert.alert('Unable to open pain guide', 'Please try again.');
     }
   };
+
   return (
     <Shell title={question.title} onBack={leave}>
       <Text style={s.flowEyebrow}>PAIN GUIDE · 1/1</Text>

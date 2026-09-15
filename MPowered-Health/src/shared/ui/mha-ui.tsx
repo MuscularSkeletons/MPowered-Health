@@ -1,3 +1,4 @@
+/** Provides the headers, buttons, cards, and summary rows reused across the app. */
 // This file contains shared colors, spacing, buttons, and basic interface components.
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 // Shared design values keep screens visually consistent and avoid repeated numbers.
@@ -27,7 +28,9 @@ export const layout = {
   controlHeight: 56,
 };
 export const radius = { sm: 12, md: 16, lg: 20, xl: 24, pill: 999 };
+
 // Render the shared MPowered Health wordmark at the top of screens.
+/** Displays the shared MPowered header. */
 export function MhaHeader() {
   return (
     <View style={s.header}>
@@ -41,7 +44,9 @@ export function MhaHeader() {
     </View>
   );
 }
+
 // Keep primary actions consistent and expose disabled state for accessibility.
+/** Displays a styled action button with optional disabled state. */
 export function ActionButton({
   label,
   onPress,
@@ -63,7 +68,9 @@ export function ActionButton({
     </Pressable>
   );
 }
+
 // Pair a small section label with its larger heading.
+/** Displays a small section label above its main heading. */
 export function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <View style={s.section}>
@@ -72,7 +79,9 @@ export function SectionHeading({ eyebrow, title }: { eyebrow: string; title: str
     </View>
   );
 }
+
 // Provide one reusable heading block for top-level pages.
+/** Displays the title and introduction at the top of a page. */
 export function PageIntro({
   eyebrow,
   title,
@@ -90,6 +99,7 @@ export function PageIntro({
     </View>
   );
 }
+
 // Pair each soft card background with readable foreground text.
 const tones = {
   rose: ['#F8E1E5', '#94465A'],
@@ -98,7 +108,9 @@ const tones = {
   gold: ['#F5EBD2', '#83651F'],
   violet: ['#E9DEFF', '#5E17EB'],
 } as const;
+
 // Render a tappable health destination with status and a clear arrow.
+/** Displays a health feature card with its content and action. */
 export function HealthCard({
   tone,
   symbol,
@@ -153,7 +165,9 @@ export function HealthCard({
     </Pressable>
   );
 }
+
 // Display one labelled value in summary cards and reports.
+/** Displays a label and value in a summary. */
 export function SummaryRow({
   tone,
   symbol,
@@ -206,6 +220,7 @@ export function SummaryRow({
     </Pressable>
   );
 }
+
 // Store shared component styles after behavior and content rules.
 const s = StyleSheet.create({
   header: {

@@ -1,3 +1,4 @@
+/** Defines the question wording and answer choices used by account setup / Get Started / questions. */
 import { Step } from './types';
 import { diagnosisOptions, painConditions, sexOptions } from '@/shared/account/profile-options';
 export const getStarted: { eyebrow: string; steps: Step[] } = {

@@ -1,7 +1,12 @@
+/** Turns the pain answers into readable summary sections. */
 import type { AssessmentAnswers, SummarySection } from '@/shared/health-records/assessment-types';
 
+/** Turns the pain answers into readable summary sections. */
 export function summarize(answers: AssessmentAnswers): SummarySection[] {
+  /** Reads the answer list for a question, using an empty list when it is missing. */
   const a = (i: number) => answers[i] ?? [];
+
+  /** Turns a recorded pain score into readable summary wording. */
   const painSentence = (value: string, kind: string) => {
     const n = Number(value);
     const level = n <= 3 ? 'mild' : n <= 6 ? 'moderate' : n <= 8 ? 'severe' : 'very severe';
@@ -13,6 +18,7 @@ export function summarize(answers: AssessmentAnswers): SummarySection[] {
         ? `My worst pain was ${level}.`
         : `I have experienced ${level} pain.`;
   };
+
   return [
     {
       title: 'Pain location',

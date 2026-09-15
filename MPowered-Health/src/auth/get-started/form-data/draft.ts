@@ -1,3 +1,4 @@
+/** Defines the registration draft and the rules for changing its answers. */
 // defines how answers change
 // for example, entering a name, selecting conditions or skipping a question.
 
@@ -9,6 +10,8 @@ export type RegistrationAction =
   | { type: 'field'; key: string; value: string }
   | { type: 'choice'; step: number; value: string; multi?: boolean }
   | { type: 'skip'; step: number; fields?: string[] };
+
+/** Returns updated registration answers after a field change, selection, or skip. */
 export function registrationReducer(
   state: RegistrationDraft,
   action: RegistrationAction,

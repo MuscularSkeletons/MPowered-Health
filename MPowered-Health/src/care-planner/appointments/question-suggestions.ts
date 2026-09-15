@@ -1,6 +1,9 @@
+/** Builds appointment question suggestions from recorded pain answers. */
 import type { PainAssessmentRecord } from '@/shared/health-records/pain-history';
 import type { AppointmentQuestion } from '@/care-planner/appointments/types';
+
 // Join body areas using normal sentence punctuation for a question the user can read aloud.
+/** Turns recorded pain areas into readable text. */
 function describeAreas(areas: string[]) {
   const names = areas.map((area) => area.trim().toLocaleLowerCase('en-AU')).filter(Boolean);
   if (names.length < 2) return names[0] ?? 'painful area';
@@ -10,6 +13,7 @@ function describeAreas(areas: string[]) {
 
 // Personalize suggested questions from the newest saved My Pain assessment.
 // Generic wording is used only when the user has not completed that assessment yet.
+/** Suggests questions using the latest pain assessment. */
 export function buildAppointmentQuestions(
   latest?: Pick<PainAssessmentRecord, 'areas' | 'current' | 'mildest' | 'worst' | 'average'>,
 ): AppointmentQuestion[] {
@@ -38,7 +42,10 @@ export function buildAppointmentQuestions(
         'When should a change in pain intensity need medical attention?',
         'What can I do to better manage days when the pain is high?',
       ];
+
+  /** Pairs each suggested question with its category. */
   const group = (name: string, items: string[]) => items.map((text) => ({ group: name, text }));
+
   return [
     ...group('Pain location', locationQuestions),
     ...group('Pain intensity', intensityQuestions),

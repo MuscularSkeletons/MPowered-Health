@@ -1,3 +1,4 @@
+/** Displays privacy information and permission controls. */
 import { s } from './styles';
 // This screen explains privacy choices and lets the user open related settings.
 import { MhaHeader } from '@/shared/ui/mha-ui';
@@ -9,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const oaicUrl = 'https://www.oaic.gov.au/privacy/australian-privacy-principles';
 
 // Reuse one heading and spacing pattern for each policy topic.
+/** Displays a titled section of privacy information. */
 function PolicySection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={s.section}>
@@ -19,6 +21,7 @@ function PolicySection({ title, children }: { title: string; children: React.Rea
 }
 
 // Show a permission's purpose and whether the user has enabled it.
+/** Displays one permission setting and its control. */
 function PermissionRow({
   icon,
   title,
@@ -45,6 +48,7 @@ function PermissionRow({
 }
 
 // Explain privacy choices and link to the relevant device or public settings.
+/** Displays privacy information and permission controls. */
 export default function PrivacyPermissions() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>

@@ -1,3 +1,4 @@
+/** Shows the three activation slides after Get Started is completed. */
 import { s } from './styles';
 // This screen explains how the app works before opening the home page.
 import { ActionButton } from '@/shared/ui/mha-ui';
@@ -26,6 +27,7 @@ const pages: { image: ImageSourcePropType; message: string; delay?: number }[] =
 ];
 
 // Advance timed guidance pages and pause on the final Continue action.
+/** Shows the three activation slides after Get Started is completed. */
 export default function ActivationScreens() {
   const { name = 'Jane' } = useLocalSearchParams<{ name?: string }>();
   const [page, setPage] = useState(0);

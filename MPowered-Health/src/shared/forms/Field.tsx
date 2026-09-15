@@ -1,6 +1,9 @@
+/** Displays a labeled form input with the supplied value and update action. */
 import { s } from '@/shared/forms/styles';
 import { Text, TextInput, View } from 'react-native';
 import { fourDigits } from './input-format';
+
+/** Displays a labeled form input with the supplied value and update action. */
 export function Field({
   label,
   value,

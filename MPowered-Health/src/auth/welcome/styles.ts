@@ -1,3 +1,4 @@
+/** Defines the colors, spacing, and layout used by account setup / welcome page. */
 import { palette } from '@/shared/ui/mha-ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({

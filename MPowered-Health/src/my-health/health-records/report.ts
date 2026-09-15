@@ -1,3 +1,4 @@
+/** Builds the printable health-record report, including its chart. */
 // This file builds printable health-record reports from saved pain assessments.
 import {
   PainAssessmentRecord,
@@ -5,13 +6,16 @@ import {
   painMetricValue,
   painRecordDate,
 } from '@/shared/health-records/pain-history';
+
 // User-entered labels must be escaped before they are inserted into the print document.
+/** Escapes special characters so user text is safe to place in an HTML report. */
 const escapeHtml = (text: string) =>
   text.replace(
     /[&<>"']/g,
     (value) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[value]!,
   );
 
+/** Builds a printable HTML report from the health records. */
 export function buildHealthRecordsHtml(
   records: PainAssessmentRecord[],
   areaLabel: string,
@@ -40,12 +44,17 @@ export function buildHealthRecordsHtml(
     chartRight = 650,
     chartTop = 18,
     chartBottom = 178;
+
   // Spread points across the available width, centring a chart with one result.
+  /** Places a record along the report chart’s horizontal axis. */
   const chartX = (index: number) =>
     chart.length === 1
       ? (chartLeft + chartRight) / 2
       : chartLeft + (index * (chartRight - chartLeft)) / (chart.length - 1);
+
+  /** Places a score along the report chart’s vertical axis. */
   const chartY = (score: number) => chartBottom - (score / 10) * (chartBottom - chartTop);
+
   // These strings become the line and shaded area coordinates in the SVG.
   const chartPoints = chart.map((score, index) => `${chartX(index)},${chartY(score)}`).join(' ');
   const chartArea = `${chartX(0)},${chartBottom} ${chartPoints} ${chartX(chart.length - 1)},${chartBottom}`;

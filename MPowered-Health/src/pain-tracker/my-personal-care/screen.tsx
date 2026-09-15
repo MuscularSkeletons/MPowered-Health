@@ -1,3 +1,4 @@
+/** Connects the My personal care questions and summary to the shared assessment screen. */
 import AssessmentScreen from '@/pain-tracker/shared/screen';
 import { definition } from './questions';
 import { summarize } from '@/shared/health-records/summaries/personal-care';
@@ -7,6 +8,8 @@ const presentation = {
   savedLabel: 'Saved to Care Journal',
   tipUrl: 'https://muscha.org/living-well-with-a-musculoskeletal-condition',
 };
+
+/** Connects the My personal care questions and summary to the shared assessment screen. */
 export default function Screen() {
   return (
     <AssessmentScreen

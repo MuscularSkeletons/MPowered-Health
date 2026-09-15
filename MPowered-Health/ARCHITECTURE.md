@@ -108,8 +108,16 @@ Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:features`, a
 
 `appointments/` owns saved appointment records, domain types, question suggestions, and the appointment screen. `answers/` owns answer editing; `recording/` owns voice controls and recording consent. Their styles live beside their controls. `shared/` contains the summary and question-list components reused by planning and appointment viewing, plus their common presentation styles. This shared folder is scoped to Care Planner; app-wide shared services remain in `src/shared/`.
 
-File and exported component names agree: `HealthServiceSelect`, `QuestionPicker`, `AppointmentSummary`, `VoiceRecordingControls`, `RecordingConsentModal`, and `useAppointmentAnswers`. Domain types are imported from `types.ts` directly rather than through the storage repository. Only navigation entries are included in the route manifest; public URLs remain unchanged.
+Reusable files use names matching their exported components or hooks: `AppointmentSummary`, `VoiceRecordingControls`, `RecordingConsentModal`, and `useAppointmentAnswers`. The private `HealthServiceSelect` and `QuestionPicker` helpers remain inside their owning screens. Domain types are imported from `types.ts` directly rather than through the storage repository. Only navigation entries are included in the route manifest; public URLs remain unchanged.
 
 The planning questions folder keeps its two screens together. The service selector and question picker are private components inside their respective screens; the platform-specific date picker remains in `date-screen.tsx`.
 
 My Pain and My Movement each contain only `questions.ts` and `screen.tsx`. Pain result rendering is a private component in its screen; movement answer scales are private data alongside the questions. Neither is shared because each has only one feature consumer.
+
+## Reading the code
+
+Every handwritten TypeScript source file starts with a short explanation of its purpose. Named functions have comments explaining their work, while comments inside longer functions explain important decisions such as retrying a failed save or keeping draft answers separate from saved answers. Comments describe the current prototype, including data that exists only in memory.
+
+Question-data files, style files, and type declarations do not need artificial functions. Their opening comments explain what they define. Route manifests remain valid JSON and are described in the navigation section above; generated routes should be read through their owning source files. When changing behavior, update the nearby explanation at the same time.
+
+For setup, naming, commenting, storage behavior, and the review checklist, see [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,3 +1,4 @@
+/** Displays settings options and the local account deletion action. */
 import { s } from './styles';
 // This screen provides account, privacy, data export, and deletion settings.
 import { deleteLocalAccount, getProfile, Profile } from '@/shared/account/repository';
@@ -9,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Small local components keep the settings rows consistent and easy to scan.
 // Keep the profile picture placeholder separate from the settings list.
+/** Draws the profile symbol used on the Settings page. */
 function ProfileIcon() {
   return (
     <View style={s.profileIcon} accessibilityElementsHidden>
@@ -19,6 +21,7 @@ function ProfileIcon() {
 }
 
 // Reuse one row layout for every settings destination.
+/** Displays a settings option with its icon and press action. */
 function SettingRow({
   icon,
   title,
@@ -51,6 +54,7 @@ function SettingRow({
 }
 
 // Load account details, open settings pages, and handle local deletion.
+/** Displays settings options and the local account deletion action. */
 export default function Settings() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -72,7 +76,9 @@ export default function Settings() {
       active = false;
     };
   }, []);
+
   // Block duplicate presses and close the modal only after deletion succeeds.
+  /** Runs the local account deletion flow and shows any failure to the user. */
   const deleteAccount = async () => {
     if (deleting) return;
     setDeleting(true);
@@ -94,6 +100,7 @@ export default function Settings() {
       setDeleting(false);
     }
   };
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />

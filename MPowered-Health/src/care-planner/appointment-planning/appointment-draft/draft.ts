@@ -1,3 +1,4 @@
+/** Defines the appointment draft, its update rules, and how to build a completed plan. */
 import { parseQuestions } from './legacy-link-parser';
 import type { AppointmentQuestion } from '@/care-planner/appointments/types';
 export interface AppointmentDraft {
@@ -11,6 +12,8 @@ export type AppointmentDraftAction =
   | { type: 'field'; field: 'date' | 'doctor' | 'service' | 'customQuestion'; value: string }
   | { type: 'toggleQuestion'; value: string }
   | { type: 'skipQuestions' };
+
+/** Creates a blank appointment plan. */
 export const emptyAppointmentDraft = (): AppointmentDraft => ({
   date: '',
   doctor: '',
@@ -18,6 +21,14 @@ export const emptyAppointmentDraft = (): AppointmentDraft => ({
   questions: [],
   customQuestion: '',
 });
+
+/**
+ * Updates the appointment draft without changing the previous draft.
+ *
+ * @param draft - Previous form values; this object is not changed.
+ * @param action - Field edit, question toggle, or question skip.
+ * @returns Updated values for the next render.
+ */
 export function appointmentDraftReducer(
   draft: AppointmentDraft,
   action: AppointmentDraftAction,
@@ -31,6 +42,13 @@ export function appointmentDraftReducer(
       : [...draft.questions, action.value],
   };
 }
+
+/**
+ * Restores supported values from an old appointment link.
+ *
+ * @param params - Values from an old planning link. Without resume, a blank draft is returned.
+ * @returns A draft with safe defaults and a validated question list.
+ */
 export function restoreAppointmentDraft(
   params: Record<string, string | undefined>,
 ): AppointmentDraft {
@@ -43,9 +61,19 @@ export function restoreAppointmentDraft(
     customQuestion: params.customQuestion ?? '',
   };
 }
+
+/** Checks that the appointment has the required date and provider information. */
 export function appointmentDetailsReady(draft: AppointmentDraft) {
   return !!draft.date.trim() && !!draft.doctor.trim();
 }
+
+/**
+ * Combines the entered appointment details with the selected questions.
+ *
+ * @param draft - Current appointment details and selected question text.
+ * @param suggestions - Suggested questions with their original categories.
+ * @returns The plan to add to appointments, including any custom question.
+ */
 export function buildAppointmentPlan(draft: AppointmentDraft, suggestions: AppointmentQuestion[]) {
   const questions = draft.questions.map(
     (text) => suggestions.find((q) => q.text === text) ?? { group: 'Other', text },

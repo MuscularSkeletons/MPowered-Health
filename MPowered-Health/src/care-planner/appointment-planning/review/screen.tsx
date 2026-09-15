@@ -1,3 +1,4 @@
+/** Shows the appointment plan for review before adding it to the saved list. */
 import { getPainHistory } from '@/shared/health-records/pain-history';
 import { ActionButton, MhaHeader } from '@/shared/ui/mha-ui';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -10,6 +11,8 @@ import { buildAppointmentPlan } from '../appointment-draft/draft';
 import { addAppointment } from '@/care-planner/appointments/repository';
 import { buildAppointmentQuestions } from '@/care-planner/appointments/question-suggestions';
 import { useAppointmentDraft } from '../appointment-draft/DraftProvider';
+
+/** Shows the appointment plan for review before adding it to the saved list. */
 export default function AppointmentPlanReviewScreen() {
   const { draft } = useAppointmentDraft();
   const navigation = usePlanningNavigation();

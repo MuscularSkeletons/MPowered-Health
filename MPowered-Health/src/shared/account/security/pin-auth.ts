@@ -1,3 +1,4 @@
+/** Checks the entered PIN using the stored credential and attempt limits. */
 // This file checks PIN sign-in attempts and requires email verification after repeated failures.
 import { getProfile } from '@/shared/account/repository';
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
@@ -9,6 +10,13 @@ type Result = { ok: boolean; message?: string; requiresEmailVerification?: boole
 // Queue checks so rapid taps cannot update the failure count at the same time.
 let checking: Promise<unknown> = Promise.resolve();
 
+/**
+ * Checks the entered PIN using the stored credential and attempt limits.
+ *
+ * @param pin - The four-digit PIN entered by the user.
+ * @returns Whether the PIN is accepted, an error message when needed, and any email-recovery requirement.
+ * @throws If reading account data or updating the attempt record fails.
+ */
 export function verifyAccountPin(pin: string): Promise<Result> {
   // Each verification joins the queue before it reads or changes the attempt record.
   const run = checking

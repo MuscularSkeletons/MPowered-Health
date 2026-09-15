@@ -1,3 +1,4 @@
+/** Shows the assessment choices, completion information, and reflection entry point. */
 import { assessmentRoutes } from '@/pain-tracker/routes';
 import type { AssessmentId } from '@/shared/health-records/assessment-types';
 import { s } from './styles';
@@ -10,7 +11,9 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 // One row decides whether to offer Record or View summary.
+/** Displays an assessment entry or its question flow for this part of Pain Tracker. */
 function Assessment({
   title,
   type,
@@ -47,7 +50,9 @@ function Assessment({
     </Pressable>
   );
 }
+
 // Separate brand text keeps the logo styling consistent.
+/** Displays the styled MPowered brand text. */
 function BrandWord() {
   return (
     <View style={s.brandWord}>
@@ -56,6 +61,7 @@ function BrandWord() {
     </View>
   );
 }
+
 // Refresh the account and weekly activity whenever Home becomes active.
 const content = {
   description: 'Assess your pain intensity and its impacts weekly to create an empowered plan.',
@@ -64,6 +70,7 @@ const content = {
   assessments: ['My Pain', 'My Movement', 'My Personal Care', 'My Social Health', 'My Management'],
 } as const;
 
+/** Shows the assessment choices, completion information, and reflection entry point. */
 export default function Home() {
   const { completed = '', name: routeName = 'Jane' } = useLocalSearchParams<{
     completed?: string;

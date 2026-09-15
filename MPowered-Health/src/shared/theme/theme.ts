@@ -1,3 +1,4 @@
+/** Defines the common visual theme values used by the app. */
 // This file defines the colors and fonts used by the app themes.
 /**
  * Below are the colors that are used in the app. The colors are defined in the light and dark mode.

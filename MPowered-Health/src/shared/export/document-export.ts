@@ -1,8 +1,10 @@
+/** Provides native printing, document sharing, and clipboard helpers. */
 // This file prints and shares pain-profile reports on native devices.
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Share } from 'react-native';
 
+/** Opens a printable document from HTML using this platform’s printing support. */
 export async function printHtml(html: string): Promise<void> {
   // Let the operating system present its normal printer and PDF destination choices.
   try {
@@ -14,6 +16,7 @@ export async function printHtml(html: string): Promise<void> {
   }
 }
 
+/** Shares a document using this platform’s available sharing support. */
 export async function shareDocument(report: {
   title: string;
   html: string;
@@ -34,6 +37,7 @@ export async function shareDocument(report: {
   return 'done';
 }
 
+/** Copies text to the clipboard. */
 export async function copyText(_text: string): Promise<boolean> {
   // Native profile actions do not show a copy option; the web module implements it.
   return false;

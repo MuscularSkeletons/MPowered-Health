@@ -1,3 +1,4 @@
+/** Lists prescriptions and provides controls for adding or editing them. */
 import { s } from './styles';
 import { Shell } from '@/shared/forms/FormScreen';
 import { ActionButton, palette } from '@/shared/ui/mha-ui';
@@ -6,6 +7,8 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { medicationLabel } from '../state/model';
 import { useMedications } from '../state/StoreProvider';
+
+/** Lists prescriptions and provides controls for adding or editing them. */
 export default function PrescriptionsScreen() {
   const { list, remove } = useMedications();
   return (

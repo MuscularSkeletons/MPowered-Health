@@ -1,3 +1,4 @@
+/** Displays editable profile details with validation and save feedback. */
 import { s } from './styles';
 // This screen lets the user view and edit their saved personal details.
 import {
@@ -16,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Load stored details on entry, validate edits, and save only when every field is valid.
 // Load the profile, validate edits, and save only complete valid details.
+/** Displays editable profile details with validation and save feedback. */
 export default function PersonalDetails() {
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
@@ -46,11 +48,15 @@ export default function PersonalDetails() {
   );
   const errors = profileErrors(profile);
   const disabled = loading || saving || !!loadError;
+
+  /** Changes one personal-detail field in the current profile draft. */
   const update = <K extends keyof Profile>(key: K, value: Profile[K]) => {
     setProfile((previous) => ({ ...previous, [key]: value }));
     setSaveError('');
   };
+
   // Validate locally first, then wait for storage before leaving the screen.
+  /** Saves valid profile changes and returns to Settings, showing an error if saving fails. */
   const save = async () => {
     if (disabled || Object.keys(errors).length) return;
     setSaving(true);
@@ -63,6 +69,8 @@ export default function PersonalDetails() {
       setSaving(false);
     }
   };
+
+  /** Builds a text field for the requested profile detail. */
   const input = (
     key: 'email' | 'name' | 'birthYear' | 'otherConditions',
     label: string,
@@ -92,6 +100,8 @@ export default function PersonalDetails() {
       {errors[key] ? <Text style={s.error}>{errors[key]}</Text> : null}
     </View>
   );
+
+  /** Builds the available choices for a profile field, allowing multiple conditions. */
   const choices = (key: 'sex' | 'diagnosis' | 'conditions', label: string, options: string[]) => (
     <View style={s.field}>
       <Text style={s.label}>{label}</Text>
@@ -129,6 +139,7 @@ export default function PersonalDetails() {
       {errors[key] ? <Text style={s.error}>{errors[key]}</Text> : null}
     </View>
   );
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />

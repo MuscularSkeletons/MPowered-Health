@@ -1,5 +1,8 @@
+/** Displays one section of an assessment summary. */
 import { s } from '../styles';
 import { Linking, Pressable, Text, View } from 'react-native';
+
+/** Displays one section of an assessment summary. */
 export function SummaryInsight({
   summary,
   tip,

@@ -1,4 +1,7 @@
+/** Moves between planning steps while keeping the visit parameters. */
 import { router, useLocalSearchParams } from 'expo-router';
+
+/** Moves between planning steps while keeping the visit parameters. */
 export function usePlanningNavigation() {
   const { fresh, resume } = useLocalSearchParams<{ fresh?: string; resume?: string }>();
   const params = { fresh, resume };

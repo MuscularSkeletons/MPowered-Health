@@ -1,3 +1,4 @@
+/** Displays suggested questions and a custom question field for the appointment plan. */
 import { buildAppointmentQuestions } from '@/care-planner/appointments/question-suggestions';
 import { getPainHistory, painRecordDate } from '@/shared/health-records/pain-history';
 import { Shell } from '@/shared/forms/FormScreen';
@@ -9,16 +10,21 @@ import { Choice } from '@/shared/forms/Choice';
 import { s as questionStyles } from '../form-styles';
 import { usePlanningNavigation } from '../usePlanningNavigation';
 import { useAppointmentDraft } from '../appointment-draft/DraftProvider';
+
+/** Displays suggested questions and a custom question field for the appointment plan. */
 export default function AppointmentQuestionsScreen() {
   const navigation = usePlanningNavigation();
   const { draft, dispatch } = useAppointmentDraft();
   const latestPain = getPainHistory().at(-1);
   const suggestions = buildAppointmentQuestions(latestPain);
   const selected = draft.questions;
+
+  /** Opens the review step, clearing optional questions when the user chooses Skip. */
   const review = (skip = false) => {
     if (skip) dispatch({ type: 'skipQuestions' });
     navigation.review();
   };
+
   return (
     <Shell title="Add Questions for My Appointment" onBack={navigation.details}>
       <Text style={s.flowEyebrow}>CARE PLANNER · 2/3</Text>
@@ -43,6 +49,7 @@ export default function AppointmentQuestionsScreen() {
   );
 }
 
+/** Displays grouped suggested questions and the field for a custom question. */
 function QuestionPicker({
   suggestions,
   assessmentDate,

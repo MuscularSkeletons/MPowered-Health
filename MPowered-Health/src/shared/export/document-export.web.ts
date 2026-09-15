@@ -1,5 +1,7 @@
+/** Provides browser printing, document sharing, and clipboard helpers. */
 // This file prints, shares, and copies pain-profile reports in web browsers.
 
+/** Opens a printable document from HTML using this platform’s printing support. */
 export function printHtml(html: string): Promise<void> {
   // Expo's web printer ignores HTML. Print an isolated document so navigation,
   // buttons and the scroll container never appear in the PDF.
@@ -47,6 +49,7 @@ export function printHtml(html: string): Promise<void> {
   });
 }
 
+/** Shares a document using this platform’s available sharing support. */
 export async function shareDocument(report: {
   title: string;
   html: string;
@@ -64,6 +67,7 @@ export async function shareDocument(report: {
   }
 }
 
+/** Copies text to the clipboard. */
 export async function copyText(text: string): Promise<boolean> {
   // Modern browsers can write directly when the page is secure and permission is granted.
   try {

@@ -1,3 +1,4 @@
+/** Defines the question wording and answer choices used by Pain Tracker / My Personal Care. */
 import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
 export const definition: AssessmentDefinition = {
   title: 'My Personal Care',

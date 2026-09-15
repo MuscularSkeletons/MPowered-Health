@@ -1,3 +1,4 @@
+/** Displays profile details and summaries of recorded assessment answers. */
 import type { AssessmentId } from '@/shared/health-records/assessment-types';
 import { getProfile } from '@/shared/account/repository';
 import { asSentence, buildSummary } from '@/shared/health-records/summaries';
@@ -10,6 +11,8 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+/** Displays a titled group of profile summary rows. */
 function ProfileSummaryCard({
   title,
   subtitle,
@@ -33,6 +36,8 @@ function ProfileSummaryCard({
     </View>
   );
 }
+
+/** Displays profile details and summaries of recorded assessment answers. */
 export default function PainProfileSummary() {
   const [profile, setProfile] = useState<Awaited<ReturnType<typeof getProfile>>>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +73,8 @@ export default function PainProfileSummary() {
     social: getAssessmentAnswers('social') ?? {},
     management: getAssessmentAnswers('management') ?? {},
   };
+
+  /** Builds profile summary rows and marks answers that have not been recorded. */
   const rows = (type: AssessmentId, answers: Record<number, string[]>) => {
     const indexes: Record<string, number[]> = {
       pain: [0, 1, 2, 3, 4, 5],
@@ -84,6 +91,7 @@ export default function PainProfileSummary() {
         return [title, recorded ? asSentence(item.text) : 'Not recorded'];
       });
   };
+
   const sections: ProfileSection[] = [
     {
       title: 'About me',

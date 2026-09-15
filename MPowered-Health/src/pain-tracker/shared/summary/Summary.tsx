@@ -1,3 +1,4 @@
+/** Displays completed assessment results and available follow-up actions. */
 import type {
   AssessmentAnswers,
   AssessmentDefinition,
@@ -17,6 +18,8 @@ export interface SummaryPresentation {
   repeatable?: boolean;
   renderResults?: (answers: AssessmentAnswers) => ReactNode;
 }
+
+/** Displays completed assessment results and available follow-up actions. */
 export function AssessmentSummary({
   definition: spec,
   answers,

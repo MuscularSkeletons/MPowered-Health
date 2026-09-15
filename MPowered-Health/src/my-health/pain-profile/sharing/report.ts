@@ -1,3 +1,4 @@
+/** Builds plain-text and HTML versions of the profile report. */
 // This file turns pain-profile sections into clear text and HTML reports.
 export type ProfileSection = {
   // Each item becomes one labelled row in both text and HTML output.
@@ -12,6 +13,7 @@ export type PainProfileReport = {
   sections: ProfileSection[];
 };
 
+/** Escapes special characters so user text is safe to place in an HTML report. */
 const escapeHtml = (value: string) =>
   // Prevent names, answers, or notes from becoming executable HTML markup.
   value.replace(/[&<>"']/g, (character) => {
@@ -25,6 +27,7 @@ const escapeHtml = (value: string) =>
     return entities[character];
   });
 
+/** Builds a plain-text version of the profile report. */
 export function profileReportText(report: PainProfileReport) {
   // Plain text supports the system share sheet and manual copying on the web.
   return [
@@ -46,6 +49,7 @@ export function profileReportText(report: PainProfileReport) {
   ].join('\n\n');
 }
 
+/** Builds an HTML version of the profile report for printing. */
 export function profileReportHtml(report: PainProfileReport) {
   // Inline all print styles so the report works inside an isolated print frame.
   return `<!DOCTYPE html>
