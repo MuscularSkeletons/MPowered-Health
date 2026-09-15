@@ -1,5 +1,4 @@
 /** Displays pain-history scores as a chart with selectable metrics. */
-// This hook prepares the history groups and selections used by the records screen.
 import {
   PainAssessmentRecord,
   PainMetric,
