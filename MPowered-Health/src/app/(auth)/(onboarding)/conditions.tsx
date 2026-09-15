@@ -32,7 +32,8 @@ export default function StorePainConditions() {
     if (!user) {
         throw new Error("User not authenticated");
     }
-    user.painConditions = painConditions;
+    // sort alphabetically at the end (to save computation) so easier to look for a condition
+    user.painConditions = painConditions.sort();
     console.log(painConditions);
     router.push("/(auth)/(onboarding)/miscconditions");
   };
