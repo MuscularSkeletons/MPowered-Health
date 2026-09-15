@@ -1,4 +1,3 @@
-/** Displays the weekly reflection form and its save feedback. */
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';
 import { s } from '@/shared/forms/styles';

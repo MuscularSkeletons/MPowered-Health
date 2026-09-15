@@ -1,5 +1,4 @@
 /** Builds plain-text and HTML versions of the profile report. */
-// This file turns pain-profile sections into clear text and HTML reports.
 export type ProfileSection = {
   // Each item becomes one labelled row in both text and HTML output.
   title: string;

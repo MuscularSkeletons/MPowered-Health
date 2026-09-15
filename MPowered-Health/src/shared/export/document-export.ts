@@ -1,5 +1,4 @@
 /** Provides native printing, document sharing, and clipboard helpers. */
-// This file prints and shares pain-profile reports on native devices.
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Share } from 'react-native';

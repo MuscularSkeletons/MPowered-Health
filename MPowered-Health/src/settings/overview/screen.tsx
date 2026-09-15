@@ -1,6 +1,4 @@
-/** Displays settings options and the local account deletion action. */
 import { s } from './styles';
-// This screen provides account, privacy, data export, and deletion settings.
 import { deleteLocalAccount, getProfile, Profile } from '@/shared/account/repository';
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';
@@ -8,9 +6,11 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Small local components keep the settings rows consistent and easy to scan.
-// Keep the profile picture placeholder separate from the settings list.
-/** Draws the profile symbol used on the Settings page. */
+/**
+ * Draws the profile symbol used on the Settings page.
+ *
+ * Small local components keep the settings rows consistent and easy to scan. Keep the profile picture placeholder separate from the settings list.
+ */
 function ProfileIcon() {
   return (
     <View style={s.profileIcon} accessibilityElementsHidden>
@@ -20,8 +20,11 @@ function ProfileIcon() {
   );
 }
 
-// Reuse one row layout for every settings destination.
-/** Displays a settings option with its icon and press action. */
+/**
+ * Displays a settings option with its icon and press action.
+ *
+ * Reuse one row layout for every settings destination.
+ */
 function SettingRow({
   icon,
   title,
@@ -53,7 +56,6 @@ function SettingRow({
   );
 }
 
-// Load account details, open settings pages, and handle local deletion.
 /** Displays settings options and the local account deletion action. */
 export default function Settings() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -77,8 +79,11 @@ export default function Settings() {
     };
   }, []);
 
-  // Block duplicate presses and close the modal only after deletion succeeds.
-  /** Runs the local account deletion flow and shows any failure to the user. */
+  /**
+   * Runs the local account deletion flow and shows any failure to the user.
+   *
+   * Block duplicate presses and close the modal only after deletion succeeds.
+   */
   const deleteAccount = async () => {
     if (deleting) return;
     setDeleting(true);
@@ -268,5 +273,3 @@ export default function Settings() {
     </SafeAreaView>
   );
 }
-
-// Keep settings, modal, and account styles together below the behavior.

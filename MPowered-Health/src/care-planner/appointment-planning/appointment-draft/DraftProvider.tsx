@@ -1,4 +1,3 @@
-/** Keeps one appointment draft available across the planning steps. */
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import {
   appointmentDraftReducer,

@@ -1,5 +1,4 @@
 /** Builds the printable health-record report, including its chart. */
-// This file builds printable health-record reports from saved pain assessments.
 import {
   PainAssessmentRecord,
   PainMetric,
@@ -7,8 +6,11 @@ import {
   painRecordDate,
 } from '@/shared/health-records/pain-history';
 
-// User-entered labels must be escaped before they are inserted into the print document.
-/** Escapes special characters so user text is safe to place in an HTML report. */
+/**
+ * Escapes special characters so user text is safe to place in an HTML report.
+ *
+ * User-entered labels must be escaped before they are inserted into the print document.
+ */
 const escapeHtml = (text: string) =>
   text.replace(
     /[&<>"']/g,
@@ -45,8 +47,11 @@ export function buildHealthRecordsHtml(
     chartTop = 18,
     chartBottom = 178;
 
-  // Spread points across the available width, centring a chart with one result.
-  /** Places a record along the report chart’s horizontal axis. */
+  /**
+   * Places a record along the report chart’s horizontal axis.
+   *
+   * Spread points across the available width, centring a chart with one result.
+   */
   const chartX = (index: number) =>
     chart.length === 1
       ? (chartLeft + chartRight) / 2

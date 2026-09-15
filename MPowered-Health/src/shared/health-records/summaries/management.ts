@@ -1,4 +1,3 @@
-/** Turns the management answers into readable summary sections. */
 import type { AssessmentAnswers, SummarySection } from '@/shared/health-records/assessment-types';
 
 /** Turns the management answers into readable summary sections. */

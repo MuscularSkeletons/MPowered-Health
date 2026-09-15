@@ -20,8 +20,11 @@ const shareProfile = (report: PainProfileReport) =>
 
 const copyProfile = copyText;
 
-// Coordinate print and share actions while preventing duplicate requests.
-/** Displays the controls for printing and sharing the profile report. */
+/**
+ * Displays the controls for printing and sharing the profile report.
+ *
+ * Coordinate print and share actions while preventing duplicate requests.
+ */
 export function ProfileExportActions({
   report,
   disabled,
@@ -36,8 +39,11 @@ export function ProfileExportActions({
   const [copyStatus, setCopyStatus] = useState('');
   const [sharingMore, setSharingMore] = useState(false);
 
-  // Web sharing may show a preview before copy or system sharing.
-  /** Runs the selected export action and handles any failure shown to the user. */
+  /**
+   * Runs the selected export action and handles any failure shown to the user.
+   *
+   * Web sharing may show a preview before copy or system sharing.
+   */
   const run = async (action: 'print' | 'share') => {
     if (pending.current || disabled) return;
     if (action === 'share' && Platform.OS === 'web') {
@@ -177,7 +183,6 @@ export function ProfileExportActions({
   );
 }
 
-// Group export buttons, messages, and preview-modal styles below.
 const s = StyleSheet.create({
   container: { flexShrink: 1, maxWidth: '100%', marginLeft: 'auto' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8 },

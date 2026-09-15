@@ -1,5 +1,6 @@
 /** Defines the question wording and answer choices used by Pain Tracker / My Social Health. */
 import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
+// Keep the question order aligned with the matching summary builder and saved answer indexes.
 export const definition: AssessmentDefinition = {
   title: 'My Social Health',
   tip: 'Explore tips on managing emotions',

@@ -1,6 +1,5 @@
 /** Keeps planned appointments in memory and clears them during account cleanup. */
 import { registerAccountCleanup } from '@/shared/account/repository';
-// This file stores planned appointments and their questions in app memory.
 
 // Appointment records stay in memory and are copied when read to prevent accidental edits.
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
@@ -15,9 +14,9 @@ let appointments: PlannedAppointment[] = [
 ];
 
 /** Returns a new list containing the planned appointments. */
+// This copies the list only; callers should use the update helpers rather than editing its records.
 export const getAppointments = () => [...appointments];
 
-// An omitted or stale route ID falls back to the first available appointment.
 /** Finds an appointment by ID, falling back to the first available appointment. */
 export const getAppointment = (id?: string) =>
   appointments.find((item) => item.id === id) ?? appointments[0];

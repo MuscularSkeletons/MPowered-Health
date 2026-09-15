@@ -1,4 +1,3 @@
-/** Connects the My social health questions and summary to the shared assessment screen. */
 import AssessmentScreen from '@/pain-tracker/shared/screen';
 import { definition } from './questions';
 import { summarize } from '@/shared/health-records/summaries/social-health';

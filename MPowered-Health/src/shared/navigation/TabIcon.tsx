@@ -1,4 +1,3 @@
-/** Displays a navigation glyph with its selected-tab background. */
 import { View } from 'react-native';
 import { NavGlyph, type NavIconName } from './NavGlyph';
 import { s } from './tab-styles';

@@ -1,4 +1,3 @@
-/** Displays the input fields required by the current registration question. */
 import { Choice } from '@/shared/forms/Choice';
 import { Field } from '@/shared/forms/Field';
 import { validAnswer } from '@/shared/forms/validation';

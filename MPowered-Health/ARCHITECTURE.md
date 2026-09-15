@@ -116,7 +116,7 @@ My Pain and My Movement each contain only `questions.ts` and `screen.tsx`. Pain 
 
 ## Reading the code
 
-Every handwritten TypeScript source file starts with a short explanation of its purpose. Named functions have comments explaining their work, while comments inside longer functions explain important decisions such as retrying a failed save or keeping draft answers separate from saved answers. Comments describe the current prototype, including data that exists only in memory.
+Every handwritten TypeScript source file explains its purpose. In a small file, the main function’s documentation provides that explanation without a duplicate file introduction. Files containing only types, styles, or data use a short purpose comment. Named functions have comments explaining their work, while comments inside longer functions explain important decisions such as retrying a failed save or keeping draft answers separate from saved answers. Comments describe the current prototype, including data that exists only in memory.
 
 Question-data files, style files, and type declarations do not need artificial functions. Their opening comments explain what they define. Route manifests remain valid JSON and are described in the navigation section above; generated routes should be read through their owning source files. When changing behavior, update the nearby explanation at the same time.
 

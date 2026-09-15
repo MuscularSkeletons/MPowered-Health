@@ -1,4 +1,3 @@
-/** Manages question progress and saves the completed assessment before showing results. */
 import { useReducer, useRef } from 'react';
 import type {
   AssessmentId,
@@ -14,16 +13,18 @@ export interface AssessmentFlowOptions {
   assessmentId: AssessmentId;
   definition: AssessmentDefinition;
   summarize: (answers: AssessmentAnswers) => SummarySection[];
+  // Features without this callback keep completion in the session only.
   persist?: (answers: AssessmentAnswers) => Promise<unknown>;
 }
 
-// Owns one mounted assessment's draft; presentation and storage policy are supplied by its feature.
 /**
  * Manages question progress and saves the completed assessment before showing results.
  *
+ * The feature supplies its questions, summary wording, and optional save function.
+ * A failed save keeps answers available for retry; repeated Continue taps cannot start another save.
+ *
  * @param options - Assessment questions, summary builder, and optional save function.
  * @returns Current answers, progress, validation, and actions for the screen.
- * A failed save leaves answers available for retry; repeated Continue taps cannot start another save.
  */
 export function useAssessmentFlow({
   assessmentId,
@@ -34,6 +35,7 @@ export function useAssessmentFlow({
   const [draft, dispatch] = useReducer(assessmentDraftReducer, assessmentId, (id) =>
     createAssessmentDraft(getAssessmentAnswers(id)),
   );
+  // A ref changes immediately, before React renders the disabled Continue button.
   const savingRef = useRef(false);
   const activeStep = Math.min(draft.step, definition.questions.length - 1);
   const question = definition.questions[activeStep];
@@ -54,6 +56,7 @@ export function useAssessmentFlow({
     savingRef.current = true;
     dispatch({ type: 'saving' });
     try {
+      // Do not mark the assessment complete until the feature’s storage write succeeds.
       await persist?.(draft.answers);
       markAssessmentCompleted(assessmentId, draft.answers);
       dispatch({ type: 'saved' });

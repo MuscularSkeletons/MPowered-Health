@@ -1,5 +1,4 @@
 /** Loads, saves, and groups dated pain assessments for screens and reports. */
-// This file saves and loads the user's dated pain assessment history.
 import type { AssessmentAnswers } from '@/shared/health-records/assessment-types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -20,8 +19,11 @@ let records: PainAssessmentRecord[] = [];
 // Chain disk writes in submission order so two quick saves cannot overwrite each other.
 let writes: Promise<unknown> = Promise.resolve();
 
-// Every public read and write crosses this copy boundary to protect saved history.
-/** Copies a record so callers cannot change the stored object through a shared reference. */
+/**
+ * Copies a record so callers cannot change the stored object through a shared reference.
+ *
+ * Every public read and write crosses this copy boundary to protect saved history.
+ */
 const clone = (record: PainAssessmentRecord): PainAssessmentRecord => ({
   ...record,
   areas: [...record.areas],

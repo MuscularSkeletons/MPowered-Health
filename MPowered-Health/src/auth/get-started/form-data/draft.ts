@@ -1,9 +1,9 @@
 /** Defines the registration draft and the rules for changing its answers. */
-// defines how answers change
-// for example, entering a name, selecting conditions or skipping a question.
 
 export interface RegistrationDraft {
+  // Keys combine the step number and field label, such as "3-Type your name".
   fields: Record<string, string>;
+  // Choice answers use the step index; even single-choice answers are lists.
   values: Record<number, string[]>;
 }
 export type RegistrationAction =
@@ -18,6 +18,7 @@ export function registrationReducer(
 ): RegistrationDraft {
   if (action.type === 'field')
     return { ...state, fields: { ...state.fields, [action.key]: action.value } };
+  // Multi-choice taps toggle one value; single-choice taps replace the selection.
   if (action.type === 'choice') {
     const selected = state.values[action.step] ?? [];
     const value = action.multi
@@ -27,6 +28,7 @@ export function registrationReducer(
       : [action.value];
     return { ...state, values: { ...state.values, [action.step]: value } };
   }
+  // Skipping removes text from this step too, so an old invalid entry cannot be submitted later.
   const fields = { ...state.fields };
   action.fields?.forEach((field) => delete fields[`${action.step}-${field}`]);
   return { fields, values: { ...state.values, [action.step]: [] } };

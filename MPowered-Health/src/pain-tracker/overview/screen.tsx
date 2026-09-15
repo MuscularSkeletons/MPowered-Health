@@ -1,8 +1,6 @@
-/** Shows the assessment choices, completion information, and reflection entry point. */
 import { assessmentRoutes } from '@/pain-tracker/routes';
 import type { AssessmentId } from '@/shared/health-records/assessment-types';
 import { s } from './styles';
-// This screen is the app home page and shows weekly assessment progress.
 import { getProfile } from '@/shared/account/repository';
 import { getCompletedAssessments, getWeeklyStreak } from '@/shared/health-records/session';
 import { getReflection } from '@/pain-tracker/reflection/repository';
@@ -12,8 +10,11 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// One row decides whether to offer Record or View summary.
-/** Displays an assessment entry or its question flow for this part of Pain Tracker. */
+/**
+ * Displays an assessment entry or its question flow for this part of Pain Tracker.
+ *
+ * One row decides whether to offer Record or View summary.
+ */
 function Assessment({
   title,
   type,
@@ -51,8 +52,11 @@ function Assessment({
   );
 }
 
-// Separate brand text keeps the logo styling consistent.
-/** Displays the styled MPowered brand text. */
+/**
+ * Displays the styled MPowered brand text.
+ *
+ * Separate brand text keeps the logo styling consistent.
+ */
 function BrandWord() {
   return (
     <View style={s.brandWord}>
@@ -189,4 +193,3 @@ export default function Home() {
     </SafeAreaView>
   );
 }
-// Keep greeting, progress, card, and footer styles below the logic.

@@ -1,4 +1,3 @@
-/** Keeps the prescription list and its update actions in memory. */
 import { getAccountSnapshot } from '@/shared/account/repository';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import { demoMedications } from './sample-data';
@@ -6,12 +5,14 @@ import { medicationReady, saveMedication, type MedicationDraft } from './model';
 
 /** Keeps the prescription list and its update actions in memory. */
 function useMedicationStore() {
+  // Only the demo session starts with sample prescriptions; this list is not saved to disk.
   const [list, setList] = useState(() => (getAccountSnapshot().demo ? demoMedications : []));
   const sequence = useRef(0);
 
   /** Adds or updates a prescription in the current list. */
   const save = (draft: MedicationDraft, id?: string) => {
     if (!medicationReady(draft)) return false;
+    // The counter keeps two additions in the same millisecond from sharing an ID.
     const key = id ?? `medication-${Date.now()}-${sequence.current++}`;
     setList((items) => saveMedication(items, draft, key));
     return true;

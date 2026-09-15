@@ -15,8 +15,11 @@ export function AccountBoundary({ children }: { children: ReactNode }) {
   const params = useGlobalSearchParams<{ flow?: string }>();
   const [startupError, setStartupError] = useState(false);
 
-  // Retry startup after a storage error without restarting the app.
-  /** Retries account initialization after a startup error. */
+  /**
+   * Retries account initialization after a startup error.
+   *
+   * Existing screens stay blocked until startup succeeds.
+   */
   const start = () => {
     setStartupError(false);
     initializeAccount().catch(() => setStartupError(true));
@@ -46,6 +49,7 @@ export function AccountBoundary({ children }: { children: ReactNode }) {
       </View>
     );
   return (
+    // A changed revision remounts child screens and discards their unsaved local state.
     <View key={account.revision} style={{ flex: 1 }}>
       {children}
     </View>

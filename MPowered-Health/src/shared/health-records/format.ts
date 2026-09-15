@@ -1,5 +1,4 @@
 /** Formats summary text for display as a sentence. */
-/** Formats summary text for display as a sentence. */
 export const asSentence = (value: string) => {
   if (!value || /[.!?]$/.test(value)) return value;
   const isCompleteStatement =

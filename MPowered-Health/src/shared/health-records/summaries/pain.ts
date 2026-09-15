@@ -1,4 +1,3 @@
-/** Turns the pain answers into readable summary sections. */
 import type { AssessmentAnswers, SummarySection } from '@/shared/health-records/assessment-types';
 
 /** Turns the pain answers into readable summary sections. */

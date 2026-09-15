@@ -22,8 +22,11 @@ export function PrintPdfButton({
   const pending = useRef(false);
   const [error, setError] = useState('');
 
-  // Build the filtered report before opening the platform print dialog.
-  /** Builds the health-record report and opens the print dialog. */
+  /**
+   * Builds the health-record report and opens the print dialog.
+   *
+   * Build the filtered report before opening the platform print dialog.
+   */
   const printPdf = async () => {
     if (pending.current || !records.length) return;
     pending.current = true;

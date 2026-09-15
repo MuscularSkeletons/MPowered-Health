@@ -1,4 +1,3 @@
-/** Displays recorded pain history and the controls for filtering and exporting it. */
 import { PrintPdfButton } from './PrintPdfButton';
 import { TrackingChart } from './TrackingChart';
 import { useHealthRecords } from './useRecords';
@@ -10,8 +9,11 @@ import { router } from 'expo-router';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Coordinate filters, chart/history tabs, record groups, and printing.
-/** Displays recorded pain history and the controls for filtering and exporting it. */
+/**
+ * Displays recorded pain history and the controls for filtering and exporting it.
+ *
+ * Coordinate filters, chart/history tabs, record groups, and printing.
+ */
 export default function HealthRecords() {
   const {
     tab,

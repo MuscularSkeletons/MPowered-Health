@@ -1,4 +1,3 @@
-/** Loads the selected health history and prepares the values shown by the records screen. */
 // This hook prepares the history groups and selections used by the records screen.
 import { getPainHistory, groupPainHistory, PainMetric } from '@/shared/health-records/pain-history';
 import { useFocusEffect } from 'expo-router';

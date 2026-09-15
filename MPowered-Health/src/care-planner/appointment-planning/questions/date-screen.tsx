@@ -19,8 +19,11 @@ export function AppointmentDateField() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [draftDate, setDraftDate] = useState(new Date());
 
-  // The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
-  /** Converts the displayed date into the format required by the web date input. */
+  /**
+   * Converts the displayed date into the format required by the web date input.
+   *
+   * The app displays DD/MM/YYYY; the browser's date control requires YYYY-MM-DD.
+   */
   const toIsoDate = (displayDate: string) => {
     const [day, month, year] = displayDate.split('/');
     return year && month && day ? `${year}-${month}-${day}` : '';

@@ -35,6 +35,7 @@ const scales = {
   ],
 };
 
+// Keep the question order aligned with the matching summary builder and saved answer indexes.
 export const definition: AssessmentDefinition = {
   title: 'My Movement',
   tip: 'Explore tips on managing movement',

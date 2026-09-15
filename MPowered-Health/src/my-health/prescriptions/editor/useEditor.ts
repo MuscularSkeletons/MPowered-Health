@@ -1,4 +1,3 @@
-/** Keeps the prescription form values and save actions together. */
 import { useState } from 'react';
 import {
   emptyMedication,
@@ -12,6 +11,7 @@ import { useMedications } from '../state/StoreProvider';
 export function useMedicationEditor(id?: string) {
   const store = useMedications();
   const existing = store.list.find((item) => item.id === id);
+  // Edit a copy so typing does not change the visible prescription list before Save.
   const [draft, setDraft] = useState<MedicationDraft>(() =>
     existing
       ? {
@@ -35,6 +35,7 @@ export function useMedicationEditor(id?: string) {
     validStrength: validStrength(draft.strength),
     ready: medicationReady(draft),
     save: () => store.save(draft, id),
+    // A stale edit link must be reported instead of silently creating a replacement.
     missing: !!id && !existing,
   };
 }

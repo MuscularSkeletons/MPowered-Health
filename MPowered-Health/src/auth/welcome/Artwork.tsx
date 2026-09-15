@@ -9,8 +9,11 @@ const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
   [require('@/assets/splash/care-home.png'), require('@/assets/splash/plan-appointment.png')],
 ];
 
-// Give the front phone preview stronger styling to create depth.
-/** Draws one small example screen in the welcome artwork. */
+/**
+ * Draws one small example screen in the welcome artwork.
+ *
+ * Give the front phone preview stronger styling to create depth.
+ */
 function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?: boolean }) {
   return (
     <View style={[styles.phoneShadow, front ? styles.front : styles.back]}>
@@ -21,8 +24,11 @@ function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?:
   );
 }
 
-// Pick the artwork pair that belongs to the current splash page.
-/** Displays the group of preview screens on the welcome page. */
+/**
+ * Displays the group of preview screens on the welcome page.
+ *
+ * Pick the artwork pair that belongs to the current splash page.
+ */
 export function SplashArtwork({ page }: { page: number }) {
   const [back, front] = previewPairs[page] ?? previewPairs[0];
 

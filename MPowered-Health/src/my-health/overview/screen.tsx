@@ -1,6 +1,4 @@
-/** Shows the pain trend and links to health records, the profile, and guidance. */
 import { s } from './styles';
-// This screen gives the user access to health records, profiles, and guidance.
 import { getPainRecords, PainRecord } from '@/shared/health-records/session';
 import { MhaHeader, palette } from '@/shared/ui/mha-ui';
 import { router, useFocusEffect } from 'expo-router';
@@ -8,7 +6,6 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Turn saved weekly scores into a small trend chart for the health overview.
 /** Draws the overview trend from saved pain scores. */
 function PainTrend({ records }: { records: PainRecord[] }) {
   const [width, setWidth] = useState(0);
@@ -18,8 +15,11 @@ function PainTrend({ records }: { records: PainRecord[] }) {
     ...r,
   }));
 
-  // Rotate and size a view to connect two score points.
-  /** Calculates the size and rotation of the line joining two chart points. */
+  /**
+   * Calculates the size and rotation of the line joining two chart points.
+   *
+   * Rotate and size a view to connect two score points.
+   */
   const segment = (a: (typeof points)[number], b: (typeof points)[number]) => {
     const dx = b.x - a.x,
       dy = b.y - a.y,
@@ -67,7 +67,6 @@ function PainTrend({ records }: { records: PainRecord[] }) {
   );
 }
 
-// Refresh health data and link to records, profile, and guidance.
 /** Shows the pain trend and links to health records, the profile, and guidance. */
 export default function Health() {
   const [records, setRecords] = useState(getPainRecords());
@@ -165,5 +164,3 @@ export default function Health() {
     </SafeAreaView>
   );
 }
-
-// Group chart, card, and navigation styles below the screen.

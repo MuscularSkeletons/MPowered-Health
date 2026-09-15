@@ -1,4 +1,3 @@
-/** Connects the My pain questions and summary to the shared assessment screen. */
 import { s } from '@/pain-tracker/shared/styles';
 import { Text, View } from 'react-native';
 import AssessmentScreen from '@/pain-tracker/shared/screen';

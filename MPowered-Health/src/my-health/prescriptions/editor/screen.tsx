@@ -1,4 +1,3 @@
-/** Displays the fields for adding or editing a prescription. */
 import { Choice } from '@/shared/forms/Choice';
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';

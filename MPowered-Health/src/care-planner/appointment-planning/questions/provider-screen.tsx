@@ -1,4 +1,3 @@
-/** Displays the provider fields and date control for the first appointment-planning step. */
 import { Field } from '@/shared/forms/Field';
 import { Shell } from '@/shared/forms/FormScreen';
 import { s } from '@/shared/forms/styles';

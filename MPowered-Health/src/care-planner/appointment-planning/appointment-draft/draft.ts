@@ -2,9 +2,11 @@
 import { parseQuestions } from './legacy-link-parser';
 import type { AppointmentQuestion } from '@/care-planner/appointments/types';
 export interface AppointmentDraft {
+  // Stored as the displayed day/month/year text, rather than a Date object.
   date: string;
   doctor: string;
   service: string;
+  // Keep selected text here; the final plan restores each question’s category.
   questions: string[];
   customQuestion: string;
 }
@@ -34,6 +36,7 @@ export function appointmentDraftReducer(
   action: AppointmentDraftAction,
 ): AppointmentDraft {
   if (action.type === 'field') return { ...draft, [action.field]: action.value };
+  // Skipping suggested questions leaves the separately entered custom question unchanged.
   if (action.type === 'skipQuestions') return { ...draft, questions: [] };
   return {
     ...draft,

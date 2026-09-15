@@ -1,4 +1,3 @@
-/** Loads and edits the current reflection, including save feedback. */
 import { getReflection, reflectionWeek, saveReflection } from './repository';
 import { useEffect, useRef, useState } from 'react';
 import { Alert } from 'react-native';

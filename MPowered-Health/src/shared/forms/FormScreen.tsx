@@ -1,4 +1,3 @@
-/** Wraps a form in the shared page layout and back navigation. */
 import { s } from '@/shared/forms/styles';
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';

@@ -1,4 +1,3 @@
-/** Shows a saved appointment, its questions, answers, and recording consent. */
 import { getPainHistory } from '@/shared/health-records/pain-history';
 import { ActionButton, MhaHeader, palette } from '@/shared/ui/mha-ui';
 import { router, useLocalSearchParams } from 'expo-router';

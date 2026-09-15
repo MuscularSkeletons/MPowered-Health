@@ -22,8 +22,11 @@ export const emptyProfile: Profile = {
   otherConditions: '',
 };
 
-// The editor and onboarding use the same validation and option lists.
-/** Returns a field-by-field list of problems in a profile. */
+/**
+ * Returns a field-by-field list of problems in a profile.
+ *
+ * The editor and onboarding use the same validation and option lists.
+ */
 export function profileErrors(profile: Profile) {
   // Collect every problem at once so the editor can mark all affected fields.
   const errors: Partial<Record<keyof Profile, string>> = {};

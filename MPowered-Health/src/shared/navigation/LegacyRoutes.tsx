@@ -2,8 +2,11 @@
 import { Redirect, Stack, useLocalSearchParams } from 'expo-router';
 import { workflowStep } from '@/shared/forms/validation';
 
-// Preserve old links with one redirect implementation and the original parameters.
-/** Creates a screen that forwards an old link and its parameters to the current route. */
+/**
+ * Creates a screen that forwards an old link and its parameters to the current route.
+ *
+ * Preserve old links with one redirect implementation and the original parameters.
+ */
 function redirectTo(pathname: string) {
   return function LegacyRedirect() {
     const params = useLocalSearchParams();

@@ -1,6 +1,4 @@
-/** Lists planned appointments and provides the entry point for a new plan. */
 import { s } from './styles';
-// This screen shows care-planning tools, appointments, and questions for clinicians.
 import { getAppointments } from '@/care-planner/appointments/repository';
 import { ActionButton, MhaHeader, PageIntro } from '@/shared/ui/mha-ui';
 import { router, useFocusEffect } from 'expo-router';
@@ -8,8 +6,11 @@ import { useCallback, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Every care card opens the shared workflow with a fresh form state.
-/** Opens the selected Care Planner destination. */
+/**
+ * Opens the selected Care Planner destination.
+ *
+ * Every care card opens the shared workflow with a fresh form state.
+ */
 const go = (flow: string) =>
   router.push({
     pathname: flow === 'appointment' ? '/appointment/details' : '/tips',
@@ -89,4 +90,3 @@ export default function CarePlannerScreen() {
     </SafeAreaView>
   );
 }
-// Keep care cards and appointment list styles below the screen behavior.

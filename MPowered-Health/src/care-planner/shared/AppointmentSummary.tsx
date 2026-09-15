@@ -1,4 +1,3 @@
-/** Displays the appointment date, doctor, and health service. */
 import { Text, View } from 'react-native';
 import type { PlannedAppointment } from '@/care-planner/appointments/types';
 import { s } from './styles';

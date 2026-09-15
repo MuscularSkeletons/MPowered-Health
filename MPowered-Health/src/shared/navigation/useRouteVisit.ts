@@ -1,4 +1,3 @@
-/** Identifies the current visit so temporary form data resets at the right time. */
 import { useGlobalSearchParams, usePathname } from 'expo-router';
 import { useState } from 'react';
 

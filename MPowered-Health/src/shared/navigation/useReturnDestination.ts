@@ -1,4 +1,3 @@
-/** Returns a leave action for an allowed return route and handles Android Back while focused. */
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback } from 'react';
 import { BackHandler } from 'react-native';
@@ -6,6 +5,7 @@ import { BackHandler } from 'react-native';
 /** Returns a leave action for an allowed return route and handles Android Back while focused. */
 export function useReturnDestination(fallback: '/dashboard' | '/care') {
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  // Accept only known in-app destinations; arbitrary route parameters cannot choose the Back target.
   const destination =
     returnTo === '/explore' || returnTo === '/care' || returnTo === '/dashboard'
       ? returnTo

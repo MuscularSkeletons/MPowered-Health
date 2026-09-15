@@ -10,7 +10,7 @@ export type Step = {
   optionsBeforeFields?: boolean;
   // Multiple selections use checkboxes; single selections use radio-style circles.
   multi?: boolean;
-  // Offer Skip; see ready below for whether Continue still requires an answer.
+  // Show Skip independently of the required-field checks used by Continue.
   optional?: boolean;
   action?: string;
 };

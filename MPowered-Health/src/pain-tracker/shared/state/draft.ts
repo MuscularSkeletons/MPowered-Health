@@ -7,6 +7,7 @@ import type {
 export interface AssessmentDraft {
   step: number;
   answers: AssessmentAnswers;
+  // Saving blocks further edits; complete shows the summary; failures return to answering.
   status: 'answering' | 'saving' | 'complete';
   error: string;
 }
@@ -29,6 +30,7 @@ export function assessmentDraftReducer(
   state: AssessmentDraft,
   action: AssessmentAction,
 ): AssessmentDraft {
+  // Only the save result may change a draft while its write is in progress.
   if (state.status === 'saving' && action.type !== 'saved' && action.type !== 'failed')
     return state;
   switch (action.type) {
@@ -42,6 +44,7 @@ export function assessmentDraftReducer(
       return { ...state, answers: { ...state.answers, [state.step]: values } };
     }
     case 'advance':
+      // A second tap from an older render must not advance an extra question.
       if (state.step !== action.fromStep) return state;
       return { ...state, step: Math.min(state.step + 1, action.questionCount - 1) };
     case 'back':
@@ -64,6 +67,7 @@ export function assessmentDraftReducer(
  * @returns Whether the answer satisfies the question’s required-input rule.
  */
 export function questionAnswered(question: AssessmentQuestion, values: string[]): boolean {
+  // Optional means an empty answer is acceptable. Numeric zero remains a valid score.
   if (question.optional) return true;
   if (!values.length || values.some((value) => !value.trim())) return false;
   if (question.kind === 'number') return /^\d{1,2}$/.test(values[0]);

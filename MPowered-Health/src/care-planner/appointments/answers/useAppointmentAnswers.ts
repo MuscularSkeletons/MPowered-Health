@@ -1,4 +1,3 @@
-/** Manages typed answers, audio recordings, and playback for the current appointment. */
 // Keeps appointment answer drafts and recording state together.
 import {
   AudioModule,
@@ -18,6 +17,7 @@ export function useAppointmentAnswers() {
   const [activeQuestion, setActiveQuestion] = useState<string>();
   const [answer, setAnswer] = useState('');
   const [savedAnswers, setSavedAnswers] = useState<Record<string, string>>({});
+  // These audio URIs belong to this mounted screen and are not persisted as appointment records.
   const [recordedAnswers, setRecordedAnswers] = useState<Record<string, string>>({});
   const [recordingStarting, setRecordingStarting] = useState(false);
   const [playbackPending, setPlaybackPending] = useState(false);
@@ -25,6 +25,7 @@ export function useAppointmentAnswers() {
   const recorderState = useAudioRecorderState(recorder);
   const player = useAudioPlayer();
   const playerState = useAudioPlayerStatus(player);
+  // Replacing an audio source loads asynchronously. Listen for readiness before playing it.
   useEffect(() => {
     if (!playbackPending) return;
 
@@ -38,10 +39,10 @@ export function useAppointmentAnswers() {
       if (status.isLoaded) play();
     });
     if (player.isLoaded) play();
+    // Remove the listener so an old source cannot trigger playback after the effect ends.
     return () => subscription.remove();
   }, [playbackPending, player]);
 
-  // Ask for microphone access only when recording starts.
   /** Requests microphone access and starts recording when permission is granted. */
   const startRecording = async () => {
     setRecordingStarting(true);
@@ -70,9 +71,13 @@ export function useAppointmentAnswers() {
     }
   };
 
-  // The same button starts recording and saves it on the next press.
-  /** Starts recording or stops and keeps the current recording. */
+  /**
+   * Starts recording or stops and keeps the current recording.
+   *
+   * The same button starts recording and saves it on the next press.
+   */
   const handleRecording = async () => {
+    // Ignore another tap while permission and recorder setup are still pending.
     if (recordingStarting) return;
     if (recorderState.isRecording) {
       try {
@@ -92,8 +97,11 @@ export function useAppointmentAnswers() {
     await startRecording();
   };
 
-  // Pause active playback or load the current answer before playing it.
-  /** Pauses playback or loads and plays the current question’s recording. */
+  /**
+   * Pauses playback or loads and plays the current question’s recording.
+   *
+   * Pause active playback or load the current answer before playing it.
+   */
   const playRecording = async () => {
     if (!activeQuestion || playbackPending) return;
     const uri = recordedAnswers[activeQuestion];
@@ -118,7 +126,6 @@ export function useAppointmentAnswers() {
     }
   };
 
-  // Remove only this question's recording before making a replacement.
   /** Removes the current question’s recording before starting a replacement. */
   const recordAgain = async () => {
     if (!activeQuestion) return;
@@ -132,7 +139,6 @@ export function useAppointmentAnswers() {
     await startRecording();
   };
 
-  // Prefer typed text and keep a marker when the answer is voice-only.
   /** Keeps the typed answer or voice-answer marker and closes the editor. */
   const saveAnswer = () => {
     if (activeQuestion && (answer.trim() || recordedAnswers[activeQuestion]))

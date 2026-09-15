@@ -1,5 +1,4 @@
 /** Defines the choices offered in account and health profile forms. */
-// This file lists the profile choices offered during registration.
 // Keep registration choices here so forms and validation use the same accepted values.
 export const sexOptions = ['Female', 'Male', 'Intersex', 'Prefer not to say'];
 export const diagnosisOptions = ['Yes, I have', 'No, I haven’t'];

@@ -1,4 +1,3 @@
-/** Displays appointment questions by category, with answer editing when enabled. */
 import { s } from './styles';
 // Keeps appointment answer drafts and recording state together.
 import { Pressable, Text, View } from 'react-native';

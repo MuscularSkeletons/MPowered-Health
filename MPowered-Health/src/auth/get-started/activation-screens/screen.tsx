@@ -1,6 +1,4 @@
-/** Shows the three activation slides after Get Started is completed. */
 import { s } from './styles';
-// This screen explains how the app works before opening the home page.
 import { ActionButton } from '@/shared/ui/mha-ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -26,14 +24,19 @@ const pages: { image: ImageSourcePropType; message: string; delay?: number }[] =
   },
 ];
 
-// Advance timed guidance pages and pause on the final Continue action.
-/** Shows the three activation slides after Get Started is completed. */
+/**
+ * Shows the three activation slides after Get Started is completed.
+ *
+ * Advance timed guidance pages and pause on the final Continue action.
+ */
 export default function ActivationScreens() {
   const { name = 'Jane' } = useLocalSearchParams<{ name?: string }>();
   const [page, setPage] = useState(0);
   const current = pages[page];
 
   // Create one timer for the current page and remove it if the screen changes.
+  // Cancel the previous timer when the slide changes or the screen closes.
+  // The final slide has no delay, so only its Continue button leaves this flow.
   useEffect(() => {
     if (!current.delay) return;
     const timer = setTimeout(
@@ -84,5 +87,3 @@ export default function ActivationScreens() {
     </SafeAreaView>
   );
 }
-
-// Group onboarding progress, artwork, message, and footer styles below.

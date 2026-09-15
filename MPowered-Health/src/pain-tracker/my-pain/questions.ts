@@ -1,5 +1,6 @@
 /** Defines the question wording and answer choices used by Pain Tracker / My Pain. */
 import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
+// Keep the question order aligned with the matching summary builder and saved answer indexes.
 export const definition: AssessmentDefinition = {
   title: 'My Pain',
   tip: 'Check Pain Guide',

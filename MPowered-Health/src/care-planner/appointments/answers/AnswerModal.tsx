@@ -1,4 +1,3 @@
-/** Displays the typed-answer editor and the recording controls for one question. */
 import { s } from './styles';
 import { VoiceRecordingControls } from '../recording/VoiceRecordingControls';
 // Keeps appointment answer drafts and recording state together.

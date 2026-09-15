@@ -1,4 +1,3 @@
-/** Chooses the summary builder for the requested assessment. */
 import { summarize as pain } from '@/shared/health-records/summaries/pain';
 import { summarize as movement } from '@/shared/health-records/summaries/movement';
 import { summarize as personal } from '@/shared/health-records/summaries/personal-care';

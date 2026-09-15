@@ -1,21 +1,24 @@
 /** Loads and saves reflection notes separately for each week. */
-// This file saves and loads the user's weekly reflection notes.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type WeeklyReflection = { week: string; notes: string; savedAt: string };
 
-// Use the local Monday date as the storage key for a week. Avoid UTC conversion,
-// which can shift the calendar date; local dates also handle daylight-saving changes.
-/** Builds the key used to group a reflection by week. */
+/**
+ * Builds the key used to group a reflection by week.
+ *
+ * Use the local Monday date as the storage key for a week. Avoid UTC conversion, which can shift the calendar date; local dates also handle daylight-saving changes.
+ */
 export function reflectionWeek(date = new Date()) {
   const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
   return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
 }
 
-// No record means a new reflection. Invalid data or a storage failure is surfaced
-// to the screen so it cannot silently replace an unreadable reflection with blank notes.
-/** Loads the reflection saved for a particular week. */
+/**
+ * Loads the reflection saved for a particular week.
+ *
+ * No record means a new reflection. Invalid data or a storage failure is surfaced to the screen so it cannot silently replace an unreadable reflection with blank notes.
+ */
 export async function getReflection(week = reflectionWeek()): Promise<WeeklyReflection | null> {
   const stored = await AsyncStorage.getItem(`mpowered:reflection:${week}`);
   if (!stored) return null;
@@ -26,10 +29,10 @@ export async function getReflection(week = reflectionWeek()): Promise<WeeklyRefl
   return reflection;
 }
 
-// One record per week: editing replaces that week’s notes and preserves other weeks.
-// Await the write so callers can distinguish a completed save from a failed attempt.
 /**
  * Saves the reflection for a particular week.
+ *
+ * One record per week: editing replaces that week’s notes and preserves other weeks. Await the write so callers can distinguish a completed save from a failed attempt.
  *
  * @param notes - Reflection text; blank notes are rejected.
  * @param week - Local Monday date used as the storage key.

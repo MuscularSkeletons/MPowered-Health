@@ -1,4 +1,3 @@
-/** Shows the current Get Started question and handles its Continue or Skip action. */
 // Shows the current question and input fields.
 // Handles Continue, Back and Skip.
 // Checks required answers.

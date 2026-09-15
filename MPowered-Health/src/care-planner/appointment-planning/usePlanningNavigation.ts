@@ -1,4 +1,3 @@
-/** Moves between planning steps while keeping the visit parameters. */
 import { router, useLocalSearchParams } from 'expo-router';
 
 /** Moves between planning steps while keeping the visit parameters. */

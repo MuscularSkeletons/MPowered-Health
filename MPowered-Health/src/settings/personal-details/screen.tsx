@@ -1,6 +1,4 @@
-/** Displays editable profile details with validation and save feedback. */
 import { s } from './styles';
-// This screen lets the user view and edit their saved personal details.
 import {
   emptyProfile,
   getProfile,
@@ -15,9 +13,11 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Load stored details on entry, validate edits, and save only when every field is valid.
-// Load the profile, validate edits, and save only complete valid details.
-/** Displays editable profile details with validation and save feedback. */
+/**
+ * Displays editable profile details with validation and save feedback.
+ *
+ * Load stored details on entry, validate edits, and save only when every field is valid. Load the profile, validate edits, and save only complete valid details.
+ */
 export default function PersonalDetails() {
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
@@ -55,8 +55,11 @@ export default function PersonalDetails() {
     setSaveError('');
   };
 
-  // Validate locally first, then wait for storage before leaving the screen.
-  /** Saves valid profile changes and returns to Settings, showing an error if saving fails. */
+  /**
+   * Saves valid profile changes and returns to Settings, showing an error if saving fails.
+   *
+   * Validate locally first, then wait for storage before leaving the screen.
+   */
   const save = async () => {
     if (disabled || Object.keys(errors).length) return;
     setSaving(true);

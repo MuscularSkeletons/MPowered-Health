@@ -13,6 +13,7 @@ export type AssessmentScreenOptions = AssessmentFlowOptions & { presentation: Su
 
 /** Displays an assessment entry or its question flow for this part of Pain Tracker. */
 export default function AssessmentScreen(props: AssessmentScreenOptions) {
+  // Switching assessment types remounts the form so one type cannot reuse another’s draft.
   return <AssessmentContent key={props.assessmentId} {...props} />;
 }
 
@@ -39,11 +40,12 @@ function AssessmentContent(props: AssessmentScreenOptions) {
     summarySections,
   } = useAssessmentFlow(props);
   const scrollRef = useRef<ScrollView>(null);
+  // Each new question starts at the top, even if the previous answer required scrolling.
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [activeStep]);
 
-  /** Closes the results view and returns to the previous destination. */
+  /** Returns to the dashboard with the updated completion list and display name. */
   const closeSummary = () => {
     const all = [...new Set([...completed.split(',').filter(Boolean), props.assessmentId])].join(
       ',',

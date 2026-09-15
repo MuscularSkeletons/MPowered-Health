@@ -1,6 +1,4 @@
-/** Displays privacy information and permission controls. */
 import { s } from './styles';
-// This screen explains privacy choices and lets the user open related settings.
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';
 import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
@@ -9,8 +7,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // Keep the official privacy source in one place so every link opens the same page.
 const oaicUrl = 'https://www.oaic.gov.au/privacy/australian-privacy-principles';
 
-// Reuse one heading and spacing pattern for each policy topic.
-/** Displays a titled section of privacy information. */
+/**
+ * Displays a titled section of privacy information.
+ *
+ * Reuse one heading and spacing pattern for each policy topic.
+ */
 function PolicySection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={s.section}>
@@ -20,8 +21,11 @@ function PolicySection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-// Show a permission's purpose and whether the user has enabled it.
-/** Displays one permission setting and its control. */
+/**
+ * Displays one permission setting and its control.
+ *
+ * Show a permission's purpose and whether the user has enabled it.
+ */
 function PermissionRow({
   icon,
   title,
@@ -47,8 +51,11 @@ function PermissionRow({
   );
 }
 
-// Explain privacy choices and link to the relevant device or public settings.
-/** Displays privacy information and permission controls. */
+/**
+ * Displays privacy information and permission controls.
+ *
+ * Explain privacy choices and link to the relevant device or public settings.
+ */
 export default function PrivacyPermissions() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -151,5 +158,3 @@ export default function PrivacyPermissions() {
     </SafeAreaView>
   );
 }
-
-// Group policy and permission styles below the readable content structure.

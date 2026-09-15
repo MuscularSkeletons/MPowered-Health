@@ -1,5 +1,4 @@
 /** Provides browser printing, document sharing, and clipboard helpers. */
-// This file prints, shares, and copies pain-profile reports in web browsers.
 
 /** Opens a printable document from HTML using this platform’s printing support. */
 export function printHtml(html: string): Promise<void> {

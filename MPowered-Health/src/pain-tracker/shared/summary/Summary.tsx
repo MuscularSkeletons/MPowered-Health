@@ -1,4 +1,3 @@
-/** Displays completed assessment results and available follow-up actions. */
 import type {
   AssessmentAnswers,
   AssessmentDefinition,
@@ -12,10 +11,12 @@ import { SummaryInsight } from './Insight';
 import { s } from '../styles';
 export interface SummaryPresentation {
   intro: string;
+  // Compute the period at render time so it can reflect the latest saved assessment.
   period: () => string;
   savedLabel: string;
   tipUrl?: string;
   repeatable?: boolean;
+  // A feature can supply its own result layout; otherwise the common summary sections are used.
   renderResults?: (answers: AssessmentAnswers) => ReactNode;
 }
 

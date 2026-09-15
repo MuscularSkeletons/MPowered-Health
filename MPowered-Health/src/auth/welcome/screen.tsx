@@ -1,6 +1,4 @@
-/** Shows the welcome page and the choices to sign in or get started. */
 import { s } from './styles';
-// This screen introduces the app and starts registration or sign-in.
 import { SplashArtwork } from './Artwork';
 import { MhaHeader } from '@/shared/ui/mha-ui';
 import { router } from 'expo-router';
@@ -15,8 +13,11 @@ const pages = [
   { title: 'Get tailored questions to assist your medical consultation' },
 ];
 
-// Track the visible introduction page and offer registration or sign-in.
-/** Shows the welcome page and the choices to sign in or get started. */
+/**
+ * Shows the welcome page and the choices to sign in or get started.
+ *
+ * Track the visible introduction page and offer registration or sign-in.
+ */
 export default function Splash() {
   const [index, setIndex] = useState(0);
   const currentIndex = useRef(0);
@@ -104,5 +105,3 @@ export default function Splash() {
     </SafeAreaView>
   );
 }
-
-// Keep carousel, action, and support-logo styles below the behavior.

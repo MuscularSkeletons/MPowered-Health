@@ -1,6 +1,8 @@
 /** Defines the question wording and answer choices used by account setup / Get Started / questions. */
 import { Step } from './types';
 import { diagnosisOptions, painConditions, sexOptions } from '@/shared/account/profile-options';
+// Step indexes and field labels are also used when building the saved profile.
+// Update the draft conversion and flow tests together if these questions are reordered.
 export const getStarted: { eyebrow: string; steps: Step[] } = {
   eyebrow: '',
   steps: [

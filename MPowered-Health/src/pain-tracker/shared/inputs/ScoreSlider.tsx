@@ -1,4 +1,3 @@
-/** Converts a touch position into a score along the slider. */
 import { s } from '../styles';
 import { useEffect, useRef, useState } from 'react';
 import { PanResponder, Text, View } from 'react-native';
@@ -23,10 +22,11 @@ export function ScoreSlider({
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  // Screen coordinates stay stable while the thumb moves beneath the user's finger.
-  // Using locationX here causes the score to jump when the touch target changes.
-  // Clamp the pointer to the track and round to a whole-number score.
-  /** Converts a touch position into a score along the slider. */
+  /**
+   * Converts a touch position into a score along the slider.
+   *
+   * Screen coordinates stay stable while the thumb moves beneath the user's finger. Using locationX here causes the score to jump when the touch target changes. Clamp the pointer to the track and round to a whole-number score.
+   */
   const updateFromPageX = (pageX: number) => {
     if (!metrics.current.ready) return;
     const next = Math.max(

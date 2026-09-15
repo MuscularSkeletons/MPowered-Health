@@ -1,4 +1,3 @@
-/** Shows the appointment plan for review before adding it to the saved list. */
 import { getPainHistory } from '@/shared/health-records/pain-history';
 import { ActionButton, MhaHeader } from '@/shared/ui/mha-ui';
 import { Pressable, ScrollView, Text, View } from 'react-native';

@@ -1,4 +1,3 @@
-/** Turns a pain score into the label shown beside the input. */
 import type { AssessmentQuestion } from '@/shared/health-records/assessment-types';
 import { asSentence } from '@/shared/health-records/format';
 import { ScoreSlider } from './ScoreSlider';

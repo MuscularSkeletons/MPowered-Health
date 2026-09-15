@@ -1,6 +1,5 @@
 /** Keeps assessment answers and completion information for the current app session. */
 import { getPainHistory, painRecordDate, clearPainHistoryMemory } from './pain-history';
-// This file tracks assessment answers and completion during the current app session.
 import type { AssessmentAnswers, AssessmentId } from '@/shared/health-records/assessment-types';
 const completedAssessments = new Set<AssessmentId>();
 const assessmentAnswers = new Map<AssessmentId, AssessmentAnswers>();
@@ -25,8 +24,11 @@ export function markAssessmentCompleted(
   if (answers) assessmentAnswers.set(type, cloneAnswers(answers));
 }
 
-// Return the date of the most recently completed assessment for profile headers.
-/** Returns the most recent completion date across all assessments. */
+/**
+ * Returns the most recent completion date across all assessments.
+ *
+ * Return the date of the most recently completed assessment for profile headers.
+ */
 export function getLatestAssessmentDate() {
   const dates = [...assessmentUpdatedAt.values()];
   if (!dates.length) return '';
@@ -58,8 +60,11 @@ export function getWeeklyStreak() {
   return weeklyStreak;
 }
 
-// Remove all in-memory health data when the local account is deleted.
-/** Clears assessment answers and completion information held in memory. */
+/**
+ * Clears assessment answers and completion information held in memory.
+ *
+ * Remove all in-memory health data when the local account is deleted.
+ */
 export function resetAssessmentSession() {
   clearPainHistoryMemory();
   painRecords.splice(0);

@@ -1,5 +1,3 @@
-/** Checks the entered PIN using the stored credential and attempt limits. */
-// This file checks PIN sign-in attempts and requires email verification after repeated failures.
 import { getProfile } from '@/shared/account/repository';
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
 import { matchesPinCredential, readPinCredential } from './pin-credential';

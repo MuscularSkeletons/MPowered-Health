@@ -1,4 +1,3 @@
-/** Displays profile details and summaries of recorded assessment answers. */
 import type { AssessmentId } from '@/shared/health-records/assessment-types';
 import { getProfile } from '@/shared/account/repository';
 import { asSentence, buildSummary } from '@/shared/health-records/summaries';

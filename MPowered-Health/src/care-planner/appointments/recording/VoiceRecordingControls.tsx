@@ -1,4 +1,3 @@
-/** Displays recording and playback buttons using the current audio state. */
 import { s } from './styles';
 // Keeps appointment answer drafts and recording state together.
 import { palette } from '@/shared/ui/mha-ui';

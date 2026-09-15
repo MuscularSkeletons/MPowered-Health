@@ -50,7 +50,7 @@ Merge a small single-use helper into its screen when the helper does not need an
 
 ## Write comments for the next developer
 
-Start each handwritten source file with one short comment describing its purpose. Document named functions with a short explanation of what they do. For public functions with non-obvious inputs or effects, explain:
+Explain each handwritten source file’s purpose. For a small file, let the main function’s documentation provide that explanation instead of repeating it in a file introduction. Use a short purpose comment for files containing only types, styles, or data; do not add unnecessary functions to these files. Document named functions with a short explanation of what they do. For public functions with non-obvious inputs or effects, explain:
 
 - What each input represents, including units or accepted formats.
 - What the result means, including an empty or invalid result.

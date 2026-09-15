@@ -1,5 +1,6 @@
 /** Defines the question wording and answer choices used by Pain Tracker / My Management. */
 import type { AssessmentDefinition } from '@/shared/health-records/assessment-types';
+// Keep the question order aligned with the matching summary builder and saved answer indexes.
 export const definition: AssessmentDefinition = {
   title: 'My Management',
   tip: 'Explore tips on managing pain',

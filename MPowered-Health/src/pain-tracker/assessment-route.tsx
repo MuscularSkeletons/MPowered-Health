@@ -1,9 +1,11 @@
-/** Forwards old assessment links to the matching current assessment screen. */
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { assessmentRoutes, resolveAssessmentId } from '@/pain-tracker/routes';
 
-// Preserve existing assessment links while giving each area its own route.
-/** Forwards old assessment links to the matching current assessment screen. */
+/**
+ * Forwards old assessment links to the matching current assessment screen.
+ *
+ * Preserve existing assessment links while giving each area its own route.
+ */
 export default function LegacyAssessment() {
   const { type, ...params } = useLocalSearchParams<{
     type?: string;

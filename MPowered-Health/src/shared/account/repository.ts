@@ -1,6 +1,5 @@
 /** Loads, saves, and deletes the local account and coordinates feature cleanup. */
 import { profileErrors, type Profile } from '@/shared/account/profile';
-// This file validates, saves, loads, and deletes the user's local account data.
 import { markAssessmentCompleted, resetAssessmentSession } from '@/shared/health-records/session';
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
 import {
@@ -55,9 +54,10 @@ export async function saveProfile(profile: Profile) {
   listeners.forEach((listener) => listener());
 }
 
-// Registration requires a PIN; editing profile details does not replace it.
 /**
  * Saves the profile and PIN credential, restoring the old credential if saving fails.
+ *
+ * Registration requires a PIN; editing profile details does not replace it.
  *
  * @param profile - Completed profile fields to validate and save.
  * @param pin - Exactly four digits for this device’s sign-in credential.
@@ -84,9 +84,10 @@ export async function registerProfile(profile: Profile, pin: string) {
 let snapshot = { ready: false, deleted: false, revision: 0, demo: true };
 const cleanupHandlers = new Map<string, () => void>();
 
-// Features retain ownership of their stores and register only their cleanup behavior.
 /**
  * Registers a feature cleanup action so account deletion can clear its local data.
+ *
+ * Features retain ownership of their stores and register only their cleanup behavior.
  *
  * @param key - Stable feature name; registering the same key replaces its previous handler.
  * @param cleanup - Clears that feature’s in-memory data. May run immediately after registration.

@@ -1,5 +1,4 @@
 /** Stores and verifies salted PIN hashes using browser storage and cryptography. */
-// This file stores and verifies a protected PIN value in web browsers.
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

@@ -1,4 +1,3 @@
-/** Displays a list of answer choices with single- or multiple-selection behavior. */
 import { s } from '@/shared/forms/styles';
 import { Pressable, Text, View } from 'react-native';
 
@@ -16,6 +15,7 @@ export function Choice({
   pick: (v: string) => void;
   multi?: boolean;
 }) {
+  // This component reports the tapped value; the owning reducer decides how selection changes.
   return (
     <View style={s.choiceWrap}>
       {title ? <Text style={s.choiceTitle}>{title}</Text> : null}

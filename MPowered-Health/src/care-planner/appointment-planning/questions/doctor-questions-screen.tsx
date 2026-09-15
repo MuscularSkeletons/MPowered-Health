@@ -1,4 +1,3 @@
-/** Displays suggested questions and a custom question field for the appointment plan. */
 import { buildAppointmentQuestions } from '@/care-planner/appointments/question-suggestions';
 import { getPainHistory, painRecordDate } from '@/shared/health-records/pain-history';
 import { Shell } from '@/shared/forms/FormScreen';

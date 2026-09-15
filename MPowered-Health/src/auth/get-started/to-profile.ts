@@ -1,4 +1,3 @@
-/** Builds an account profile from the registration answers. */
 import type { Profile } from '@/shared/account/profile';
 
 /** Builds an account profile from the registration answers. */

@@ -1,4 +1,3 @@
-/** Lists prescriptions and provides controls for adding or editing them. */
 import { s } from './styles';
 import { Shell } from '@/shared/forms/FormScreen';
 import { ActionButton, palette } from '@/shared/ui/mha-ui';

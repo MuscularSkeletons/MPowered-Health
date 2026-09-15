@@ -1,12 +1,14 @@
 /** Stores PIN credentials in native encrypted storage and checks entered PINs. */
-// This file stores and verifies PIN credentials securely on native devices.
 import { isFourDigits as isValidPin } from '@/shared/forms/input-format';
 import * as SecureStore from 'expo-secure-store';
 
 const key = 'mpowered.pin.v1';
 
-// Build the complete credential before registration writes any account data.
-/** Builds the email and PIN payload that is saved only in the native encrypted credential store. */
+/**
+ * Builds the email and PIN payload that is saved only in the native encrypted credential store.
+ *
+ * Build the complete credential before registration writes any account data.
+ */
 export async function createPinCredential(email: string, pin: string) {
   if (!isValidPin(pin)) throw new Error('Enter exactly four digits.');
   // This payload goes only into the platform's encrypted credential store.
