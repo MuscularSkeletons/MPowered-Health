@@ -1,7 +1,7 @@
+import { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { PrimaryButton } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
 import { useAuth } from '@/context/authcontext';
 
@@ -9,6 +9,12 @@ import { useAuth } from '@/context/authcontext';
 export default function ActivationScreen() {
   const router = useRouter();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const timer = setTimeout(() => router.replace('/(tabs)'), 5000);
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View pointerEvents="none" style={styles.glowTop} />
@@ -32,11 +38,7 @@ export default function ActivationScreen() {
           <Text style={styles.message}>
             {user?.name ? `${user.name}, you’re off to` : 'You’re off to'} an MPowered start!
           </Text>
-          <Text style={styles.description}>
-            Your profile is ready. Continue to explore your health tools and start tracking what matters to you.
-          </Text>
         </View>
-        <PrimaryButton label="Continue" onPress={() => router.replace('/(tabs)')} />
       </View>
     </SafeAreaView>
   );
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
     borderRadius: 140,
     top: -145,
     right: -95,
-    backgroundColor: palette.secondary,
+    backgroundColor: palette.accent,
     opacity: 0.2,
   },
   glowBottom: {
@@ -61,8 +63,8 @@ const styles = StyleSheet.create({
     borderRadius: 120,
     bottom: -145,
     left: -105,
-    backgroundColor: palette.primary,
-    opacity: 0.18,
+    backgroundColor: palette.accent,
+    opacity: 0.2,
   },
   content: {
     flex: 1,
@@ -93,7 +95,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 4,
   },
-  imageHalo: { position: 'absolute', width: 156, height: 156, borderRadius: 78, backgroundColor: palette.surfaceSoft },
+  imageHalo: {
+    position: 'absolute',
+    width: 156,
+    height: 156,
+    borderRadius: 78,
+    backgroundColor: palette.accent,
+    opacity: 0.2,
+  },
   image: { width: 150, height: 150 },
   message: {
     maxWidth: 380,
@@ -105,5 +114,4 @@ const styles = StyleSheet.create({
     color: palette.text,
     textAlign: 'center',
   },
-  description: { maxWidth: 380, marginTop: 14, fontSize: 14, lineHeight: 21, color: palette.muted, textAlign: 'center' },
 });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
 import { painConditionsOptions } from '@/constants/profile/profile-options';
@@ -37,7 +37,7 @@ export default function StorePainConditions() {
         eyebrow="YOUR PROFILE"
         progress="5 of 6"
         title="Tell us about the pain you’re experiencing"
-        description="Select as many musculoskeletal or chronic pain conditions as apply. You can continue without choosing one."
+        description="Select any musculoskeletal or chronic pain conditions that apply."
       />
       <View style={authStyles.choices}>
         {painConditionsOptions.map((condition) => (
@@ -51,7 +51,14 @@ export default function StorePainConditions() {
         ))}
       </View>
       <View style={authStyles.actions}>
-        <PrimaryButton label="Continue" onPress={handleComplete} />
+        <PrimaryButton label="Continue" disabled={!painConditions.length} onPress={handleComplete} />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/(auth)/(onboarding)/miscconditions')}
+          style={authStyles.secondaryAction}
+        >
+          <Text style={authStyles.secondaryText}>Skip</Text>
+        </Pressable>
       </View>
     </AuthScreen>
   );
