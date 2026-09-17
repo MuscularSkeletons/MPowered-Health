@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 4,
     borderWidth: 2,
-    borderColor: palette.light,
+    borderColor: palette.secondary,
     borderRadius: 19,
     backgroundColor: palette.surface,
     overflow: 'hidden',
