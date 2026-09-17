@@ -21,6 +21,7 @@ export const s = StyleSheet.create({
     letterSpacing: -0.65,
     color: palette.text,
     paddingHorizontal: 18,
+    marginTop: 10,
     marginBottom: 8,
   },
   dots: {

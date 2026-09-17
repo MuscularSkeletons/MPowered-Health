@@ -34,7 +34,6 @@ export function SplashArtwork({ page }: { page: number }) {
 
   return (
     <View style={styles.canvas}>
-      <View style={styles.glow} />
       <ScreenPreview source={back} />
       <ScreenPreview source={front} front />
     </View>
@@ -49,16 +48,6 @@ const styles = StyleSheet.create({
     height: 294,
     alignSelf: 'center',
     overflow: 'hidden',
-  },
-  glow: {
-    position: 'absolute',
-    top: 62,
-    left: '10%',
-    right: '10%',
-    height: 205,
-    borderRadius: 103,
-    backgroundColor: '#F1EBFF',
-    opacity: 0.72,
   },
   phonePreview: {
     position: 'absolute',
@@ -84,11 +73,12 @@ const styles = StyleSheet.create({
   back: {
     left: '1%',
     top: 68,
-    width: '49%',
+    transform: [{ rotate: '-1.25deg' }],
   },
   front: {
     right: '3%',
     top: 18,
     zIndex: 2,
+    transform: [{ rotate: '1.25deg' }],
   },
 });
