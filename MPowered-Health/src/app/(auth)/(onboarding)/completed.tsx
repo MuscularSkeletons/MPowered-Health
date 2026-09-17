@@ -23,7 +23,7 @@ export default function CompleteOnboarding() {
         otherCondition: user.otherCondition,
         onboardingComplete: true,
       });
-      router.replace('/(tabs)');
+      router.replace('/(auth)/activation');
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');

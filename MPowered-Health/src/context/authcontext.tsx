@@ -38,11 +38,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
 
-  // run checkSession when first render the app
-  useEffect(() => {
-    checkSession();
-  }, []);
-
   // get the user information from supabase for the user with that userId (check if user authenticated)
   // checks if user information exists when they sign-in/sign-up
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
@@ -198,6 +193,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false); // finished checking session so can proceed
     }
   }; 
+
+  // Check the saved backend session once when the provider first mounts.
+  useEffect(() => {
+    void Promise.resolve().then(checkSession);
+    // Session restoration intentionally runs only once for this mounted provider.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AuthContext.Provider 
