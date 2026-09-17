@@ -42,7 +42,7 @@ export default function Login() {
   };
 
   return (
-    <AuthScreen>
+    <AuthScreen compact>
       <Pressable onPress={() => router.replace('/(auth)/splashscreen')}>
         <Text style={authStyles.back}>‹ Back</Text>
       </Pressable>
