@@ -3,34 +3,32 @@ import { render, screen } from '@testing-library/react-native';
 
 
 describe('The screen renders all the components properly', () => {
+
+    beforeEach(() => {
+        render (<Login/>);
+    })
     
     test('greeting message is rendered on screen',  () => {
-        render (<Login/>);
         expect(screen.getByText("Welcome back! Glad to see you again!")).toBeTruthy();
     })
 
     test('email input field is rendered on screen', () => {
-        render (<Login/>);
         expect(screen.getByPlaceholderText("Email")).toBeTruthy();
     })
 
     test('password input field is rendered on screen', () => {
-        render (<Login/>); 
         expect(screen.getByPlaceholderText("Password")).toBeTruthy();
     })
 
     test('login button is rendered on screen', () => {
-        render (<Login/>);
         expect(screen.getByText("LOGIN")).toBeTruthy();
     })
 
     test('sign up button is rendered on screen', () => {
-        render (<Login/>);
         expect(screen.getByText("Sign up")).toBeTruthy();
     })
 
     test('forgot password is rendered on screen', () => {
-        render (<Login/>);
         expect(screen.getByText("Forgot Password?")).toBeTruthy();
     })
     
