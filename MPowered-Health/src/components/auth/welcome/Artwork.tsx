@@ -82,8 +82,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   back: {
-    left: '3%',
+    left: '1%',
     top: 68,
+    width: '49%',
   },
   front: {
     right: '3%',
