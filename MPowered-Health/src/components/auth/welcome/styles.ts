@@ -2,8 +2,9 @@
 import { palette } from '@/constants/profile/ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  page: { paddingHorizontal: 24 },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  list: { backgroundColor: palette.background },
+  page: { paddingHorizontal: 24, backgroundColor: palette.background },
   art: {
     height: 294,
     alignItems: 'center',
@@ -43,6 +44,7 @@ export const s = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 30,
     gap: 6,
+    backgroundColor: palette.background,
   },
   primary: {
     height: 50,
@@ -67,6 +69,7 @@ export const s = StyleSheet.create({
     color: palette.muted,
     textAlign: 'center',
     paddingTop: 8,
-    paddingBottom: 14,
+    paddingBottom: 28,
+    backgroundColor: palette.background,
   },
 });

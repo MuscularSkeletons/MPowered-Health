@@ -43,10 +43,11 @@ export default function Splash() {
     return () => clearInterval(timer);
   }, []);
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView style={s.safe} edges={['top']}>
       <AuthHeader />
       <FlatList
         ref={ref}
+        style={s.list}
         horizontal
         pagingEnabled
         bounces={false}

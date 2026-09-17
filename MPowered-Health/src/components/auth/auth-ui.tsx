@@ -32,7 +32,7 @@ export function AuthHeader() {
 /** Provides the shared background, header, scrolling, and keyboard behavior for auth screens. */
 export function AuthScreen({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
       <KeyboardAvoidingView
         style={styles.keyboard}
@@ -185,15 +185,15 @@ export const authStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  keyboard: { flex: 1 },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  keyboard: { flex: 1, backgroundColor: palette.background },
   header: {
     height: 64,
     borderBottomWidth: 1,
     borderBottomColor: palette.line,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.background,
+    backgroundColor: palette.surface,
   },
   logoLockup: { height: 34, flexDirection: 'row', alignItems: 'flex-end' },
   poweredMark: { width: 78, height: 34, position: 'relative' },
