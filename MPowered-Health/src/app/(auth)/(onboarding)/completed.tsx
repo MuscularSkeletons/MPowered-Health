@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
 import { AuthIntro, AuthScreen, PrimaryButton, authStyles } from '@/components/auth/auth-ui';
 
 /** Saves the same backend profile fields, then leaves onboarding through its completion route. */
 export default function CompleteOnboarding() {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const { user, updateUser } = useAuth();
 
   const handleComplete = async () => {
@@ -23,7 +21,7 @@ export default function CompleteOnboarding() {
         otherCondition: user.otherCondition,
         onboardingComplete: true,
       });
-      router.replace('/(auth)/activation');
+      // The session guard opens activation when the saved profile becomes complete.
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');

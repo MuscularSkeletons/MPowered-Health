@@ -18,4 +18,10 @@ describe('session routing', () => {
     expect(requiredSessionRoute({ user, rootSegment: '(tabs)' })).toBeNull();
     expect(requiredSessionRoute({ user, rootSegment: '(auth)', nestedSegment: 'login' })).toBe('/(tabs)');
   });
+
+  it('opens activation when the saved profile becomes complete while still in onboarding', () => {
+    const route = { rootSegment: '(auth)', nestedSegment: '(onboarding)' };
+    expect(requiredSessionRoute({ ...route, user: { onboardingComplete: false } })).toBeNull();
+    expect(requiredSessionRoute({ ...route, user: { onboardingComplete: true } })).toBe('/(auth)/activation');
+  });
 });
