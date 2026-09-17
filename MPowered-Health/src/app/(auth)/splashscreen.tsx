@@ -1,158 +1,101 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type ImageSourcePropType,
-  type ViewToken,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { s } from '@/components/auth/welcome/styles';
+import { SplashArtwork } from '@/components/auth/welcome/Artwork';
 import { AuthHeader } from '@/components/auth/auth-ui';
-import { palette } from '@/constants/profile/ui';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, Pressable, Text, View, ViewToken } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const pages: { title: string; image: ImageSourcePropType }[] = [
-  {
-    title: 'Track your pain and its impacts weekly',
-    image: require('@/assets/images/splash-track.png'),
-  },
-  {
-    title: 'Easily share your pain logs with your healthcare professionals',
-    image: require('@/assets/images/splash-share.png'),
-  },
-  {
-    title: 'Get tailored questions to assist your medical consultation',
-    image: require('@/assets/images/splash-questions.png'),
-  },
+// The user can swipe through these messages before choosing registration or sign-in.
+const pages = [
+  { title: 'Track your pain and its impacts weekly' },
+  { title: 'Easily share your pain logs to your healthcare professionals' },
+  { title: 'Get tailored questions to assist your medical consultation' },
 ];
 
-/** Presents the Front-End welcome experience while retaining the backend auth routes. */
-export default function SplashScreen() {
-  const router = useRouter();
-  const list = useRef<FlatList<(typeof pages)[number]>>(null);
-  const current = useRef(0);
+/**
+ * Shows the welcome page and the choices to sign in or get started.
+ *
+ * Track the visible introduction page and offer registration or sign-in.
+ */
+export default function Splash() {
   const [index, setIndex] = useState(0);
+  const currentIndex = useRef(0);
+  const ref = useRef<FlatList<(typeof pages)[number]>>(null);
   const width = Dimensions.get('window').width;
-  const [onViewableItemsChanged] = useState(
-    () => ({ viewableItems }: { viewableItems: ViewToken<(typeof pages)[number]>[] }) => {
-      if (viewableItems[0]?.index == null) return;
-      current.current = viewableItems[0].index;
-      setIndex(viewableItems[0].index);
-    },
+  // Update the active dot when a new page becomes mostly visible.
+  const [changed] = useState(
+    () =>
+      ({ viewableItems }: { viewableItems: ViewToken<(typeof pages)[number]>[] }) => {
+        if (viewableItems[0]?.index != null) {
+          currentIndex.current = viewableItems[0].index;
+          setIndex(viewableItems[0].index);
+        }
+      },
   );
-
+  // Advance messages automatically while still allowing manual swipes.
   useEffect(() => {
     const timer = setInterval(() => {
-      const next = (current.current + 1) % pages.length;
-      current.current = next;
-      list.current?.scrollToIndex({ index: next, animated: true });
-    }, 2400);
+      const next = (currentIndex.current + 1) % pages.length;
+      currentIndex.current = next;
+      ref.current?.scrollToIndex({ index: next, animated: true });
+    }, 1900);
     return () => clearInterval(timer);
   }, []);
-
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={s.safe}>
       <AuthHeader />
       <FlatList
-        ref={list}
-        data={pages}
+        ref={ref}
         horizontal
         pagingEnabled
         bounces={false}
+        decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.title}
-        getItemLayout={(_, page) => ({ length: width, offset: width * page, index: page })}
-        onViewableItemsChanged={onViewableItemsChanged}
-        renderItem={({ item }) => (
-          <View style={[styles.page, { width }]}>
-            <View style={styles.artworkCard}>
-              <View style={styles.halo} />
-              <Image source={item.image} resizeMode="contain" style={styles.artwork} />
+        data={pages}
+        keyExtractor={(x) => x.title}
+        getItemLayout={(_, i) => ({
+          length: width,
+          offset: width * i,
+          index: i,
+        })}
+        onViewableItemsChanged={changed}
+        renderItem={({ item, index: page }) => (
+          <View style={[s.page, { width }]}>
+            <View style={s.art}>
+              <SplashArtwork page={page} />
             </View>
-            <View style={styles.dots}>
-              {pages.map((_, dot) => (
+            <View style={s.dots}>
+              {pages.map((_, i) => (
                 <Pressable
-                  key={dot}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Show welcome page ${dot + 1}`}
-                  onPress={() => list.current?.scrollToIndex({ index: dot, animated: true })}
-                  style={[styles.dot, dot === index && styles.dotActive]}
+                  accessibilityLabel={`Show splash page ${i + 1}`}
+                  key={i}
+                  onPress={() => ref.current?.scrollToIndex({ index: i, animated: true })}
+                  style={[s.dot, i === index && s.dotOn]}
                 />
               ))}
             </View>
-            <Text style={styles.message}>{item.title}</Text>
+            <Text style={s.message}>{item.title}</Text>
           </View>
         )}
       />
-      <View style={styles.actions}>
+      <View style={s.actions}>
         <Pressable
-          accessibilityRole="button"
-          onPress={() => router.replace('/(auth)/signup')}
-          style={({ pressed }) => [styles.primary, pressed && styles.primaryPressed]}
+          style={({ pressed }) => [s.primary, pressed && s.primaryPressed]}
+          onPress={() =>
+            router.replace('/(auth)/signup')
+          }
         >
-          <Text style={styles.primaryText}>Get started →</Text>
+          <Text style={s.primaryText}>Get started →</Text>
         </Pressable>
         <Pressable
-          accessibilityRole="button"
+          style={({ pressed }) => [s.secondary, pressed && s.secondaryPressed]}
           onPress={() => router.replace('/(auth)/login')}
-          style={({ pressed }) => [styles.secondary, pressed && styles.secondaryPressed]}
         >
-          <Text style={styles.secondaryText}>Sign in</Text>
+          <Text style={s.secondaryText}>Sign in</Text>
         </Pressable>
       </View>
-      <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+      <Text style={s.sponsor}>Supported by ABBVIE</Text>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.surface },
-  page: { paddingHorizontal: 24, justifyContent: 'center' },
-  artworkCard: {
-    height: 300,
-    maxWidth: 500,
-    width: '100%',
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  halo: { position: 'absolute', width: 280, height: 220, borderRadius: 110, backgroundColor: '#F1EBFF' },
-  artwork: { width: 260, height: 260 },
-  dots: {
-    width: '100%',
-    maxWidth: 520,
-    minHeight: 44,
-    alignSelf: 'center',
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#D8CFE5' },
-  dotActive: { width: 34, backgroundColor: palette.primary },
-  message: {
-    width: '100%',
-    maxWidth: 520,
-    minHeight: 104,
-    alignSelf: 'center',
-    paddingHorizontal: 18,
-    fontSize: 28,
-    lineHeight: 35,
-    fontWeight: '800',
-    letterSpacing: -0.65,
-    color: palette.text,
-  },
-  actions: { width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 30, gap: 6 },
-  primary: { height: 50, borderRadius: 25, backgroundColor: palette.primary, alignItems: 'center', justifyContent: 'center' },
-  primaryPressed: { backgroundColor: palette.primaryDark, transform: [{ scale: 0.99 }] },
-  primaryText: { color: palette.surface, fontSize: 14, fontWeight: '800' },
-  secondary: { height: 40, alignItems: 'center', justifyContent: 'center' },
-  secondaryPressed: { backgroundColor: '#F3EEFF', borderRadius: 12 },
-  secondaryText: { color: palette.text, fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' },
-  sponsor: { paddingTop: 8, paddingBottom: 14, color: palette.muted, fontSize: 10, fontWeight: '500', textAlign: 'center' },
-});
