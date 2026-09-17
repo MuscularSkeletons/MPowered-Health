@@ -16,7 +16,7 @@ const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
  */
 function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?: boolean }) {
   return (
-    <View style={[styles.phoneShadow, front ? styles.front : styles.back]}>
+    <View style={[styles.phonePreview, front ? styles.front : styles.back]}>
       <View style={styles.phoneFrame}>
         <Image source={source} resizeMode="cover" style={styles.screen} />
       </View>
@@ -60,17 +60,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1EBFF',
     opacity: 0.72,
   },
-  phoneShadow: {
+  phonePreview: {
     position: 'absolute',
     width: '51%',
     aspectRatio: 1179 / 2556,
     borderRadius: 19,
     backgroundColor: '#FFFFFF',
-    shadowColor: '#2C174B',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.17,
-    shadowRadius: 16,
-    elevation: 8,
   },
   phoneFrame: {
     flex: 1,
