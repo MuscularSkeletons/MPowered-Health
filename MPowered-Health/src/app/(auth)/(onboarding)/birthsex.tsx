@@ -1,113 +1,54 @@
-import { useState } from "react";
-import { 
-  Text, 
-  View, 
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
-import { sexOptions } from "@/constants/profile/profile-options";
+import { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authcontext';
+import { sexOptions } from '@/constants/profile/profile-options';
+import {
+  AuthIntro,
+  AuthScreen,
+  ChoiceButton,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
+/** Collects the selected sex while retaining the existing onboarding data shape. */
 export default function StoreBirthSex() {
-  // information to store
-  const [birthsex, setBirthSex] = useState("");
-
+  const [birthsex, setBirthSex] = useState('');
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateUserDraft } = useAuth();
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     if (!birthsex) {
-        Alert.alert("Error", "please select an option");
-        return;
+      Alert.alert('Error', 'Please select an option');
+      return;
     }
-
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    user.birthsex = birthsex;
-    router.push("/(auth)/(onboarding)/birthyear");
+    if (!user) throw new Error('User not authenticated');
+    updateUserDraft({ birthsex });
+    router.push('/(auth)/(onboarding)/birthyear');
   };
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-        <View style={styles.content}>
-            <View style={styles.header}>
-            <Text style={styles.title}>Birth Sex</Text>
-            </View>
-
-            <View style={styles.form}>
-                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[0])}>
-                    <Text style={styles.buttonText}>{sexOptions[0]}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[1])}>
-                    <Text style={styles.buttonText}>{sexOptions[1]}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[2])}>
-                    <Text style={styles.buttonText}>{sexOptions[2]}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => setBirthSex(sexOptions[3])}>
-                    <Text style={styles.buttonText}>{sexOptions[3]}</Text>
-                </TouchableOpacity>
-            </View>        
-            
-            {/* buttons */}
-            <TouchableOpacity style={styles.button} onPress={handleComplete}>
-                <Text style={styles.buttonText}>Continue</Text>
-            </TouchableOpacity>
-        </View>
-    </SafeAreaView>
-    
+    <AuthScreen>
+      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
+      <AuthIntro
+        eyebrow="YOUR PROFILE"
+        progress="2 of 6"
+        title="Your sex"
+        description="Research shows that people may experience pain differently depending on their sex."
+      />
+      <View style={authStyles.choices}>
+        {sexOptions.map((option) => (
+          <ChoiceButton
+            key={option}
+            label={option}
+            selected={birthsex === option}
+            onPress={() => setBirthSex(option)}
+          />
+        ))}
+      </View>
+      <View style={authStyles.actions}>
+        <PrimaryButton label="Continue" disabled={!birthsex} onPress={handleComplete} />
+      </View>
+    </AuthScreen>
   );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    header: {
-      marginBottom: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-});

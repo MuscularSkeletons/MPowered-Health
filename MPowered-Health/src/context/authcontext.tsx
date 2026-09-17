@@ -26,6 +26,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
@@ -129,6 +130,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }
 
+  // Onboarding screens build one local profile before the completed screen saves it.
+  const updateUserDraft = (userData: Partial<User>) => {
+    setUser((current) => current ? { ...current, ...userData } : current);
+  };
+
   // update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
     // check user logged in
@@ -195,7 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUser, isLoading }}
+        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
     >
         {children}
     </AuthContext.Provider>

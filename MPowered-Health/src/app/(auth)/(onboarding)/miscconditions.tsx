@@ -1,127 +1,52 @@
-import { useState } from "react";
-import { 
-  Text, 
-  View, 
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authcontext';
+import {
+  AuthInput,
+  AuthIntro,
+  AuthScreen,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
+/** Collects or skips other conditions without changing the backend's profile shape. */
 export default function StoreOtherConditions() {
-  // information to store
-  const [otherCondition, setOtherCondition] = useState("");
-
+  const [otherCondition, setOtherCondition] = useState('');
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateUserDraft } = useAuth();
+  const finish = () => router.push('/(auth)/(onboarding)/completed');
 
-  // store typed text if present and proceed to next screen
-  const handleComplete = async () => {
-    if (!otherCondition) {
-        Alert.alert("Error", "no input detected");
-        return;
-    }
-
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    user.otherCondition = otherCondition;
-    router.push("/(auth)/(onboarding)/completed");
+  const handleComplete = () => {
+    if (!user) throw new Error('User not authenticated');
+    updateUserDraft({ otherCondition: otherCondition.trim() });
+    finish();
   };
 
-  // if question skipped, proceed to next page without storing any value
-  const handleIncomplete = async () => {
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    router.push("/(auth)/(onboarding)/completed");   
-  }
-
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
-            <View style={styles.content}>
-                <View style={styles.header}>
-                <Text style={styles.title}>Do you have any other conditions?</Text>
-                </View>
-
-                <View style={styles.form}>
-                    <TextInput 
-                        placeholder="Type conditions or symptoms that you know"
-                        placeholderTextColor={"#999"}
-                        keyboardType="default"
-                        inputMode="text"
-                        autoCorrect={false}
-                        value={otherCondition}
-                        onChangeText={setOtherCondition}
-                        style={styles.input}
-                    />
-                </View>        
-                
-                {/* buttons */}
-                <TouchableOpacity style={styles.button} onPress={handleComplete}>
-                    <Text style={styles.buttonText}>SUBMIT</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
-                    <Text style={styles.buttonText}>SKIP</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
-    </SafeAreaView>
-    
+    <AuthScreen>
+      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
+      <AuthIntro
+        eyebrow="YOUR PROFILE"
+        progress="6 of 6"
+        title="Do you have any other conditions?"
+        description="Add any other conditions or symptoms you know about. This question is optional."
+      />
+      <AuthInput
+        label="Other conditions"
+        placeholder="Type conditions or symptoms"
+        inputMode="text"
+        autoCorrect
+        value={otherCondition}
+        onChangeText={setOtherCondition}
+        onSubmitEditing={handleComplete}
+      />
+      <View style={authStyles.actions}>
+        <PrimaryButton label="Continue" disabled={!otherCondition.trim()} onPress={handleComplete} />
+        <Pressable accessibilityRole="button" onPress={finish} style={authStyles.secondaryAction}>
+          <Text style={authStyles.secondaryText}>Skip</Text>
+        </Pressable>
+      </View>
+    </AuthScreen>
   );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    header: {
-      marginBottom: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-});

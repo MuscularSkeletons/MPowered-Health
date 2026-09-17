@@ -1,141 +1,63 @@
-import { useState } from "react";
-import { 
-  Text, 
-  View, 
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
-import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
+import { useState } from 'react';
+import { Alert, Pressable, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authcontext';
+import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
+import {
+  AuthInput,
+  AuthIntro,
+  AuthScreen,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
+/** Collects or skips the optional birth year using the backend's existing range. */
 export default function StoreBirthYear() {
-  // information to store
-  const [birthyearstr, setBirthYearStr] = useState("");
-
+  const [birthYear, setBirthYear] = useState('');
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateUserDraft } = useAuth();
 
-  // store birth year value if present and proceed to next screen
-  const handleComplete = async () => {
-    if (!birthyearstr) {
-        Alert.alert("Error", "no input detected");
-        return;
+  const continueToDiagnosis = () => router.push('/(auth)/(onboarding)/diagnosis');
+  const handleComplete = () => {
+    const numericBirthYear = Number(birthYear);
+    if (
+      !/^\d{4}$/.test(birthYear) ||
+      numericBirthYear < BIRTH_YEAR_RANGE.LOWER_BOUND ||
+      numericBirthYear > BIRTH_YEAR_RANGE.UPPER_BOUND
+    ) {
+      Alert.alert('Error', 'Please enter a valid four-digit year');
+      return;
     }
-    if (birthyearstr.length != 4) {
-        Alert.alert("Error", "invalid year entered");
-        return;
-    }
-
-    // convert string to numeric type
-    const numericBirthYear = Number(birthyearstr.replace(/[^0-9]/g, ""));
-
-    // verify birth year within a valid time frame
-    if ((numericBirthYear < BIRTH_YEAR_RANGE.LOWER_BOUND) || (numericBirthYear > BIRTH_YEAR_RANGE.UPPER_BOUND)) {
-        Alert.alert("Error", "please enter a valid years");
-        return;
-    }
-
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    user.birthyear = numericBirthYear;
-    router.push("/(auth)/(onboarding)/diagnosis");
+    if (!user) throw new Error('User not authenticated');
+    updateUserDraft({ birthyear: numericBirthYear });
+    continueToDiagnosis();
   };
 
-  // if question skipped, proceed to next page without storing any value
-  const handleIncomplete = async () => {
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    router.push("/(auth)/(onboarding)/diagnosis");   
-  }
-
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
-            <View style={styles.content}>
-                <View style={styles.header}>
-                <Text style={styles.title}>Birth Year</Text>
-                </View>
-
-                <View style={styles.form}>
-                    <TextInput 
-                        placeholder="YYYY"
-                        placeholderTextColor={"#999"}
-                        keyboardType="number-pad"
-                        inputMode="numeric"
-                        autoCorrect={false}
-                        value={birthyearstr}
-                        onChangeText={setBirthYearStr}
-                        style={styles.input}
-                    />
-                </View>        
-                
-                {/* buttons */}
-                <TouchableOpacity style={styles.button} onPress={handleComplete}>
-                    <Text style={styles.buttonText}>SUBMIT</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleIncomplete}>
-                    <Text style={styles.buttonText}>SKIP</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
-    </SafeAreaView>
-    
+    <AuthScreen>
+      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
+      <AuthIntro
+        eyebrow="YOUR PROFILE"
+        progress="3 of 6"
+        title="Your year of birth"
+        description="Research shows that people can feel pain differently depending on their age. This question is optional."
+      />
+      <AuthInput
+        label="Year of birth"
+        placeholder="YYYY"
+        keyboardType="number-pad"
+        inputMode="numeric"
+        maxLength={4}
+        value={birthYear}
+        onChangeText={(value) => setBirthYear(value.replace(/\D/g, '').slice(0, 4))}
+        onSubmitEditing={handleComplete}
+      />
+      <View style={authStyles.actions}>
+        <PrimaryButton label="Continue" disabled={birthYear.length !== 4} onPress={handleComplete} />
+        <Pressable accessibilityRole="button" onPress={continueToDiagnosis} style={authStyles.secondaryAction}>
+          <Text style={authStyles.secondaryText}>Skip</Text>
+        </Pressable>
+      </View>
+    </AuthScreen>
   );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    header: {
-      marginBottom: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-});
