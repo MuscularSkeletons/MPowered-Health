@@ -1,6 +1,7 @@
 /** Draws the preview artwork used on the welcome page. */
 // This component displays the artwork used on the opening screens.
 import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
+import { palette } from '@/constants/profile/ui';
 
 // Each splash page uses a back preview and a front preview to create depth.
 const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
@@ -54,15 +55,15 @@ const styles = StyleSheet.create({
     width: '51%',
     aspectRatio: 1179 / 2556,
     borderRadius: 19,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: palette.surface,
   },
   phoneFrame: {
     flex: 1,
     padding: 4,
     borderWidth: 2,
-    borderColor: '#D8C7FA',
+    borderColor: palette.light,
     borderRadius: 19,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: palette.surface,
     overflow: 'hidden',
   },
   screen: {

@@ -93,7 +93,7 @@ export function AuthInput({
         <TextInput
           {...props}
           secureTextEntry={secure && !reveal}
-          placeholderTextColor="#81798A"
+          placeholderTextColor={palette.muted}
           style={styles.input}
         />
         {secure && onToggleReveal ? (
@@ -136,7 +136,9 @@ export function PrimaryButton({
         pressed && styles.primaryPressed,
       ]}
     >
-      <Text style={styles.primaryText}>{loading ? 'Please wait…' : label}</Text>
+      <Text style={[styles.primaryText, (disabled || loading) && styles.primaryDisabledText]}>
+        {loading ? 'Please wait…' : label}
+      </Text>
     </Pressable>
   );
 }
@@ -175,11 +177,11 @@ export function ChoiceButton({
 export const authStyles = StyleSheet.create({
   actions: { gap: 10, marginTop: 28 },
   secondaryAction: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  secondaryText: { color: palette.primary, fontSize: 13, fontWeight: '700' },
+  secondaryText: { color: palette.primaryDark, fontSize: 13, fontWeight: '700' },
   helper: { color: palette.muted, fontSize: 13, lineHeight: 20, marginTop: 8 },
   error: { color: palette.error, fontSize: 13, lineHeight: 20, marginTop: 12 },
   choices: { gap: 12, marginTop: 12 },
-  back: { alignSelf: 'flex-start', paddingVertical: 12, color: palette.primary, fontWeight: '700' },
+  back: { alignSelf: 'flex-start', paddingVertical: 12, color: palette.primaryDark, fontWeight: '700' },
 });
 
 const styles = StyleSheet.create({
@@ -195,8 +197,8 @@ const styles = StyleSheet.create({
   },
   logoLockup: { height: 34, flexDirection: 'row', alignItems: 'flex-end' },
   poweredMark: { width: 78, height: 34, position: 'relative' },
-  logoM: { position: 'absolute', left: 0, bottom: 0, fontSize: 30, lineHeight: 33, fontWeight: '800', color: '#18151C' },
-  logoPowered: { position: 'absolute', left: 25, top: 0, fontSize: 14, lineHeight: 16, fontWeight: '800', color: '#18151C' },
+  logoM: { position: 'absolute', left: 0, bottom: 0, fontSize: 30, lineHeight: 33, fontWeight: '800', color: palette.text },
+  logoPowered: { position: 'absolute', left: 25, top: 0, fontSize: 14, lineHeight: 16, fontWeight: '800', color: palette.text },
   logoHealth: { fontSize: 25, lineHeight: 30, fontWeight: '800', color: palette.secondary, marginLeft: 12 },
   content: {
     flexGrow: 1,
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
   compactContent: { justifyContent: 'flex-start', paddingTop: 24, paddingBottom: 72 },
   intro: { marginBottom: 26 },
   introMeta: { minHeight: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primary },
+  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primaryDark },
   progress: { fontSize: 11, fontWeight: '700', color: palette.muted },
   title: { marginTop: 8, fontSize: 29, lineHeight: 36, fontWeight: '800', letterSpacing: -0.6, color: palette.text },
   description: { marginTop: 10, fontSize: 15, lineHeight: 23, color: palette.muted },
@@ -242,9 +244,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 2,
   },
-  primaryDisabled: { backgroundColor: palette.light, shadowOpacity: 0, elevation: 0 },
+  primaryDisabled: { backgroundColor: '#F3D6D1', shadowOpacity: 0, elevation: 0 },
+  primaryDisabledText: { color: '#A47C76' },
   primaryPressed: { backgroundColor: palette.primaryDark, transform: [{ scale: 0.985 }] },
-  primaryText: { color: palette.surface, fontSize: 14, fontWeight: '700' },
+  primaryText: { color: palette.text, fontSize: 14, fontWeight: '800' },
   choice: {
     minHeight: 60,
     borderWidth: 1,
@@ -256,12 +259,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  choiceSelected: { backgroundColor: '#F3EEFF', borderColor: palette.accent },
+  choiceSelected: { backgroundColor: '#EAF7FF', borderColor: palette.light },
   choicePressed: { opacity: 0.82 },
   choiceText: { flex: 1, paddingRight: 10, fontSize: 14, lineHeight: 20, color: palette.text },
   choiceTextSelected: { color: palette.primaryDark, fontWeight: '700' },
-  radio: { width: 23, height: 23, borderRadius: 12, borderWidth: 1.5, borderColor: '#B9AFC8', alignItems: 'center', justifyContent: 'center' },
-  checkbox: { width: 23, height: 23, borderRadius: 7, borderWidth: 1.5, borderColor: '#B9AFC8', alignItems: 'center', justifyContent: 'center' },
+  radio: { width: 23, height: 23, borderRadius: 12, borderWidth: 1.5, borderColor: palette.line, alignItems: 'center', justifyContent: 'center' },
+  checkbox: { width: 23, height: 23, borderRadius: 7, borderWidth: 1.5, borderColor: palette.line, alignItems: 'center', justifyContent: 'center' },
   choiceMark: { backgroundColor: palette.primary, borderColor: palette.primary },
   tick: { color: palette.surface, fontSize: 12, fontWeight: '800' },
 });

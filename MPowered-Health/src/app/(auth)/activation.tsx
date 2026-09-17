@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     borderRadius: 140,
     top: -145,
     right: -95,
-    backgroundColor: palette.light,
-    opacity: 0.45,
+    backgroundColor: palette.secondary,
+    opacity: 0.2,
   },
   glowBottom: {
     position: 'absolute',
@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     borderRadius: 120,
     bottom: -145,
     left: -105,
-    backgroundColor: palette.accent,
-    opacity: 0.2,
+    backgroundColor: palette.primary,
+    opacity: 0.18,
   },
   content: {
     flex: 1,

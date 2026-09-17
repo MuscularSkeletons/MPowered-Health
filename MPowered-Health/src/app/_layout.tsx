@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F1EBFF',
+    backgroundColor: palette.light,
   },
   loadingM: { fontSize: 42, fontWeight: '800', color: palette.primary },
   loadingTitle: { marginTop: 24, fontSize: 22, fontWeight: '800', color: palette.text, textAlign: 'center' },
