@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
   back: {
     left: '3%',
     top: 68,
-    transform: [{ rotate: '-1.5deg' }],
   },
   front: {
     right: '3%',
