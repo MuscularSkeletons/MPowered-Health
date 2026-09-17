@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
+import { palette } from '@/constants/profile/ui';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import {
   AuthInput,
@@ -11,15 +13,27 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
+const SAVED_EMAIL_KEY = 'mpowered.saved-email';
+
 /** Keeps the existing backend password sign-in while presenting the Front-End form design. */
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<AuthUserError | null>(null);
   const router = useRouter();
   const { signIn } = useAuth();
+
+  useEffect(() => {
+    void AsyncStorage.getItem(SAVED_EMAIL_KEY).then((savedEmail) => {
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    });
+  }, []);
 
   /** Validates the form and delegates authentication to the unchanged backend context. */
   const handleLogin = async () => {
@@ -31,6 +45,11 @@ export default function Login() {
     setAuthError(null);
     try {
       await signIn(email.trim(), password);
+      if (rememberMe) {
+        await AsyncStorage.setItem(SAVED_EMAIL_KEY, email.trim());
+      } else {
+        await AsyncStorage.removeItem(SAVED_EMAIL_KEY);
+      }
       router.replace('/(tabs)');
     } catch (error) {
       const userError = toUserError(error);
@@ -83,6 +102,17 @@ export default function Login() {
         onToggleReveal={() => setShowPassword((visible) => !visible)}
         onSubmitEditing={() => void handleLogin()}
       />
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: rememberMe }}
+        onPress={() => setRememberMe((checked) => !checked)}
+        style={styles.rememberRow}
+      >
+        <View style={[styles.rememberBox, rememberMe && styles.rememberBoxChecked]}>
+          {rememberMe ? <Text style={styles.rememberTick}>✓</Text> : null}
+        </View>
+        <Text style={styles.rememberText}>Remember my email address</Text>
+      </Pressable>
       {authError ? (
         <Text accessibilityRole="alert" style={authStyles.error}>
           {authError.message}
@@ -107,3 +137,19 @@ export default function Login() {
     </AuthScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  rememberRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 },
+  rememberBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: '#D8D0D4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rememberBoxChecked: { backgroundColor: palette.primary, borderColor: palette.primary },
+  rememberTick: { color: palette.surface, fontSize: 13, fontWeight: '800' },
+  rememberText: { color: palette.muted, fontSize: 13, fontWeight: '600' },
+});
