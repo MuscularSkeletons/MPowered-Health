@@ -35,8 +35,8 @@ export const s = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: 8,
   },
-  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: palette.line },
-  dotOn: { width: 34, height: 12, borderRadius: 6, backgroundColor: palette.primary },
+  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: palette.light },
+  dotOn: { width: 34, height: 12, borderRadius: 6, backgroundColor: palette.success },
   actions: {
     width: '100%',
     maxWidth: 520,

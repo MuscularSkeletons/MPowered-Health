@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 4,
     borderWidth: 2,
-    borderColor: palette.secondary,
+    borderColor: palette.success,
     borderRadius: 19,
     backgroundColor: palette.surface,
     overflow: 'hidden',
@@ -74,12 +74,10 @@ const styles = StyleSheet.create({
   back: {
     left: '1%',
     top: 68,
-    transform: [{ rotate: '-1.25deg' }],
   },
   front: {
     right: '3%',
     top: 18,
     zIndex: 2,
-    transform: [{ rotate: '1.25deg' }],
   },
 });
