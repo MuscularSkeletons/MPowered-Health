@@ -1,229 +1,137 @@
-import { useState } from "react";
-import { 
-    Text, 
-    TextInput,
-    View, 
-    StyleSheet, 
-    KeyboardAvoidingView, 
-    Platform, 
-    TouchableOpacity,
-    Alert,
-    ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
-import { supabase } from "@/lib/supabase/client";
-import { Ionicons } from "@expo/vector-icons";
-import { toUserError, type AuthUserError } from "@/constants/profile/autherror";
-import { palette } from "@/constants/profile/ui";
+import { useState } from 'react';
+import { Alert, Pressable, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authcontext';
+import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
+import {
+  AuthInput,
+  AuthIntro,
+  AuthScreen,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
-// login screen for existing user
-// TODO: integrate UI from front-end branch
-
+/** Keeps the existing backend registration behavior while using the Front-End visual language. */
 export default function Signup() {
-    // keep track of what user typing
-    const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<AuthUserError | null>(null);
+  const router = useRouter();
+  const { signUp } = useAuth();
+  const passwordsMatch = !confirmPassword || confirmPassword === password;
 
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+  /** Validates the password pair and delegates account creation to the existing backend context. */
+  const handleSignUp = async () => {
+    if (!email.trim() || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Please enter the same password');
+      return;
+    }
+    setIsLoading(true);
+    setAuthError(null);
+    try {
+      await signUp(email.trim(), password);
+      router.replace('/(auth)/(onboarding)/onboarding');
+    } catch (error) {
+      const userError = toUserError(error);
+      setAuthError(userError);
+      Alert.alert('Error', userError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // confirm password
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const isEqualPasswords = confirmPassword === password;
-
-    const [isLoading, setIsLoading] = useState(false); // keep track of loading state
-
-    // routing info
-    const router = useRouter();
-    const { signUp, user, updateUser } = useAuth();
-
-    // error handling
-    const [authError, setAuthError] = useState<AuthUserError | null>(null);
-
-    // validate sign in
-    const handleSignUp = async () => {
-        // any field empty
-        if (!email || !password || !confirmPassword) {
-            Alert.alert("Error", "Please fill in all fields");
-            return;
-        }
-
-        // check wrote same password twice
-        if (password !== confirmPassword) {
-            Alert.alert("Error", "Please enter the same password");
-            return;
-        }
-        
-        setIsLoading(true);
-        setAuthError(null);
-
-        try {
-            await signUp(email, password);
-            router.replace("/(auth)/(onboarding)/onboarding");
-        } catch (error) {
-            // handle errors
-            console.log(error);
-            const userError = toUserError(error);
-            setAuthError(userError);
-            Alert.alert("Error", userError.message); // better to do alert message or just show text?
-            return;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // toggle password visibility
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
-    // toggle confirm password visibility
-    const toggleShowConfirmPassword = () => {
-        setShowConfirmPassword(!showConfirmPassword);
-    };
-
-    return (
-        <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}> 
-                <View style={styles.content}>
-                    <Text style={styles.title}>SIGN UP</Text>
-                    {/*display authentication error
-                    <Text>{authError?.message}</Text>*/}
-                    <View style={styles.form}>
-                        <TextInput 
-                            placeholder="Email"
-                            placeholderTextColor={"#999"}
-                            keyboardType="email-address"
-                            inputMode="email"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            autoComplete="email"
-                            value={email}
-                            onChangeText={setEmail}
-                            style={styles.input}
-                        />
-                        <TextInput 
-                            placeholder="Password"
-                            placeholderTextColor={"#999"}
-                            keyboardType="default"
-                            inputMode="text"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            autoComplete="password"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry={!showPassword}
-                            style={styles.input}
-                        />
-                        <Ionicons
-                            name={showPassword ? 'eye-off' : 'eye'}
-                            size={24}
-                            color="#aaa"
-                            style={styles.icon}
-                            onPress={toggleShowPassword}
-                        />
-                        <Text>Confirm Password</Text>
-                        <TextInput 
-                            placeholder="Confirm Password"
-                            placeholderTextColor={"#999"}
-                            keyboardType="default"
-                            inputMode="text"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            autoComplete="password"
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                            secureTextEntry={!showConfirmPassword}
-                            style={styles.input}
-                        />
-                        <Ionicons
-                            name={showConfirmPassword ? 'eye-off' : 'eye'}
-                            size={24}
-                            color="#aaa"
-                            style={styles.icon}
-                            onPress={toggleShowConfirmPassword}
-                        />
-                        {/*when confirming password, display text if password not the same */}
-                        {(confirmPassword && !isEqualPasswords) ? (
-                            <Text>Passwords are not equal</Text>
-                        ) : (
-                            <Text></Text>
-                        )}
-                        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                            {/*if loading, replace button with loading indicator */}
-                            {isLoading ? (
-                                <ActivityIndicator size={24} color="#fff" />
-                            ) : (
-                                <Text style={styles.buttonText}>SIGNUP</Text>
-                            )}
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.link} onPress={() => router.push("/(auth)/login")}>
-                            <Text style={styles.linkText}>Log in to a different account</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    );
+  return (
+    <AuthScreen compact>
+      <Pressable onPress={() => router.replace('/(auth)/splashscreen')}>
+        <Text style={authStyles.back}>‹ Back</Text>
+      </Pressable>
+      <AuthIntro
+        eyebrow="GET STARTED"
+        title="Create your account"
+        description="Set up your secure sign-in, then tell us what matters for your health."
+      />
+      <AuthInput
+        label="Email address"
+        placeholder="you@example.com"
+        keyboardType="email-address"
+        inputMode="email"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        editable={!isLoading}
+        value={email}
+        onChangeText={(value) => {
+          setEmail(value);
+          setAuthError(null);
+        }}
+      />
+      <AuthInput
+        label="Password"
+        placeholder="Create a password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="new-password"
+        editable={!isLoading}
+        value={password}
+        onChangeText={(value) => {
+          setPassword(value);
+          setAuthError(null);
+        }}
+        secure
+        reveal={showPassword}
+        onToggleReveal={() => setShowPassword((visible) => !visible)}
+      />
+      <AuthInput
+        label="Confirm password"
+        placeholder="Enter the same password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="new-password"
+        editable={!isLoading}
+        value={confirmPassword}
+        onChangeText={(value) => {
+          setConfirmPassword(value);
+          setAuthError(null);
+        }}
+        secure
+        reveal={showConfirmPassword}
+        onToggleReveal={() => setShowConfirmPassword((visible) => !visible)}
+        onSubmitEditing={() => void handleSignUp()}
+      />
+      {!passwordsMatch ? (
+        <Text accessibilityRole="alert" style={authStyles.error}>
+          Passwords do not match.
+        </Text>
+      ) : null}
+      {authError ? (
+        <Text accessibilityRole="alert" style={authStyles.error}>
+          {authError.message}
+        </Text>
+      ) : null}
+      <View style={authStyles.actions}>
+        <PrimaryButton
+          label="Create account"
+          loading={isLoading}
+          disabled={!email.trim() || !password || !confirmPassword || !passwordsMatch}
+          onPress={() => void handleSignUp()}
+        />
+        <Pressable
+          accessibilityRole="button"
+          disabled={isLoading}
+          onPress={() => router.push('/(auth)/login')}
+          style={authStyles.secondaryAction}
+        >
+          <Text style={authStyles.secondaryText}>Already have an account? Sign in</Text>
+        </Pressable>
+      </View>
+    </AuthScreen>
+  );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-    link: {
-        alignSelf: 'flex-end', 
-        paddingVertical: 11, 
-        paddingLeft: 16
-    },
-    linkText: {
-        fontSize: 13,
-        fontWeight: '700',
-        textDecorationLine: 'underline',
-    },
-    icon: {
-        marginLeft: 10,
-    },
-    errorMsg: {
-        color: palette.error,
-    },
-});
