@@ -2,7 +2,7 @@
 import { palette } from '@/constants/profile/ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: palette.background },
   page: { paddingHorizontal: 24 },
   art: {
     height: 294,
