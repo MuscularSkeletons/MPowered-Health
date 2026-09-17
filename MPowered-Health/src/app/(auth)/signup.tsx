@@ -31,7 +31,7 @@ export default function Signup() {
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Please enter the same password');
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
     setIsLoading(true);
@@ -56,7 +56,7 @@ export default function Signup() {
       <AuthIntro
         eyebrow="GET STARTED"
         title="Create your account"
-        description="Set up your secure sign-in, then tell us what matters for your health."
+        description="Create your account, then tell us what matters for your health."
       />
       <AuthInput
         label="Email address"
@@ -75,7 +75,7 @@ export default function Signup() {
       />
       <AuthInput
         label="Password"
-        placeholder="Create a password"
+        placeholder="Enter a password"
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete="new-password"
@@ -91,7 +91,7 @@ export default function Signup() {
       />
       <AuthInput
         label="Confirm password"
-        placeholder="Enter the same password"
+        placeholder="Re-enter your password"
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete="new-password"
