@@ -16,4 +16,12 @@ describe('splash screen components render properly', () => {
         expect(screen.getByText("Sign in")).toBeTruthy();
     });
     
+     //todo:add slideshow render test
+    /*
+    test('rendering app info slide show', async() => {
+
+        //use fireEvent() and mocks
+
+    })*/
+
 });
