@@ -31,7 +31,7 @@ export default function StoreBirthSex() {
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="2 of 6"
         title="Your sex"
         description="Research shows that people may experience pain differently depending on their sex."

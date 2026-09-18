@@ -66,7 +66,7 @@ export default function Login() {
         <Text style={authStyles.back}>‹ Back</Text>
       </Pressable>
       <AuthIntro
-        eyebrow="SIGN IN"
+        sectionLabel="SIGN IN"
         title="Welcome back!"
         description="Sign in to continue your MPowered Health journey."
       />

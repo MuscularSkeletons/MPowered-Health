@@ -54,7 +54,7 @@ export default function Signup() {
         <Text style={authStyles.back}>‹ Back</Text>
       </Pressable>
       <AuthIntro
-        eyebrow="GET STARTED"
+        sectionLabel="GET STARTED"
         title="Create your account"
         description="Create your account, then tell us what matters for your health."
       />

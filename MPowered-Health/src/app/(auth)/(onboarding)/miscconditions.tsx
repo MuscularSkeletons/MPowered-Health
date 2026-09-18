@@ -27,7 +27,7 @@ export default function StoreOtherConditions() {
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="6 of 6"
         title="Do you have any other conditions?"
         description="Add any other conditions or symptoms you know about. This question is optional."

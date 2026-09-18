@@ -37,7 +37,7 @@ export default function StoreBirthYear() {
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="3 of 6"
         title="Your year of birth"
         description="Research shows that people can feel pain differently depending on their age. This question is optional."

@@ -20,7 +20,7 @@ export default function Onboarding() {
   return (
     <AuthScreen>
       <AuthIntro
-        eyebrow="GET STARTED"
+        sectionLabel="GET STARTED"
         title="Hello 👋🏻"
         description={
           'A few quick questions so we can make MPowered Health more relevant for you.'

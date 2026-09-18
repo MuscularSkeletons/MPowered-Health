@@ -33,7 +33,7 @@ export default function CompleteOnboarding() {
   return (
     <AuthScreen>
       <AuthIntro
-        eyebrow="PROFILE COMPLETE"
+        sectionLabel="PROFILE COMPLETE"
         title={`Thank you${user?.name ? `, ${user.name}` : ''} 😃`}
         description="Your answers are ready to be linked to your account."
       />

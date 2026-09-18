@@ -49,14 +49,14 @@ export function AuthScreen({ children, compact = false }: { children: ReactNode;
   );
 }
 
-/** Displays page context; the eyebrow is the small section label above the title. */
+/** Displays a section label, title, description, and optional progress above the form. */
 export function AuthIntro({
-  eyebrow,
+  sectionLabel,
   title,
   description,
   progress,
 }: {
-  eyebrow?: string;
+  sectionLabel?: string;
   title: string;
   description?: string;
   progress?: string;
@@ -64,7 +64,7 @@ export function AuthIntro({
   return (
     <View style={styles.intro}>
       <View style={styles.introMeta}>
-        {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : <View />}
+        {sectionLabel ? <Text style={styles.sectionLabel}>{sectionLabel}</Text> : <View />}
         {progress ? <Text style={styles.progress}>{progress}</Text> : null}
       </View>
       <Text style={styles.title}>{title}</Text>
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   compactContent: { justifyContent: 'flex-start', paddingTop: 24, paddingBottom: 72 },
   intro: { marginBottom: 26 },
   introMeta: { minHeight: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primaryDark },
+  sectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primaryDark },
   progress: { fontSize: 11, fontWeight: '700', color: palette.muted },
   title: { marginTop: 8, fontSize: 29, lineHeight: 36, fontWeight: '800', letterSpacing: -0.6, color: palette.text },
   description: { marginTop: 10, fontSize: 15, lineHeight: 23, color: palette.muted },

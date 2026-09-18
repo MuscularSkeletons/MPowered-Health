@@ -31,7 +31,7 @@ export default function StoreDiagnosis() {
     <AuthScreen compact>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="4 of 6"
         title="Do you have a musculoskeletal or chronic pain diagnosis from your doctor?"
         description="For example, arthritis, back pain, or gout. No diagnosis? No problem—you know your body and how you feel."

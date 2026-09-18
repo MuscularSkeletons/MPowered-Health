@@ -34,7 +34,7 @@ export default function StorePainConditions() {
     <AuthScreen compact>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="5 of 6"
         title="Tell us about the pain you’re experiencing"
         description="Select any musculoskeletal or chronic pain conditions that apply."

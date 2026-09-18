@@ -2,7 +2,7 @@
 
 `auth-ui.tsx` contains the header, form layout, fields, buttons, and answer choices
 shared by sign-in, sign-up, and onboarding. Its styles stay with these components.
-The `eyebrow` prop is the small section label above a page title, such as YOUR PROFILE.
+The `sectionLabel` prop is the small section label above a page title, such as YOUR PROFILE.
 
 `welcome/styles.ts` styles only the opening splash carousel, including its text,
 page dots, and actions. It does not style sign-in or onboarding forms.

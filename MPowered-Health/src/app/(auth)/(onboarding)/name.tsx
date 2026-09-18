@@ -31,7 +31,7 @@ export default function StoreName() {
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
-        eyebrow="YOUR PROFILE"
+        sectionLabel="YOUR PROFILE"
         progress="1 of 6"
         title="Your name"
         description="Your health and wellbeing are uniquely you. Your name helps us address you personally."
