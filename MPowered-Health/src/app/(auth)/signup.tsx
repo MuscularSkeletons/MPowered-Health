@@ -61,7 +61,7 @@ export default function Signup() {
 
         try {
             await signUp(email, password);
-            router.replace("/(auth)/(onboarding)/onboarding");
+            router.replace("/(auth)/confirmation");
         } catch (error) {
             // handle errors
             console.log(error);

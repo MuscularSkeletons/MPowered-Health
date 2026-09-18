@@ -6,6 +6,8 @@ import {
     ReactNode,
     useContext,
 } from "react";
+import { makeRedirectUri } from "expo-auth-session";
+import { Session } from  "@supabase/supabase-js";
 
 // information related to user authentication + its related functions
 
@@ -23,6 +25,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -35,6 +38,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // defines all functions related to authentication
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
 
   // run checkSession when first render the app
@@ -108,20 +112,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // handles user sign up using an email and pasword authentication method
   const signUp = async (email: string, password: string) => {
+    // confirmation email
+    const redirectTo = makeRedirectUri({
+      scheme: 'mpoweredhealth',
+      path: 'confirmation',
+    });
+    console.log("redirect url", redirectTo);
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: redirectTo,
+      }
     });
 
     if (error) throw error; // TO DO: try-catch block? maybe??
 
-    console.log("User signed up");
+    console.log("User signed up", data.user?.id);
+    console.log("redirect url", redirectTo);
+    console.log("session:", data.session);
 
-    if (data.user) {
+    /*if (data.user) {
       const userProfile = await fetchUserProfile(data.user.id);
       setUser(userProfile);
       console.log("User profile information fetched and set");
-    }
+    }*/
   };
 
   const signOut = async () => {
@@ -176,7 +192,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // tries to get a session from supabase to see if user logged in
     try {
       const { data: { session }} = await supabase.auth.getSession();
-
+      setSession(session);
       if (session?.user) {
         const userProfile = await fetchUserProfile(session.user.id);
         setUser(userProfile);
@@ -187,6 +203,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Error checking session", error);
+      setSession(null);
       setUser(null);
     } finally {
       setIsLoading(false); // finished checking session so can proceed
@@ -195,7 +212,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUser, isLoading }}
+        value={{ user, session, signIn, signUp, signOut, updateUser, isLoading }}
     >
         {children}
     </AuthContext.Provider>
