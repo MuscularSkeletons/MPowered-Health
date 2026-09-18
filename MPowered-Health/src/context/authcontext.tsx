@@ -200,7 +200,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Restore the saved login when this provider first appears.
   useEffect(() => {
     void Promise.resolve().then(checkSession);
-    // Do not reload on profile edits: that would replace unsaved onboarding answers.
+    // Check the saved login only once when the app opens.
+    // Checking again while the user answers questions could erase their unsaved answers.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
