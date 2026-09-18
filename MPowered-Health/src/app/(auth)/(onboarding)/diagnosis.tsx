@@ -1,109 +1,56 @@
-import { useState } from "react";
-import { 
-  Text, 
-  View, 
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
-import { diagnosisOptions } from "@/constants/profile/profile-options";
+import { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authcontext';
+import { diagnosisOptions } from '@/constants/profile/profile-options';
+import {
+  AuthIntro,
+  AuthScreen,
+  ChoiceButton,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
+/** Stores whether the user has a formal diagnosis. */
 export default function StoreDiagnosis() {
-  // information to store
   const [hasDiagnosis, setHasDiagnosis] = useState<boolean | null>(null);
-
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateUserDraft } = useAuth();
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     if (hasDiagnosis === null) {
-        Alert.alert("Error", "please select an option");
-        return;
+      Alert.alert('Error', 'Please select an option');
+      return;
     }
-
-    // confirm user authenticated
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
-    user.formalDiagnosis = hasDiagnosis;
-    router.push("/(auth)/(onboarding)/conditions");
+    if (!user) throw new Error('User not authenticated');
+    updateUserDraft({ formalDiagnosis: hasDiagnosis });
+    router.push('/(auth)/(onboarding)/conditions');
   };
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-        <View style={styles.content}>
-            <View style={styles.header}>
-            <Text style={styles.title}>Do you have a musculoskeletal for example arthritis, back pain, gout or chronic pain diagnosis from your doctor?</Text>
-            </View>
-
-            <View style={styles.form}>
-                <TouchableOpacity style={styles.button} onPress={() => setHasDiagnosis(true)}>
-                    <Text style={styles.buttonText}>{diagnosisOptions[0]}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => setHasDiagnosis(false)}>
-                    <Text style={styles.buttonText}>{diagnosisOptions[1]}</Text>
-                </TouchableOpacity>
-            </View>    
-
-            <Text>No diagnosis? No problem! You know your body and how you feel so being Health MPowered is for you</Text>    
-            
-            {/* buttons */}
-            <TouchableOpacity style={styles.button} onPress={handleComplete}>
-                <Text style={styles.buttonText}>Continue</Text>
-            </TouchableOpacity>
-        </View>
-    </SafeAreaView>
-    
+    <AuthScreen compact>
+      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
+      <AuthIntro
+        sectionLabel="YOUR PROFILE"
+        progress="4 of 6"
+        title="Do you have a musculoskeletal or chronic pain diagnosis from your doctor?"
+        description="For example, arthritis, back pain, or gout. No diagnosis? No problem—you know your body and how you feel."
+      />
+      <View style={authStyles.choices}>
+        <ChoiceButton
+          label={diagnosisOptions[0]}
+          selected={hasDiagnosis === true}
+          onPress={() => setHasDiagnosis(true)}
+        />
+        <ChoiceButton
+          label={diagnosisOptions[1]}
+          selected={hasDiagnosis === false}
+          onPress={() => setHasDiagnosis(false)}
+        />
+      </View>
+      <View style={authStyles.actions}>
+        <PrimaryButton label="Continue" disabled={hasDiagnosis === null} onPress={handleComplete} />
+      </View>
+    </AuthScreen>
   );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    header: {
-      marginBottom: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
-});

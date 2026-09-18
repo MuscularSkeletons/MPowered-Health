@@ -1,76 +1,51 @@
-import { 
-  Text, 
-  View, 
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { openBrowserAsync } from 'expo-web-browser';
+import { useRouter } from 'expo-router';
+import { palette } from '@/constants/profile/ui';
+import { AuthIntro, AuthScreen, PrimaryButton, authStyles } from '@/components/auth/auth-ui';
 
+/** Introduces profile setup and links to the terms and privacy policy. */
 export default function Onboarding() {
-  // information to store
   const router = useRouter();
 
+  /** Opens a policy without losing the current onboarding screen. */
+  const openPolicy = async (url: string) => {
+    try {
+      await openBrowserAsync(url);
+    } catch {
+      Alert.alert('Unable to open page', 'Please try again.');
+    }
+  };
+
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Complete Your Profile</Text>
-        </View>
-        
-        {/* buttons */}
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/(auth)/(onboarding)/name")}>
-            <Text style={styles.buttonText}>CONTINUE</Text>
-      </TouchableOpacity>
+    <AuthScreen>
+      <AuthIntro
+        sectionLabel="GET STARTED"
+        title="Hello 👋🏻"
+        description={
+          'A few quick questions so we can make MPowered Health more relevant for you.'
+        }
+      />
+      <Text style={styles.policy}>
+        By continuing, you agree to MPowered’s{' '}
+        <Text accessibilityRole="link" style={styles.link}
+          onPress={() => void openPolicy('https://muscha.org/terms-and-conditions/')}>
+          Terms and Conditions
+        </Text>
+        {' '}and{' '}
+        <Text accessibilityRole="link" style={styles.link}
+          onPress={() => void openPolicy('https://muscha.org/privacy-policy/')}>
+          Privacy Policy
+        </Text>.
+      </Text>
+      <View style={authStyles.actions}>
+        <PrimaryButton label="Continue" onPress={() => router.push('/(auth)/(onboarding)/name')} />
       </View>
-    </SafeAreaView>
-    
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 24,
-    },
-    content: {
-        width: '100%',
-        maxWidth: 520,
-        alignSelf: 'center',
-        paddingHorizontal: 28,
-        paddingVertical: 32,
-    },
-    header: {
-      marginBottom: 32,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: '800',
-        letterSpacing: 1.15,
-        marginBottom: 10,
-    },
-    form: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-    },
-    button: {
-        minHeight: 40,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    buttonText: {
-        fontSize: 13,
-        fontWeight: '700',
-    },
+  policy: { fontSize: 15, lineHeight: 23, color: palette.muted },
+  link: { color: palette.primaryDark, textDecorationLine: 'underline' },
 });
-

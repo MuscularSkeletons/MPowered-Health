@@ -26,6 +26,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
@@ -36,11 +37,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
-
-  // run checkSession when first render the app
-  useEffect(() => {
-    checkSession();
-  }, []);
 
   // get the user information from supabase for the user with that userId (check if user authenticated)
   // checks if user information exists when they sign-in/sign-up
@@ -129,6 +125,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }
 
+  // Onboarding screens build one local profile before the completed screen saves it.
+  const updateUserDraft = (userData: Partial<User>) => {
+    if (!user) return;
+    setUser((current) => current ? { ...current, ...userData } : current);
+    // Log field names only so health answers and personal details stay out of logs.
+    if (__DEV__) console.log('User draft updated locally:', Object.keys(userData));
+  };
+
   // update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
     // check user logged in
@@ -158,10 +162,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // update the change here
       if (data) {
-        console.log(data);
+        if (__DEV__) console.log('User profile saved:', Object.keys(updateData));
         const userProfile = await fetchUserProfile(data.user_id);
         setUser(userProfile);
-        console.log("updated change locally (?)");
+        if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
 
     } catch (error) {
@@ -193,9 +197,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }; 
 
+  // Restore the saved login when this provider first appears.
+  useEffect(() => {
+    void Promise.resolve().then(checkSession);
+    // Check the saved login only once when the app opens.
+    // Checking again while the user answers questions could erase their unsaved answers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUser, isLoading }}
+        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
     >
         {children}
     </AuthContext.Provider>
