@@ -1,11 +1,24 @@
+jest.mock("@/context/authcontext", () => ({
+    useAuth: () => ({
+        user: null,
+        signIn: jest.fn(),
+        signUp: jest.fn(),
+        signOut: jest.fn(),
+        updateUser: jest.fn(),
+        isLoading: false,
+    }),
+}))
+
 import Signup from '../src/app/(auth)/signup';
 import { render, screen } from '@testing-library/react-native';
 
 describe ('Sign up rendering', () => {
 
-    beforeEach(() => {
-        render (<Signup/>);
+    beforeEach(async () => {
+        await render (<Signup/>);
     })
+
+    afterEach(jest.clearAllMocks);
 
     test('signup message is rendered on screen',  () => {
         expect(screen.getByText("SIGN UP")).toBeTruthy();
