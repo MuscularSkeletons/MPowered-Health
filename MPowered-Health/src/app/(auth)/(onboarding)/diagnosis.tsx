@@ -11,7 +11,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects the existing formal-diagnosis flag with a clearly selected answer. */
+/** Stores whether the user has a formal diagnosis. */
 export default function StoreDiagnosis() {
   const [hasDiagnosis, setHasDiagnosis] = useState<boolean | null>(null);
   const router = useRouter();

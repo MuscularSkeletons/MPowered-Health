@@ -127,7 +127,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Onboarding screens build one local profile before the completed screen saves it.
   const updateUserDraft = (userData: Partial<User>) => {
+    if (!user) return;
     setUser((current) => current ? { ...current, ...userData } : current);
+    // Log field names only so health answers and personal details stay out of logs.
+    if (__DEV__) console.log('User draft updated locally:', Object.keys(userData));
   };
 
   // update user info in supabase - pass in a partial value so can update any combination of fields
@@ -159,10 +162,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // update the change here
       if (data) {
-        console.log(data);
+        if (__DEV__) console.log('User profile saved:', Object.keys(updateData));
         const userProfile = await fetchUserProfile(data.user_id);
         setUser(userProfile);
-        console.log("updated change locally (?)");
+        if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
 
     } catch (error) {
@@ -194,10 +197,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }; 
 
-  // Check the saved backend session once when the provider first mounts.
+  // Restore the saved login when this provider first appears.
   useEffect(() => {
     void Promise.resolve().then(checkSession);
-    // Session restoration intentionally runs only once for this mounted provider.
+    // Do not reload on profile edits: that would replace unsaved onboarding answers.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

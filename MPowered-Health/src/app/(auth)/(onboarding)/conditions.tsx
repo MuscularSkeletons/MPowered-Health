@@ -11,7 +11,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects zero or more pain conditions using the backend's existing option values. */
+/** Stores the selected pain conditions locally. */
 export default function StorePainConditions() {
   const [painConditions, setPainConditions] = useState<string[]>([]);
   const router = useRouter();
@@ -25,8 +25,8 @@ export default function StorePainConditions() {
     );
   };
   const handleComplete = () => {
-    if (painConditions.length && !user) throw new Error('User not authenticated');
-    if (user && painConditions.length) updateUserDraft({ painConditions });
+    if (!user) throw new Error('User not authenticated');
+    if (painConditions.length) updateUserDraft({ painConditions });
     router.push('/(auth)/(onboarding)/miscconditions');
   };
 

@@ -1,10 +1,9 @@
-/** Draws the preview artwork used on the welcome page. */
-// This component displays the artwork used on the opening screens.
-import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Image, type ImageSource } from 'expo-image';
 import { palette } from '@/constants/profile/ui';
 
 // Each splash page uses a back preview and a front preview to create depth.
-const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
+const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
   [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
   [require('@/assets/splash/health-home.png'), require('@/assets/splash/health-records.png')],
   [require('@/assets/splash/care-home.png'), require('@/assets/splash/plan-appointment.png')],
@@ -13,13 +12,13 @@ const previewPairs: readonly [ImageSourcePropType, ImageSourcePropType][] = [
 /**
  * Draws one small example screen in the welcome artwork.
  *
- * Give the front phone preview stronger styling to create depth.
+ * Position the front preview above the back preview.
  */
-function ScreenPreview({ source, front }: { source: ImageSourcePropType; front?: boolean }) {
+function ScreenPreview({ source, front }: { source: ImageSource | number; front?: boolean }) {
   return (
     <View style={[styles.phonePreview, front ? styles.front : styles.back]}>
       <View style={styles.phoneFrame}>
-        <Image source={source} resizeMode="cover" style={styles.screen} />
+        <Image source={source} contentFit="cover" style={styles.screen} />
       </View>
     </View>
   );
@@ -41,7 +40,7 @@ export function SplashArtwork({ page }: { page: number }) {
   );
 }
 
-// Keep phone positions and decorative shapes in one section.
+// Keep preview positions and frames together.
 const styles = StyleSheet.create({
   canvas: {
     width: '100%',

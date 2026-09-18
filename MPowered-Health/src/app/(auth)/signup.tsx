@@ -11,7 +11,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Keeps the existing backend registration behavior while using the Front-End visual language. */
+/** Displays the account registration form. */
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +24,7 @@ export default function Signup() {
   const { signUp } = useAuth();
   const passwordsMatch = !confirmPassword || confirmPassword === password;
 
-  /** Validates the password pair and delegates account creation to the existing backend context. */
+  /** Validates matching passwords and creates the account through the authentication context. */
   const handleSignUp = async () => {
     if (!email.trim() || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');

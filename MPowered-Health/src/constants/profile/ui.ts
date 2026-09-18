@@ -13,6 +13,11 @@ export const palette = {
   line: '#F0DCD7',
   success: '#67A96B',
   error: '#D85F68',
+  controlBorder: '#D8D0D4',
+  pressedBackground: '#FFF0EC',
+  disabledBackground: '#F3D6D1',
+  disabledText: '#A47C76',
+  selectionBackground: '#EEF7E9',
 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
 

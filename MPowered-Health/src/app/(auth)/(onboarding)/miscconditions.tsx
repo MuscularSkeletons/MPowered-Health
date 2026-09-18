@@ -10,7 +10,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects or skips other conditions without changing the backend's profile shape. */
+/** Stores other miscellaneous conditions if the question is not skipped. */
 export default function StoreOtherConditions() {
   const [otherCondition, setOtherCondition] = useState('');
   const router = useRouter();

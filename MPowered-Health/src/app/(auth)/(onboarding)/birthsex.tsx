@@ -11,7 +11,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects the selected sex while retaining the existing onboarding data shape. */
+/** Stores the selected birth sex locally. */
 export default function StoreBirthSex() {
   const [birthsex, setBirthSex] = useState('');
   const router = useRouter();

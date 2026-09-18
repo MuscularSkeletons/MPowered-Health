@@ -7,34 +7,36 @@ import { AuthHeader } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
 import { requiredSessionRoute } from '@/navigation/route-guard';
 
-/** Replaces the temporary text with a branded session-loading state. */
+/** Shows the green brand initial while restoring the session. */
 function AppLoadingScreen() {
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
-      <View pointerEvents="none" style={styles.glowTop} />
-      <View pointerEvents="none" style={styles.glowBottom} />
-      <View style={styles.loadingContent}>
-        <View style={styles.loadingCard}>
-          <View style={styles.loadingMark}>
-            <Text style={styles.loadingM}>M</Text>
+      <View style={styles.body}>
+        <View pointerEvents="none" style={styles.glowTop} />
+        <View pointerEvents="none" style={styles.glowBottom} />
+        <View style={styles.loadingContent}>
+          <View style={styles.loadingCard}>
+            <View style={styles.loadingMark}>
+              <Text style={styles.loadingM}>M</Text>
+            </View>
+            <Text style={styles.loadingTitle}>Welcome to MPowered Health</Text>
+            <Text style={styles.loadingCopy}>Loading your secure account…</Text>
+            <ActivityIndicator size="small" color={palette.primary} style={styles.spinner} />
           </View>
-          <Text style={styles.loadingTitle}>Welcome to MPowered Health</Text>
-          <Text style={styles.loadingCopy}>Loading your secure account…</Text>
-          <ActivityIndicator size="small" color={palette.primary} style={styles.spinner} />
         </View>
       </View>
     </SafeAreaView>
   );
 }
 
-/** Directs users according to the existing backend session and onboarding status. */
+/** Directs users according to their session and onboarding status. */
 function RouteGuard() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const segments = useSegments();
   const rootSegment = segments[0];
-  const nestedSegment = (segments as string[])[1];
+  const nestedSegment = segments[1];
 
   useEffect(() => {
     if (isLoading) return;
@@ -52,7 +54,7 @@ function RouteGuard() {
   );
 }
 
-/** Gives all routes access to the unchanged backend authentication provider. */
+/** Gives all routes access to the authentication provider. */
 export default function RootLayout() {
   return (
     <AuthProvider>
@@ -62,7 +64,8 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, overflow: 'hidden', backgroundColor: palette.background },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  body: { flex: 1, overflow: 'hidden', backgroundColor: palette.background },
   glowTop: {
     position: 'absolute',
     width: 290,
@@ -70,8 +73,8 @@ const styles = StyleSheet.create({
     borderRadius: 145,
     top: -140,
     right: -110,
-    backgroundColor: palette.light,
-    opacity: 0.46,
+    backgroundColor: palette.accent,
+    opacity: 0.2,
   },
   glowBottom: {
     position: 'absolute',
@@ -106,9 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.light,
   },
-  loadingM: { fontSize: 42, fontWeight: '800', color: palette.primary },
+  loadingM: { fontSize: 42, fontWeight: '800', color: palette.success },
   loadingTitle: { marginTop: 24, fontSize: 22, fontWeight: '800', color: palette.text, textAlign: 'center' },
   loadingCopy: { marginTop: 9, fontSize: 14, lineHeight: 21, color: palette.muted, textAlign: 'center' },
   spinner: { marginTop: 24 },

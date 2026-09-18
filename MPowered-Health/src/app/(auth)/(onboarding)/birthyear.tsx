@@ -11,7 +11,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects or skips the optional birth year using the backend's existing range. */
+/** Stores an optional birth year after checking the allowed range. */
 export default function StoreBirthYear() {
   const [birthYear, setBirthYear] = useState('');
   const router = useRouter();

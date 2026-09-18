@@ -1,5 +1,5 @@
 import { s } from '@/components/auth/welcome/styles';
-import { SplashArtwork } from '@/components/auth/welcome/Artwork';
+import { SplashArtwork } from '@/components/auth/welcome/artwork';
 import { AuthHeader } from '@/components/auth/auth-ui';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';

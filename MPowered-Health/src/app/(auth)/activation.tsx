@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { palette } from '@/constants/profile/ui';
 import { useAuth } from '@/context/authcontext';
 
-/** Shows the first Front-End activation screen after the backend confirms onboarding. */
+/** Celebrates completed onboarding before opening the home page. */
 export default function ActivationScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -31,7 +32,7 @@ export default function ActivationScreen() {
             <View style={styles.imageHalo} />
             <Image
               source={require('@/assets/images/onboarding-launch.png')}
-              resizeMode="contain"
+              contentFit="contain"
               style={styles.image}
             />
           </View>

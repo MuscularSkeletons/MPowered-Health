@@ -49,7 +49,7 @@ export function AuthScreen({ children, compact = false }: { children: ReactNode;
   );
 }
 
-/** Displays consistent page context before a form or onboarding question. */
+/** Displays page context; the eyebrow is the small section label above the title. */
 export function AuthIntro({
   eyebrow,
   title,
@@ -205,9 +205,10 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 560,
     alignSelf: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 24,
-    paddingVertical: 36,
+    paddingTop: 24,
+    paddingBottom: 36,
   },
   compactContent: { justifyContent: 'flex-start', paddingTop: 24, paddingBottom: 72 },
   intro: { marginBottom: 26 },
@@ -244,8 +245,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 2,
   },
-  primaryDisabled: { backgroundColor: '#F3D6D1', shadowOpacity: 0, elevation: 0 },
-  primaryDisabledText: { color: '#A47C76' },
+  primaryDisabled: { backgroundColor: palette.disabledBackground, shadowOpacity: 0, elevation: 0 },
+  primaryDisabledText: { color: palette.disabledText },
   primaryPressed: { backgroundColor: palette.primaryDark, transform: [{ scale: 0.985 }] },
   primaryText: { color: palette.text, fontSize: 14, fontWeight: '800' },
   choice: {
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  choiceSelected: { backgroundColor: '#EEF7E9', borderColor: palette.success },
+  choiceSelected: { backgroundColor: palette.selectionBackground, borderColor: palette.success },
   choicePressed: { opacity: 0.82 },
   choiceText: { flex: 1, paddingRight: 10, fontSize: 14, lineHeight: 20, color: palette.text },
   choiceTextSelected: { color: palette.success, fontWeight: '700' },

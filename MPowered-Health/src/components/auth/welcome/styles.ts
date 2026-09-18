@@ -1,4 +1,4 @@
-/** Defines the colors, spacing, and layout used by account setup / welcome page. */
+/** Defines the splash carousel layout; shared account forms use auth-ui.tsx. */
 import { palette } from '@/constants/profile/ui';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
@@ -56,7 +56,7 @@ export const s = StyleSheet.create({
   primaryPressed: { backgroundColor: palette.primaryDark, transform: [{ scale: 0.99 }] },
   primaryText: { fontSize: 14, fontWeight: '800', color: palette.text },
   secondary: { height: 40, alignItems: 'center', justifyContent: 'center' },
-  secondaryPressed: { backgroundColor: '#FFF0EC', borderRadius: 12 },
+  secondaryPressed: { backgroundColor: palette.pressedBackground, borderRadius: 12 },
   secondaryText: {
     fontSize: 13,
     fontWeight: '700',

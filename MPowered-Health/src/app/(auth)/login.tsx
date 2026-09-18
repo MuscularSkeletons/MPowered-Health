@@ -15,7 +15,7 @@ import {
 
 const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 
-/** Keeps the existing backend password sign-in while presenting the Front-End form design. */
+/** Displays the sign-in form and restores the remembered email address. */
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +35,7 @@ export default function Login() {
     });
   }, []);
 
-  /** Validates the form and delegates authentication to the unchanged backend context. */
+  /** Validates the form and signs in through the authentication context. */
   const handleLogin = async () => {
     if (!email.trim() || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 7,
     borderWidth: 1.5,
-    borderColor: '#D8D0D4',
+    borderColor: palette.controlBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },

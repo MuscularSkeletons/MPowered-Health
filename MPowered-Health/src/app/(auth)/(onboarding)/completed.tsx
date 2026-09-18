@@ -3,7 +3,7 @@ import { Alert, Text, View } from 'react-native';
 import { useAuth } from '@/context/authcontext';
 import { AuthIntro, AuthScreen, PrimaryButton, authStyles } from '@/components/auth/auth-ui';
 
-/** Saves the same backend profile fields, then leaves onboarding through its completion route. */
+/** Saves the profile answers and marks onboarding complete. */
 export default function CompleteOnboarding() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateUser } = useAuth();
@@ -37,7 +37,7 @@ export default function CompleteOnboarding() {
         title={`Thank you${user?.name ? `, ${user.name}` : ''} 😃`}
         description="Your answers are ready to be linked to your account."
       />
-      <Text style={authStyles.helper}>
+      <Text style={[authStyles.helper, { fontStyle: 'italic' }]}>
         Continue to finish setup and prepare your MPowered Health experience.
       </Text>
       <View style={authStyles.actions}>

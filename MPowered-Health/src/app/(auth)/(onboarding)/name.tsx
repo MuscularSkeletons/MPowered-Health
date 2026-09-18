@@ -10,7 +10,7 @@ import {
   authStyles,
 } from '@/components/auth/auth-ui';
 
-/** Collects the name used by the existing onboarding profile object. */
+/** Stores the name used to personalise the profile. */
 export default function StoreName() {
   const [name, setName] = useState('');
   const router = useRouter();
