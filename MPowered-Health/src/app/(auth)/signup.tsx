@@ -123,6 +123,7 @@ export default function Signup() {
                             color="#aaa"
                             style={styles.icon}
                             onPress={toggleShowPassword}
+                            testID = "toggle-password-icon"
                         />
                         <Text>Confirm Password</Text>
                         <TextInput 
@@ -144,6 +145,7 @@ export default function Signup() {
                             color="#aaa"
                             style={styles.icon}
                             onPress={toggleShowConfirmPassword}
+                            testID="toggle-confirm-password-icon"
                         />
                         {/*when confirming password, display text if password not the same */}
                         {(confirmPassword && !isEqualPasswords) ? (

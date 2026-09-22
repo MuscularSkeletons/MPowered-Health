@@ -52,7 +52,11 @@ describe ('Sign up rendering', () => {
     
     //password visibility button
     test("password visibility icon is rendered", () => {
-
+        expect(screen.getByTestId('toggle-password-icon')).toBeTruthy();
+    })
+    
+    test("confirm password visibility icon is rendered", () => {
+        expect(screen.getByTestId('toggle-confirm-password-icon')).toBeTruthy();
     })
 
 })
@@ -363,10 +367,79 @@ describe("Email Validation", () => {
     })
 })
 
-describe("Rendering error messages", () => {
-    //other error handling messages
-})
+describe("Password visibility", () => {
 
+    test("password is hidden by default", async() => {
+        await render(<Signup/>);
+        const passwordInput = screen.getByPlaceholderText("Password");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+    })
+
+    test("confirm password is hidden by default", async() => {
+        await render(<Signup/>);
+        const passwordInput = screen.getByPlaceholderText("Confirm Password");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+    })
+
+    test("clicking the eye button shows the password", async() => {
+        await render(<Signup/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Password");
+        const visibilityIcon = screen.getByTestId('toggle-password-icon');
+
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
+    })
+
+    test("clicking the eye button again hides the password", async() => {
+        await render(<Signup/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Password");
+        const visibilityIcon = screen.getByTestId('toggle-password-icon');
+
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+    })
+
+    test("clicking the eye button shows the confirm password", async() => {
+        await render(<Signup/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Confirm Password");
+        const visibilityIcon = screen.getByTestId('toggle-confirm-password-icon');
+
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+    })
+
+    test("clicking the eye button again hides the confirm password", async() => {
+        await render(<Signup/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Confirm Password");
+        const visibilityIcon = screen.getByTestId('toggle-confirm-password-icon');
+
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+    })
+})
 
 //navigation test throws an error about expo router linking
 /*
@@ -390,3 +463,7 @@ describe ("Navigation to the correct screen", () => {
     //do not navigate anywhere if wrong input
 
 })*/
+
+describe("Rendering error messages", () => {
+    //other error handling messages
+})
