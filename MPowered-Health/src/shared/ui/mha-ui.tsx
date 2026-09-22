@@ -1,4 +1,4 @@
-// This file contains shared colors, spacing, buttons, and basic interface components.
+/** Provides the headers, buttons, cards, and summary rows reused across the app. */
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 // Shared design values keep screens visually consistent and avoid repeated numbers.
 export const palette = {
@@ -27,7 +27,12 @@ export const layout = {
   controlHeight: 56,
 };
 export const radius = { sm: 12, md: 16, lg: 20, xl: 24, pill: 999 };
-// Render the shared MPowered Health wordmark at the top of screens.
+
+/**
+ * Displays the shared MPowered header.
+ *
+ * Render the shared MPowered Health wordmark at the top of screens.
+ */
 export function MhaHeader() {
   return (
     <View style={s.header}>
@@ -41,7 +46,12 @@ export function MhaHeader() {
     </View>
   );
 }
-// Keep primary actions consistent and expose disabled state for accessibility.
+
+/**
+ * Displays a styled action button with optional disabled state.
+ *
+ * Keep primary actions consistent and expose disabled state for accessibility.
+ */
 export function ActionButton({
   label,
   onPress,
@@ -63,7 +73,8 @@ export function ActionButton({
     </Pressable>
   );
 }
-// Pair a small section label with its larger heading.
+
+/** Displays a small section label above its main heading. */
 export function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <View style={s.section}>
@@ -72,7 +83,12 @@ export function SectionHeading({ eyebrow, title }: { eyebrow: string; title: str
     </View>
   );
 }
-// Provide one reusable heading block for top-level pages.
+
+/**
+ * Displays the title and introduction at the top of a page.
+ *
+ * Provide one reusable heading block for top-level pages.
+ */
 export function PageIntro({
   eyebrow,
   title,
@@ -90,6 +106,7 @@ export function PageIntro({
     </View>
   );
 }
+
 // Pair each soft card background with readable foreground text.
 const tones = {
   rose: ['#F8E1E5', '#94465A'],
@@ -98,7 +115,12 @@ const tones = {
   gold: ['#F5EBD2', '#83651F'],
   violet: ['#E9DEFF', '#5E17EB'],
 } as const;
-// Render a tappable health destination with status and a clear arrow.
+
+/**
+ * Displays a health feature card with its content and action.
+ *
+ * Render a tappable health destination with status and a clear arrow.
+ */
 export function HealthCard({
   tone,
   symbol,
@@ -153,7 +175,12 @@ export function HealthCard({
     </Pressable>
   );
 }
-// Display one labelled value in summary cards and reports.
+
+/**
+ * Displays a label and value in a summary.
+ *
+ * Display one labelled value in summary cards and reports.
+ */
 export function SummaryRow({
   tone,
   symbol,
@@ -206,23 +233,16 @@ export function SummaryRow({
     </Pressable>
   );
 }
+
 // Store shared component styles after behavior and content rules.
 const s = StyleSheet.create({
   header: {
     height: 64,
-    paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderColor: '#E9E4F0',
+    borderBottomColor: '#F0DCD7',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    shadowColor: '#2F174A',
-    shadowOpacity: 0.035,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    backgroundColor: '#FFFFFF',
   },
   logoLockup: { height: 34, flexDirection: 'row', alignItems: 'flex-end' },
   poweredMark: { width: 78, height: 34, position: 'relative' },
@@ -233,7 +253,7 @@ const s = StyleSheet.create({
     fontSize: 30,
     lineHeight: 33,
     fontWeight: '800',
-    color: '#18151C',
+    color: '#3A3035',
   },
   centerPowered: {
     position: 'absolute',
@@ -242,13 +262,13 @@ const s = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16,
     fontWeight: '800',
-    color: '#18151C',
+    color: '#3A3035',
   },
   centerHealth: {
     fontSize: 25,
     lineHeight: 30,
     fontWeight: '800',
-    color: '#8C52FF',
+    color: '#67A96B',
     marginLeft: 12,
   },
   action: {

@@ -1,0 +1,4 @@
+-- Reserved for the backend teammate: Movement, Personal Care, Social Health, and Management.
+-- Intentionally contains no executable SQL until those integrations are implemented.
+-- My Pain policies are maintained in the separate pain migrations.
+-- Existing remote tables and records are not removed by this placeholder.

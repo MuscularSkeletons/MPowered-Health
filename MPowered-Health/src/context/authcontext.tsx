@@ -1,0 +1,211 @@
+import { supabase } from "@/lib/supabase/client";
+import {
+    createContext,
+    useEffect,
+    useState,
+    ReactNode,
+    useContext,
+} from "react";
+
+// information related to user authentication + its related functions
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  birthsex?: string;
+  birthyear?: number;
+  formalDiagnosis?: boolean;
+  painConditions?: string[];
+  otherCondition?: string;
+  onboardingComplete?: boolean;
+}
+
+interface AuthContextType {
+  user: User | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateUserDraft: (userData: Partial<User>) => void;
+  updateUser: (userData: Partial<User>) => Promise<void>;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// defines all functions related to authentication
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
+  const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
+
+  // get the user information from supabase for the user with that userId (check if user authenticated)
+  // checks if user information exists when they sign-in/sign-up
+  const fetchUserProfile = async (userId: string): Promise<User | null> => {
+    try {
+      // fetch all user info from db for the given user id
+      const { data, error } = await supabase
+        .from("User")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+        if (error) {
+          console.error("Error fetching user profile:", error);
+          return null; // abort function early
+        }
+
+        if (!data) {
+          console.error("User profile data not found");
+          return null; // abort function early
+        }
+
+        const authUser = await supabase.auth.getUser(); // gets info about a user currently logged in
+        if (!authUser.data.user) {
+          console.error("No authenticated user found");
+          return null; // abort function early
+        }
+
+        // return the user
+        return {
+          id: data.user_id,
+          name: data.name,
+          email: authUser.data.user.email || "", // get the email used for authentication
+          birthsex: data.sex,
+          birthyear: data.birth_year,
+          formalDiagnosis: data.formal_diagnosis,
+          painConditions: data.pain_conditions,
+          otherCondition: data.other_condition,
+          onboardingComplete: data.onboarding_complete,
+        };
+
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  }
+
+  // TODO: implement sign in using email and password
+  const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
+      email,
+      password,
+    });
+
+    if (error) throw error; // TO DO: try-catch block? maybe??
+
+    console.log("User signed in");
+
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  };
+
+  // handles user sign up using an email and pasword authentication method
+  const signUp = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) throw error; // TO DO: try-catch block? maybe??
+
+    console.log("User signed up");
+
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  }
+
+  // Onboarding screens build one local profile before the completed screen saves it.
+  const updateUserDraft = (userData: Partial<User>) => {
+    if (!user) return;
+    setUser((current) => current ? { ...current, ...userData } : current);
+    // Log field names only so health answers and personal details stay out of logs.
+    if (__DEV__) console.log('User draft updated locally:', Object.keys(userData));
+  };
+
+  // update user info in supabase - pass in a partial value so can update any combination of fields
+  const updateUser = async (userData: Partial<User>) => {
+    // check user logged in
+    if (!user) return;
+
+    try {
+      // the values we want to update
+      const updateData: any = {};
+      // only update data if the data to update is defined
+      if (userData.name !== undefined) updateData.name = userData.name;
+      if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
+      if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
+      if (userData.formalDiagnosis !== undefined) updateData.formal_diagnosis = userData.formalDiagnosis;
+      if (userData.painConditions !== undefined) updateData.pain_conditions = userData.painConditions;
+      if (userData.otherCondition !== undefined) updateData.other_condition = userData.otherCondition;
+      if (userData.onboardingComplete !== undefined) updateData.onboarding_complete = userData.onboardingComplete;
+
+      // update values in db
+      const { error, data } = await supabase
+        .from("User")
+        .update(updateData)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // update the change here
+      if (data) {
+        if (__DEV__) console.log('User profile saved:', Object.keys(updateData));
+        const userProfile = await fetchUserProfile(data.user_id);
+        setUser(userProfile);
+        if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
+      }
+
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  };
+
+  // Start each app launch at Login. Only clear this device's session; other devices stay signed in.
+  useEffect(() => {
+    let active = true;
+    const openLogin = async () => {
+      try {
+        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        if (error) console.error('Unable to clear the previous local session:', error);
+      } finally {
+        if (active) {
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    };
+    void openLogin().catch((error) => console.error('Unable to prepare login:', error));
+    return () => { active = false; };
+  }, []);
+
+  return (
+    <AuthContext.Provider
+        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
+    >
+        {children}
+    </AuthContext.Provider>
+  );
+};
+
+// allows easy access to functions defined here
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("calling from outside the provider");
+  }
+  return context;
+};

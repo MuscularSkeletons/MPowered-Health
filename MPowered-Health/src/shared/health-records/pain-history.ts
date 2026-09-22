@@ -1,7 +1,7 @@
-// This file saves and loads the user's dated pain assessment history.
+/** Loads, saves, and groups dated pain assessments for screens and reports. */
+import type { AssessmentAnswers } from '@/shared/health-records/assessment-types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { AssessmentAnswers } from './assessment-session';
-import { supabase } from '../../lib/supabase';
+import { saveAssessmentRecord } from './assessment-repository';
 
 export type PainAssessmentRecord = {
   id: string;
@@ -19,7 +19,12 @@ const storageKey = 'mpowered:pain-history:v1';
 let records: PainAssessmentRecord[] = [];
 // Chain disk writes in submission order so two quick saves cannot overwrite each other.
 let writes: Promise<unknown> = Promise.resolve();
-// Every public read and write crosses this copy boundary to protect saved history.
+
+/**
+ * Copies a record so callers cannot change the stored object through a shared reference.
+ *
+ * Every public read and write crosses this copy boundary to protect saved history.
+ */
 const clone = (record: PainAssessmentRecord): PainAssessmentRecord => ({
   ...record,
   areas: [...record.areas],
@@ -28,11 +33,13 @@ const clone = (record: PainAssessmentRecord): PainAssessmentRecord => ({
   ),
 });
 
+/** Builds a consistent key for a set of pain areas. */
 export function painAreaKey(areas: string[]) {
   // Trim, remove duplicates, and sort so "Back, Knee" always has one stable key.
   return JSON.stringify([...new Set(areas.map((area) => area.trim()).filter(Boolean))].sort());
 }
 
+/** Builds a dated pain-history record from assessment answers. */
 function createRecord(
   answers: AssessmentAnswers,
   completedAt: string,
@@ -42,6 +49,8 @@ function createRecord(
   const areas: string[] = JSON.parse(painAreaKey(answers[0] ?? []));
   if (!areas.length || !Number.isFinite(Date.parse(completedAt)))
     throw new Error('Missing pain areas or assessment date.');
+
+  /** Reads a numeric pain score from the answers. */
   const score = (index: number) => {
     // Reject missing, decimal, and out-of-range values before anything reaches storage.
     const value = answers[index]?.[0];
@@ -56,6 +65,7 @@ function createRecord(
     }
     return Number(value);
   };
+
   return clone({
     id,
     completedAt,
@@ -68,6 +78,11 @@ function createRecord(
   });
 }
 
+/**
+ * Loads and validates saved pain history into memory.
+ *
+ * @throws If saved JSON is malformed, a record is invalid, or storage cannot be read.
+ */
 export async function loadPainHistory() {
   // Rebuild each stored entry through createRecord so old or damaged data is validated.
   const raw = await AsyncStorage.getItem(storageKey);
@@ -96,6 +111,14 @@ export async function loadPainHistory() {
     .sort((a, b) => a.completedAt.localeCompare(b.completedAt));
 }
 
+/**
+ * Adds a completed pain assessment and saves the updated history.
+ *
+ * @param answers - Answers keyed by question index; pain areas and all four intensity scores are required.
+ * @param now - Completion time; defaults to the current time.
+ * @returns A copy of the saved record after storage succeeds.
+ * @throws If the answers are invalid or the storage write fails.
+ */
 export async function savePainAssessment(answers: AssessmentAnswers, now = new Date()) {
   // Snapshot answers before the asynchronous save so later edits cannot change history.
   const record = createRecord(
@@ -110,50 +133,39 @@ export async function savePainAssessment(answers: AssessmentAnswers, now = new D
       const updated = [...records, record].sort((a, b) =>
         a.completedAt.localeCompare(b.completedAt),
       );
+      // Complete the backend write before showing the success summary.
+      await saveAssessmentRecord('pain', record.answers, record.completedAt);
       await AsyncStorage.setItem(storageKey, JSON.stringify(updated));
       records = updated;
-
-      //supabase
-      console.log('Payload being sent to Supabase:');
-      const { error } = await supabase
-        .from('pain_assessment')
-        .insert([
-          {
-            pain_location: record.areas,
-            pain_characteristics: record.answers[1] ?? [],
-            current_pain: record.current,
-            average_pain: record.average,
-            mildest_pain: record.mildest,
-            worst_pain: record.worst,
-          },
-        ]);
-
-      if (error) {
-        console.error('Error saving to Supabase:', error.message);
-      } else {
-        console.log('Saved to Supabase successfully.');
-      }
-
       return clone(record);
     });
-    
   writes = write;
   return write;
 }
 
+/** Waits until pending pain-history saves have finished. */
 export async function finishPainHistoryWrites() {
   // Account deletion waits for any active save before clearing persistent data.
   await writes.catch(() => undefined);
 }
+
+/** Clears the pain records currently held in memory. */
 export function clearPainHistoryMemory() {
   // Clear the session copy after account deletion or an explicit reset.
   records = [];
 }
+
+/**
+ * Returns copies of the current pain-history records.
+ *
+ * @returns New record and answer objects that callers can sort or edit without changing stored history.
+ */
 export function getPainHistory() {
   // Screens receive copies and can sort or filter them safely.
   return records.map(clone);
 }
 
+/** Groups pain records by the areas where pain was reported. */
 export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup[] {
   // Group weeks by their complete area combination, in chronological order.
   const groups = new Map<string, PainAreaGroup>();
@@ -165,11 +177,13 @@ export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup
   return [...groups.values()];
 }
 
+/** Reads the requested pain score from a history record. */
 export function painMetricValue(record: PainAssessmentRecord, metric: PainMetric) {
   // Keep chart metric selection in one place for the screen and PDF report.
   return metric === 'Worst' ? record.worst : metric === 'Mildest' ? record.mildest : record.average;
 }
 
+/** Formats the completion date for display. */
 export function painRecordDate(record: PainAssessmentRecord, compact = false) {
   // Charts use DD/MM; lists and reports use a readable Australian date.
   const date = new Date(record.completedAt);
@@ -177,5 +191,3 @@ export function painRecordDate(record: PainAssessmentRecord, compact = false) {
     ? `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`
     : date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
 }
-
-
