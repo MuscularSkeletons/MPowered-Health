@@ -3,11 +3,15 @@ import {
   View, 
   StyleSheet,
   TouchableOpacity, 
+  Modal,
+  Pressable,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
 import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/profile/ui";
+import { useState } from "react";
 
 // temporary UI reusing auth ui
 import {
@@ -21,7 +25,41 @@ import {
 
 export default function ManageProfile() {
   const router = useRouter();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, updateUserDraft } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // pop-up to edit a detail
+  const [showEdit, setShowEdit] = useState(false);
+  const [name, setName] = useState('');
+
+  const handleUpdateName = async () => {
+    if (!user) {
+      return;
+    }
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      Alert.alert('Error', 'Please enter your name');
+      return;
+    }
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        name: trimmedName 
+      });
+      // update supabase
+      await updateUser({
+        name: user.name,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowEdit(!showEdit);
+    }
+  }
 
   return (
     <AuthScreen>
@@ -31,8 +69,8 @@ export default function ManageProfile() {
         title="Edit your profile"
         description="Edit your information or update your security details"
       />
-
-      <TouchableOpacity style={styles.settingItem}>
+      
+      <TouchableOpacity style={styles.settingItem} onPress={() => setShowEdit(!showEdit)}>
         <Text style={styles.settingLabel}>{user?.name || "No Name"}</Text>
         <Ionicons 
             name={"create-outline"}
@@ -67,7 +105,41 @@ export default function ManageProfile() {
             style={styles.settingValue}
         />
       </TouchableOpacity>
+      
+      <Modal 
+        visible={showEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Name</Text>
+            <AuthInput
+              label="Name"
+              placeholder={user?.name}
+              inputMode="text"
+              autoCapitalize="words"
+              autoCorrect={false}
+              value={name}
+              onChangeText={setName}
+              onSubmitEditing={handleUpdateName}
+              editable={!isLoading}
+            />
+            <Pressable 
+              style={[styles.button, styles.buttonClose]} 
+              onPress={() => setShowEdit(!showEdit)}
+              disabled={isLoading}
+              >
+              <Text>Cancel</Text>
+            </Pressable>
+            <Pressable  style={[styles.button, styles.buttonClose]} onPress={handleUpdateName}>
+              <Text>Save</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </AuthScreen>
+  
   );
 }
 
@@ -89,5 +161,34 @@ const styles = StyleSheet.create({
   settingValue: {
     fontSize: 25,
     color: palette.success,
+  },
+  centredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editInterface: {
+    backgroundColor: 'white',
+    margin: 20,
+    padding: 50,
+    paddingLeft: 120,
+    paddingRight: 120,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderRadius: 20,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonClose: {
+    backgroundColor: palette.primary,
   },
 })
