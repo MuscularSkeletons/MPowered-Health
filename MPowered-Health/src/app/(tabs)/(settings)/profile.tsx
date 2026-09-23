@@ -125,16 +125,18 @@ export default function ManageProfile() {
               onSubmitEditing={handleUpdateName}
               editable={!isLoading}
             />
-            <Pressable 
-              style={[styles.button, styles.buttonClose]} 
-              onPress={() => setShowEdit(!showEdit)}
-              disabled={isLoading}
-              >
-              <Text>Cancel</Text>
-            </Pressable>
-            <Pressable  style={[styles.button, styles.buttonClose]} onPress={handleUpdateName}>
-              <Text>Save</Text>
-            </Pressable>
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowEdit(!showEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateName}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -171,8 +173,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     margin: 20,
     padding: 50,
-    paddingLeft: 120,
-    paddingRight: 120,
+    paddingLeft: 100,
+    paddingRight: 100,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -183,12 +185,20 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 20,
   },
+  buttonOptions: {
+    flexDirection: 'row',
+    paddingTop: 20,
+  },
   button: {
     borderRadius: 20,
-    padding: 10,
+    padding: 15,
     elevation: 2,
+    marginHorizontal: 10,
   },
-  buttonClose: {
+  buttonCancel: {
+    backgroundColor: palette.line,
+  },
+  buttonSave: {
     backgroundColor: palette.primary,
   },
 })
