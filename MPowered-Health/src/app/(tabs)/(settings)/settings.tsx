@@ -8,6 +8,15 @@ import {
 import { useAuth } from "@/context/authcontext";
 import { useRouter } from "expo-router";
 import { openBrowserAsync } from 'expo-web-browser';
+// temporary UI - to be replaced by settings specific UI
+import {
+  AuthIntro,
+  AuthScreen,
+  ChoiceButton,
+  PrimaryButton,
+  authStyles,
+} from '@/components/auth/auth-ui';
+import { palette } from '@/constants/profile/ui';
 
 export default function Settings() {
   const { user, signOut } = useAuth();
@@ -42,27 +51,34 @@ export default function Settings() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text>settings.</Text>
-      <TouchableOpacity>
-        <Text>Edit Profile</Text>
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <Text>Notifications</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => void openPolicy('https://muscha.org/privacy-policy/')}>
-        <Text>Privacy Policy</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => void openPolicy('https://muscha.org/terms-and-conditions/')}>
-        <Text>Terms and Conditions</Text>
-      </TouchableOpacity>
+    <AuthScreen>
+      <AuthIntro
+        sectionLabel="SETTINGS"
+        title="Edit Your Profile"
+      />
+      <PrimaryButton
+          label="Edit Profile"
+          onPress={() => router.push('/(tabs)/(settings)/profile')}
+        />
+      <PrimaryButton
+        label="Notifications"
+        onPress={() => router.push('/(tabs)/(settings)/notifications')}
+      />
+      <Text accessibilityRole="link" style={styles.link}
+        onPress={() => void openPolicy('https://muscha.org/privacy-policy/')}>
+        Privacy Policy
+      </Text>
+      <Text accessibilityRole="link" style={styles.link}
+        onPress={() => void openPolicy('https://muscha.org/terms-and-conditions/')}>
+        Terms and Conditions
+      </Text>
       <TouchableOpacity onPress={handleSignOut}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
       <TouchableOpacity>
-        <Text>Delete Account</Text>
+        <Text style={styles.deleteAccountText}>Delete Account</Text>
       </TouchableOpacity>
-    </View>
+    </AuthScreen>
   );
 }
 
@@ -78,5 +94,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     color: 'red',
     fontWeight: 'bold',
+  },
+  deleteAccountText: {
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  link: { 
+    color: palette.primaryDark, 
+    textDecorationLine: 'underline' 
   },
 });
