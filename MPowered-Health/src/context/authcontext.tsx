@@ -167,6 +167,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(userProfile);
         if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
+      console.log("user draft data", data);
 
     } catch (error) {
       console.error("Error updating user:", error);

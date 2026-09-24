@@ -12,6 +12,8 @@ import { useAuth } from '@/context/authcontext';
 import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/profile/ui";
 import { useState } from "react";
+import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
+import { sexOptions, diagnosisOptions } from '@/constants/profile/profile-options';
 
 // temporary UI reusing auth ui
 import {
@@ -20,6 +22,7 @@ import {
   AuthScreen,
   PrimaryButton,
   authStyles,
+  ChoiceButton,
 } from '@/components/auth/auth-ui';
 
 
@@ -29,9 +32,9 @@ export default function ManageProfile() {
   const [isLoading, setIsLoading] = useState(false);
 
   // pop-up to edit a detail
-  const [showEdit, setShowEdit] = useState(false);
+  // edit name
+  const [showNameEdit, setShowNameEdit] = useState(false);
   const [name, setName] = useState('');
-
   const handleUpdateName = async () => {
     if (!user) {
       return;
@@ -57,7 +60,105 @@ export default function ManageProfile() {
     } finally {
       setIsLoading(false);
       // close modal
-      setShowEdit(!showEdit);
+      setShowNameEdit(!showNameEdit);
+    }
+  }
+
+  // edit birth sex
+  const [showBirthsexEdit, setShowBirthsexEdit] = useState(false);
+  const [birthsex, setBirthsex] = useState('');
+  const handleUpdateBirthsex = async () => {
+    if (!user) {
+      return;
+    }
+    if (!birthsex) {
+      Alert.alert('Error', 'Please select an option');
+      return;
+    }
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        birthsex: birthsex 
+      });
+      // update supabase
+      await updateUser({
+        birthsex: user.birthsex,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowBirthsexEdit(!showBirthsexEdit);
+    }
+  }
+
+  // edith birth year
+  const [showBirthYearEdit, setShowBirthYearEdit] = useState(false);
+  const [birthYear, setBirthYear] = useState('');
+  const handleUpdateBirthYear = async () => {
+    if (!user) {
+      return;
+    }
+    const numericBirthYear = Number(birthYear);
+    if (
+      !/^\d{4}$/.test(birthYear) ||
+      numericBirthYear < BIRTH_YEAR_RANGE.LOWER_BOUND ||
+      numericBirthYear > BIRTH_YEAR_RANGE.UPPER_BOUND
+    ) {
+      Alert.alert('Error', 'Please enter a valid four-digit year');
+      return;
+    }
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        birthyear: numericBirthYear 
+      });
+      // update supabase
+      await updateUser({
+        birthyear: user.birthyear,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowBirthYearEdit(!showBirthYearEdit);
+    }
+  }
+
+  // edit diagnosis status
+  const [showDiagnosisEdit, setShowDiagnosisEdit] = useState(false);
+  const [hasDiagnosis, setHasDiagnosis] = useState<boolean | null>(null);
+  const handleUpdateDiagnosis = async () => {
+    if (hasDiagnosis === null) {
+      Alert.alert('Error', 'Please select an option');
+      return;
+    }
+    console.log("diagnosis", hasDiagnosis);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        formalDiagnosis: hasDiagnosis 
+      });
+      console.log("draft diagnosis", user.formalDiagnosis);
+      // update supabase
+      await updateUser({
+        formalDiagnosis: user.formalDiagnosis,
+      });
+      console.log("Updated diagnosis", user.formalDiagnosis);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowDiagnosisEdit(!showDiagnosisEdit);
     }
   }
 
@@ -70,15 +171,33 @@ export default function ManageProfile() {
         description="Edit your information or update your security details"
       />
       
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowEdit(!showEdit)}>
+      <TouchableOpacity style={styles.settingItem} onPress={() => setShowNameEdit(!showNameEdit)}>
         <Text style={styles.settingLabel}>{user?.name || "No Name"}</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}>
-        <Text style={styles.settingLabel}>{user?.formalDiagnosis || "No diagnosis given"}</Text>
+      <TouchableOpacity style={styles.settingItem} onPress={() => setShowBirthsexEdit(!showBirthsexEdit)}>
+        <Text style={styles.settingLabel}>{user?.birthsex || "Prefer not to say"}</Text>
+        <Ionicons 
+            name={"create-outline"}
+            style={styles.settingValue}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.settingItem} onPress={() => setShowBirthYearEdit(!showBirthYearEdit)}>
+        <Text style={styles.settingLabel}>{user?.birthyear || "No birth year"}</Text>
+        <Ionicons 
+            name={"create-outline"}
+            style={styles.settingValue}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.settingItem} onPress={() => setShowDiagnosisEdit(!showDiagnosisEdit)}>
+        {user?.formalDiagnosis === true ?
+        <Text style={styles.settingLabel}>Have formal diagnosis</Text> :
+        user?.formalDiagnosis === false ?
+        <Text style={styles.settingLabel}>Have no formal diagnosis</Text> :
+        <Text style={styles.settingLabel}>No diagnosis given</Text>}
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
@@ -86,6 +205,13 @@ export default function ManageProfile() {
       </TouchableOpacity>
       <TouchableOpacity style={styles.settingItem}>
         <Text style={styles.settingLabel}>Edit Conditions</Text>
+        <Ionicons 
+            name={"create-outline"}
+            style={styles.settingValue}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.settingItem}>
+        <Text style={styles.settingLabel}>Edit Other Conditions</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
@@ -107,7 +233,7 @@ export default function ManageProfile() {
       </TouchableOpacity>
       
       <Modal 
-        visible={showEdit} 
+        visible={showNameEdit} 
         transparent={true} 
         animationType="slide"
         >
@@ -128,7 +254,7 @@ export default function ManageProfile() {
             <View style={styles.buttonOptions}>
               <Pressable 
                 style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowEdit(!showEdit)}
+                onPress={() => setShowNameEdit(!showNameEdit)}
                 disabled={isLoading}
                 >
                 <Text>Cancel</Text>
@@ -140,6 +266,112 @@ export default function ManageProfile() {
           </View>
         </View>
       </Modal>
+
+      <Modal 
+        visible={showBirthsexEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Birth Sex</Text>
+            <View style={authStyles.choices}>
+              {sexOptions.map((option) => (
+                <ChoiceButton
+                  key={option}
+                  label={option}
+                  selected={birthsex === option}
+                  onPress={() => setBirthsex(option)}
+                />
+              ))}
+            </View>
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowBirthsexEdit(!showBirthsexEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateBirthsex}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal 
+        visible={showBirthYearEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Birth Year</Text>
+            <AuthInput
+              label="Year of birth"
+              placeholder={String(user?.birthyear || "XXXX")}
+              keyboardType="number-pad"
+              inputMode="numeric"
+              maxLength={4}
+              value={birthYear}
+              onChangeText={(value) => setBirthYear(value.replace(/\D/g, '').slice(0, 4))}
+              onSubmitEditing={handleUpdateBirthYear}
+              editable={!isLoading}
+            />
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowBirthYearEdit(!showBirthYearEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateBirthYear}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      
+      <Modal 
+        visible={showDiagnosisEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Diagnosis</Text>
+            <View style={authStyles.choices}>
+              <ChoiceButton
+                label={diagnosisOptions[0]}
+                selected={hasDiagnosis === true}
+                onPress={() => setHasDiagnosis(true)}
+              />
+              <ChoiceButton
+                label={diagnosisOptions[1]}
+                selected={hasDiagnosis === false}
+                onPress={() => setHasDiagnosis(false)}
+              />
+            </View>
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowDiagnosisEdit(!showDiagnosisEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateDiagnosis}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </AuthScreen>
   
   );
@@ -171,7 +403,7 @@ const styles = StyleSheet.create({
   },
   editInterface: {
     backgroundColor: 'white',
-    margin: 20,
+    margin: 10,
     padding: 50,
     paddingLeft: 100,
     paddingRight: 100,
