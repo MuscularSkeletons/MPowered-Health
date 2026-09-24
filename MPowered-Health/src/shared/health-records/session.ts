@@ -1,5 +1,6 @@
 /** Keeps assessment answers and completion information for the current app session. */
-import { getPainHistory, painRecordDate, clearPainHistoryMemory } from './pain-history';
+import { getDisplayPainHistory } from './display-history';
+import { painRecordDate, clearPainHistoryMemory } from './pain-history';
 import type { AssessmentAnswers, AssessmentId } from '@/shared/health-records/assessment-types';
 const completedAssessments = new Set<AssessmentId>();
 const assessmentAnswers = new Map<AssessmentId, AssessmentAnswers>();
@@ -80,7 +81,7 @@ const painRecords: PainRecord[] = [];
 /** Returns the pain records used by the session summaries. */
 export function getPainRecords() {
   // Real saved history replaces the starter chart as soon as a result exists.
-  const saved = getPainHistory();
+  const saved = getDisplayPainHistory();
   if (saved.length)
     return saved.map((record) => ({ date: painRecordDate(record, true), score: record.average }));
   return [...painRecords];

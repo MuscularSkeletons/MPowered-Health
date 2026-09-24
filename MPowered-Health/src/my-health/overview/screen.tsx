@@ -1,3 +1,5 @@
+import { getDisplayPainHistory } from '@/shared/health-records/display-history';
+import { isDemoPainRecord } from '@/shared/health-records/demo-history';
 import { s } from './styles';
 import { getLatestAssessmentDate, getPainRecords, PainRecord } from '@/shared/health-records/session';
 import { MhaHeader, palette } from '@/shared/ui/mha-ui';
@@ -76,6 +78,7 @@ export default function Health() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />
+      {getDisplayPainHistory().some(isDemoPainRecord) ? <Text style={{ padding: 12, textAlign: 'center' }}>Demo data — sample pain records, not your health results.</Text> : null}
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         <Text style={s.eyebrow}>MY HEALTH</Text>
         <View style={s.heroTitle}>

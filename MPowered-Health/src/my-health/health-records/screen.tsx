@@ -1,3 +1,5 @@
+import { getDisplayPainHistory } from '@/shared/health-records/display-history';
+import { isDemoPainRecord } from '@/shared/health-records/demo-history';
 import { PrintPdfButton } from './PrintPdfButton';
 import { TrackingChart } from './TrackingChart';
 import { useHealthRecords } from './useRecords';
@@ -34,6 +36,7 @@ export default function HealthRecords() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <MhaHeader />
+      {getDisplayPainHistory().some(isDemoPainRecord) ? <Text style={{ padding: 12, textAlign: 'center' }}>Demo data — sample pain records, not your health results.</Text> : null}
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         <Pressable onPress={() => router.replace('/(tabs)/myhealth')}>
           <Text style={s.back}>‹ Back</Text>

@@ -154,3 +154,22 @@ test('queued saves cannot cross accounts', async () => {
   await assert.rejects(saving, /account changed/);
   assert.equal(history.getPainHistory().length, 0);
 });
+
+test('demo history fills charts without persisting or mixing with real records', async () => {
+  const env = environment();
+  const display = env.load('shared/health-records/display-history');
+  const history = env.load('shared/health-records/pain-history');
+  const demo = display.getDisplayPainHistory();
+  assert.equal(demo.length, 5);
+  assert.equal(history.getPainHistory().length, 0);
+  assert.equal(env.storage.size, 0);
+  assert.equal(history.groupPainHistory(demo).length, 2);
+  demo[0].areas.push('Changed');
+  assert.equal(display.getDisplayPainHistory()[0].areas.length, 2);
+  const report = env.load('my-health/health-records/report');
+  assert.ok(report.buildHealthRecordsHtml(demo, 'Back', 'Average').includes('Demo data'));
+  await history.savePainAssessment(answers(['Back']), date(1));
+  assert.equal(display.getDisplayPainHistory().length, 1);
+  assert.ok(!display.getDisplayPainHistory()[0].id.startsWith('demo-'));
+  assert.ok(![...env.storage.values()][0].includes('demo-pain'));
+});

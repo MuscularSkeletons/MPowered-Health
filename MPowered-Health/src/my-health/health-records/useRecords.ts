@@ -1,5 +1,6 @@
+import { getDisplayPainHistory } from '@/shared/health-records/display-history';
 // This hook prepares the history groups and selections used by the records screen.
-import { getPainHistory, groupPainHistory, PainMetric } from '@/shared/health-records/pain-history';
+import { groupPainHistory, PainMetric } from '@/shared/health-records/pain-history';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
@@ -8,12 +9,12 @@ export function useHealthRecords() {
   const [tab, setTab] = useState<'chart' | 'history'>('chart');
   const [metric, setMetric] = useState<PainMetric>('Average');
   const [expanded, setExpanded] = useState(false);
-  const [history, setHistory] = useState(getPainHistory);
+  const [history, setHistory] = useState(getDisplayPainHistory);
   const [selectedKey, setSelectedKey] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   useFocusEffect(
     useCallback(() => {
-      setHistory(getPainHistory());
+      setHistory(getDisplayPainHistory());
     }, []),
   );
   // Keep the selected group when it exists, or use the first group.
