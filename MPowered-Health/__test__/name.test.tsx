@@ -2,6 +2,19 @@ import StoreName from '../src/app/(auth)/(onboarding)/name';
 import {render, screen, fireEvent, userEvent} from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
+const mockUser = jest.fn(() => Promise.resolve('mocked user'));
+
+jest.mock("@/context/authcontext", () => ({
+    useAuth: () => ({
+        user: mockUser,
+        signIn: jest.fn(),
+        signUp: jest.fn(),
+        signOut: jest.fn(),
+        updateUser: jest.fn(),
+        isLoading: false,
+    }),
+}))
+
 describe("rendering objects on screen", () => {
 
     test("screen objects are rendered on screen", async() => {
@@ -52,6 +65,18 @@ describe("name validation", () => {
         fireEvent.press(screen.getByText("SUBMIT"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "white space only is not allowed");
 
+    })
+
+    test("throw an error for a name with a whitespace", async() => {
+        jest.spyOn(Alert, "alert");
+
+        await render(<StoreName/>);
+        const nameInput = screen.getByPlaceholderText("Name");
+        const user = userEvent.setup();
+
+        await user.type(nameInput, "Jane "); 
+        fireEvent.press(screen.getByText("SUBMIT"));
+        expect(nameInput.props.value).toBe("Jane"); 
     })
 
 
