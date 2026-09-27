@@ -17,7 +17,7 @@ export interface User {
   birthyear?: number;
   formalDiagnosis?: boolean;
   painConditions?: string[];
-  otherCondition?: string;
+  otherCondition?: string | null;
   onboardingComplete?: boolean;
 }
 

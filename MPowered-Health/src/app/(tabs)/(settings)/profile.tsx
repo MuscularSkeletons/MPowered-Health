@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/profile/ui";
 import { useState } from "react";
 import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
-import { sexOptions, diagnosisOptions } from '@/constants/profile/profile-options';
+import { sexOptions, diagnosisOptions, painConditionsOptions } from '@/constants/profile/profile-options';
 
 // temporary UI reusing auth ui
 import {
@@ -24,6 +24,7 @@ import {
   authStyles,
   ChoiceButton,
 } from '@/components/auth/auth-ui';
+import { ScrollView } from 'react-native';
 
 
 export default function ManageProfile() {
@@ -44,6 +45,7 @@ export default function ManageProfile() {
       Alert.alert('Error', 'Please enter your name');
       return;
     }
+    setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
       // update locally
@@ -52,7 +54,7 @@ export default function ManageProfile() {
       });
       // update supabase
       await updateUser({
-        name: user.name,
+        name: trimmedName,
       });
     } catch (error) {
       console.error(error);
@@ -75,6 +77,7 @@ export default function ManageProfile() {
       Alert.alert('Error', 'Please select an option');
       return;
     }
+    setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
       // update locally
@@ -83,7 +86,7 @@ export default function ManageProfile() {
       });
       // update supabase
       await updateUser({
-        birthsex: user.birthsex,
+        birthsex: birthsex,
       });
     } catch (error) {
       console.error(error);
@@ -111,6 +114,7 @@ export default function ManageProfile() {
       Alert.alert('Error', 'Please enter a valid four-digit year');
       return;
     }
+    setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
       // update locally
@@ -119,7 +123,7 @@ export default function ManageProfile() {
       });
       // update supabase
       await updateUser({
-        birthyear: user.birthyear,
+        birthyear: numericBirthYear,
       });
     } catch (error) {
       console.error(error);
@@ -139,19 +143,17 @@ export default function ManageProfile() {
       Alert.alert('Error', 'Please select an option');
       return;
     }
-    console.log("diagnosis", hasDiagnosis);
+    setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
       // update locally
       updateUserDraft({ 
-        formalDiagnosis: hasDiagnosis 
+        formalDiagnosis: hasDiagnosis, 
       });
-      console.log("draft diagnosis", user.formalDiagnosis);
       // update supabase
       await updateUser({
-        formalDiagnosis: user.formalDiagnosis,
+        formalDiagnosis: hasDiagnosis,
       });
-      console.log("Updated diagnosis", user.formalDiagnosis);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');
@@ -162,6 +164,79 @@ export default function ManageProfile() {
     }
   }
 
+  // edit conditions
+  const [showConditionsEdit, setShowConditionsEdit] = useState(false);
+  const [painConditions, setPainConditions] = useState<string[]>([]);
+
+  const toggleCondition = (condition: string) => {
+    setPainConditions((selected) =>
+      selected.includes(condition)
+        ? selected.filter((item) => item !== condition)
+        : [...selected, condition].sort(),
+    );
+  };
+  const handleUpdateConditions = async () => {
+    if (!user) {
+      return;
+    }
+    setIsLoading(true);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        painConditions: painConditions,
+      });
+      // update supabase
+      await updateUser({
+        painConditions: painConditions,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowConditionsEdit(!showConditionsEdit);
+    }
+  };
+
+  // edit other conditions
+  const [showOtherConditionEdit, setShowOtherConditionEdit] = useState(false);
+  const [otherCondition, setOtherCondition] = useState('');
+
+  const handleUpdateOtherCondition = async () => {
+    if (!user) {
+      return;
+    }
+    const trimmedOtherCondition = otherCondition.trim();
+    let updatedOtherCondition: string | null;
+    if (!trimmedOtherCondition) {
+      console.log("Setting other condition to null");
+      updatedOtherCondition = null;
+    } else {
+      updatedOtherCondition = trimmedOtherCondition;
+    }
+    setIsLoading(true);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      // update locally
+      updateUserDraft({ 
+        otherCondition: updatedOtherCondition,
+      });      
+      // update supabase
+      await updateUser({
+        otherCondition: updatedOtherCondition,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowOtherConditionEdit(!showOtherConditionEdit);
+    }
+  };
+
   return (
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
@@ -171,28 +246,44 @@ export default function ManageProfile() {
         description="Edit your information or update your security details"
       />
       
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowNameEdit(!showNameEdit)}>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => { 
+          setName(user?.name ?? ''); 
+          setShowNameEdit(!showNameEdit);
+        }}>
         <Text style={styles.settingLabel}>{user?.name || "No Name"}</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowBirthsexEdit(!showBirthsexEdit)}>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => {
+          setBirthsex(user?.birthsex ?? '');
+          setShowBirthsexEdit(!showBirthsexEdit);
+        }}>
         <Text style={styles.settingLabel}>{user?.birthsex || "Prefer not to say"}</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowBirthYearEdit(!showBirthYearEdit)}>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => {
+          setBirthYear(user?.birthyear?.toString() ?? '');
+          setShowBirthYearEdit(!showBirthYearEdit);
+        }}>
         <Text style={styles.settingLabel}>{user?.birthyear || "No birth year"}</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowDiagnosisEdit(!showDiagnosisEdit)}>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => {
+          setHasDiagnosis(user?.formalDiagnosis ?? null);
+          setShowDiagnosisEdit(!showDiagnosisEdit);
+        }}>
         {user?.formalDiagnosis === true ?
         <Text style={styles.settingLabel}>Have formal diagnosis</Text> :
         user?.formalDiagnosis === false ?
@@ -203,15 +294,23 @@ export default function ManageProfile() {
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => {
+          setPainConditions(user?.painConditions ?? []);
+          setShowConditionsEdit(!showConditionsEdit);
+        }}>
         <Text style={styles.settingLabel}>Edit Conditions</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}>
-        <Text style={styles.settingLabel}>Edit Other Conditions</Text>
+      <TouchableOpacity style={styles.settingItem} 
+        onPress={() => {
+          setOtherCondition(user?.otherCondition ?? '');
+          setShowOtherConditionEdit(!showOtherConditionEdit);
+        }}>
+        <Text style={styles.settingLabel}>{user?.otherCondition || "No other condition"}</Text>
         <Ionicons 
             name={"create-outline"}
             style={styles.settingValue}
@@ -365,6 +464,76 @@ export default function ManageProfile() {
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateDiagnosis}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal 
+        visible={showConditionsEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Conditions</Text>
+            <ScrollView>
+            <View style={authStyles.choices}>
+              {painConditionsOptions.map((condition) => (
+                <ChoiceButton
+                  key={condition}
+                  label={condition}
+                  multiple
+                  selected={painConditions.includes(condition)}
+                  onPress={() => toggleCondition(condition)}
+                />
+              ))}
+            </View>
+            </ScrollView>
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowConditionsEdit(!showConditionsEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateConditions}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal 
+        visible={showOtherConditionEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Other Conditions</Text>
+            <AuthInput
+              label="Other conditions"
+              placeholder={user?.otherCondition || 'Type conditions or symptoms'}
+              inputMode="text"
+              autoCorrect
+              value={otherCondition}
+              onChangeText={setOtherCondition}
+              onSubmitEditing={handleUpdateOtherCondition}
+            />
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowOtherConditionEdit(!showOtherConditionEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateOtherCondition}>
                 <Text>Save</Text>
               </Pressable>
             </View>
