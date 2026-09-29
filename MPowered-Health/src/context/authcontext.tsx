@@ -26,6 +26,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteUser: () => Promise<void>;
   updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
@@ -125,7 +126,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-  }
+  };
+
+
+  // delete user - (not sure how to do so correctly just signs user out)
+  const deleteUser = async () => {
+    // check user logged in
+    if (!user) return;
+
+    // sign the user out
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   // Onboarding screens build one local profile before the completed screen saves it.
   const updateUserDraft = (userData: Partial<User>) => {
@@ -253,6 +265,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           signIn, 
           signUp, 
           signOut, 
+          deleteUser,
           updateUserDraft, 
           updateUser, 
           isLoading,

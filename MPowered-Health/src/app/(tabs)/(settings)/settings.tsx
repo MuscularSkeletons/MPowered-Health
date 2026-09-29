@@ -19,7 +19,7 @@ import {
 import { palette } from '@/constants/profile/ui';
 
 export default function Settings() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteUser } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -35,6 +35,27 @@ export default function Settings() {
           console.log('Sign Out Pressed');
           await signOut();
           router.replace("/(auth)/login");
+        },
+        style: 'destructive',
+      }
+    ])
+  }
+
+  const handleDelete = async () => {
+    if (!user) throw new Error('User not authenticated');
+
+    Alert.alert("Delete Account", "Are you sure you want to delete your account? This action cannot be reversed.", [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'Delete Account',
+        onPress: async () => {
+          console.log('Delete pressed');
+          await deleteUser();
+          router.replace("/(auth)/splashscreen");
         },
         style: 'destructive',
       }
@@ -75,7 +96,7 @@ export default function Settings() {
       <TouchableOpacity onPress={handleSignOut}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleDelete}>
         <Text style={styles.deleteAccountText}>Delete Account</Text>
       </TouchableOpacity>
     </AuthScreen>
