@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
+import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/profile/ui";
 import { useState } from "react";
@@ -29,7 +30,7 @@ import { ScrollView } from 'react-native';
 
 export default function ManageProfile() {
   const router = useRouter();
-  const { user, updateUser, updateUserDraft } = useAuth();
+  const { user, updateUser, updateUserDraft, updateAuthUserEmail, updateAuthUserPassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   // pop-up to edit a detail
@@ -237,6 +238,73 @@ export default function ManageProfile() {
     }
   };
 
+  // update authentication info
+  const [authError, setAuthError] = useState<AuthUserError | null>(null);
+
+  // update email
+  /* NOTE: when testing email update, a confirmation email is sent to the new email. please enter a valid email address
+    to reduce the number of bounced emails sent.
+    Confirmation link currently redirects to a site (TODO: implement deep linking when do email verification)
+    if you don't click confirm, you can check if the email has been updated in the email_change field in
+    supabase. once confirmed it will update in the email field. updating to the UI may be delayed.
+  */
+  const [showEmailEdit, setShowEmailEdit] = useState(false);
+  const [email, setEmail] = useState('');  
+  
+  const handleUpdateEmail = async () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    setIsLoading(true);
+    setAuthError(null);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      await updateAuthUserEmail(email.trim());
+      // close modal
+      setShowEmailEdit(!showEmailEdit);
+    } catch (error) {
+      const userError = toUserError(error);
+      setAuthError(userError);
+      Alert.alert('Error', userError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // update password
+  const [showPasswordEdit, setShowPasswordEdit] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const passwordsMatch = !confirmPassword || confirmPassword === password;
+
+  const handleUpdatePassword = async () => {
+    if (!password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+    setIsLoading(true);
+    setAuthError(null);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      await updateAuthUserPassword(password);
+      // close modal
+      setShowPasswordEdit(!showPasswordEdit);
+    } catch (error) {
+      const userError = toUserError(error);
+      setAuthError(userError);
+      Alert.alert('Error', userError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
@@ -316,7 +384,11 @@ export default function ManageProfile() {
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}>
+      <TouchableOpacity style={styles.settingItem}
+        onPress={() => {
+          setEmail(user?.email ?? '');
+          setShowEmailEdit(!showEmailEdit);
+        }}>
         <Text style={styles.settingLabel}>{user?.email || "No email"}</Text>
         <Ionicons 
             name={"create-outline"}
@@ -534,6 +606,45 @@ export default function ManageProfile() {
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateOtherCondition}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal 
+        visible={showEmailEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Email</Text>
+            <AuthInput
+              label="Email address"
+              placeholder="you@example.com"
+              keyboardType="email-address"
+              inputMode="email"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              editable={!isLoading}
+              value={email}
+              onChangeText={(value) => {
+                setEmail(value);
+                setAuthError(null);
+              }}
+            />
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowEmailEdit(!showEmailEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateEmail}>
                 <Text>Save</Text>
               </Pressable>
             </View>

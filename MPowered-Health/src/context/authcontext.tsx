@@ -29,6 +29,8 @@ interface AuthContextType {
   updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
+  updateAuthUserEmail: (email: string) => Promise<void>;
+  updateAuthUserPassword: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -175,6 +177,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // functions that updates info related to authentication i.e. email and password
+  const updateAuthUserEmail = async (email: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      email: email.trim(),
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }    
+  }
+
+  const updateAuthUserPassword = async (password: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      password: password,
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
   // check if there is an existing session - automatically runs when open the app
   const checkSession = async () => {
     setIsLoading(true);
@@ -208,7 +247,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
+        value={{ 
+          user, 
+          signIn, 
+          signUp, 
+          signOut, 
+          updateUserDraft, 
+          updateUser, 
+          isLoading,
+          updateAuthUserEmail,
+          updateAuthUserPassword, }}
     >
         {children}
     </AuthContext.Provider>
