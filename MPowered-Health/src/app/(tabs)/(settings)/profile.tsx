@@ -263,6 +263,7 @@ export default function ManageProfile() {
       await updateAuthUserEmail(email.trim());
       // close modal
       setShowEmailEdit(!showEmailEdit);
+      Alert.alert('A confirmation email has been sent to ' + email.trim() + '. Please confirm the address to update your email.');
     } catch (error) {
       const userError = toUserError(error);
       setAuthError(userError);
