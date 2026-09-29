@@ -30,7 +30,7 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
   updateAuthUserEmail: (email: string) => Promise<void>;
-  updateAuthUserPassword: (password: string) => Promise<void>;
+  updateAuthUserPassword: (currPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -196,13 +196,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }    
   }
 
-  const updateAuthUserPassword = async (password: string) => {
+  const updateAuthUserPassword = async (currPassword: string, newPassword: string) => {
     // check user logged in
     if (!user) return;
 
     // update values in db
     const { data, error } = await supabase.auth.updateUser({
-      password: password,
+      current_password: currPassword,
+      password: newPassword,
     });
 
     if (error) throw error;

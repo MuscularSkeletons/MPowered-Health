@@ -274,29 +274,26 @@ export default function ManageProfile() {
   };
 
   // update password
-  const [showPasswordEdit, setShowPasswordEdit] = useState(false);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const passwordsMatch = !confirmPassword || confirmPassword === password;
+  const [showCurrPasswordEdit, setShowCurrPasswordEdit] = useState(false);
+  const [currPassword, setCurrPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showCurrPassword, setShowCurrPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handleUpdatePassword = async () => {
-    if (!password || !confirmPassword) {
+    if (!currPassword || !newPassword) {
       Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
     setIsLoading(true);
     setAuthError(null);
     try {
       if (!user) throw new Error('User not authenticated');
-      await updateAuthUserPassword(password);
+      await updateAuthUserPassword(currPassword, newPassword);
+      // for debugging purposes - to delete
+      console.log("Password updated to", newPassword);
       // close modal
-      setShowPasswordEdit(!showPasswordEdit);
+      setShowCurrPasswordEdit(!showCurrPasswordEdit);
     } catch (error) {
       const userError = toUserError(error);
       setAuthError(userError);
@@ -396,7 +393,10 @@ export default function ManageProfile() {
             style={styles.settingValue}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}>
+      <TouchableOpacity style={styles.settingItem}
+        onPress={() => {
+          setShowCurrPasswordEdit(!showCurrPasswordEdit);
+        }}>
         <Text style={styles.settingLabel}>Change password</Text>
         <Ionicons 
             name={"create-outline"}
@@ -646,6 +646,68 @@ export default function ManageProfile() {
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateEmail}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal 
+        visible={showCurrPasswordEdit} 
+        transparent={true} 
+        animationType="slide"
+        >
+        <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Update your password</Text>
+            <Text>Please enter your existing password and your new password.</Text>
+            <AuthInput
+              label="Current password"
+              placeholder="Enter your current password password"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!isLoading}
+              value={currPassword}
+              onChangeText={(value) => {
+                setCurrPassword(value);
+                setAuthError(null);
+              }}
+              secure
+              reveal={showCurrPassword}
+              onToggleReveal={() => setShowCurrPassword((visible) => !visible)}
+            />
+            <AuthInput
+              label="New password"
+              placeholder="Enter a new password"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="new-password"
+              editable={!isLoading}
+              value={newPassword}
+              onChangeText={(value) => {
+                setNewPassword(value);
+                setAuthError(null);
+              }}
+              secure
+              reveal={showNewPassword}
+              onToggleReveal={() => setShowNewPassword((visible) => !visible)}
+              onSubmitEditing={() => void handleUpdatePassword()}
+            />
+            {authError ? (
+              <Text accessibilityRole="alert" style={authStyles.error}>
+                {authError.message}
+              </Text>
+            ) : null}
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowCurrPasswordEdit(!showCurrPasswordEdit)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdatePassword}>
                 <Text>Save</Text>
               </Pressable>
             </View>
