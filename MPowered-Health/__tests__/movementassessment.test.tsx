@@ -1,4 +1,4 @@
-import { MovementAssessment } from '../src/app/(tabs)/index';
+import { MovementAssessment } from '../src/app/(tabs)/(assessment)/movementassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { movementQuestions } from "@/constants/assessment/questions";
 
