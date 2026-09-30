@@ -71,7 +71,7 @@ describe("personal care assessment questions are rendered on screen", () => {
         expect(screen.getByText('Reflection on your personal care')).toBeTruthy();
         expect(screen.getByText('Write any reflections of pain impacts on your daily life.')).toBeTruthy();
         // text
-        expect(screen.getByPlaceholderText('For instance, you may have felt unable to complete everyday tasks, such as doing the laundry.')).toBeTruthy();
+        expect(screen.getByPlaceholderText('For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.')).toBeTruthy();
 
         expect(screen.getByText('4/4')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();

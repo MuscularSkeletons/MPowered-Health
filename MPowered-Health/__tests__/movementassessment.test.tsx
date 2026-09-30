@@ -114,7 +114,7 @@ describe("movement assessment questions are rendered on screen", () => {
         expect(screen.getByText('Reflection on your movement')).toBeTruthy();
         expect(screen.getByText('Write any reflections of pain impacts on your mobility.')).toBeTruthy();
         // text
-        expect(screen.getByPlaceholderText('For instance, when pain occurred, you may have needed to lie down for the whole day.')).toBeTruthy();
+        expect(screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.')).toBeTruthy();
 
         expect(screen.getByText('7/7')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
