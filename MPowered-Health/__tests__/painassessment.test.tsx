@@ -26,6 +26,7 @@ describe("pain assessment questions are rendered on screen", () => {
     test("question 1 (pain location) is rendered on screen", () => {
         expect(screen.getByText('Pain location')).toBeTruthy();
         expect(screen.getByText('I have had pain in these areas last week.')).toBeTruthy();
+        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
         // options
         expect(screen.getByText('Head')).toBeTruthy();
         expect(screen.getByText('Neck')).toBeTruthy();
@@ -38,12 +39,14 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByText('Knee')).toBeTruthy();
         expect(screen.getByText('Other')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('1/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test("question 2 (pain characteristics) is rendered on screen", () => {
         expect(screen.getByText('Pain characteristics')).toBeTruthy();
         expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
+        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
         // options
         expect(screen.getByText('Aching')).toBeTruthy();
         expect(screen.getByText('Throbbing')).toBeTruthy();
@@ -61,43 +64,48 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByText('Miserable')).toBeTruthy();
         expect(screen.getByText('Unbearable')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('2/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     }); 
 
     test("question 3 (pain intensity) is rendered on screen", () => {
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My current pain is')).toBeTruthy();
         // score
-        expect(screen.getByPlaceholderText('0')).toBeTruthy();
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('3/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test("question 4 (pain intensity) is rendered on screen", () => {
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My mildest pain last week was')).toBeTruthy();
         // score
-        expect(screen.getByPlaceholderText('0')).toBeTruthy();
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('4/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test("question 5 (pain intensity) is rendered on screen", () => {
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My worst pain last week was')).toBeTruthy();
         // score
-        expect(screen.getByPlaceholderText('0')).toBeTruthy();
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('5/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test("question 6 (pain intensity) is rendered on screen", () => {
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My overall average pain last week was')).toBeTruthy();
         // score
-        expect(screen.getByPlaceholderText('0')).toBeTruthy();
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
 
-        expect(screen.getByText('Record')).toBeTruthy();
+        expect(screen.getByText('6/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
 
