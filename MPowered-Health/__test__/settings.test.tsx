@@ -1,5 +1,5 @@
 import Settings from '../src/app/(tabs)/(settings)/settings';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { openBrowserAsync } from 'expo-web-browser';
 import { renderRouter } from 'expo-router/testing-library';
 import SettingsLayout from '@/app/(tabs)/(settings)/_layout';
@@ -43,6 +43,10 @@ describe("objects rendering on screen", () => {
 
 describe("url link tests", () => {
 
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     test("clicking on privacy policy opens the correct link", async() => {
         await render(<Settings/>);
         fireEvent.press(screen.getByRole('link', {name : "Privacy Policy"}));
@@ -54,9 +58,35 @@ describe("url link tests", () => {
         fireEvent.press(screen.getByRole('link', {name : "Terms and Conditions"}));
         await expect(openBrowserAsync).toHaveBeenCalledWith('https://muscha.org/terms-and-conditions/');
     })
+
+    test("throw error if unable to open privacy policy link", async() => {
+        await render(<Settings/>);
+
+        const browserError = new Error('Failed to open web browser');
+        (openBrowserAsync as jest.Mock).mockRejectedValueOnce(browserError);
+
+        const spyAlert = jest.spyOn(Alert, 'alert');
+        fireEvent.press(screen.getByRole('link', {name : "Privacy Policy"}));
+        await waitFor(() => expect(spyAlert).toHaveBeenCalledWith('Unable to open page', 'Please try again.'))
+    })
+
+    test("throw error if unable to open t&cs link", async() => {
+        await render(<Settings/>);
+
+        const browserError = new Error('Failed to open web browser');
+        (openBrowserAsync as jest.Mock).mockRejectedValueOnce(browserError);
+
+        const spyAlert = jest.spyOn(Alert, 'alert');
+        fireEvent.press(screen.getByRole('link', {name : "Terms and Conditions"}));
+        await waitFor(() => expect(spyAlert).toHaveBeenCalledWith('Unable to open page', 'Please try again.'))
+    })
 })
 
 describe("navigation tests", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
     test("clicking on edit profile directs to edit profile screen", async() => {
         await renderRouter(
