@@ -2,6 +2,10 @@ import Settings from '../src/app/(tabs)/(settings)/settings';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { PrimaryButton } from '@/components/auth/auth-ui';
 import { openBrowserAsync } from 'expo-web-browser';
+import { renderRouter } from 'expo-router/testing-library';
+import SettingsLayout from '@/app/(tabs)/(settings)/_layout';
+import ManageProfile from '@/app/(tabs)/(settings)/profile';
+import ManageNotifications from '@/app/(tabs)/(settings)/notifications';
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -45,5 +49,37 @@ describe("url link tests", () => {
         await render(<Settings/>);
         fireEvent.press(screen.getByRole('link', {name : "Terms and Conditions"}));
         await expect(openBrowserAsync).toHaveBeenCalledWith('https://muscha.org/terms-and-conditions/');
+    })
+})
+
+describe("navigation tests", () => {
+
+    test("clicking on edit profile directs to edit profile screen", async() => {
+        await renderRouter(
+            {
+                "_layout": () => <SettingsLayout/>,
+                "Edit Profile": () => <ManageProfile/>,
+            }, {
+                initialUrl: '../src/app/(tabs)/(settings)/settings',
+            }
+        )
+
+        fireEvent.press(screen.getByRole('button', {name : "Edit Profile"}));
+        expect(screen.getByText("PROFILE")).toBeTruthy();
+    
+    })
+
+    test("clicking on notifications directs to notifications screen", async() => {
+        await renderRouter(
+            {
+                "_layout": () => <SettingsLayout/>,
+                "notifications": () => <ManageNotifications/>,
+            }, {
+                initialUrl: '../src/app/(tabs)/(settings)/settings',
+            }
+        )
+
+        fireEvent.press(screen.getByRole('button', {name : "Notifications"}));
+        expect(screen.getByText("NOTIFICATIONS")).toBeTruthy();
     })
 })
