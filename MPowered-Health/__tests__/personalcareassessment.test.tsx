@@ -1,6 +1,7 @@
 import { PersonalCareAssessment } from '../src/app/(tabs)/(assessment)/personalcareassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { personalCareQuestions } from "@/constants/assessment/questions";
+import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 
@@ -15,6 +16,7 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+// rendering test
 describe("personal care assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -77,4 +79,121 @@ describe("personal care assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
+});
+
+// selection/input tests
+describe("my personal care assessment questions are selected/inputted correctly", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("question 1 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PersonalCareAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 2 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PersonalCareAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 3 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PersonalCareAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 4 answer can be entered", async() => {
+        await render(<PersonalCareAssessment/>);
+        const reflection = screen.getByPlaceholderText("For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.");
+        const user = userEvent.setup();
+        await user.type(reflection, "I felt hopeless and unmotivated to do anything this week.");
+
+        expect(reflection.props.value).toBe("I felt hopeless and unmotivated to do anything this week.");
+    });
+
+});
+
+// input validation tests
+describe("input validation for question 4", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("no text is entered", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<PersonalCareAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect("").toBeTruthy(); // optional question
+    });
+});
+
+// navigation tests
+describe("navigation", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('question 1 selected and navigate to next screen', async() => {
+        await render(<PersonalCareAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I sleep less well because of my pain"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 2 selected and navigate to next screen', async() => {
+        await render(<PersonalCareAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I can look after myself normally without causing extra pain"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 3 selected and navigate to next screen', async() => {
+        await render(<PersonalCareAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("Because of pain I have less than 4 hours of sleep"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 4 answered and navigate to next screen', async() => {
+        await render(<PersonalCareAssessment/>);
+        jest.spyOn(Alert, "alert");
+        const reflection = screen.getByPlaceholderText("For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.");
+        const user = userEvent.setup();
+        await user.type(reflection, "I felt hopeless and unmotivated to do anything this week.");
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled();
+        //todo: navigate to next page
+    });
+
+    test('user presses the back button', () => {
+        expect("").toBeTruthy();
+    });
 });

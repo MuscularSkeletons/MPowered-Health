@@ -130,7 +130,7 @@ describe("input validation for question 2 & 4", () => {
         jest.spyOn(Alert, "alert");
         await render(<ManagementAssessment/>);
 
-        fireEvent.press(screen.getByText("SUBMIT"));
+        fireEvent.press(screen.getByText("Record"));
         expect("").toBeTruthy(); // optional question
     });
 });
