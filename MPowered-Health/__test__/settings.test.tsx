@@ -1,6 +1,7 @@
 import Settings from '../src/app/(tabs)/(settings)/settings';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { PrimaryButton } from '@/components/auth/auth-ui';
+import { openBrowserAsync } from 'expo-web-browser';
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -11,6 +12,11 @@ jest.mock("@/context/authcontext", () => ({
         updateUser: jest.fn(),
         isLoading: false,
     }),
+}))
+
+//mocking the web browser
+jest.mock('expo-web-browser', () => ({
+    openBrowserAsync: jest.fn()
 }))
 
 describe("objects rendering on screen", () => {
@@ -24,5 +30,20 @@ describe("objects rendering on screen", () => {
         expect(screen.getByRole('link', {name : "Terms and Conditions"})).toBeTruthy();
         expect(screen.getByText("Sign Out")).toBeTruthy();
         expect(screen.getByText("Delete Account")).toBeTruthy();
+    })
+})
+
+describe("url link tests", () => {
+
+    test("clicking on privacy policy opens the correct link", async() => {
+        await render(<Settings/>);
+        fireEvent.press(screen.getByRole('link', {name : "Privacy Policy"}));
+        await expect(openBrowserAsync).toHaveBeenCalledWith('https://muscha.org/privacy-policy/');
+    })
+
+    test("clicking on T&Cs opens the correct link", async() => {
+        await render(<Settings/>);
+        fireEvent.press(screen.getByRole('link', {name : "Terms and Conditions"}));
+        await expect(openBrowserAsync).toHaveBeenCalledWith('https://muscha.org/terms-and-conditions/');
     })
 })
