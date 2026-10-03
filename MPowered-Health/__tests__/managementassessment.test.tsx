@@ -168,7 +168,7 @@ describe("navigation", () => {
     test('question 3 selected and navigate to next screen', async() => {
         await render(<ManagementAssessment/>);
         jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("0 days")); // TODO: when assessment is implemented
+        fireEvent.press(screen.getByText("0 days"));
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 

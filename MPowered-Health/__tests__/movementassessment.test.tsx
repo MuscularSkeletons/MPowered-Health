@@ -1,6 +1,7 @@
 import { MovementAssessment } from '../src/app/(tabs)/(assessment)/movementassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { movementQuestions } from "@/constants/assessment/questions";
+import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 
@@ -15,6 +16,7 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+// rendering test
 describe("movement assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -120,4 +122,209 @@ describe("movement assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
+});
+
+// selection/input tests
+describe("my management assessment questions are selected/inputted correctly", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("question 1 answer can be entered", async() => {
+        await render(<MovementAssessment/>);
+        const hours = screen.getByPlaceholderText("0");
+        const user = userEvent.setup();
+        await user.type(hours, "2");
+
+        expect(hours.props.value).toBe("2");
+    });
+
+    test("question 2 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    
+
+    test("question 3 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+    
+    test("question 4 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 5 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 6 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 7 answer can be entered", async() => {
+        await render(<MovementAssessment/>);
+        const reflection = screen.getByPlaceholderText("For instance, when pain occured, you lie down for the whole day.");
+        const user = userEvent.setup();
+        await user.type(reflection, "I was able to walk for 2 hours without pain.");
+
+        expect(reflection.props.value).toBe("I was able to walk for 2 hours without pain.");
+    });
+
+});
+
+// input validation tests
+describe("input validation for question 1 & 7", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // question 1 is mandatory
+    test("no text is entered for question 1", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    // question 1 must be a number
+    test("non-numeric text is entered for question 1", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+        const hours = screen.getByPlaceholderText("0");
+        const user = userEvent.setup();
+        await user.type(hours, "abc");
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please enter a valid number");
+    });
+
+    // question 7 is optional
+    test("no text is entered for question 7", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<MovementAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled(); // optional question
+    });
+});
+
+// navigation tests
+describe("navigation", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('question 1 answered and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        const hours = screen.getByPlaceholderText("0");
+        const user = userEvent.setup();
+        await user.type(hours, "2");
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled();
+        //todo: navigate to next page
+    });
+
+    test('question 2 selected and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I lie down to rest more often because of my pain"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 3 selected and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("Pain prevents me from walking more than 500 metres")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 4 selected and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I cannot lift or carry anything at all")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 5 selected and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I can only sit in my favourite chair as long as I like")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 6 selected and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("Pain prevents me standing more than 30 minutes")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 7 answered and navigate to next screen', async() => {
+        await render(<MovementAssessment/>);
+        jest.spyOn(Alert, "alert");
+        const reflection = screen.getByPlaceholderText("For instance, when pain occured, you lie down for the whole day.");
+        const user = userEvent.setup();
+        await user.type(reflection, "I was able to walk for 2 hours without pain.");
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled();
+        //todo: navigate to next page
+    });
+
+    test('user presses the back button', () => {
+        expect("").toBeTruthy();
+    });
 });
