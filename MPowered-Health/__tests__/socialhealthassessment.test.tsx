@@ -1,6 +1,7 @@
 import { SocialHealthAssessment } from '../src/app/(tabs)/(assessment)/socialhealthassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { socialHealthQuestions } from "@/constants/assessment/questions";
+import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 
@@ -15,6 +16,7 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+// rendering test
 describe("social health assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -108,4 +110,187 @@ describe("social health assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
+});
+
+// selection/input tests
+describe("my social health assessment questions are selected/inputted correctly", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("question 1 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 2 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    // TODO: see how Q3-5 implemented
+    test("question 3 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+    
+    test("question 4 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 5 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 6 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 7 answer can be entered", async() => {
+        await render(<SocialHealthAssessment/>);
+        const moodReason = screen.getByPlaceholderText("i.e: delays in work due to pain or inability to meet with friends, etc.");
+        const user = userEvent.setup();
+        await user.type(moodReason, "No friends.");
+
+        expect(moodReason.props.value).toBe("No friends.");
+    });
+
+});
+
+// input validation tests
+describe("input validation for question 7", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // question 7 is optional
+    test("no text is entered for question 7", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<SocialHealthAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled(); // optional question
+    });
+});
+
+// navigation tests
+describe("navigation", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('question 1 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("My social life is normal and gives me no extra pain"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 2 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I can travel anywhere without pain"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 3 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("3")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 4 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("3"));
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 5 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("3"));
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 6 selected and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("I was feeling sad")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 7 answered and navigate to next screen', async() => {
+        await render(<SocialHealthAssessment/>);
+        jest.spyOn(Alert, "alert");
+        const moodReason = screen.getByPlaceholderText("i.e: delays in work due to pain or inability to meet with friends, etc.");
+        const user = userEvent.setup();
+        await user.type(moodReason, "No friends.");
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled();
+        //todo: navigate to next page
+    });
+
+    test('user presses the back button', () => {
+        expect("").toBeTruthy();
+    });
 });
