@@ -1,6 +1,7 @@
 import { PainAssessment } from '../src/app/(tabs)/(assessment)/painassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { painQuestions } from "@/constants/assessment/questions";
+import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 
@@ -15,6 +16,7 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+// rendering test
 describe("pain assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -108,5 +110,183 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
+});
 
+// selection/input tests
+describe("my pain assessment questions are selected/inputted correctly", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("question 1 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("can input text for question 1 option other", async() => {
+        await render(<PainAssessment/>);
+        fireEvent.press(screen.getByText("Other"));
+        const otherInput = screen.getByPlaceholderText("Input other pain location");
+        const user = userEvent.setup();
+        await user.type(otherInput, "Inner thigh");
+    });
+
+    test("question 2 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    // TODO: check how Q3-6 implemented in assessment
+    test("question 3 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+    
+    test("question 4 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 5 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+    test("question 6 not selected", async() => {
+        //show an alert if continue is pressed without selecting an option
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+
+});
+
+// input validation tests
+describe("input validation for question 1 other", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // question 1 is mandatory
+    test("no text is entered for question 1 other", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+        fireEvent.press(screen.getByText("Other"));
+
+        fireEvent.press(screen.getByText("OK"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+    });
+});
+
+// navigation tests
+describe("navigation", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('question 1 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("Head"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 1 other answered and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        const otherInput = screen.getByPlaceholderText("Input other pain location");
+        const user = userEvent.setup();
+        await user.type(otherInput, "Inner thigh");
+
+        fireEvent.press(screen.getByText("Record"));
+        expect(Alert.alert).not.toHaveBeenCalled();
+        //todo: navigate to next page
+    });
+
+    test('question 2 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("Throbbing"));
+        fireEvent.press(screen.getByText("Record"));
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 3 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("2")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 4 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("2")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 5 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("2")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
+
+    test('question 6 selected and navigate to next screen', async() => {
+        await render(<PainAssessment/>);
+        jest.spyOn(Alert, "alert");
+        fireEvent.press(screen.getByText("2")); 
+        fireEvent.press(screen.getByText("Record"));
+        
+
+        expect(Alert.alert).not.toHaveBeenCalled(); 
+        //todo: navigate to next page
+        expect("").toBeTruthy();
+    });
 });

@@ -125,7 +125,7 @@ describe("movement assessment questions are rendered on screen", () => {
 });
 
 // selection/input tests
-describe("my management assessment questions are selected/inputted correctly", () => {
+describe("my movement assessment questions are selected/inputted correctly", () => {
     afterEach(() => {
         jest.clearAllMocks();
     });
