@@ -88,4 +88,23 @@ describe("editing name tests", () => {
         console.log("user name updated");        
     })
 
+    test("pressing cancel does not edit the name", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Jane"));
+        expect(screen.getByText("Edit Name")).toBeTruthy();
+
+        const nameInput = screen.getByTestId("name-input");
+        fireEvent.changeText(nameInput, "John");
+
+        //press cancel
+        await user.press(screen.getByText("Cancel"));
+
+        //no change should be expected
+        expect(screen.getByText("Jane")).toBeTruthy();
+        //expect(mockUpdateUser).not.toHaveBeenCalled();
+    })
+
 })
