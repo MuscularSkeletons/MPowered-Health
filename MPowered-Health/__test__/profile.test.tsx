@@ -1,7 +1,7 @@
 import ManageProfile from "@/app/(tabs)/(settings)/profile";
 import { painConditionsOptions } from "@/constants/profile/profile-options";
 import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
-import { Modal } from "react-native";
+import { Alert, Modal } from "react-native";
 
 const mockUser = {
     name: "Jane",
@@ -105,6 +105,26 @@ describe("editing name tests", () => {
         //no change should be expected
         expect(screen.getByText("Jane")).toBeTruthy();
         //expect(mockUpdateUser).not.toHaveBeenCalled();
+    })
+
+    test("entering an empty string throws an alert", async() => {
+        const user = userEvent.setup();
+        const spyAlert = jest.spyOn(Alert, 'alert');
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Jane"));
+        console.log("modal is open");
+        expect(screen.getByText("Edit Name")).toBeTruthy();
+
+        //get the input field and make the edit
+        const nameInput = screen.getByTestId("name-input");
+        fireEvent.changeText(nameInput, "");
+
+        //save the edit
+        await user.press(screen.getByText("Save"));
+
+        expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter your name');
     })
 
 })
