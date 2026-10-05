@@ -483,6 +483,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Birth Year</Text>
             <AuthInput
+              testID="birth-year-input"
               label="Year of birth"
               placeholder={String(user?.birthyear || "XXXX")}
               keyboardType="number-pad"
