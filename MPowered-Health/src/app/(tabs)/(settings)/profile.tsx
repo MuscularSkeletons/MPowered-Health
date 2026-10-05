@@ -413,6 +413,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Name</Text>
             <AuthInput
+              testID="name-input"
               label="Name"
               placeholder={user?.name}
               inputMode="text"

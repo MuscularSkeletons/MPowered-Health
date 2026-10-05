@@ -1,6 +1,7 @@
 import ManageProfile from "@/app/(tabs)/(settings)/profile";
 import { painConditionsOptions } from "@/constants/profile/profile-options";
-import { render, screen } from "@testing-library/react-native";
+import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
+import { Modal } from "react-native";
 
 const mockUser = {
     name: "Jane",
@@ -12,6 +13,8 @@ const mockUser = {
     otherCondition: "Frequent headaches",
 }
 
+const mockUpdateUser = jest.fn();
+
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -20,7 +23,7 @@ jest.mock("@/context/authcontext", () => ({
         signOut: jest.fn(),
         deleteUser: jest.fn(),
         updateUserDraft: jest.fn(),
-        updateUser: jest.fn(),
+        updateUser: mockUpdateUser,
         isLoading: false,
         updateAuthUserEmail: jest.fn(),
         updateAuthUserPassword: jest.fn()
@@ -33,6 +36,8 @@ describe("objects rendered on screen", () => {
         expect(screen.getByText("PROFILE")).toBeTruthy();
         expect(screen.getByText("Edit your profile")).toBeTruthy();
         expect(screen.getByText("Edit your information or update your security details")).toBeTruthy();
+
+        //user info
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Female")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy();  
@@ -41,4 +46,46 @@ describe("objects rendered on screen", () => {
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
         expect(screen.getByText("Change password")).toBeTruthy();
     })
+})
+
+describe("editing name tests", () => {
+    test("pressing on name should open the name editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on name to edit
+        await user.press(screen.getByText("Jane"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Name")).toBeTruthy();
+        expect(screen.getByText("Name")).toBeTruthy();
+        expect(screen.getByText("Jane")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getByText("Save")).toBeTruthy();
+        console.log("pop up was opened");
+        
+    })
+
+    test("name is edited successfully", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Jane"));
+        console.log("modal is open");
+        expect(screen.getByText("Edit Name")).toBeTruthy();
+
+        //get the input field and make the edit
+        const nameInput = screen.getByTestId("name-input");
+        fireEvent.changeText(nameInput, "John");
+        console.log("name changed");
+
+        //save the edit
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({name: "John"});
+        console.log("user name updated");        
+    })
+
 })
