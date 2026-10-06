@@ -10,7 +10,7 @@ const mockUser = {
     birthsex: "Female",
     birthyear: "1997",
     formalDiagnosis: true,
-    painConditions: ["Arthritis", "Back pain"],
+    painConditions: [painConditionsOptions[0], painConditionsOptions[2]],
     otherCondition: "Frequent headaches",
 }
 
@@ -48,6 +48,7 @@ describe("objects rendered on screen", () => {
         expect(screen.getByText("Female")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy();  
         expect(screen.getByText("Have formal diagnosis")).toBeTruthy();
+        expect(screen.getByText("Edit Conditions")).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();    
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
         expect(screen.getByText("Change password")).toBeTruthy();
@@ -296,6 +297,100 @@ describe("editing birth year tests", () => {
 
         expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');
     }) 
+})
+
+describe("editing conditions tests (scrollable list)", () => {
+    
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("pressing on conditions should open the editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on conditions to edit
+        await user.press(screen.getByText("Edit Conditions"));
+
+        //modal should open
+        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText(painConditionsOptions[0])).toBeTruthy();
+        expect(screen.getByText(painConditionsOptions[1])).toBeTruthy();
+        expect(screen.getByText("Cancel"));
+        expect(screen.getByText("Save"));
+    })
+
+    test("adding a condition to the list successfully", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        await user.press(screen.getByText("Edit Conditions"));
+
+        //modal should open
+        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+
+        await user.press(screen.getByText(painConditionsOptions[5]));
+        await user.press(screen.getByText(painConditionsOptions[10]));
+        console.log("adding", painConditionsOptions[5], "to conditions list");
+        console.log("adding", painConditionsOptions[10], "to conditions list");
+        
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({painConditions:[painConditionsOptions[0], painConditionsOptions[2], painConditionsOptions[5], painConditionsOptions[10]]});
+    })
+
+    test("removing a condition from the list successfully", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        await user.press(screen.getByText("Edit Conditions"));
+
+        //modal should open
+        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+
+        await user.press(screen.getByText(painConditionsOptions[0]));
+        console.log("removing", painConditionsOptions[0], "from conditions list");
+        
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({painConditions:[painConditionsOptions[2]]});
+    })
+
+    test("allow deselection of all previously selected conditions", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        await user.press(screen.getByText("Edit Conditions"));
+
+        //modal should open
+        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+
+        await user.press(screen.getByText(painConditionsOptions[0]));
+        await user.press(screen.getByText(painConditionsOptions[2]));
+        console.log("removing", painConditionsOptions[0], "from conditions list");
+        console.log("removing", painConditionsOptions[2], "from conditions list");
+        
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({painConditions:[]});
+    })
+
+    test("pressing cancel does not make the edits", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        await user.press(screen.getByText("Edit Conditions"));
+
+        //modal should open
+        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+
+        await user.press(screen.getByText(painConditionsOptions[1]));
+        await user.press(screen.getByText(painConditionsOptions[3]));
+       
+        await user.press(screen.getByText("Cancel"));
+
+        expect(screen.getByText("Edit Conditions")).toBeTruthy();
+    })
 })
 
 describe("editing diagnosis tests", () => {
