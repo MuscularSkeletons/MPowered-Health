@@ -215,8 +215,19 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 2 components to be rendered on screen
+        expect(screen.getByText('Travelling')).toBeTruthy();
+        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
+        // options
+        expect(screen.getByText('I can travel anywhere without pain')).toBeTruthy();
+        expect(screen.getByText('I can travel anywhere, but it gives me extra pain')).toBeTruthy();
+        expect(screen.getByText('Pain is bad, but I manage journeys over two hours')).toBeTruthy();
+        expect(screen.getByText('Pain restricts me to journeys of less than one hour')).toBeTruthy();
+        expect(screen.getByText('Pain restricts me to short necessary journeys under 30 minutes')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from travelling except to receive treatment')).toBeTruthy();
+
+        expect(screen.getByText('2/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 2 selected and navigate to next screen', async() => {
@@ -226,8 +237,14 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 3 components to be rendered on screen
+        expect(screen.getByText('Mood')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain impacted your mood?')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('3/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 3 selected and navigate to next screen', async() => {
@@ -238,8 +255,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 4 components to be rendered on screen
+        expect(screen.getByText('Relation with others')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain interfered with your relationships with other people?')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('4/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 4 selected and navigate to next screen', async() => {
@@ -250,8 +273,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 5 components to be rendered on screen
+        expect(screen.getByText('Enjoyment of life')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain impacted your ability to enjoy life?')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('5/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 5 selected and navigate to next screen', async() => {
@@ -262,8 +291,19 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 6 components to be rendered on screen
+        expect(screen.getByText('Mood')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how was your mood generally?')).toBeTruthy();
+        expect(screen.getByText('Tap below the emoji that best describes your mood.')).toBeTruthy();
+        // options - to adjust to how it's actually implemented
+        expect(screen.getByText('I was feeling frustrated')).toBeTruthy();
+        expect(screen.getByText('I was feeling sad')).toBeTruthy();
+        expect(screen.getByText('I was feeling okay')).toBeTruthy();
+        expect(screen.getByText('I was feeling calm')).toBeTruthy();
+        expect(screen.getByText('I was feeling delighted')).toBeTruthy();
+
+        expect(screen.getByText('6/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 6 selected and navigate to next screen', async() => {
@@ -274,8 +314,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 7 components to be rendered on screen
+        expect(screen.getByText('Mood')).toBeTruthy();
+        expect(screen.getByText('What triggered that mood?')).toBeTruthy();
+        // text
+        expect(screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.')).toBeTruthy();
+
+        expect(screen.getByText('7/7')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 7 answered and navigate to next screen', async() => {
@@ -287,7 +333,8 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
     });
 
     test('user presses the back button', () => {
