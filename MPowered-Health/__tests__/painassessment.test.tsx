@@ -215,8 +215,30 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        
+        // expect question 2 components to be rendered on screen
+        expect(screen.getByText('Pain characteristics')).toBeTruthy();
+        expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
+        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
+        // options
+        expect(screen.getByText('Aching')).toBeTruthy();
+        expect(screen.getByText('Throbbing')).toBeTruthy();
+        expect(screen.getByText('Shooting')).toBeTruthy();
+        expect(screen.getByText('Stabbing')).toBeTruthy();
+        expect(screen.getByText('Gnawing')).toBeTruthy();
+        expect(screen.getByText('Sharp')).toBeTruthy();
+        expect(screen.getByText('Tender')).toBeTruthy();
+        expect(screen.getByText('Burning')).toBeTruthy();
+        expect(screen.getByText('Exhausting')).toBeTruthy();
+        expect(screen.getByText('Tiring')).toBeTruthy();
+        expect(screen.getByText('Penetrating')).toBeTruthy();
+        expect(screen.getByText('Nagging')).toBeTruthy();
+        expect(screen.getByText('Numb')).toBeTruthy();
+        expect(screen.getByText('Miserable')).toBeTruthy();
+        expect(screen.getByText('Unbearable')).toBeTruthy();
+
+        expect(screen.getByText('2/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 1 other answered and navigate to next screen', async() => {
@@ -228,7 +250,30 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        // expect question 2 components to be rendered on screen
+        expect(screen.getByText('Pain characteristics')).toBeTruthy();
+        expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
+        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
+        // options
+        expect(screen.getByText('Aching')).toBeTruthy();
+        expect(screen.getByText('Throbbing')).toBeTruthy();
+        expect(screen.getByText('Shooting')).toBeTruthy();
+        expect(screen.getByText('Stabbing')).toBeTruthy();
+        expect(screen.getByText('Gnawing')).toBeTruthy();
+        expect(screen.getByText('Sharp')).toBeTruthy();
+        expect(screen.getByText('Tender')).toBeTruthy();
+        expect(screen.getByText('Burning')).toBeTruthy();
+        expect(screen.getByText('Exhausting')).toBeTruthy();
+        expect(screen.getByText('Tiring')).toBeTruthy();
+        expect(screen.getByText('Penetrating')).toBeTruthy();
+        expect(screen.getByText('Nagging')).toBeTruthy();
+        expect(screen.getByText('Numb')).toBeTruthy();
+        expect(screen.getByText('Miserable')).toBeTruthy();
+        expect(screen.getByText('Unbearable')).toBeTruthy();
+
+        expect(screen.getByText('2/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
+        
     });
 
     test('question 2 selected and navigate to next screen', async() => {
@@ -238,8 +283,14 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 3 components to be rendered on screen
+        expect(screen.getByText('Pain intensity')).toBeTruthy();
+        expect(screen.getByText('My current pain is')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('3/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 3 selected and navigate to next screen', async() => {
@@ -250,8 +301,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 4 components to be rendered on screen
+        expect(screen.getByText('Pain intensity')).toBeTruthy();
+        expect(screen.getByText('My mildest pain last week was')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('4/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 4 selected and navigate to next screen', async() => {
@@ -262,8 +319,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 5 components to be rendered on screen
+        expect(screen.getByText('Pain intensity')).toBeTruthy();
+        expect(screen.getByText('My worst pain last week was')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('5/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 5 selected and navigate to next screen', async() => {
@@ -274,8 +337,14 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 6 components to be rendered on screen
+        expect(screen.getByText('Pain intensity')).toBeTruthy();
+        expect(screen.getByText('My overall average pain last week was')).toBeTruthy();
+        // score
+        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+
+        expect(screen.getByText('6/6')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 6 selected and navigate to next screen', async() => {
@@ -286,7 +355,7 @@ describe("navigation", () => {
         
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Pain Summary')).toBeTruthy();
     });
 });
