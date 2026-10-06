@@ -155,8 +155,19 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 2 components to be rendered on screen
+        expect(screen.getByText('Personal care (washing, dressing, etc.)')).toBeTruthy();
+        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
+        // options
+        expect(screen.getByText('I can look after myself normally without causing extra pain')).toBeTruthy();
+        expect(screen.getByText('I can look after myself normally, but it causes extra pain')).toBeTruthy();
+        expect(screen.getByText('It is painful to look after myself and I am slow and careful')).toBeTruthy();
+        expect(screen.getByText('I need some help but manage most of my personal care')).toBeTruthy();
+        expect(screen.getByText('I need help every day with most aspects of self-care')).toBeTruthy();
+        expect(screen.getByText('I do not get dressed, wash with difficulty and stay in bed')).toBeTruthy();
+
+        expect(screen.getByText('2/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 2 selected and navigate to next screen', async() => {
@@ -166,8 +177,19 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 3 components to be rendered on screen
+        expect(screen.getByText('Sleeping')).toBeTruthy();
+        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
+        // options
+        expect(screen.getByText('My sleep is never disturbed by pain')).toBeTruthy();
+        expect(screen.getByText('My sleep is occasionally disturbed by pain')).toBeTruthy();
+        expect(screen.getByText('Because of pain I have less than 6 hours of sleep')).toBeTruthy();
+        expect(screen.getByText('Because of pain I have less than 4 hours of sleep')).toBeTruthy();
+        expect(screen.getByText('Because of pain I have less than 2 hours of sleep')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from sleeping at all')).toBeTruthy();
+
+        expect(screen.getByText('3/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 3 selected and navigate to next screen', async() => {
@@ -177,8 +199,14 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 4 components to be rendered on screen
+        expect(screen.getByText('Reflection on your personal care')).toBeTruthy();
+        expect(screen.getByText('Write any reflections of pain impacts on your daily life.')).toBeTruthy();
+        // text
+        expect(screen.getByPlaceholderText('For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.')).toBeTruthy();
+
+        expect(screen.getByText('4/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 4 answered and navigate to next screen', async() => {
@@ -190,7 +218,8 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
     });
 
     test('user presses the back button', () => {
