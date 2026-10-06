@@ -366,7 +366,7 @@ describe("editing other conditions tests (text input)", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     })
-    
+
     test("pressing on other conditions should open the editor", async() => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
@@ -437,4 +437,45 @@ describe("editing other conditions tests (text input)", () => {
 
         expect(mockUpdateUser).toHaveBeenCalledWith({otherCondition : null});    
     })
+})
+
+describe("editing email tests (rendering)", () => {
+    test("pressing on email opens up the editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("jane12@example.com"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Email")).toBeTruthy();
+        expect(screen.getByText("Email address")).toBeTruthy();
+        expect(screen.getByText("jane12@example.com")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getByText("Save")).toBeTruthy();
+    })
+
+    //email editing functionality will be tested manually
+})
+
+describe("editing password tests (rendering)" , () => {
+    test("pressing on change password opens up the editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("Change password"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Update your password")).toBeTruthy();
+        expect(screen.getByText("Please enter your existing password and your new password.")).toBeTruthy();
+        expect(screen.getByText("Current password")).toBeTruthy();
+        expect(screen.getByText("New password")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getByText("Save")).toBeTruthy();
+    })
+
+    //password editing functionality will be tested manually
 })

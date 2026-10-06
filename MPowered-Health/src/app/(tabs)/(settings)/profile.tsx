@@ -667,7 +667,7 @@ export default function ManageProfile() {
             <Text>Please enter your existing password and your new password.</Text>
             <AuthInput
               label="Current password"
-              placeholder="Enter your current password password"
+              placeholder="Enter your current password"
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
