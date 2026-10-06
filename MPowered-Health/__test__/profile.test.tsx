@@ -362,6 +362,11 @@ describe("editing diagnosis tests", () => {
 })
 
 describe("editing other conditions tests (text input)", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+    
     test("pressing on other conditions should open the editor", async() => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
