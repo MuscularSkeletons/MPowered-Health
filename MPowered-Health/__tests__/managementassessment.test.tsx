@@ -149,8 +149,15 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 1 components to be rendered on screen
+        expect(screen.getByText('Medication')).toBeTruthy();
+        expect(screen.getByText('Over the past week, did you consume any over the counter (OTC) medication.')).toBeTruthy();
+        expect(screen.getByText('Not taking OTC medications? Just click the record button')).toBeTruthy();
+        // text
+        expect(screen.getByPlaceholderText('Input name of over the counter medication')).toBeTruthy();
+
+        expect(screen.getByText('2/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 2 answered and navigate to next screen', async() => {
@@ -162,7 +169,19 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        // expect question 3 components to be rendered on screen
+        expect(screen.getByText('Exercise')).toBeTruthy();
+        expect(screen.getByText('In the past 7 days, did you perform any exercises to manage your musculoskeletal pain or improve your movement?')).toBeTruthy();
+        expect(screen.getByText('Examples: walking, stretching, strengthening, yoga, resistance band work, or balance exercises.')).toBeTruthy();
+        // options
+        expect(screen.getByText('0 days')).toBeTruthy();
+        expect(screen.getByText('1-2 days')).toBeTruthy();
+        expect(screen.getByText('3-4 days')).toBeTruthy();
+        expect(screen.getByText('5-6 days')).toBeTruthy();
+        expect(screen.getByText('7 days')).toBeTruthy();
+
+        expect(screen.getByText('3/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 3 selected and navigate to next screen', async() => {
@@ -172,8 +191,15 @@ describe("navigation", () => {
         fireEvent.press(screen.getByText("Record"));
 
         expect(Alert.alert).not.toHaveBeenCalled(); 
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        // expect question 4 components to be rendered on screen
+        expect(screen.getByText('Emotion')).toBeTruthy();
+        expect(screen.getByText('Over the past week, did you perform any strategies to manage your stress level or emotion?')).toBeTruthy();
+        expect(screen.getByText('Examples: meditation, journaling, meeting people')).toBeTruthy();
+        // text
+        expect(screen.getByPlaceholderText('Examples: meditation, journaling, meeting people')).toBeTruthy();
+
+        expect(screen.getByText('4/4')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
     test('question 4 answered and navigate to next screen', async() => {
@@ -185,7 +211,8 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Management Summary')).toBeTruthy();
     });
 
     test('user presses the back button', () => {
