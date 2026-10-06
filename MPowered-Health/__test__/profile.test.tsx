@@ -32,6 +32,11 @@ jest.mock("@/context/authcontext", () => ({
 }))
 
 describe("objects rendered on screen", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
     test("objects are rendered on screen correctly", async() => {
         await render(<ManageProfile/>);
         expect(screen.getByText("PROFILE")).toBeTruthy();
@@ -294,6 +299,11 @@ describe("editing birth year tests", () => {
 })
 
 describe("editing diagnosis tests", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
     test("pressing on diagnosis should open the editor", async() => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
