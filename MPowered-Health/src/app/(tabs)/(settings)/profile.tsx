@@ -592,6 +592,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Other Conditions</Text>
             <AuthInput
+              testID="other-conditions-input"
               label="Other conditions"
               placeholder={user?.otherCondition || 'Type conditions or symptoms'}
               inputMode="text"

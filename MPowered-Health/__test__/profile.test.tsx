@@ -360,3 +360,76 @@ describe("editing diagnosis tests", () => {
 
     })
 })
+
+describe("editing other conditions tests (text input)", () => {
+    test("pressing on other conditions should open the editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("Frequent headaches"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+        expect(screen.getByText("Other conditions")).toBeTruthy();
+        expect(screen.getByText("Frequent headaches")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getByText("Save")).toBeTruthy();
+        console.log("pop up was opened");
+    })
+
+    test("other conditions is changed successfully", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Frequent headaches"));
+        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+
+        //get the input field and make the edit
+        const conditionsInput = screen.getByTestId("other-conditions-input");
+        fireEvent.changeText(conditionsInput, "Pain");
+
+        //save the edit
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({otherCondition: "Pain"}); 
+    })
+
+    test("pressing cancel does not edit the condition", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Frequent headaches"));
+        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+
+        //get the input field and make the edit
+        const conditionsInput = screen.getByTestId("other-conditions-input");
+        fireEvent.changeText(conditionsInput, "Pain");
+
+        //save the edit
+        await user.press(screen.getByText("Cancel"));
+
+        expect(screen.getByText("Frequent headaches")).toBeTruthy();   
+    })
+
+    test("entering an empty string for a condition removes the previously saved condition", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //open the modal
+        await user.press(screen.getByText("Frequent headaches"));
+        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+
+        //get the input field and make the edit
+        const conditionsInput = screen.getByTestId("other-conditions-input");
+        fireEvent.changeText(conditionsInput, "");
+
+        //save the edit
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({otherCondition : null});    
+    })
+})
