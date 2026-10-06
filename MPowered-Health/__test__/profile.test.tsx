@@ -1,7 +1,7 @@
 import ManageProfile from "@/app/(tabs)/(settings)/profile";
 import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
-import { painConditionsOptions } from "@/constants/profile/profile-options";
-import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
+import { diagnosisOptions, painConditionsOptions } from "@/constants/profile/profile-options";
+import { render, screen, fireEvent, userEvent, waitFor } from "@testing-library/react-native";
 import { Alert, Modal } from "react-native";
 
 const mockUser = {
@@ -291,5 +291,62 @@ describe("editing birth year tests", () => {
 
         expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');
     }) 
+})
 
+describe("editing diagnosis tests", () => {
+    test("pressing on diagnosis should open the editor", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("Have formal diagnosis"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        expect(screen.getByText(diagnosisOptions[0])).toBeTruthy();
+        expect(screen.getByText(diagnosisOptions[1])).toBeTruthy()
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getByText("Save")).toBeTruthy();
+        console.log("pop up was opened");
+
+    })
+
+    test("diagnosis is changed successfully", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("Have formal diagnosis"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        await fireEvent.press(screen.getByText(diagnosisOptions[1]));
+
+        //save the edit
+        await user.press(screen.getByText("Save"));
+
+        expect(mockUpdateUser).toHaveBeenCalledWith({formalDiagnosis: false});
+
+    })
+
+    test("pressing cancel does not make edits", async() => {
+        const user = userEvent.setup();
+        await render(<ManageProfile/>);
+        //clicking on diagnosis to edit
+        await user.press(screen.getByText("Have formal diagnosis"));
+
+        //modal should open
+        console.log("open up modal");
+        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        await fireEvent.press(screen.getByText(diagnosisOptions[1]));
+
+        //save the edit
+        await user.press(screen.getByText("Cancel"));
+
+        expect(screen.getByText("Have formal diagnosis"));
+        //expect(mockUpdateUser).toHaveBeenCalledWith({formaldiagnosis: false});
+
+    })
 })
