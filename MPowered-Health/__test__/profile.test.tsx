@@ -371,7 +371,7 @@ describe("editing other conditions tests (text input)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        //clicking on diagnosis to edit
+        //clicking on other conditions to edit
         await user.press(screen.getByText("Frequent headaches"));
 
         //modal should open
@@ -444,7 +444,7 @@ describe("editing email tests (rendering)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        //clicking on diagnosis to edit
+        //clicking on email to edit
         await user.press(screen.getByText("jane12@example.com"));
 
         //modal should open
@@ -464,7 +464,7 @@ describe("editing password tests (rendering)" , () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        //clicking on diagnosis to edit
+        //clicking on password to edit
         await user.press(screen.getByText("Change password"));
 
         //modal should open
