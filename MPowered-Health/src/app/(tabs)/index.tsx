@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-// import { ASSESSMENT_QUESTIONS } from './questions/index';
-// import AssessmentScreen from './assessmentScreen';
+import { ASSESSMENT_QUESTIONS } from '../(assessment)/questions/index';
+import AssessmentScreen from '../(assessment)/assessmentScreen';
 
 export default function HomeScreen() {
 
   const [currentPage, setCurrentPage] = useState('home');
   const [currentAssessmentId, setCurrentAssessmentId] = useState(null);
 
-  // // If a category is selected, render the assessment screen
-  // if (currentPage !== 'home') {
-  //   return (
-  //     <AssessmentScreen
-  //       categoryData={ASSESSMENT_QUESTIONS[currentPage]}
-  //       assessmentId={currentAssessmentId}
-  //       onBack={() => setCurrentPage('home')}
-  //     />
-  //   );
-  // }
+// If a category is selected, render the assessment screen
+  if (currentPage !== 'home') {
+    return (
+      <AssessmentScreen
+        categoryData={(ASSESSMENT_QUESTIONS as Record<string, any>)[currentPage]}
+        assessmentId={currentAssessmentId ?? ''}
+        onBack={() => setCurrentPage('home')}
+      />
+    );
+  }
   
   // Otherwise render the homescreen
   return(
