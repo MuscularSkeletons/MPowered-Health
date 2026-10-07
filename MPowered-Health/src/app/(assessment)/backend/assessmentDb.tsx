@@ -83,11 +83,6 @@ export async function submitAssessmentAnswers(
     throw new Error(`No Supabase table configured for category: "${categoryTitle}"`);
   }
 
-  console.log('--- SUBMITTING ASSESSMENT ---');
-  console.log('Category:', categoryTitle);
-  console.log('Mapped Table:', tableName);
-  console.log('Payload Data:', JSON.stringify(answers, null, 2));
-
   const assessmentId =
     explicitAssessmentId || (await getOrCreateCurrentWeeklyAssessment());
 
