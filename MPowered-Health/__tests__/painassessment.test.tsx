@@ -199,6 +199,17 @@ describe("input validation for question 1 other", () => {
         fireEvent.press(screen.getByText("OK"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
     });
+
+    test("other location entered is not the same as a pre-existing option", async() => {
+        jest.spyOn(Alert, "alert");
+        await render(<PainAssessment/>);
+        fireEvent.press(screen.getByText("Other"));
+        const otherInput = screen.getByPlaceholderText("Input other pain location");
+        const user = userEvent.setup();
+        await user.type(otherInput, "Shoulder");
+        fireEvent.press(screen.getByText("OK"));
+        expect(Alert.alert).toHaveBeenCalledWith("Error", "please input a location that is not already listed as an option");
+    });
 });
 
 // navigation tests
