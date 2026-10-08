@@ -34,6 +34,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        working-directory: ./MPowered-Health
         run: npm ci
 
       - name: Run lint
