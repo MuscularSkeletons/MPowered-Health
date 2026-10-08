@@ -82,6 +82,7 @@ describe("url link tests", () => {
     })
 })
 
+//todo: fix expo router linking issue
 describe("navigation tests", () => {
 
     beforeEach(() => {
@@ -135,15 +136,15 @@ describe("sign out tests", () => {
         await render(<Settings/>);
         const spyAlert = jest.spyOn(Alert, 'alert');
         const alertButtons = [{
-        text: 'Cancel',
-        onPress: expect.anything(),
-        style: 'cancel',
-      },
-      {
-        text: 'Sign Out',
-        onPress: expect.anything(),
-        style: 'destructive',
-      }]
+            text: 'Cancel',
+            onPress: expect.anything(),
+            style: 'cancel',
+        },
+        {
+            text: 'Sign Out',
+            onPress: expect.anything(),
+            style: 'destructive',
+        }]
 
         fireEvent.press(screen.getByText("Sign Out"));
         expect(spyAlert).toHaveBeenCalledWith("Sign Out", "Are you sure you want to sign out?", expect.arrayContaining(alertButtons));        
@@ -180,7 +181,7 @@ describe("sign out tests", () => {
         expect(mockSignOut).toHaveBeenCalledTimes(1);
         console.log("sign out was called");
 
-        //navigate to login
+        //todo: navigate to login
     })
 })
 
@@ -200,15 +201,15 @@ describe("delete account tests", () => {
         await render(<Settings/>);
         const spyAlert = jest.spyOn(Alert, 'alert');
         const alertButtons = [{
-        text: 'Cancel',
-        onPress: expect.anything(),
-        style: 'cancel',
-      },
-      {
-        text: 'Delete Account',
-        onPress: expect.anything(),
-        style: 'destructive',
-      }]
+            text: 'Cancel',
+            onPress: expect.anything(),
+            style: 'cancel',
+        },
+        {
+            text: 'Delete Account',
+            onPress: expect.anything(),
+            style: 'destructive',
+        }]
 
         fireEvent.press(screen.getByText("Delete Account"));
         expect(spyAlert).toHaveBeenCalledWith("Delete Account", "Are you sure you want to delete your account? This action cannot be reversed.", expect.arrayContaining(alertButtons));        
@@ -245,6 +246,6 @@ describe("delete account tests", () => {
         expect(mockDeleteUser).toHaveBeenCalledTimes(1);
         console.log("delete was called");
 
-        //navigate to splash screen
+        //todo: navigate to splash screen
     })
 })
