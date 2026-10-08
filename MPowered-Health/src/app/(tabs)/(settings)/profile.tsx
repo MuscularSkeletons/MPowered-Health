@@ -413,6 +413,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Name</Text>
             <AuthInput
+              testID="name-input"
               label="Name"
               placeholder={user?.name}
               inputMode="text"
@@ -482,6 +483,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Birth Year</Text>
             <AuthInput
+              testID="birth-year-input"
               label="Year of birth"
               placeholder={String(user?.birthyear || "XXXX")}
               keyboardType="number-pad"
@@ -590,6 +592,7 @@ export default function ManageProfile() {
           <View style={styles.editInterface}>
             <Text>Edit Other Conditions</Text>
             <AuthInput
+              testID="other-conditions-input"
               label="Other conditions"
               placeholder={user?.otherCondition || 'Type conditions or symptoms'}
               inputMode="text"
@@ -664,7 +667,7 @@ export default function ManageProfile() {
             <Text>Please enter your existing password and your new password.</Text>
             <AuthInput
               label="Current password"
-              placeholder="Enter your current password password"
+              placeholder="Enter your current password"
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
