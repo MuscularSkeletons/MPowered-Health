@@ -69,13 +69,13 @@ describe("editing name tests", () => {
         await user.press(screen.getByText("Jane"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up name editor modal");
         expect(screen.getByText("Edit Name")).toBeTruthy();
         expect(screen.getByText("Name")).toBeTruthy();
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("pop up was opened");
+        console.log("name editor pop up was opened");
         
     })
 
@@ -85,13 +85,12 @@ describe("editing name tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Jane"));
-        console.log("modal is open");
         expect(screen.getByText("Edit Name")).toBeTruthy();
 
         //get the input field and make the edit
         const nameInput = screen.getByTestId("name-input");
         fireEvent.changeText(nameInput, "John");
-        console.log("name changed");
+        console.log("name edited");
 
         //save the edit
         await user.press(screen.getByText("Save"));
@@ -116,7 +115,7 @@ describe("editing name tests", () => {
 
         //no change should be expected
         expect(screen.getByText("Jane")).toBeTruthy();
-        //expect(mockUpdateUser).not.toHaveBeenCalled();
+        expect(mockUpdateUser).not.toHaveBeenCalled();
     })
 
     test("entering an empty string throws an alert", async() => {
@@ -126,7 +125,6 @@ describe("editing name tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Jane"));
-        console.log("modal is open");
         expect(screen.getByText("Edit Name")).toBeTruthy();
 
         //get the input field and make the edit
@@ -155,12 +153,12 @@ describe("editing birthsex tests", () => {
         await user.press(screen.getByText("Female"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up birthsex editor modal");
         expect(screen.getByText("Edit Birth Sex")).toBeTruthy();
         expect(screen.getByText("Male")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("pop up was opened");
+        console.log("birthsex editor pop up was opened");
     })
     
     test("birthsex is edited successfully", async() => {
@@ -169,7 +167,6 @@ describe("editing birthsex tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Female"));
-        console.log("modal is open");
         expect(screen.getByText("Edit Birth Sex")).toBeTruthy();
 
         fireEvent.press(screen.getByText("Male"));
@@ -193,10 +190,9 @@ describe("editing birthsex tests", () => {
 
         //no change should be expected
         expect(screen.getByText("Female")).toBeTruthy();
-        //expect(mockUpdateUser).not.toHaveBeenCalled();
+        expect(mockUpdateUser).not.toHaveBeenCalled();
     })
  
-
 })
 
 describe("editing birth year tests", () => {
@@ -213,13 +209,13 @@ describe("editing birth year tests", () => {
         await user.press(screen.getByText("1997"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up birth year modal");
         expect(screen.getByText("Edit Birth Year")).toBeTruthy();
         expect(screen.getByText("Year of birth")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("pop up was opened");
+        console.log("birth year editor pop up was opened");
     })
 
     test("birthyear is changed successfully", async() => {
@@ -257,7 +253,7 @@ describe("editing birth year tests", () => {
         await user.press(screen.getByText("Cancel"));
 
         expect(screen.getByText("1997")).toBeTruthy();
-        //expect(mockUpdateUser).not.toHaveBeenCalled();
+        expect(mockUpdateUser).not.toHaveBeenCalled();
     })
 
     test("entered year is below the allowed range", async() => {
@@ -407,13 +403,13 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Have formal diagnosis"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up diagnosis modal");
         expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[0])).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[1])).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("pop up was opened");
+        console.log("diagnosis pop up was opened");
 
     })
 
@@ -425,7 +421,6 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Have formal diagnosis"));
 
         //modal should open
-        console.log("open up modal");
         expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
         await fireEvent.press(screen.getByText(diagnosisOptions[1]));
 
@@ -443,7 +438,6 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Have formal diagnosis"));
 
         //modal should open
-        console.log("open up modal");
         expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
         await fireEvent.press(screen.getByText(diagnosisOptions[1]));
 
@@ -451,7 +445,7 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Cancel"));
 
         expect(screen.getByText("Have formal diagnosis"));
-        //expect(mockUpdateUser).toHaveBeenCalledWith({formaldiagnosis: false});
+        expect(mockUpdateUser).not.toHaveBeenCalled();
 
     })
 })
@@ -470,13 +464,13 @@ describe("editing other conditions tests (text input)", () => {
         await user.press(screen.getByText("Frequent headaches"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up other conditions modal");
         expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
         expect(screen.getByText("Other conditions")).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("pop up was opened");
+        console.log("conditions pop up was opened");
     })
 
     test("other conditions is changed successfully", async() => {
@@ -543,7 +537,7 @@ describe("editing email tests (rendering)", () => {
         await user.press(screen.getByText("jane12@example.com"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up email editor modal");
         expect(screen.getByText("Edit Email")).toBeTruthy();
         expect(screen.getByText("Email address")).toBeTruthy();
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
@@ -563,7 +557,7 @@ describe("editing password tests (rendering)" , () => {
         await user.press(screen.getByText("Change password"));
 
         //modal should open
-        console.log("open up modal");
+        console.log("open up password editor modal");
         expect(screen.getByText("Update your password")).toBeTruthy();
         expect(screen.getByText("Please enter your existing password and your new password.")).toBeTruthy();
         expect(screen.getByText("Current password")).toBeTruthy();
