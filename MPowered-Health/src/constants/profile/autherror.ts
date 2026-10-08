@@ -17,6 +17,7 @@ export const AUTH_ERROR_CODES = [
   'session_expired',
   'refresh_token_not_found',
   'validation_failed',
+  'current_password_invalid',
 ] as const;
  
 export type AuthErrorCode = typeof AUTH_ERROR_CODES[number];
@@ -93,6 +94,10 @@ const ERRORS: Record<AuthErrorCode, AuthUserError> = {
   validation_failed: {
     message: 'That email address looks invalid. Double-check the format.',
     field: 'email',
+  },
+  current_password_invalid: {
+    message: 'Current password is incorrect.',
+    field: 'password',
   },
 };
  
