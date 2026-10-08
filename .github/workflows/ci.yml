@@ -38,12 +38,15 @@ jobs:
         run: npm ci
 
       - name: Run lint
+        working-directory: ./MPowered-Health
         run: npm run lint --if-present
 
       - name: TypeScript check
+        working-directory: ./MPowered-Health
         run: npx tsc --noEmit
 
       - name: Run unit tests with coverage
+        working-directory: ./MPowered-Health
         run: npm test -- --runInBand --watchAll=false --passWithNoTests --coverage
 
       - name: Upload coverage report
