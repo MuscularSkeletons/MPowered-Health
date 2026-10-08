@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // TODO: implement sign in using email and password
+  // TODO: implement sign in using email auth
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
       email,
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // handles user sign up using an email and pasword authentication method
+  // handles user sign up using an email and password authentication method
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -129,10 +129,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
 
-  // delete user - (not sure how to do so correctly just signs user out)
+  // delete user - adds user id to delete requests table and signs user out
   const deleteUser = async () => {
     // check user logged in
     if (!user) return;
+
+    // add user id to delete requests table
+      const { error } = await supabase
+        .from("DeleteRequest")
+        .insert({ user_id: user.id });
+
+    if (error) throw error;
+
+    console.log("Delete request added to DeleteRequest table. Awaiting manual delete by admin.");
 
     // sign the user out
     await supabase.auth.signOut();
