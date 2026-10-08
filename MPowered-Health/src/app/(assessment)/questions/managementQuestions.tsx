@@ -1,0 +1,55 @@
+export const managementQuestions = {
+    title: 'My Management',
+    tip: 'Explore tips on managing pain',
+   
+    questions: [
+        {   
+            id: 'medication',
+            title: 'Medication',
+            prompt: 'Over the past week, select medications that you consumed to manage your pain.',
+            kind: 'multi',
+            optional: true,
+            helper:
+                'Not taking medications? You can continue without selecting an option. This list is generated from your medication records.',
+            options: [
+                'Perindopril arginine 5 mg — Once daily',
+                'Candesartan 16 mg — Once daily',
+                'Amlodipine 5 mg — Once daily',
+                'Vitamin D3 1000 IU — Once daily',
+                'Raloxifene 60 mg — Once daily',
+            ],
+        },
+
+        {   
+            id: 'otc_medication',
+            title: 'Medication',
+            prompt: 'Over the past week, did you take any over-the-counter (OTC) medication?',
+            kind: 'text',
+            optional: true,
+            helper: 'Not taking OTC medication? You can continue without entering a medication.',
+        },
+
+        {   
+            id: 'exercise_frequency',
+            title: 'Exercise',
+            prompt:
+                'In the past 7 days, did you perform any exercises to manage your musculoskeletal pain or improve your movement?',
+            kind: 'single',
+            helper:
+                'Examples include walking, stretching, strengthening, yoga, resistance-band work, or balance exercises.',
+            options: ['0 days', '1-2 days', '3-4 days', '5-6 days', '7 days'],
+        
+        },
+
+        {   
+            id: 'emotion_strategies',
+            title: 'Emotion',
+            prompt:
+                'Over the past week, did you perform any strategies to manage your stress level or emotion?',
+            kind: 'text',
+            optional: true,
+            helper: 'Examples include meditation, journaling, or meeting with people.',
+        },
+        
+    ],
+};
