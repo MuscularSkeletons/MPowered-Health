@@ -17,71 +17,76 @@ CREATE TABLE "public"."Health Conditions" (
 ALTER TABLE "public"."Health Conditions"
   ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE "public"."Movement Assessment" (
+CREATE TABLE "public"."movement_assessment" (
   "movement_assessment_id" uuid                     NOT NULL DEFAULT gen_random_uuid(),
   "created_at"             timestamp with time zone NOT NULL DEFAULT now(),
-  "score"                  smallint                 NOT NULL,
-  "standing_impact"        smallint                 NOT NULL,
-  "lifting_impact"         smallint                 NOT NULL,
-  "sitting_impact"         smallint                 NOT NULL,
-  "walking_impact"         smallint                 NOT NULL,
-  "active_hour"            smallint                 NOT NULL,
-  "reflection"             text,
+  "movement_score"         smallint                 NOT NULL,
+  "standing_impact"        text                     NOT NULL,
+  "lifting_impact"         text                     NOT NULL,
+  "sitting_impact"         text                     NOT NULL,
+  "walking_impact"         text                     NOT NULL,
+  "active_hour"            text                     NOT NULL,
+  "movement_reflection"    text,
   "assessment_id"          uuid                     NOT NULL,
-  CONSTRAINT "Movement Assessment_pkey" PRIMARY KEY (movement_assessment_id)
+  "general_impacts"        jsonb[]                  NOT NULL,
+  "impac_level"            text                     NOT NULL,
+  CONSTRAINT "movement_assessment_pkey" PRIMARY KEY (movement_assessment_id)
 );
 
-ALTER TABLE "public"."Movement Assessment"
+ALTER TABLE "public"."movement_assessment"
   ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE "public"."Pain Assessment" (
+CREATE TABLE "public"."pain_assessment" (
   "pain_assessment_id"      uuid                     NOT NULL DEFAULT gen_random_uuid(),
   "created_at"              timestamp with time zone NOT NULL DEFAULT now(),
-  "score"                   smallint                 NOT NULL,
-  "worst_pain_evaluation"   smallint                 NOT NULL,
-  "mildest_pain_evaluation" smallint                 NOT NULL,
-  "average_pain_evaluation" smallint                 NOT NULL,
-  "current_pain_evaluation" smallint                 NOT NULL,
-  "pain_location"           text                     NOT NULL,
+  "pain_score"              smallint                 NOT NULL,
+  "worst_pain"              smallint                 NOT NULL,
+  "mildest_pain"            smallint                 NOT NULL,
+  "average_pain"            smallint                 NOT NULL,
+  "current_pain"            smallint                 NOT NULL,
+  "pain_location"           jsonb[]                  NOT NULL,
   "pain_characteristics"    text                     NOT NULL,
   "pain_reflection"         text,
   "assessment_id"           uuid                     NOT NULL,
-  CONSTRAINT "Pain Assessment_pkey" PRIMARY KEY (pain_assessment_id)
+  CONSTRAINT "pain_assessment_pkey" PRIMARY KEY (pain_assessment_id)
 );
 
-ALTER TABLE "public"."Pain Assessment"
+ALTER TABLE "public"."pain_assessment"
   ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE "public"."Personal Care Assessment" (
+CREATE TABLE "public"."personal_care_assessment" (
   "personal_assmt_id"   uuid                     NOT NULL DEFAULT gen_random_uuid(),
   "created_at"          timestamp with time zone NOT NULL DEFAULT now(),
-  "general_impact"      smallint                 NOT NULL,
-  "personal_care_score" smallint                 NOT NULL,
-  "sleeping_impact"     smallint                 NOT NULL,
-  "score"               smallint                 NOT NULL,
-  "reflection"          text,
+  "activities_impact"   jsonb[]                  NOT NULL,
+  "personal_care_score" text                     NOT NULL,
+  "sleeping_impact"     text                     NOT NULL,
+  "care_score"          smallint                 NOT NULL,
+  "care_reflection"     text,
   "assessment_id"       uuid                     NOT NULL,
-  CONSTRAINT "Personal Care Assessment_pkey" PRIMARY KEY (personal_assmt_id)
+  "impac_level"         text                     NOT NULL,
+  CONSTRAINT "personal_care_assessment_pkey" PRIMARY KEY (personal_assmt_id)
 );
 
-ALTER TABLE "public"."Personal Care Assessment"
+ALTER TABLE "public"."personal_care_assessment"
   ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE "public"."Social Health Assessment" (
+CREATE TABLE "public"."social_health_assessment" (
   "social_health_assmt_id" uuid                     NOT NULL DEFAULT gen_random_uuid(),
   "created_at"             timestamp with time zone NOT NULL DEFAULT now(),
-  "score"                  smallint                 NOT NULL,
-  "social_life"            smallint                 NOT NULL,
-  "travelling"             smallint                 NOT NULL,
+  "social_score"           smallint                 NOT NULL,
+  "social_life"            text                     NOT NULL,
+  "travelling"             text                     NOT NULL,
   "mood_impact"            smallint                 NOT NULL,
   "relation_impact"        smallint                 NOT NULL,
   "enjoyment_impact"       smallint                 NOT NULL,
-  "general_mood"           smallint                 NOT NULL,
+  "general_mood"           text                     NOT NULL,
   "assessment_id"          uuid                     NOT NULL,
-  CONSTRAINT "Social Health Assessment_pkey" PRIMARY KEY (social_health_assmt_id)
+  "mood_trigger"           text                     NOT NULL,
+  "impac_level"            text                     NOT NULL,
+  CONSTRAINT "social_health_assessment_pkey" PRIMARY KEY (social_health_assmt_id)
 );
 
-ALTER TABLE "public"."Social Health Assessment"
+ALTER TABLE "public"."social_health_assessment"
   ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE "public"."Appointment" (
@@ -97,15 +102,15 @@ CREATE TABLE "public"."Appointment" (
 ALTER TABLE "public"."Appointment"
   ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE "public"."Assessment" (
+CREATE TABLE "public"."assessment" (
   "assessment_id" uuid                     NOT NULL DEFAULT gen_random_uuid(),
   "date"          timestamp with time zone NOT NULL DEFAULT now(),
   "user_id"       uuid                     NOT NULL,
-  "refelction"    text,
-  CONSTRAINT "Assessment_pkey" PRIMARY KEY (assessment_id)
+  "week_start"    date                     NOT NULL,
+  CONSTRAINT "assessment_pkey" PRIMARY KEY (assessment_id)
 );
 
-ALTER TABLE "public"."Assessment"
+ALTER TABLE "public"."assessment"
   ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE "public"."Prescription" (
@@ -169,17 +174,17 @@ BEGIN
 END;
 $function$;
 
-ALTER TABLE "public"."Movement Assessment"
-  ADD CONSTRAINT "Movement Assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."Assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "public"."movement_assessment"
+  ADD CONSTRAINT "movement_assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "public"."Pain Assessment"
-  ADD CONSTRAINT "Pain Assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."Assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "public"."pain_assessment"
+  ADD CONSTRAINT "pain_assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "public"."Personal Care Assessment"
-  ADD CONSTRAINT "Personal Care Assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."Assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "public"."personal_care_assessment"
+  ADD CONSTRAINT "personal_care_assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "public"."Social Health Assessment"
-  ADD CONSTRAINT "Social Health Assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."Assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "public"."social_health_assessment"
+  ADD CONSTRAINT "social_health_assessment_assessment_id_fkey" FOREIGN KEY (assessment_id) REFERENCES public."assessment"(assessment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "public"."Health Conditions"
   ADD CONSTRAINT "Health Conditions_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public."User"(user_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -204,22 +209,22 @@ GRANT CREATE, USAGE ON SCHEMA "public" TO "prisma";
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Health Conditions" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
-  ON TABLE "public"."Movement Assessment"
+  ON TABLE "public"."movement_assessment"
   TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Pain Assessment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
-  ON TABLE "public"."Personal Care Assessment"
+  ON TABLE "public"."personal_care_assessment"
   TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
-  ON TABLE "public"."Social Health Assessment"
+  ON TABLE "public"."social_health_assessment"
   TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Appointment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
-GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Assessment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
+GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."assessment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Prescription" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
