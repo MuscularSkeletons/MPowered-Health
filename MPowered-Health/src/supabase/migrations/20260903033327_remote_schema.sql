@@ -212,7 +212,7 @@ GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
   ON TABLE "public"."movement_assessment"
   TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
-GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."Pain Assessment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
+GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."pain_assessment" TO "anon", "authenticated", "postgres", "prisma", "service_role";
 
 GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
   ON TABLE "public"."personal_care_assessment"
