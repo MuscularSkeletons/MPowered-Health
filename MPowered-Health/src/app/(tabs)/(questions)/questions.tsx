@@ -46,8 +46,12 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
       {
         text: 'Delete',
         onPress: async () => {
-          console.log("Deleted a question");
-          await deleteQuestion(question.id);
+          try {
+            await deleteQuestion(question.id);
+            console.log("Deleted a question");
+          } catch (error) {
+            Alert.alert("Error", "Error deleting question. Please refresh and try again");
+          }
         },
         style: 'destructive',
       }

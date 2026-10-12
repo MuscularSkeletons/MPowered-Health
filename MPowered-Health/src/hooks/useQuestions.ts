@@ -63,7 +63,7 @@ export const useQuestions = () => {
             .single();
 
             if (error) {
-                console.error("Error creating question:", error);
+                console.error("Error deleting question:", error);
                 throw error;
             }
 
@@ -71,7 +71,7 @@ export const useQuestions = () => {
             await loadQuestions();
         
         } catch (error) {
-            console.error("Error creating question:", error);
+            console.error("Error deleting question:", error);
             throw error;
         }   
     };
@@ -105,7 +105,7 @@ export const useQuestions = () => {
             await loadQuestions();
         
         } catch (error) {
-            console.error("Error creating question:", error);
+            console.error("Error updating answer:", error);
             throw error;
         }
     }
