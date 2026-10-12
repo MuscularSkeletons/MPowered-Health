@@ -16,6 +16,7 @@ import {
   getPainManagementQuestions,
 } from "@/constants/questions/questions";
 import { useAuth } from "@/context/authcontext";
+import { useQuestions } from "@/hooks/useQuestions";
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
@@ -30,6 +31,7 @@ export default function AddQuestion() {
   const { user } = useAuth();
 
   const [questions, setQuestions] = useState<string[]>([]);
+  const { createQuestion } = useQuestions();
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleQuestions = (question: string) => {
@@ -46,7 +48,7 @@ export default function AddQuestion() {
   const painManagementQuestions = getPainManagementQuestions();
 
   // save questions and send to backend
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsLoading(true);
     try {
       if (!user) {
@@ -56,7 +58,11 @@ export default function AddQuestion() {
         Alert.alert('Error', 'Please select at least one question');
         return;
       }
-      
+      for (const question of questions) {
+        await createQuestion(question);
+      };
+      // reset questions
+      setQuestions([]);
       router.replace('/(tabs)/(questions)/questions');
     } catch (error) {
       console.error(error);
