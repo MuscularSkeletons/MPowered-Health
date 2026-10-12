@@ -43,7 +43,7 @@ export function getPainIntensityQuestions(currentPainLevel: number | null,
     } else {
         return [
             `My average pain over the past week has been around ${averagePainLevel} — what does this indicate?`,
-            'Even though I don\'t have pain right now, I\'ve had severe pain at times (up to ${worstPainLevel}). What could explain these flare-ups?',
+            `Even though I don\'t have pain right now, I\'ve had severe pain at times (up to ${worstPainLevel}). What could explain these flare-ups?`,
             `Is it normal for pain to vary between mild (${mildestPainLevel}) and very severe (${worstPainLevel})?`,
             `What can I do to better manage days when the pain is high?`,
         ];
