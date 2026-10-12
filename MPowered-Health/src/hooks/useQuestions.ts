@@ -92,7 +92,7 @@ export const useQuestions = () => {
             .from("Question")
             .select("*")
             .eq("user_id", user.id)
-            .order("created_at", { ascending: false });
+            .order("updated_at", { ascending: false });
 
             if (questionsError) {
                 console.error("Error loading questions:", questionsError);
@@ -121,5 +121,9 @@ export const useQuestions = () => {
         }
     };
 
-    return { createQuestion, updateAnswer, questions };
+    const refreshQuestions = async () => {
+        await loadQuestions();
+    };
+
+    return { createQuestion, updateAnswer, refreshQuestions, questions };
 }

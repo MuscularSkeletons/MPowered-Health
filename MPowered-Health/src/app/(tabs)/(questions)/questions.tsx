@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/profile/ui";
@@ -68,9 +69,6 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
 
       // update supabase
       await updateAnswer(question.id, trimmedAnswer);
-
-      // reset answer
-      setAnswer('');
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');
@@ -125,9 +123,8 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
             <AuthInput
               testID="answer-input"
               label="Answer"
-              placeholder={answer || 'Enter your answer'}
+              placeholder={'Enter your answer'}
               inputMode="text"
-              autoCapitalize="words"
               autoCorrect={false}
               value={answer}
               onChangeText={setAnswer}
@@ -156,7 +153,20 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
 export default function Questions() {
   const router = useRouter();
   const { user } = useAuth();
-  const { questions } = useQuestions();
+  const { questions, refreshQuestions } = useQuestions();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refreshQuestions();
+    } catch (error) {
+      console.error("Error refreshing questions", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   const renderQuestion = ({item}: {item: Question}) => (
     <QuestionCard question={item} currentUserId={user?.id}></QuestionCard>
@@ -171,7 +181,16 @@ export default function Questions() {
       />
 
       {/* render questions */}
-      <FlatList data={questions} renderItem={renderQuestion}/>
+      <FlatList 
+        data={questions} 
+        renderItem={renderQuestion} 
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={
+          questions.length === 0 ? styles.emptyContent : styles.content
+        }
+        ListEmptyComponent={<Text>No questions created yet</Text>}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+      />     
 
       <TouchableOpacity style={styles.addButton} onPress={() => router.push("/(tabs)/(questions)/addquestion")}>
         <Text style={styles.addButtonText}>+</Text>
@@ -228,6 +247,14 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "300",
     lineHeight: 32,
+  },
+  content: {
+    paddingBottom: 100,
+  },
+  emptyContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   questionContainer: {
     backgroundColor: palette.light,
