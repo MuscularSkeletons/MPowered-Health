@@ -19,7 +19,7 @@ export const formatTimeAgo = (createdAt: string): string => {
     const years = Math.floor(weeks / TIME.WEEKS_IN_YEAR);
 
     if (minutes < 1) {
-        return "Just now";
+        return "just now";
     } else if (minutes< 60) {
         return `${minutes}m ago`;
     } else if (hours < 24) {

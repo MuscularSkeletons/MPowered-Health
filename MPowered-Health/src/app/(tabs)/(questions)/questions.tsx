@@ -4,6 +4,9 @@ import {
   TouchableOpacity,
   FlatList,
   View,
+  Alert,
+  Modal,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/profile/ui";
@@ -12,6 +15,7 @@ import { useRouter } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
 import { formatTimeAgo } from "@/lib/date-helper";
+import { Ionicons } from "@expo/vector-icons";
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
@@ -19,6 +23,7 @@ import {
   ChoiceButton,
   PrimaryButton,
   authStyles,
+  AuthInput,
 } from '@/components/auth/auth-ui';
 
 interface QuestionCardProps {
@@ -26,32 +31,124 @@ interface QuestionCardProps {
   currentUserId?: string;
 }
 const QuestionCard = ({question, currentUserId}: QuestionCardProps) => { 
-  const handleAnswer = () => {
 
+  const { user } = useAuth();
+  const { updateAnswer } = useQuestions();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDelete = () => {
+    Alert.alert("Delete Question", "Are you sure you want to delete this question?", [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+      }
+    ])
+  }
+
+  const [showAnswerPreview, setShowAnswerPreview] = useState(false);
+  const [answer, setAnswer] = useState('');
+  const handleAnswer = async () => {
+    if (!user) {
+      return;
+    }
+    const trimmedAnswer = answer.trim();
+    if (!trimmedAnswer) {
+      Alert.alert('Error', 'Please enter an answer');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // update supabase
+      await updateAnswer(question.id, trimmedAnswer);
+
+      // reset answer
+      setAnswer('');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+      // close modal
+      setShowAnswerPreview(!showAnswerPreview);
+    }
   }
 
   return (
-    <View style={styles.questionContainer}>
-      <View style={styles.questionHeader}>
-        <View style={styles.timeInfo}>
-          <View>
+    <View>
+      <View style={styles.questionContainer}>
+        <View style={styles.questionHeader}>
+          <View style={styles.timeInfo}>
             <Text style={styles.timeAgo}>
-              { question.created_at === question.updated_at ? `created ${formatTimeAgo(question.created_at)}` : `edited ${formatTimeAgo(question.updated_at)}` }
+              { 
+                question.created_at === question.updated_at 
+                ? `created ${formatTimeAgo(question.created_at)}` 
+                : `edited ${formatTimeAgo(question.updated_at)}` 
+              }
             </Text>
           </View>
+          <TouchableOpacity onPress={handleDelete}>
+            <Ionicons 
+              name={"trash-outline"}
+              style={styles.delete}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.questionContent}>
+          <View style={styles.question}>
+              <Text style={styles.questionText}>{question.question}</Text>
+          </View>  
+          <View style={styles.answer}>
+            <Text style={styles.answerText}>{ question.answer || "No answer submitted yet"}</Text>
+        </View>
+        </View>
+        <View style={styles.answerButton}>
+          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}}/>
         </View>
       </View>
-      <View style={styles.questionContent}>
-        <View style={styles.question}>
-            <Text style={styles.questionText}>{question.question}</Text>
-        </View>  
-        <View style={styles.answer}>
-          <Text style={styles.answerText}>{ question.answer || "No answer submitted yet"}</Text>
-      </View>
-      </View>
-      <View style={styles.answerButton}>
-        <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={handleAnswer}/>
-      </View>
+
+      <Modal
+          visible={showAnswerPreview}
+          transparent={true}
+          animationType="slide"
+          >
+          <View style={styles.centredView}>
+          <View style={styles.editInterface}>
+            <Text>Edit Answer</Text>
+            <AuthInput
+              testID="answer-input"
+              label="Answer"
+              placeholder={answer || 'Enter your answer'}
+              inputMode="text"
+              autoCapitalize="words"
+              autoCorrect={false}
+              value={answer}
+              onChangeText={setAnswer}
+              onSubmitEditing={handleAnswer}
+              editable={!isLoading}
+            />
+            <View style={styles.buttonOptions}>
+              <Pressable 
+                style={[styles.button, styles.buttonCancel]} 
+                onPress={() => setShowAnswerPreview(!showAnswerPreview)}
+                disabled={isLoading}
+                >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable style={[styles.button, styles.buttonSave]} onPress={handleAnswer}>
+                <Text>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+        </Modal>
     </View>
   )
 }
@@ -171,5 +268,46 @@ const styles = StyleSheet.create({
   },
   answerButton: {
     padding: 10,
+  },
+  delete: {
+    fontSize: 20,
+    paddingRight: 5,
+  },
+  centredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editInterface: {
+    backgroundColor: 'white',
+    margin: 10,
+    padding: 50,
+    paddingLeft: 100,
+    paddingRight: 100,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderRadius: 20,
+  },
+  buttonOptions: {
+    flexDirection: 'row',
+    paddingTop: 20,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    marginHorizontal: 10,
+  },
+  buttonCancel: {
+    backgroundColor: palette.line,
+  },
+  buttonSave: {
+    backgroundColor: palette.primary,
   },
 });
