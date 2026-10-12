@@ -3,6 +3,7 @@ import {render, screen, fireEvent, userEvent} from '@testing-library/react-nativ
 import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
+const mockUpdateUserDraft = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -11,6 +12,7 @@ jest.mock("@/context/authcontext", () => ({
         signUp: jest.fn(),
         signOut: jest.fn(),
         updateUser: jest.fn(),
+        updateUserDraft: mockUpdateUserDraft,
         isLoading: false,
     }),
 }))
@@ -20,86 +22,114 @@ describe("rendering objects on screen", () => {
     test("screen objects are rendered on screen", async() => {
         await render(<StoreName/>);
 
-        expect(screen.getByText("Name")).toBeTruthy();
-        expect(screen.getByPlaceholderText("Name")).toBeTruthy();
-        expect(screen.getByText("SUBMIT")).toBeTruthy();
+        expect(screen.getByText("YOUR PROFILE")).toBeTruthy();
+        expect(screen.getByText("1 of 6")).toBeTruthy();
+        expect(screen.getByText("Your name")).toBeTruthy();
+        expect(screen.getByText("Your health and wellbeing are uniquely you. Your name helps us address you personally.")).toBeTruthy();
+        expect(screen.getByText("Name")).toBeTruthy();        
+        expect(screen.getByPlaceholderText("Type your name")).toBeTruthy();
+        expect(screen.getByRole("button", {name:"Continue"})).toBeTruthy();
+        expect(screen.getByText("< Back")).toBeTruthy();
     });
 
 })
 
 describe("input fields", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
     test("user is able to type in the input field", async() => {
         await render(<StoreName/>);
-        const nameInput = screen.getByPlaceholderText("Name");
+        const nameInput = screen.getByPlaceholderText("Type your name");
         const user = userEvent.setup();
 
         await user.type(nameInput, "Jane");
-        fireEvent.press(screen.getByText("SUBMIT"));
+        fireEvent.press(screen.getByRole("button", {name:"Continue"}));
         expect(nameInput.props.value).toBe("Jane");
+    })
+
+    test("continue button should be disabled if no name is entered", async() => {
+        await render(<StoreName/>);
+
+        expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
+    })
+
+    test("continue button should be enabled if a name is entered", async() => {
+        await render(<StoreName/>);
+        const nameInput = screen.getByPlaceholderText("Type your name");
+        const user = userEvent.setup();
+
+        await user.type(nameInput, "Jane");
+
+        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
     })
 })
 
 describe("name validation", () => {
-    afterEach(() => {
+    
+    beforeEach(() => {
         jest.clearAllMocks();
     })
 
-    test("throw an error for empty strings", async() => {
-        jest.spyOn(Alert, "alert");
-
+    test("throw an error for name containing only white spaces", async() => {
+        const spyAlert = jest.spyOn(Alert, "alert");
         await render(<StoreName/>);
 
-        fireEvent.press(screen.getByText("SUBMIT"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "mandatory field missing");
-
-    })
-
-    test("throw an error for names containing only white spaces", async() => {
-        jest.spyOn(Alert, "alert");
-
-        await render(<StoreName/>);
-        const nameInput = screen.getByPlaceholderText("Name");
+        const nameInput = screen.getByPlaceholderText("Type your name");
         const user = userEvent.setup();
 
-        await user.type(nameInput, " "); 
-        fireEvent.press(screen.getByText("SUBMIT"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "white space only is not allowed");
+        await user.type(nameInput, " ");
+        fireEvent.press(screen.getByRole("button", {name:"Continue"}));
+        expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter your name');
 
     })
 
-    test("throw an error for a name with a whitespace", async() => {
-        jest.spyOn(Alert, "alert");
-
+    test("successfully enter the name" , async() => {
         await render(<StoreName/>);
-        const nameInput = screen.getByPlaceholderText("Name");
+
+        const nameInput = screen.getByPlaceholderText("Type your name");
         const user = userEvent.setup();
 
-        await user.type(nameInput, "Jane "); 
-        fireEvent.press(screen.getByText("SUBMIT"));
-        expect(nameInput.props.value).toBe("Jane"); 
+        const userName = "Jane";
+        await user.type(nameInput, userName);
+
+        fireEvent.press(screen.getByRole("button", {name:"Continue"}));   
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({name: userName});
     })
 
+    test("for a name with a whitespace, remove the whitespace and save the name", async() => {
+        await render(<StoreName/>);
 
+        const nameInput = screen.getByPlaceholderText("Type your name");
+        const user = userEvent.setup();
+
+        const userName = "Jane ";
+        await user.type(nameInput, userName);
+
+        fireEvent.press(screen.getByRole("button", {name:"Continue"})); 
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({name: userName.trim()});
+    })
 })
 
-//should there be a test for symbols in name?
-
-
+//todo: navigation
 describe("navigation", () => {
-    test("adding a valid name and pressing submit takes to the next screen", async() => {
-        await render(<StoreName/>);
-        const nameInput = screen.getByPlaceholderText("Name");
-        const user = userEvent.setup();
 
-        await user.type(nameInput, "Jane"); 
-        fireEvent.press(screen.getByText("SUBMIT"));
-        expect(nameInput.props.value).toBe("Jane");
-        expect(Alert.alert).not.toHaveBeenCalled();
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("pressing continue navigates to the next screen", async() => {
+        await render(<StoreName/>);
         //todo: navigate to next screen
     })
+
+    test("pressing back navigates to the previous screen", async() => {
+        await render(<StoreName/>);
+        //todo: navigate to splash screen
+    })
 })
-//submit to next screen
-//back to onboarding screen
 
 
 
