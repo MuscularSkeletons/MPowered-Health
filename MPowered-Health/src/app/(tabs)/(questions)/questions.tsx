@@ -122,33 +122,33 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
           animationType="slide"
           >
           <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text>Edit Answer</Text>
-            <AuthInput
-              testID="answer-input"
-              label="Answer"
-              placeholder={'Enter your answer'}
-              inputMode="text"
-              autoCorrect={false}
-              value={answer}
-              onChangeText={setAnswer}
-              onSubmitEditing={handleAnswer}
-              editable={!isLoading}
-            />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowAnswerPreview(!showAnswerPreview)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable style={[styles.button, styles.buttonSave]} onPress={handleAnswer}>
-                <Text>Save</Text>
-              </Pressable>
+            <View style={styles.editInterface}>
+              <Text>{question.question}</Text>
+              <AuthInput
+                testID="answer-input"
+                label="Answer"
+                placeholder={'Enter your answer'}
+                inputMode="text"
+                autoCorrect={false}
+                value={answer}
+                onChangeText={setAnswer}
+                onSubmitEditing={handleAnswer}
+                editable={!isLoading}
+              />
+              <View style={styles.buttonOptions}>
+                <Pressable 
+                  style={[styles.button, styles.buttonCancel]} 
+                  onPress={() => setShowAnswerPreview(!showAnswerPreview)}
+                  disabled={isLoading}
+                  >
+                  <Text>Cancel</Text>
+                </Pressable>
+                <Pressable style={[styles.button, styles.buttonSave]} onPress={handleAnswer}>
+                  <Text>Save</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
         </Modal>
     </View>
   )
