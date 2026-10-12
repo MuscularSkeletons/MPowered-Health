@@ -34,7 +34,7 @@ interface QuestionCardProps {
 const QuestionCard = ({question, currentUserId}: QuestionCardProps) => { 
 
   const { user } = useAuth();
-  const { updateAnswer } = useQuestions();
+  const { updateAnswer, deleteQuestion } = useQuestions();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = () => {
@@ -45,6 +45,10 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
       },
       {
         text: 'Delete',
+        onPress: async () => {
+          console.log("Deleted a question");
+          await deleteQuestion(question.id);
+        },
         style: 'destructive',
       }
     ])
@@ -188,7 +192,7 @@ export default function Questions() {
         contentContainerStyle={
           questions.length === 0 ? styles.emptyContent : styles.content
         }
-        ListEmptyComponent={<Text>No questions created yet</Text>}
+        ListEmptyComponent={<Text style={styles.emptyContentText}>No questions created yet. Press the + button to start adding questions!</Text>}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
       />     
 
@@ -252,9 +256,17 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   emptyContent: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    borderRadius: 28,
+    backgroundColor: palette.light,
+    overflow: "hidden",
+    padding: 16,
+
+  },
+  emptyContentText: {
+    fontSize: 16,
+    color: palette.text,
+    fontStyle: "italic",
   },
   questionContainer: {
     backgroundColor: palette.light,

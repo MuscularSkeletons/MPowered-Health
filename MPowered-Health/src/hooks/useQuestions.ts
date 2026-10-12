@@ -47,6 +47,35 @@ export const useQuestions = () => {
         }
     };
 
+    const deleteQuestion = async (questionId: string) => {
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
+
+        try {
+            const {error} = await supabase
+            .from("Question")
+            .delete()
+            .match({
+                question_id: questionId
+            })
+            .select()
+            .single();
+
+            if (error) {
+                console.error("Error creating question:", error);
+                throw error;
+            }
+
+            // refresh posts
+            await loadQuestions();
+        
+        } catch (error) {
+            console.error("Error creating question:", error);
+            throw error;
+        }   
+    };
+
     const updateAnswer = async (questionId: string, answer: string) => {
         if (!user) {
             throw new Error("User not authenticated");
@@ -125,5 +154,5 @@ export const useQuestions = () => {
         await loadQuestions();
     };
 
-    return { createQuestion, updateAnswer, refreshQuestions, questions };
+    return { createQuestion, deleteQuestion, updateAnswer, refreshQuestions, questions };
 }
