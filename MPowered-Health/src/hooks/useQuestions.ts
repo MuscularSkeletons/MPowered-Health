@@ -1,26 +1,91 @@
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/context/authcontext";
+import { useEffect, useState } from "react";
+
+export interface Question {
+    id: string;
+    user_id: string;
+    question: string;
+    answer: string | null;
+    created_at: string;
+    updated_at: string;
+}
 
 export const useQuestions = () => {
-  const { user } = useAuth();
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const { user } = useAuth();
 
-  const createQuestion = async (question: string) => {
-    if (!user) {
-        throw new Error("User not authenticated");
-    }
+    useEffect(() => {
+        loadQuestions();
+    }, []);
 
-    try {
-        const {error} = await supabase.from("Question").insert({
-            user_id: user.id,
-            question: question,
-        })
-        .select()
-        .single();
-    
-    } catch (error) {
-        console.error("Error creating question:", error);
-    }
-  };
+    const createQuestion = async (question: string) => {
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
 
-  return { createQuestion };
+        try {
+            const {error} = await supabase.from("Question").insert({
+                user_id: user.id,
+                question: question,
+            })
+            .select()
+            .single();
+
+            if (error) {
+                console.error("Error creating question:", error);
+                throw error;
+            }
+
+            // refresh posts
+            await loadQuestions();
+        
+        } catch (error) {
+            console.error("Error creating question:", error);
+            throw error;
+        }
+    };
+
+    const loadQuestions = async () => {
+        if (!user) {
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const {data: questionsData, error: questionsError } = await supabase
+            .from("Question")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false });
+
+            if (questionsError) {
+                console.error("Error loading questions:", questionsError);
+                throw questionsError;
+            }
+
+            if (!questionsData || questionsData.length === 0) {
+                setQuestions([]);
+                return;
+            }
+
+            const formattedQuestions: Question[] = questionsData.map((question) => ({
+                id: question.id,
+                user_id: question.user_id,
+                question: question.question,
+                answer: question.answer || null,
+                created_at: question.created_at,
+                updated_at: question.updated_at,
+            }));
+
+            setQuestions(formattedQuestions);
+        } catch (error) {
+            console.error("Error loading questions:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { createQuestion, questions };
 }
