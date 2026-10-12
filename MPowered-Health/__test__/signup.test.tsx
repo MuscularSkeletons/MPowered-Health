@@ -283,3 +283,5 @@ describe ("Navigation to the correct screen", () => {
     //navigate to onboarding screen if successful input
 
 })
+
+//password and email validation will be manually tested
