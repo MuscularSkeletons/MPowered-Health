@@ -42,7 +42,7 @@ export default function AddQuestion() {
     );
   };
 
-  const painLocationQuestions = getPainLocationQuestions(null); // TODO
+  const painLocationQuestions = getPainLocationQuestions(null); // TODO when integrate with assessments as need access to assessment hook
   const painIntensityQuestions = getPainIntensityQuestions(null, null, null, null); // TODO
   const painImpactQuestions = getPainImpactQuestions();
   const painManagementQuestions = getPainManagementQuestions();
