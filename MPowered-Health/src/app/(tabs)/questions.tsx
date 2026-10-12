@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 
-export default function Careplanner() {
+export default function Questions() {
   return (
     <View style={styles.container}>
       <Text>care planner.</Text>

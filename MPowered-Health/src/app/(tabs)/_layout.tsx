@@ -55,9 +55,9 @@ export default function TabsLayout() {
             }}
         />
         <Tabs.Screen 
-            name="careplanner" 
+            name="questions" 
             options={{
-                title: 'Care Planner',
+                title: 'Questions',
                 tabBarIcon: ({ color, size, focused }) => (
                 <Ionicons 
                     name={focused ? "clipboard" : "clipboard-outline"}
