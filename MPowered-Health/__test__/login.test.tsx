@@ -1,7 +1,17 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Login from '../src/app/(auth)/login';
+import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+
+const SAVED_EMAIL_KEY = 'mpowered.saved-email';
+
+const mockUser = jest.fn(() => Promise.resolve('mocked user'));
+const mockSignIn = jest.fn();
+
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
-        user: null,
-        signIn: jest.fn(),
+        user: mockUser,
+        signIn: mockSignIn,
         signUp: jest.fn(),
         signOut: jest.fn(),
         updateUser: jest.fn(),
@@ -9,124 +19,241 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }))
 
-import Login from '../src/app/(auth)/login';
-import { render, screen } from '@testing-library/react-native';
+jest.mock('@react-native-async-storage/async-storage', () => ({
+    AsyncStorage: () => ({
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn(),
+    })
+}))
 
 
 describe('The screen renders all the components properly', () => {
 
-    beforeEach(async() => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+    
+    test('greeting message is rendered on screen',  async() => {
         await render (<Login/>);
+        expect(screen.getByText("Welcome back!")).toBeTruthy();
+        expect(screen.getByText("SIGN IN")).toBeTruthy();
+        expect(screen.getByText("Sign in to continue your MPowered Health journey.")).toBeTruthy();
+
+        //input fields
+        expect(screen.getByText("Email address")).toBeTruthy();
+        expect(screen.getByPlaceholderText("you@example.com")).toBeTruthy();
+        expect(screen.getByText("Password")).toBeTruthy();
+        expect(screen.getByPlaceholderText("Enter your password")).toBeTruthy();
+
+        //buttons
+        //todo: check if the below one passes
+        expect(screen.getByRole("checkbox")).toBeTruthy();
+        expect(screen.getByText("Remember my email address")).toBeTruthy();
+        expect(screen.getByRole("button", {name: "Show Password"})).toBeTruthy();
+        expect(screen.getByRole("button", {name: "Sign in"})).toBeTruthy();
+        expect(screen.getByText("New to MPowered Health? Get started")).toBeTruthy();
+        expect(screen.getByText("< Back")).toBeTruthy();
+    })    
+})
+
+describe("input functionality", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
     })
 
-    afterEach(jest.clearAllMocks);
+    test("user can type in email", async() => {
+        await render(<Login/>);
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        const user = userEvent.setup();
+        await user.type(emailInput, "email-test@example.com");
+
+        expect(emailInput.props.value).toBe("email-test@example.com");
+    })
+
+    test("user can type in password", async() => {
+        await render(<Login/>);
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        const user = userEvent.setup();
+        await user.type(passwordInput, "Password123!");
+
+        expect(passwordInput.props.value).toBe("Password123!");
+    })
+})
+
+describe("checking empty input fields", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("continue button is disabled is input fields are empty", async() => {
+        await render(<Login/>);
+
+        expect(screen.getByRole("button", {name: "Sign in"})).toBeDisabled();
+    })
+
+    test("sign in button is disabled if email field is empty", async() => {
+        await render(<Login/>);
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        const user = userEvent.setup();
+        await user.type(passwordInput, "Password123!");
+
+        expect(screen.getByRole("button", {name: "Sign in"})).toBeDisabled();
+    })
+
+    test("sign in button is disabled if password field is empty", async() => {
+        await render(<Login/>);
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        const user = userEvent.setup();
+        await user.type(emailInput, "email-test@example.com");
+
+        expect(screen.getByRole("button", {name: "Sign in"})).toBeDisabled();
+    })
+})
+
+describe("sign in process and remembering email functionality", () => {
     
-    test('greeting message is rendered on screen',  () => {
-        expect(screen.getByText("Welcome back! Glad to see you again!")).toBeTruthy();
+    beforeEach(() => {
+        jest.clearAllMocks();
+    }) 
+
+    //both tests are successful sign ins
+    test("if remember email address is checked, save the email", async() => {
+        await render(<Login/>);
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        const user = userEvent.setup();
+        await user.type(emailInput, "email-test@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        await user.type(passwordInput, "Password123!");
+        //default is true
+        //fireEvent.press(screen.getByRole("checkbox"));
+        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+
+        //calling sign in and saving the email address
+        await waitFor(() => {
+            expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
+            expect(AsyncStorage.setItem).toHaveBeenCalledWith(SAVED_EMAIL_KEY, 'email-test@example.com');
+        })
     })
 
-    test('email input field is rendered on screen', () => {
-        expect(screen.getByPlaceholderText("Email")).toBeTruthy();
+    test("if remember email address is not checked, do not save the email", async() => {
+        await render(<Login/>);
+        const user = userEvent.setup();
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        await user.type(emailInput, "email-test@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        await user.type(passwordInput, "Password123!");
+        fireEvent.press(screen.getByRole("checkbox"));
+        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+
+        //calling sign in but not saving the email address
+        await waitFor(() => {
+            expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
+            expect(AsyncStorage.removeItem).toHaveBeenCalledWith(SAVED_EMAIL_KEY);
+        })
+    })
+})
+
+describe("password visibility", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
     })
 
-    test('password input field is rendered on screen', () => {
-        expect(screen.getByPlaceholderText("Password")).toBeTruthy();
+    test("password is hidden by default", async() => {
+        await render(<Login/>);
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
     })
 
-    test('login button is rendered on screen', () => {
-        expect(screen.getByText("LOGIN")).toBeTruthy();
+    test("clicking the eye button shows the password", async() => {
+        await render(<Login/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        const visibilityIcon = screen.getByRole("button", {name: "Show Password"});
+
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
     })
 
-    test('sign up button is rendered on screen', () => {
-        expect(screen.getByText("Sign up")).toBeTruthy();
-    })
+    test("clicking the eye button again hides the password", async() => {
+        await render(<Login/>);
+        const user = userEvent.setup();
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        const visibilityIcon = screen.getByRole("button", {name: "Show Password"});
 
-    test('forgot password is rendered on screen', () => {
-        expect(screen.getByText("Forgot Password?")).toBeTruthy();
+        await user.type(passwordInput, "Password123!");
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
+        await fireEvent.press(visibilityIcon);
+        expect(passwordInput.props.secureTextEntry).toBe(true);
     })
+})
+
+//todo: navigation tests
+describe("navigation tests", () => {
     
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("pressing sign in navigates to dashboard", async() => {
+        await render(<Login/>);
+    })
+
+    test("pressing get started navigates to sign up page", async() => {
+        await render(<Login/>);
+    })
 })
 
-/*error: 
-FAIL  __test__/login.test.tsx
-  ● Test suite failed to run
+describe('Authentication tests', () => {
 
-    [@RNC/AsyncStorage]: NativeModule: AsyncStorage is null.
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
 
-    To fix this issue try these steps:
+    test("successful login", async() => {
+        await render(<Login/>);
+        const user = userEvent.setup();
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        await user.type(emailInput, "email-test@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        await user.type(passwordInput, "Password123!");
+        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
 
-      • Uninstall, rebuild and restart the app.
-
-      • Run the packager with `--reset-cache` flag.
-
-      • If you are using CocoaPods on iOS, run `pod install` in the `ios` directory, then rebuild and re-run the app.
-
-      • Make sure your project's `package.json` depends on `@react-native-async-storage/async-storage`, even if you only depend on it indirectly through other dependencies. CLI only autolinks native modules found in your `package.json`.
-
-      • If this happens while testing with Jest, check out how to integrate AsyncStorage here: https://react-native-async-storage.github.io/async-storage/docs/advanced/jest
-
-    If none of these fix the issue, please open an issue on the GitHub repository: https://github.com/react-native-async-storage/async-storage/issues
-
-    > 1 | import AsyncStorage from "@react-native-async-storage/async-storage";
-        | ^
-      2 | import { createClient } from "@supabase/supabase-js";
-      3 |
-      4 | const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-
-      at Object.<anonymous> (node_modules/@react-native-async-storage/async-storage/src/AsyncStorage.native.ts:23:9)
-      at Object.require (node_modules/@react-native-async-storage/async-storage/src/index.ts:1:1)
-      at Object.require (src/lib/supabase/client.ts:1:1)
-      at Object.require (src/context/authcontext.tsx:1:1)
-      at Object.require (C:\Users\ssg20\OneDrive\Documents\Uni\Y3\IT Project\Repository\MPowered-Health\MPowered-Health\src\app\(auth)../../../../../../../../../../login.tsx:15:1)
-      at Object.require (__test__/login.test.tsx:1:1*/
+        await waitFor(() => {
+            expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
+        })
+    })
 
 
-describe ('Email Validation', () => {
+    test("throw an error if login process fails", async() => {
+        await render(<Login/>);
+        const spyAlert = jest.spyOn(Alert, 'alert');
 
+        const loginError = new Error("Failed to login");
+        mockSignIn.mockRejectedValueOnce(loginError);
+
+        const user = userEvent.setup();
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        await user.type(emailInput, 'email-test@example.com');
+        await user.type(passwordInput, 'Password123!');
+        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+
+        await expect(mockSignIn).toHaveBeenCalled();
+
+        expect(spyAlert).toHaveBeenCalledWith('Error', 'The email or password is incorrect.');
+    })
 })
 
-describe ('Login Validation', () => {
-
-})
-
-describe ('password validation', () => {
-
-})
-
-describe('authentication', () => {
-
-})
-
-describe('password visibility', () => {
-    
-})
-//check basic rendering
-/*
-title, 
-email input
-password input, 
-login button
-signup button
-
-check form validation
-if email empty
-invalid email
-invalid password
-password empty
-
-check successful login
-what functions are called
-and user is directed to the right screen
-
-failed login
-alert and show pop ups
-
-password visibility 
-
-loading state
-activitiy indicator
-
-
-
-
-*/
+//email and password validation will be manually tested
