@@ -55,7 +55,7 @@ export default function TabsLayout() {
             }}
         />
         <Tabs.Screen 
-            name="questions" 
+            name="(questions)" 
             options={{
                 title: 'Questions',
                 tabBarIcon: ({ color, size, focused }) => (
