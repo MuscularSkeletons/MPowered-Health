@@ -3,97 +3,116 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   ScrollView,
+  Pressable,
   TextInput,
   Alert,
+  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { palette } from '../../constants/colours';
 import { submitAssessmentAnswers } from './backend/assessmentDb';
 
-export interface QuestionItem {
+interface Question {
   id: string;
   title: string;
   prompt: string;
-  kind: 'single' | 'multi' | 'score' | 'number' | 'text';
+  kind: 'single' | 'multi' | 'score' | 'text' | string;
   options?: string[];
   helper?: string;
   optional?: boolean;
 }
 
-export interface CategoryData {
-  title: string;
-  tip?: string;
-  questions: QuestionItem[];
-  calculateScore?: (answers: Record<string, any>) => {
-    extraFields?: Record<string, any>;
-    summaryMessage?: string;
-  };
-}
-
 interface AssessmentScreenProps {
-  categoryData: CategoryData;
+  categoryData: {
+    title: string;
+    tip?: string;
+    summary?: string;
+    questions: Question[];
+    calculateScore?: (answers: Record<string, any>) => any;
+  };
   onBack: () => void;
-  assessmentId: string | number;
+  assessmentId?: string | null;
+  initialCompleted?: boolean; 
+  existingAnswers?: Record<string, any>;
+  onComplete?: (answers: Record<string, any>) => void;
 }
 
 export default function AssessmentScreen({
   categoryData,
   onBack,
   assessmentId,
+  initialCompleted = false,
+  onComplete,
 }: AssessmentScreenProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-  const [summaryMessage, setSummaryMessage] = useState('');
+  const [isFinished, setIsFinished] = useState(initialCompleted);
+  const [calculatedSummary, setCalculatedSummary] = useState<string | null>(null);
+  const [summaryMessage, setSummaryMessage] = useState<string | null>(null);
 
-  if (!categoryData || !categoryData.questions || categoryData.questions.length === 0) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>No questions found for this assessment.</Text>
-        <TouchableOpacity style={styles.primaryBtn} onPress={onBack}>
-          <Text style={styles.primaryBtnText}>Back to Menu</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const questions = categoryData?.questions || [];
+  const currentQ = questions[currentIndex];
+  const isLast = currentIndex === questions.length - 1;
 
-  const currentQ = categoryData.questions[currentIndex];
-  const totalQuestions = categoryData.questions.length;
-  const currentAnswer = answers[currentQ.id];
+  const handleSelectSingle = (opt: string) => {
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: opt }));
+  };
 
-  // Multi-select handler
-  const toggleMultiOption = (option: string) => {
-    const selectedList: string[] = Array.isArray(currentAnswer) ? currentAnswer : [];
-    const exists = selectedList.includes(option);
-    const updated = exists
-      ? selectedList.filter((item) => item !== option)
-      : [...selectedList, option];
+  // Function to restart / edit responses
+  const handleRedoAssessment = () => {
+    setCurrentIndex(0);
+    setIsFinished(false);
+  };
 
+  const handleToggleMulti = (opt: string) => {
+    const list: string[] = answers[currentQ.id] || [];
+    const updated = list.includes(opt)
+      ? list.filter((i) => i !== opt)
+      : [...list, opt];
     setAnswers((prev) => ({ ...prev, [currentQ.id]: updated }));
   };
 
-  // Single-select handler
-  const selectSingleOption = (option: string) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: option }));
+  const handleSetScore = (val: number) => {
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: val }));
   };
 
-  // Direct value handler (score, number, text)
-  const setDirectValue = (value: string | number) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: value }));
+  const handleTextChange = (text: string) => {
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: text }));
   };
 
-  // Submit handler
+  const handleNext = () => {
+    const val = answers[currentQ.id];
+
+    if (!currentQ.optional) {
+      if (currentQ.kind === 'score' && val === undefined) {
+        setAnswers((prev) => ({ ...prev, [currentQ.id]: 0 }));
+      } else if (currentQ.kind === 'multi' && (!val || val.length === 0)) {
+        Alert.alert('Required', 'Please select at least one option.');
+        return;
+      } else if (currentQ.kind === 'single' && !val) {
+        Alert.alert('Required', 'Please select an option to continue.');
+        return;
+      }
+    }
+
+    if (!isLast) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
       let extraFields = {};
-
       if (typeof categoryData.calculateScore === 'function') {
         const result = categoryData.calculateScore(answers);
-        extraFields = result.extraFields || {};
-        if (result.summaryMessage) {
+        extraFields = result?.extraFields || {};
+        if (result?.summaryMessage) {
           setSummaryMessage(result.summaryMessage);
         }
       }
@@ -104,39 +123,25 @@ export default function AssessmentScreen({
         extraFields,
         assessmentId
       );
+
+      // Notify parent of the completed answers
+      if (onComplete) {
+        onComplete(answers);
+      }
+
       setIsFinished(true);
     } catch (err: any) {
-      console.error('Submission failed:', err);
-      Alert.alert('Submission Error', err.message || 'Failed to submit responses.');
+      console.error('Submit error:', err);
+      Alert.alert('Error', err.message || 'Failed to submit responses.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Next / Finish handler
-  const handleNext = () => {
-    if (!currentQ.optional) {
-      const isMissing =
-        currentAnswer === undefined ||
-        currentAnswer === '' ||
-        (Array.isArray(currentAnswer) && currentAnswer.length === 0);
 
-      if (isMissing) {
-        Alert.alert('Required', 'Please answer this question before continuing.');
-        return;
-      }
-    }
-
-    if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      handleSubmit();
-    }
-  };
-
-  // -------------------------------------------------------------
-  // VIEW: Summary Screen
-  // -------------------------------------------------------------
+// -------------------------------------------------------------
+// VIEW: Summary Screen
+// -------------------------------------------------------------
   if (isFinished) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -153,7 +158,7 @@ export default function AssessmentScreen({
         ) : null}
 
         <View style={styles.summaryList}>
-          {categoryData.questions.map((q: QuestionItem, idx: number) => {
+          {categoryData.questions.map((q: Question, idx: number) => {
             const val = answers[q.id];
             let displayVal = 'No response';
 
@@ -176,332 +181,563 @@ export default function AssessmentScreen({
           })}
         </View>
 
-        <TouchableOpacity style={styles.primaryBtn} onPress={onBack}>
-          <Text style={styles.primaryBtnText}>Return to Main Menu</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        {/* Button 1: Return to Overview */}
+      <TouchableOpacity style={styles.primaryBtn} onPress={onBack}>
+        <Text style={styles.primaryBtnText}>Return to Main Menu</Text>
+      </TouchableOpacity>
+
+      {/* Button 2: Redo / Change answers */}
+      <TouchableOpacity style={styles.redoBtn} onPress={handleRedoAssessment}>
+        <Text style={styles.redoBtnText}>Change Answers / Retake</Text>
+      </TouchableOpacity>
+    </ScrollView>
     );
   }
 
-  // -------------------------------------------------------------
-  // VIEW: Questions
-  // -------------------------------------------------------------
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.categoryTitle}>{categoryData.title}</Text>
-      <Text style={styles.counter}>
-        Question {currentIndex + 1} of {totalQuestions}
-      </Text>
+  // 2. EMPTY STATE
+  if (!questions.length) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No questions found for this assessment.</Text>
+          <Pressable style={styles.secondaryBtn} onPress={onBack}>
+            <Text style={styles.secondaryBtnText}>Back to Overview</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
-      <View style={styles.questionCard}>
-        <Text style={styles.questionTitle}>{currentQ.title}</Text>
-        <Text style={styles.prompt}>{currentQ.prompt}</Text>
-        {currentQ.helper ? <Text style={styles.helperText}>{currentQ.helper}</Text> : null}
+  const selectedValue = answers[currentQ.id];
+  const selectedMulti: string[] = Array.isArray(selectedValue) ? selectedValue : [];
+  const currentScore: number = typeof selectedValue === 'number' ? selectedValue : 0;
+  const currentText: string = typeof selectedValue === 'string' ? selectedValue : '';
+
+  // 3. QUESTIONS FLOW
+  return (
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      {/* Top Header */}
+      <View style={styles.topBar}>
+        <Pressable
+          onPress={() => (currentIndex > 0 ? setCurrentIndex((prev) => prev - 1) : onBack())}
+          style={styles.backButton}
+          hitSlop={12}
+        >
+          <Text style={styles.backChevron}>‹</Text>
+          <Text style={styles.backLabel}>Back</Text>
+        </Pressable>
+
+        <Text style={styles.categoryTitle}>{categoryData.title}</Text>
+
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepBadgeText}>
+            {currentIndex + 1} / {questions.length}
+          </Text>
+        </View>
       </View>
 
-      {/* MULTI: Options */}
-      {currentQ.kind === 'multi' && (
-        <View style={styles.verticalList}>
-          {currentQ.options?.map((opt: string) => {
-            const isSelected = (currentAnswer || []).includes(opt);
-            return (
-              <TouchableOpacity
-                key={opt}
-                style={[styles.rowCard, isSelected && styles.rowCardSelected]}
-                onPress={() => toggleMultiOption(opt)}
-              >
-                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                  {isSelected && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={[styles.rowText, isSelected && styles.rowTextSelected]}>
-                  {opt}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      )}
+      {/* Progress Track */}
+      <View style={styles.progressBarBg}>
+        <View
+          style={[
+            styles.progressBarFill,
+            { width: `${((currentIndex + 1) / questions.length) * 100}%` },
+          ]}
+        />
+      </View>
 
-      {/* SINGLE: Options */}
-      {currentQ.kind === 'single' && (
-        <View style={styles.verticalList}>
-          {currentQ.options?.map((opt: string) => {
-            const isSelected = currentAnswer === opt;
-            return (
-              <TouchableOpacity
-                key={opt}
-                style={[styles.rowCard, isSelected && styles.rowCardSelected]}
-                onPress={() => selectSingleOption(opt)}
-              >
-                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                  {isSelected && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={[styles.rowText, isSelected && styles.rowTextSelected]}>
-                  {opt}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      )}
-
-      {/* SCORE: 0 to 10 */}
-      {currentQ.kind === 'score' && (
-        <View style={styles.scoreRowContainer}>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num: number) => {
-            const isSelected = currentAnswer === num;
-            return (
-              <TouchableOpacity
-                key={num}
-                style={[styles.scoreBtn, isSelected && styles.scoreBtnSelected]}
-                onPress={() => setDirectValue(num)}
-              >
-                <Text style={[styles.scoreText, isSelected && styles.scoreTextSelected]}>
-                  {num}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      )}
-
-      {/* NUMBER: Input */}
-      {currentQ.kind === 'number' && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            keyboardType="numeric"
-            placeholder="Enter a number..."
-            value={currentAnswer !== undefined ? String(currentAnswer) : ''}
-            onChangeText={(val) => setDirectValue(val)}
-          />
-        </View>
-      )}
-
-      {/* TEXT: Input */}
-      {currentQ.kind === 'text' && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.textInput, styles.textArea]}
-            multiline
-            numberOfLines={4}
-            placeholder="Enter here..."
-            textAlignVertical="top"
-            value={currentAnswer || ''}
-            onChangeText={(val) => setDirectValue(val)}
-          />
-        </View>
-      )}
-
-      {/* Bottom Controls */}
-      <TouchableOpacity
-        style={[styles.primaryBtn, isSubmitting && styles.primaryBtn]}
-        onPress={handleNext}
-        disabled={isSubmitting}
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        {isSubmitting ? (
-          <ActivityIndicator color="#ffffff" />
-        ) : (
-          <Text style={styles.primaryBtnText}>
-            {currentIndex === totalQuestions - 1 ? 'Finish' : 'Next'}
-          </Text>
+        <View style={styles.tagPill}>
+          <Text style={styles.tagPillText}>{currentQ.title}</Text>
+        </View>
+
+        <Text style={styles.prompt}>{currentQ.prompt}</Text>
+        {currentQ.helper && <Text style={styles.helperText}>{currentQ.helper}</Text>}
+
+        {/* Single Select */}
+        {currentQ.kind === 'single' && (
+          <View style={styles.optionsWrap}>
+            {currentQ.options?.map((option) => {
+              const active = selectedValue === option;
+              return (
+                <Pressable
+                  key={option}
+                  onPress={() => handleSelectSingle(option)}
+                  style={({ pressed }) => [
+                    styles.optionCard,
+                    active && styles.optionCardActive,
+                    pressed && styles.cardPressed,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionCardText,
+                      active && styles.optionCardTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                  <View
+                    style={[
+                      styles.radioCircle,
+                      active && styles.radioCircleActive,
+                    ]}
+                  >
+                    {active && <View style={styles.radioInner} />}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
         )}
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.cancelBtn}
-        onPress={onBack}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.cancelBtnText}>Back to Menu</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {/* Multi Select */}
+        {currentQ.kind === 'multi' && (
+          <View style={styles.optionsWrap}>
+            {currentQ.options?.map((option) => {
+              const active = selectedMulti.includes(option);
+              return (
+                <Pressable
+                  key={option}
+                  onPress={() => handleToggleMulti(option)}
+                  style={({ pressed }) => [
+                    styles.optionCard,
+                    active && styles.optionCardActive,
+                    pressed && styles.cardPressed,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionCardText,
+                      active && styles.optionCardTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                  <View
+                    style={[
+                      styles.checkCircle,
+                      active && styles.checkCircleActive,
+                    ]}
+                  >
+                    {active && <Text style={styles.checkIcon}>✓</Text>}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Score Stepper */}
+        {currentQ.kind === 'score' && (
+          <View style={styles.sliderCard}>
+            <View style={styles.scoreBubble}>
+              <Text style={styles.scoreValue}>{currentScore}</Text>
+              <Text style={styles.scoreScale}>/ 10</Text>
+            </View>
+
+            <View style={styles.trackContainer}>
+              <View style={styles.trackLine}>
+                <View
+                  style={[
+                    styles.trackLineActive,
+                    { width: `${(currentScore / 10) * 100}%` },
+                  ]}
+                />
+              </View>
+
+              <View style={styles.nodesRow}>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                  const isSelected = currentScore === num;
+                  const isPast = currentScore >= num;
+                  return (
+                    <Pressable
+                      key={num}
+                      onPress={() => handleSetScore(num)}
+                      hitSlop={8}
+                      style={[
+                        styles.trackNode,
+                        isPast && styles.trackNodePast,
+                        isSelected && styles.trackNodeSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.nodeText,
+                          isSelected && styles.nodeTextSelected,
+                        ]}
+                      >
+                        {num}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
+            <View style={styles.sliderLabels}>
+              <Text style={styles.sliderMin}>0 (None)</Text>
+              <Text style={styles.sliderMax}>10 (Severe)</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Free Text */}
+        {currentQ.kind === 'text' && (
+          <View style={styles.textContainer}>
+            <TextInput
+              style={styles.textInput}
+              multiline
+              numberOfLines={4}
+              placeholder="Type your notes or reflections here..."
+              placeholderTextColor={palette.muted}
+              value={currentText}
+              onChangeText={handleTextChange}
+            />
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Docked Footer */}
+      <View style={styles.footer}>
+        <Pressable
+          style={[styles.actionBtn, isSubmitting && styles.actionBtnDisabled]}
+          onPress={handleNext}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.actionBtnText}>
+              {isLast ? 'Complete Assessment' : 'Next Question ›'}
+            </Text>
+          )}
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 50,
+  safe: { flex: 1, backgroundColor: palette.surface },
+  topBar: {
+    height: 54,
     paddingHorizontal: 20,
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    flexGrow: 1,
+    justifyContent: 'space-between',
+    backgroundColor: palette.surface,
   },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  backButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f8fafc',
+    gap: 4,
+    width: 65,
+  },
+  backChevron: {
+    fontSize: 24,
+    lineHeight: 24,
+    color: palette.text,
+    fontWeight: '600',
+  },
+  backLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: palette.text,
   },
   categoryTitle: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: palette.text,
   },
-  counter: {
-    fontSize: 14,
-    color: '#64748b',
-    marginTop: 4,
-    marginBottom: 16,
+  stepBadge: {
+    backgroundColor: palette.accentSoft,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  questionCard: {
+  stepBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: palette.primary,
+  },
+  progressBarBg: {
+    height: 3,
+    backgroundColor: palette.line,
     width: '100%',
-    maxWidth: 400,
-    marginBottom: 20,
   },
-  questionTitle: {
-    fontSize: 13,
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: palette.primary,
+  },
+  scrollArea: {
+    flex: 1,
+    backgroundColor: palette.background,
+  },
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 40,
+    maxWidth: 680,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  tagPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: palette.accentSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  tagPillText: {
+    fontSize: 12,
     fontWeight: '700',
-    color: '#2563eb',
+    color: palette.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 4,
   },
   prompt: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1e293b',
-    lineHeight: 24,
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: '800',
+    color: palette.text,
+    marginBottom: 8,
   },
   helperText: {
     fontSize: 13,
-    color: '#64748b',
-    marginTop: 6,
-    fontStyle: 'italic',
+    lineHeight: 18,
+    color: palette.muted,
+    marginBottom: 20,
   },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1.5,
-    borderColor: '#94a3b8',
-    borderRadius: 4,
-    marginRight: 12,
-    justifyContent: 'center',
+  optionsWrap: { gap: 10 },
+  optionCard: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 16,
+    backgroundColor: palette.surface,
+    borderWidth: 1.5,
+    borderColor: palette.line,
   },
-  checkboxSelected: {
-    borderColor: '#2563eb',
-    backgroundColor: '#2563eb',
+  optionCardActive: {
+    backgroundColor: palette.selectionBackground,
+    borderColor: palette.success,
   },
-  checkmark: {
+  cardPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.99 }],
+  },
+  optionCardText: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '600',
+    color: palette.text,
+    flex: 1,
+    paddingRight: 10,
+  },
+  optionCardTextActive: {
+    color: palette.text,
+    fontWeight: '700',
+  },
+  checkCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: palette.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.surface,
+  },
+  checkCircleActive: {
+    backgroundColor: palette.success,
+    borderColor: palette.success,
+  },
+  checkIcon: {
     color: '#ffffff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
-  
-  verticalList: {
-    width: '100%',
-    maxWidth: 340,         
-    alignSelf: 'center',    
-    flexDirection: 'column',
-    gap: 10,
-    marginBottom: 24,
-  },
-  rowCard: {
-    width: '100%',          
-    flexDirection: 'row',
+  radioCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: palette.line,
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-
-  rowCardSelected: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
-  },
-  rowText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#334155',
-  },
-  rowTextSelected: {
-    color: '#1d4ed8',
-    fontWeight: '500',
-  },
-
-  scoreRowContainer: {
-    width: '100%',
-    maxWidth: 360,
-    flexDirection: 'row',
-    justifyContent: 'space-between', 
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  scoreBtn: {
-    flex: 1,                          
-    aspectRatio: 0.85,                
-    marginHorizontal: 2,              
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    backgroundColor: '#ffffff',
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: palette.surface,
   },
-  scoreBtnSelected: {
-    backgroundColor: '#2563eb',
-    borderColor: '#2563eb',
+  radioCircleActive: {
+    borderColor: palette.success,
   },
-  scoreText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#334155',
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: palette.success,
   },
-  scoreTextSelected: {
-    color: '#ffffff',
-  },
-  inputContainer: {
-    width: '100%',
-    maxWidth: 400,
-    marginBottom: 24,
-  },
-  textInput: {
-    backgroundColor: '#ffffff',
+  sliderCard: {
+    backgroundColor: palette.surface,
+    padding: 24,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: '#1e293b',
-  },
-  textArea: {
-    height: 110,
-  },
-  primaryBtn: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    paddingHorizontal: 36,
-    borderRadius: 8,
-    minWidth: 200,
+    borderColor: palette.line,
     alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 10,
   },
-  primaryBtnText: {
-    color: '#ffffff',
+  scoreBubble: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    backgroundColor: palette.accentSoft,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderRadius: 18,
+    marginBottom: 30,
+  },
+  scoreValue: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: palette.primary,
+  },
+  scoreScale: {
     fontSize: 16,
     fontWeight: '600',
+    color: palette.muted,
+    marginLeft: 4,
   },
-  cancelBtn: {
-    paddingVertical: 10,
+  trackContainer: {
+    width: '100%',
+    position: 'relative',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
-  cancelBtnText: {
-    color: '#64748b',
-    fontSize: 14,
+  trackLine: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    height: 6,
+    backgroundColor: palette.line,
+    borderRadius: 3,
+    overflow: 'hidden',
   },
-  errorText: {
+  trackLineActive: {
+    height: '100%',
+    backgroundColor: palette.primary,
+  },
+  nodesRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  trackNode: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: palette.surface,
+    borderWidth: 2,
+    borderColor: palette.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trackNodePast: {
+    borderColor: palette.primary,
+    backgroundColor: palette.accentSoft,
+  },
+  trackNodeSelected: {
+    backgroundColor: palette.primary,
+    borderColor: palette.primary,
+    transform: [{ scale: 1.2 }],
+  },
+  nodeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: palette.muted,
+  },
+  nodeTextSelected: {
+    color: '#ffffff',
+  },
+  sliderLabels: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  sliderMin: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: palette.muted,
+  },
+  sliderMax: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: palette.muted,
+  },
+  textContainer: { marginTop: 10 },
+  textInput: {
+    backgroundColor: palette.surface,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1.5,
+    borderColor: palette.line,
+    color: palette.text,
+    fontSize: 15,
+    lineHeight: 22,
+    minHeight: 120,
+    textAlignVertical: 'top',
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderTopWidth: 1,
+    borderTopColor: palette.line,
+    backgroundColor: palette.surface,
+  },
+  actionBtn: {
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionBtnDisabled: { opacity: 0.6 },
+  actionBtnText: {
     fontSize: 16,
-    color: '#ef4444',
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  emptyText: {
+    fontSize: 15,
+    color: palette.muted,
     marginBottom: 16,
   },
-  summaryBadge: {
+  secondaryBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    backgroundColor: palette.light,
+  },
+  secondaryBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: palette.text,
+  },
+
+   summaryBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#dcfce7',
     color: '#15803d',
@@ -564,6 +800,44 @@ const styles = StyleSheet.create({
   },
   summaryAnswerLabel: {
     color: '#475569',
+    fontWeight: '600',
+  },
+  primaryBtn: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    borderRadius: 8,
+    minWidth: 200,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  primaryBtnText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  container: {
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    flexGrow: 1,
+  },
+  redoBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    minWidth: 200,
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  redoBtnText: {
+    color: '#475569',
+    fontSize: 15,
     fontWeight: '600',
   },
 });

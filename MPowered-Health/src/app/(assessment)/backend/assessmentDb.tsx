@@ -96,7 +96,7 @@ export async function submitAssessmentAnswers(
 
   const { data, error } = await supabase
     .from(tableName)
-    .insert([payload])
+    .insert(payload)
     .select();
 
   if (error) {
