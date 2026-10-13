@@ -1,7 +1,13 @@
-/** Loads, saves, and groups dated pain assessments for screens and reports. */
+/**
+ * Groups dated pain assessments for screens and reports.
+ *
+ * History lives in Supabase. This module keeps only an in-memory copy for the current session, so
+ * the screens can keep reading it synchronously. Nothing is written to device storage.
+ */
 import type { AssessmentAnswers } from '@/shared/health-records/assessment-types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { fetchHealthSnapshot } from '@/services/health-records.services';
+import type { HealthSnapshot } from '@/services/health-records.mapper';
+ 
 export type PainAssessmentRecord = {
   id: string;
   completedAt: string;
@@ -14,8 +20,14 @@ export type PainAssessmentRecord = {
 };
 export type PainMetric = 'Average' | 'Worst' | 'Mildest';
 export type PainAreaGroup = { key: string; label: string; records: PainAssessmentRecord[] };
-let storageKey = 'mpowered:pain-history:v1';
+
+/** The id the session boundary passes when nobody is signed in. */
+const SIGNED_OUT = 'signed-out';
+ 
+let accountId: string | null = null;
 let generation = 0;
+let records: PainAssessmentRecord[] = [];
+let latest: HealthSnapshot['latest'] = {};
 
 /** Select an account without exposing another account’s saved assessments. */
 export function setPainHistoryAccount(userId: string) {
