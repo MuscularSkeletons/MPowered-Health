@@ -231,7 +231,7 @@ export interface WeeklyPainRow {
   record: PainAssessmentRecord;
 }
 
-/** One row per week, newest first. If a week has several assessments the latest one is used. */
+/** One row per week, newest first. If a week has several assessments latest one is used. */
 export function weeklyPainRows(records: PainAssessmentRecord[]): WeeklyPainRow[] {
   const byWeek = new Map<string, PainAssessmentRecord>();
   for (const record of records) {
@@ -246,4 +246,41 @@ export function weeklyPainRows(records: PainAssessmentRecord[]): WeeklyPainRow[]
       label: weekLabel(new Date(`${key}T00:00:00`)), // no offset, so parsed as local time
       record,
     }));
+}
+
+
+// Numbers shown on the overview and profile
+
+/** Mean of the assessment average pain over the last N days, or null when there is none. */
+export function averagePainOverDays(
+  records: PainAssessmentRecord[],
+  days = 2 * DAYS_PER_WEEK,
+  now = new Date(),
+): number | null {
+  const since = now.getTime() - days * MS_PER_DAY;
+  const recent = records.filter((record) => Date.parse(record.completedAt) >= since);
+  if (!recent.length) return null;
+  return Math.round(recent.reduce((sum, record) => sum + record.average, 0) / recent.length);
+}
+
+export type PainDirection = 'increased' | 'decreased' | 'unchanged';
+export interface PainInsight {
+  direction: PainDirection;
+  points: { date: string; value: number }[]; // oldest first
+}
+
+/** The overview card: null until a month of data exists, then up to three weekly average points. */
+export function painInsight(records: PainAssessmentRecord[]): PainInsight | null {
+  if (!records.length) return null;
+  const times = records.map((record) => Date.parse(record.completedAt));
+  if (Math.max(...times) - Math.min(...times) < MIN_INSIGHT_SPAN_DAYS * MS_PER_DAY) return null;
+
+  const points = weeklyPainRows(records)
+    .slice(0, INSIGHT_POINTS)
+    .reverse()
+    .map((row) => ({ date: row.record.completedAt, value: row.record.average }));
+  if (points.length < 2) return null;
+
+  const change = points[points.length - 1].value - points[0].value;
+  return { direction: change > 0 ? 'increased' : change < 0 ? 'decreased' : 'unchanged', points };
 }
