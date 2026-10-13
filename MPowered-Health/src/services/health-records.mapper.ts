@@ -51,8 +51,7 @@ export interface SocialRow {
   mood_trigger: string | null;
 }
 export interface ManagementRow {
-  medication: string[] | null;
-  otc_medication: string | null;
+  medicine_name: string[] | null;
   exercise_frequency: string;
   emotion_strategies: string | null;
 }
@@ -134,10 +133,9 @@ export function socialAnswers(row: SocialRow): AssessmentAnswers {
 
 export function managementAnswers(row: ManagementRow): AssessmentAnswers {
   return {
-    0: [...(row.medication ?? [])],
-    1: one(row.otc_medication),
-    2: one(row.exercise_frequency),
-    3: one(row.emotion_strategies),
+    0: [...(row.medicine_name ?? [])],
+    1: one(row.exercise_frequency),
+    2: one(row.emotion_strategies),
   };
 }
 
