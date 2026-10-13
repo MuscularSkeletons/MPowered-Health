@@ -1,8 +1,8 @@
 /**
  * Groups dated pain assessments for screens and reports.
  *
- * History lives in Supabase. This module keeps only an in-memory copy for the current session, so
- * the screens can keep reading it synchronously. Nothing is written to device storage.
+ * History lives in supabase. This module keeps only an in-memory copy for the current session, so
+ * the screens can keep reading it, with nothing written to device.
  */
 import type { AssessmentAnswers } from '@/shared/health-records/assessment-types';
 import { fetchHealthSnapshot } from '@/services/health-records.services';
@@ -28,28 +28,28 @@ let accountId: string | null = null;
 let generation = 0;
 let records: PainAssessmentRecord[] = [];
 let latest: HealthSnapshot['latest'] = {};
-
-/** Select an account without exposing another account’s saved assessments. */
+ 
+/** Select an account without exposing another account's saved assessments. */
 export function setPainHistoryAccount(userId: string) {
   generation += 1;
-  storageKey = `mpowered:pain-history:v1:${encodeURIComponent(userId)}`;
+  accountId = userId === SIGNED_OUT ? null : userId;
   records = [];
+  latest = {};
 }
-let records: PainAssessmentRecord[] = [];
-// Chain disk writes in submission order so two quick saves cannot overwrite each other.
-let writes: Promise<unknown> = Promise.resolve();
-
+ 
+/** Copies answers so callers cannot change the stored lists. */
+const cloneAnswers = (answers: AssessmentAnswers): AssessmentAnswers =>
+  Object.fromEntries(Object.entries(answers).map(([key, values]) => [key, [...values]]));
+ 
 /**
  * Copies a record so callers cannot change the stored object through a shared reference.
  *
- * Every public read and write crosses this copy boundary to protect saved history.
+ * Every public read crosses this copy boundary to protect the loaded history.
  */
 const clone = (record: PainAssessmentRecord): PainAssessmentRecord => ({
   ...record,
   areas: [...record.areas],
-  answers: Object.fromEntries(
-    Object.entries(record.answers).map(([key, values]) => [key, [...values]]),
-  ),
+  answers: cloneAnswers(record.answers),
 });
 
 /** Builds a consistent key for a set of pain areas. */
