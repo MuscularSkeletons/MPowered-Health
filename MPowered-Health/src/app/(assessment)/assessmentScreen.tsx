@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Alert,
+  KeyboardAvoidingView,
+  PanResponder,
+  Platform,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
-  Pressable,
   TextInput,
-  Alert,
-  TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AuthHeader, PrimaryButton } from '../../components/auth/auth-ui';
 import { palette } from '../../constants/profile/ui';
 import { submitAssessmentAnswers } from './backend/assessmentDb';
 
@@ -18,7 +20,7 @@ interface Question {
   id: string;
   title: string;
   prompt: string;
-  kind: 'single' | 'multi' | 'score' | 'text' | string;
+  kind: 'single' | 'multi' | 'score' | 'number' | 'text' | string;
   options?: string[];
   helper?: string;
   optional?: boolean;
@@ -34,9 +36,108 @@ interface AssessmentScreenProps {
   };
   onBack: () => void;
   assessmentId?: string | null;
-  initialCompleted?: boolean; 
+  initialCompleted?: boolean;
   existingAnswers?: Record<string, any>;
   onComplete?: (answers: Record<string, any>) => void;
+}
+
+const asSentence = (value: string) =>
+  value.length ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
+
+const painLabel = (score: number) =>
+  score === 0
+    ? 'I have no pain at all'
+    : score <= 3
+      ? 'The pain is very mild'
+      : score <= 6
+        ? 'The pain is moderate'
+        : score <= 8
+          ? 'The pain is fairly severe'
+          : score === 9
+            ? 'The pain is extremely severe'
+            : 'The pain is the worst imaginable';
+
+function ScoreSlider({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const trackRef = useRef<View>(null);
+  const metrics = useRef({ left: 0, width: 1, ready: false });
+  const lastValue = useRef(value);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    lastValue.current = value;
+    onChangeRef.current = onChange;
+  }, [value, onChange]);
+
+  const updateFromPageX = (pageX: number) => {
+    if (!metrics.current.ready) return;
+    const next = Math.max(
+      0,
+      Math.min(10, Math.round(((pageX - metrics.current.left) / metrics.current.width) * 10)),
+    );
+    if (next !== lastValue.current) {
+      lastValue.current = next;
+      onChangeRef.current(next);
+    }
+  };
+
+  const measureTrack = (pageX?: number) =>
+    trackRef.current?.measureInWindow((left, _top, width) => {
+      metrics.current = { left, width: Math.max(width, 1), ready: true };
+      if (pageX != null) updateFromPageX(pageX);
+    });
+
+  // PanResponder keeps these callbacks for the full drag; refs are read only during a gesture.
+  // eslint-disable-next-line react-hooks/refs
+  const [pan] = useState(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (event) => measureTrack(event.nativeEvent.pageX),
+      onPanResponderMove: (event) => updateFromPageX(event.nativeEvent.pageX),
+      onPanResponderTerminationRequest: () => false,
+    }),
+  );
+
+  return (
+    <View style={styles.sliderArea}>
+      <View
+        ref={trackRef}
+        collapsable={false}
+        onLayout={() => measureTrack()}
+        {...pan.panHandlers}
+        style={styles.sliderTrack}
+      >
+        <View pointerEvents="none" style={[styles.sliderFill, { width: `${value * 10}%` }]} />
+        <View pointerEvents="none" style={[styles.sliderThumb, { left: `${value * 10}%` }]}>
+          <View style={styles.sliderBubble}>
+            <Text style={styles.sliderBubbleText}>{value}</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.sliderEnds}>
+        <Text style={styles.sliderEnd}>0</Text>
+        <Text style={styles.sliderEnd}>10</Text>
+      </View>
+    </View>
+  );
+}
+
+function currentPeriod() {
+  const start = new Date();
+  const day = start.getDay();
+  start.setDate(start.getDate() - day + (day === 0 ? -6 : 1));
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  const startMonth = start.toLocaleDateString('en-AU', { month: 'short' });
+  const endMonth = end.toLocaleDateString('en-AU', { month: 'short' });
+  const range =
+    startMonth === endMonth
+      ? `${start.getDate()}–${end.getDate()} ${endMonth}`
+      : `${start.getDate()} ${startMonth}–${end.getDate()} ${endMonth}`;
+
+  return `Period: ${range}`;
 }
 
 export default function AssessmentScreen({
@@ -44,800 +145,495 @@ export default function AssessmentScreen({
   onBack,
   assessmentId,
   initialCompleted = false,
+  existingAnswers = {},
   onComplete,
 }: AssessmentScreenProps) {
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, any>>(existingAnswers);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(initialCompleted);
-  const [calculatedSummary, setCalculatedSummary] = useState<string | null>(null);
   const [summaryMessage, setSummaryMessage] = useState<string | null>(null);
-
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const questions = categoryData?.questions || [];
   const currentQ = questions[currentIndex];
+  const selectedValue = currentQ ? answers[currentQ.id] : undefined;
+  const selectedMulti: string[] = Array.isArray(selectedValue) ? selectedValue : [];
+  const currentScore = typeof selectedValue === 'number' ? selectedValue : 0;
+  const currentText = typeof selectedValue === 'string' ? selectedValue : '';
   const isLast = currentIndex === questions.length - 1;
+  const valid = Boolean(
+    currentQ?.optional ||
+      selectedValue === 0 ||
+      (Array.isArray(selectedValue) ? selectedValue.length : String(selectedValue ?? '').trim()),
+  );
 
-  const handleSelectSingle = (opt: string) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: opt }));
-  };
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [currentIndex]);
 
-  // Function to restart / edit responses
-  const handleRedoAssessment = () => {
-    setCurrentIndex(0);
-    setIsFinished(false);
-  };
-
-  const handleToggleMulti = (opt: string) => {
-    const list: string[] = answers[currentQ.id] || [];
-    const updated = list.includes(opt)
-      ? list.filter((i) => i !== opt)
-      : [...list, opt];
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: updated }));
-  };
-
-  const handleSetScore = (val: number) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: val }));
-  };
-
-  const handleTextChange = (text: string) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.id]: text }));
-  };
-
-  const handleNext = () => {
-    const val = answers[currentQ.id];
-
-    if (!currentQ.optional) {
-      if (currentQ.kind === 'score' && val === undefined) {
-        setAnswers((prev) => ({ ...prev, [currentQ.id]: 0 }));
-      } else if (currentQ.kind === 'multi' && (!val || val.length === 0)) {
-        Alert.alert('Required', 'Please select at least one option.');
-        return;
-      } else if (currentQ.kind === 'single' && !val) {
-        Alert.alert('Required', 'Please select an option to continue.');
-        return;
-      }
+  const select = (value: string | number) => {
+    if (currentQ.kind === 'multi') {
+      const next = selectedMulti.includes(String(value))
+        ? selectedMulti.filter((item) => item !== value)
+        : [...selectedMulti, String(value)];
+      setAnswers((previous) => ({ ...previous, [currentQ.id]: next }));
+      return;
     }
-
-    if (!isLast) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      handleSubmit();
-    }
+    setAnswers((previous) => ({ ...previous, [currentQ.id]: value }));
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      let extraFields = {};
-      if (typeof categoryData.calculateScore === 'function') {
-        const result = categoryData.calculateScore(answers);
-        extraFields = result?.extraFields || {};
-        if (result?.summaryMessage) {
-          setSummaryMessage(result.summaryMessage);
-        }
-      }
-
+      const calculated = categoryData.calculateScore?.(answers);
+      setSummaryMessage(calculated?.summaryMessage || null);
       await submitAssessmentAnswers(
         categoryData.title,
         answers,
-        extraFields,
-        assessmentId
+        calculated?.extraFields || {},
+        assessmentId,
       );
-
-      // Notify parent of the completed answers
-      if (onComplete) {
-        onComplete(answers);
-      }
-
+      onComplete?.(answers);
       setIsFinished(true);
-    } catch (err: any) {
-      console.error('Submit error:', err);
-      Alert.alert('Error', err.message || 'Failed to submit responses.');
+    } catch (error: any) {
+      const message = error?.message || 'Failed to save responses. Please try again.';
+      setSubmitError(message);
+      Alert.alert('Could not save answers', message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const next = () => {
+    if (!valid) return;
+    if (isLast) handleSubmit();
+    else setCurrentIndex((index) => index + 1);
+  };
 
-// -------------------------------------------------------------
-// VIEW: Summary Screen
-// -------------------------------------------------------------
-  if (isFinished) {
-    return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.categoryTitle}>{categoryData.title}</Text>
-        <Text style={styles.summaryBadge}>Submission Complete</Text>
-        <Text style={styles.summarySubtitle}>
-          Here is a summary of the responses recorded:
-        </Text>
-
-        {summaryMessage ? (
-          <View style={styles.feedbackCard}>
-            <Text style={styles.feedbackBody}>{summaryMessage}</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.summaryList}>
-          {categoryData.questions.map((q: Question, idx: number) => {
-            const val = answers[q.id];
-            let displayVal = 'No response';
-
-            if (Array.isArray(val) && val.length > 0) {
-              displayVal = val.join(', ');
-            } else if (val !== undefined && val !== '') {
-              displayVal = String(val);
-            }
-
-            return (
-              <View key={q.id} style={styles.summaryCard}>
-                <Text style={styles.summaryQuestionNumber}>Question {idx + 1}</Text>
-                <Text style={styles.summaryQuestionPrompt}>{q.prompt}</Text>
-                <Text style={styles.summaryAnswerText}>
-                  <Text style={styles.summaryAnswerLabel}>Your Answer: </Text>
-                  {displayVal}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-
-        {/* Button 1: Return to Overview */}
-      <TouchableOpacity style={styles.primaryBtn} onPress={onBack}>
-        <Text style={styles.primaryBtnText}>Return to Main Menu</Text>
-      </TouchableOpacity>
-
-      {/* Button 2: Redo / Change answers */}
-      <TouchableOpacity style={styles.redoBtn} onPress={handleRedoAssessment}>
-        <Text style={styles.redoBtnText}>Change Answers / Retake</Text>
-      </TouchableOpacity>
-    </ScrollView>
-    );
-  }
-
-  // 2. EMPTY STATE
   if (!questions.length) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No questions found for this assessment.</Text>
-          <Pressable style={styles.secondaryBtn} onPress={onBack}>
-            <Text style={styles.secondaryBtnText}>Back to Overview</Text>
-          </Pressable>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <AuthHeader />
+        <View style={styles.empty}>
+          <Text style={styles.required}>No questions found for this assessment.</Text>
+          <PrimaryButton label="Back to Overview" onPress={onBack} />
         </View>
       </SafeAreaView>
     );
   }
 
-  const selectedValue = answers[currentQ.id];
-  const selectedMulti: string[] = Array.isArray(selectedValue) ? selectedValue : [];
-  const currentScore: number = typeof selectedValue === 'number' ? selectedValue : 0;
-  const currentText: string = typeof selectedValue === 'string' ? selectedValue : '';
-
-  // 3. QUESTIONS FLOW
-  return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      {/* Top Header */}
-      <View style={styles.topBar}>
-        <Pressable
-          onPress={() => (currentIndex > 0 ? setCurrentIndex((prev) => prev - 1) : onBack())}
-          style={styles.backButton}
-          hitSlop={12}
-        >
-          <Text style={styles.backChevron}>‹</Text>
-          <Text style={styles.backLabel}>Back</Text>
-        </Pressable>
-
-        <Text style={styles.categoryTitle}>{categoryData.title}</Text>
-
-        <View style={styles.stepBadge}>
-          <Text style={styles.stepBadgeText}>
-            {currentIndex + 1} / {questions.length}
+  if (isFinished) {
+    const calculated = categoryData.calculateScore?.(answers);
+    const insight = summaryMessage || calculated?.summaryMessage;
+    const grouped = questions.reduce<Record<string, Question[]>>((result, question) => {
+      (result[question.title] ||= []).push(question);
+      return result;
+    }, {});
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <AuthHeader />
+        <ScrollView style={styles.body} contentContainerStyle={styles.summary}>
+          <Text style={styles.summaryTitle}>{categoryData.title} Summary</Text>
+          <Text style={styles.summaryCopy}>
+            {categoryData.summary || 'This helps guide your treatment and support your recovery.'}
           </Text>
-        </View>
-      </View>
-
-      {/* Progress Track */}
-      <View style={styles.progressBarBg}>
-        <View
-          style={[
-            styles.progressBarFill,
-            { width: `${((currentIndex + 1) / questions.length) * 100}%` },
-          ]}
-        />
-      </View>
-
-      <ScrollView
-        style={styles.scrollArea}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.tagPill}>
-          <Text style={styles.tagPillText}>{currentQ.title}</Text>
-        </View>
-
-        <Text style={styles.prompt}>{currentQ.prompt}</Text>
-        {currentQ.helper && <Text style={styles.helperText}>{currentQ.helper}</Text>}
-
-        {/* Single Select */}
-        {currentQ.kind === 'single' && (
-          <View style={styles.optionsWrap}>
-            {currentQ.options?.map((option) => {
-              const active = selectedValue === option;
-              return (
-                <Pressable
-                  key={option}
-                  onPress={() => handleSelectSingle(option)}
-                  style={({ pressed }) => [
-                    styles.optionCard,
-                    active && styles.optionCardActive,
-                    pressed && styles.cardPressed,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.optionCardText,
-                      active && styles.optionCardTextActive,
-                    ]}
-                  >
-                    {option}
-                  </Text>
-                  <View
-                    style={[
-                      styles.radioCircle,
-                      active && styles.radioCircleActive,
-                    ]}
-                  >
-                    {active && <View style={styles.radioInner} />}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
-
-        {/* Multi Select */}
-        {currentQ.kind === 'multi' && (
-          <View style={styles.optionsWrap}>
-            {currentQ.options?.map((option) => {
-              const active = selectedMulti.includes(option);
-              return (
-                <Pressable
-                  key={option}
-                  onPress={() => handleToggleMulti(option)}
-                  style={({ pressed }) => [
-                    styles.optionCard,
-                    active && styles.optionCardActive,
-                    pressed && styles.cardPressed,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.optionCardText,
-                      active && styles.optionCardTextActive,
-                    ]}
-                  >
-                    {option}
-                  </Text>
-                  <View
-                    style={[
-                      styles.checkCircle,
-                      active && styles.checkCircleActive,
-                    ]}
-                  >
-                    {active && <Text style={styles.checkIcon}>✓</Text>}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
-
-        {/* Score Stepper */}
-        {currentQ.kind === 'score' && (
-          <View style={styles.sliderCard}>
-            <View style={styles.scoreBubble}>
-              <Text style={styles.scoreValue}>{currentScore}</Text>
-              <Text style={styles.scoreScale}>/ 10</Text>
+          <View style={styles.resultCard}>
+            <View style={styles.summaryMeta}>
+              <Text style={styles.resultHeading}>{categoryData.title}</Text>
+              <Text style={styles.period}>{currentPeriod()}</Text>
             </View>
-
-            <View style={styles.trackContainer}>
-              <View style={styles.trackLine}>
-                <View
-                  style={[
-                    styles.trackLineActive,
-                    { width: `${(currentScore / 10) * 100}%` },
-                  ]}
-                />
+            {insight ? (
+              <View style={styles.summaryInsight}>
+                <View style={styles.summaryStatement}>
+                  <Text style={styles.summaryStatementText}>{insight}</Text>
+                </View>
+                {categoryData.tip ? (
+                  <View style={styles.guideButton}>
+                    <Text style={styles.guideIcon}>⌕</Text>
+                    <Text style={styles.guideText}>{categoryData.tip}</Text>
+                    <Text style={styles.guideArrow}>›</Text>
+                  </View>
+                ) : null}
               </View>
-
-              <View style={styles.nodesRow}>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
-                  const isSelected = currentScore === num;
-                  const isPast = currentScore >= num;
+            ) : null}
+            {Object.entries(grouped).map(([title, group], index) => (
+              <View key={title} style={[styles.resultSection, index > 0 && styles.resultSectionBorder]}>
+                <Text style={styles.resultSectionTitle}>{title}</Text>
+                {group.map((question) => {
+                  const answer = answers[question.id];
+                  const text = Array.isArray(answer)
+                    ? answer.map(asSentence).join('\n')
+                    : answer === undefined || answer === ''
+                      ? 'No response'
+                      : asSentence(String(answer));
                   return (
-                    <Pressable
-                      key={num}
-                      onPress={() => handleSetScore(num)}
-                      hitSlop={8}
-                      style={[
-                        styles.trackNode,
-                        isPast && styles.trackNodePast,
-                        isSelected && styles.trackNodeSelected,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.nodeText,
-                          isSelected && styles.nodeTextSelected,
-                        ]}
-                      >
-                        {num}
-                      </Text>
-                    </Pressable>
+                    <View key={question.id} style={styles.resultItem}>
+                      <Text style={styles.resultLabel}>{question.prompt}</Text>
+                      <Text style={styles.result}>{text}</Text>
+                    </View>
                   );
                 })}
               </View>
-            </View>
-
-            <View style={styles.sliderLabels}>
-              <Text style={styles.sliderMin}>0 (None)</Text>
-              <Text style={styles.sliderMax}>10 (Severe)</Text>
-            </View>
+            ))}
           </View>
-        )}
+          <View style={styles.summaryFooter}>
+            <Text style={styles.saved}>Your answers have been saved.</Text>
+            <Pressable
+              style={styles.closeButton}
+              onPress={() => {
+                setCurrentIndex(0);
+                setIsFinished(false);
+              }}
+            >
+              <Text style={styles.closeText}>Edit</Text>
+            </Pressable>
+            <Pressable style={styles.closeButton} onPress={onBack}>
+              <Text style={styles.closeText}>Close</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
-        {/* Free Text */}
-        {currentQ.kind === 'text' && (
-          <View style={styles.textContainer}>
-            <TextInput
-              style={styles.textInput}
-              multiline
-              numberOfLines={4}
-              placeholder="Type your notes or reflections here..."
-              placeholderTextColor={palette.muted}
-              value={currentText}
-              onChangeText={handleTextChange}
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <AuthHeader />
+      <KeyboardAvoidingView style={styles.body} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.top}>
+            <Pressable onPress={() => (currentIndex ? setCurrentIndex((index) => index - 1) : onBack())}>
+              <Text style={styles.back}>‹ Back</Text>
+            </Pressable>
+            <Text style={styles.counter}>{currentIndex + 1}/{questions.length}</Text>
+          </View>
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${((currentIndex + 1) / questions.length) * 100}%` },
+              ]}
             />
           </View>
-        )}
-      </ScrollView>
+          <Text style={styles.module}>{categoryData.title}</Text>
+          <Text style={styles.title}>{currentQ.title}</Text>
+          <Text style={styles.prompt}>{currentQ.prompt}</Text>
 
-      {/* Docked Footer */}
-      <View style={styles.footer}>
-        <Pressable
-          style={[styles.actionBtn, isSubmitting && styles.actionBtnDisabled]}
-          onPress={handleNext}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#ffffff" />
+          {currentQ.kind === 'score' ? (
+            <>
+              <View style={styles.score}>
+                <Text style={styles.scoreNumber}>
+                  {selectedValue === undefined ? '0 to 10' : currentScore}
+                </Text>
+                <Text style={styles.scoreLabel}>
+                  {selectedValue === undefined ? 'Slide to select a value' : painLabel(currentScore)}
+                </Text>
+              </View>
+              <ScoreSlider value={currentScore} onChange={select} />
+            </>
+          ) : currentQ.kind === 'text' || currentQ.kind === 'number' ? (
+            <TextInput
+              value={currentText}
+              onChangeText={(text) => select(currentQ.kind === 'number' ? text.replace(/\D/g, '') : text)}
+              keyboardType={currentQ.kind === 'number' ? 'numeric' : 'default'}
+              maxLength={currentQ.kind === 'number' ? 2 : undefined}
+              multiline={currentQ.kind === 'text'}
+              placeholder={currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
+              placeholderTextColor="#81798A"
+              style={[styles.input, currentQ.kind === 'text' && styles.textArea]}
+            />
           ) : (
-            <Text style={styles.actionBtnText}>
-              {isLast ? 'Complete Assessment' : 'Next Question ›'}
-            </Text>
+            <View style={styles.options}>
+              {currentQ.options?.map((option) => {
+                const on = currentQ.kind === 'multi'
+                  ? selectedMulti.includes(option)
+                  : selectedValue === option;
+                return (
+                  <Pressable
+                    key={option}
+                    onPress={() => select(option)}
+                    style={[styles.option, on && styles.optionOn]}
+                  >
+                    <Text style={[styles.optionText, on && styles.optionTextOn]}>{asSentence(option)}</Text>
+                    <View
+                      style={[
+                        currentQ.kind === 'single' ? styles.radio : styles.box,
+                        on && styles.markOn,
+                      ]}
+                    >
+                      <Text style={styles.tick}>{on ? '✓' : ''}</Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
           )}
-        </Pressable>
-      </View>
+
+          <View style={styles.action}>
+            <PrimaryButton
+              label={isSubmitting ? 'Saving…' : isLast ? 'Review' : 'Record'}
+              disabled={!valid || isSubmitting}
+              loading={isSubmitting}
+              onPress={next}
+            />
+            {!valid ? <Text style={styles.required}>This question is mandatory.</Text> : null}
+            {submitError ? <Text style={styles.submitError}>{submitError}</Text> : null}
+          </View>
+          {currentQ.helper ? <Text style={styles.helper}>{currentQ.helper}</Text> : null}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.surface },
-  topBar: {
-    height: 54,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: palette.surface,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    width: 65,
-  },
-  backChevron: {
-    fontSize: 24,
-    lineHeight: 24,
-    color: palette.text,
-    fontWeight: '600',
-  },
-  backLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: palette.text,
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: palette.text,
-  },
-  stepBadge: {
-    backgroundColor: palette.accent,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  stepBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: palette.primary,
-  },
-  progressBarBg: {
-    height: 3,
-    backgroundColor: palette.line,
+  body: { flex: 1, backgroundColor: palette.background },
+  content: {
     width: '100%',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: palette.primary,
-  },
-  scrollArea: {
-    flex: 1,
-    backgroundColor: palette.background,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
     maxWidth: 680,
-    width: '100%',
     alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 120,
   },
-  tagPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: palette.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 8,
-    marginBottom: 10,
+  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  back: { fontSize: 14, fontWeight: '700', color: palette.success, paddingVertical: 12 },
+  counter: { fontSize: 12, fontWeight: '700', color: palette.muted },
+  progressTrack: {
+    height: 5,
+    borderRadius: 4,
+    backgroundColor: palette.line,
+    overflow: 'hidden',
+    marginTop: 8,
+    marginBottom: 26,
   },
-  tagPillText: {
-    fontSize: 12,
-    fontWeight: '700',
+  progressFill: { height: '100%', borderRadius: 4, backgroundColor: palette.success },
+  module: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.1,
     color: palette.primary,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
-  prompt: {
-    fontSize: 20,
-    lineHeight: 28,
+  title: {
+    fontSize: 28,
+    lineHeight: 34,
     fontWeight: '800',
+    letterSpacing: -0.6,
     color: palette.text,
-    marginBottom: 8,
+    marginTop: 8,
   },
-  helperText: {
-    fontSize: 13,
+  prompt: { fontSize: 15, lineHeight: 22, color: palette.muted, marginTop: 9 },
+  helper: {
+    fontSize: 12,
     lineHeight: 18,
     color: palette.muted,
-    marginBottom: 20,
+    marginTop: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: palette.accentSoft,
+    borderWidth: 1,
+    borderColor: palette.accent,
+    borderRadius: 12,
   },
-  optionsWrap: { gap: 10 },
-  optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    borderRadius: 16,
-    backgroundColor: palette.surface,
-    borderWidth: 1.5,
-    borderColor: palette.line,
-  },
-  optionCardActive: {
-    backgroundColor: palette.selectionBackground,
-    borderColor: palette.success,
-  },
-  cardPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.99 }],
-  },
-  optionCardText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '600',
-    color: palette.text,
-    flex: 1,
-    paddingRight: 10,
-  },
-  optionCardTextActive: {
-    color: palette.text,
-    fontWeight: '700',
-  },
-  checkCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: palette.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: palette.surface,
-  },
-  checkCircleActive: {
-    backgroundColor: palette.success,
-    borderColor: palette.success,
-  },
-  checkIcon: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  radioCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: palette.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: palette.surface,
-  },
-  radioCircleActive: {
-    borderColor: palette.success,
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: palette.success,
-  },
-  sliderCard: {
-    backgroundColor: palette.surface,
-    padding: 24,
-    borderRadius: 20,
+  options: { gap: 12, marginTop: 24 },
+  option: {
+    minHeight: 64,
+    borderRadius: 17,
     borderWidth: 1,
     borderColor: palette.line,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  scoreBubble: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
     flexDirection: 'row',
-    alignItems: 'baseline',
-    backgroundColor: palette.accent,
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    borderRadius: 18,
-    marginBottom: 30,
+    alignItems: 'center',
   },
-  scoreValue: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: palette.primary,
-  },
-  scoreScale: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: palette.muted,
-    marginLeft: 4,
-  },
-  trackContainer: {
-    width: '100%',
-    position: 'relative',
+  optionOn: { backgroundColor: '#EDF5ED', borderColor: palette.success },
+  optionText: { flex: 1, fontSize: 14, lineHeight: 20, color: palette.text, paddingRight: 10 },
+  optionTextOn: { fontWeight: '700' },
+  box: {
+    width: 24,
+    height: 24,
+    borderWidth: 1.5,
+    borderColor: palette.controlBorder,
+    borderRadius: 7,
+    alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10,
   },
-  trackLine: {
+  radio: {
+    width: 24,
+    height: 24,
+    borderWidth: 1.5,
+    borderColor: palette.controlBorder,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markOn: { backgroundColor: palette.success, borderColor: palette.success },
+  tick: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  score: {
+    backgroundColor: palette.accentSoft,
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    marginTop: 26,
+  },
+  scoreNumber: { fontSize: 38, fontWeight: '800', color: palette.success },
+  scoreLabel: { fontSize: 13, color: palette.muted, marginTop: 7 },
+  sliderArea: { marginTop: 28, marginBottom: 12 },
+  sliderTrack: {
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: palette.accentSoft,
+    borderWidth: 1,
+    borderColor: palette.accent,
+    justifyContent: 'center',
+  },
+  sliderFill: {
     position: 'absolute',
-    left: 12,
-    right: 12,
-    height: 6,
-    backgroundColor: palette.line,
-    borderRadius: 3,
+    left: 0,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: palette.accent,
+  },
+  sliderThumb: {
+    position: 'absolute',
+    marginLeft: -10,
+    width: 20,
+    height: 42,
+    borderRadius: 6,
+    backgroundColor: palette.accent,
+    alignItems: 'center',
+  },
+  sliderBubble: {
+    position: 'absolute',
+    top: -40,
+    minWidth: 42,
+    height: 34,
+    borderRadius: 7,
+    backgroundColor: palette.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sliderBubbleText: { fontSize: 16, fontWeight: '800', color: palette.text },
+  sliderEnds: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 9 },
+  sliderEnd: { fontSize: 11, fontWeight: '700', color: palette.muted },
+  input: {
+    minHeight: 58,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 18,
+    backgroundColor: '#fff',
+    padding: 16,
+    fontSize: 15,
+    color: palette.text,
+    textAlignVertical: 'top',
+    marginTop: 24,
+  },
+  textArea: { minHeight: 150 },
+  action: { marginTop: 28 },
+  required: { fontSize: 12, fontWeight: '400', color: palette.text, textAlign: 'center', marginTop: 10 },
+  submitError: {
+    marginTop: 10,
+    fontSize: 12,
+    lineHeight: 18,
+    color: palette.error,
+    textAlign: 'center',
+  },
+  empty: { flex: 1, justifyContent: 'center', padding: 24, gap: 18 },
+  summary: {
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 110,
+  },
+  summaryTitle: { fontSize: 30, fontWeight: '800', color: palette.text },
+  summaryCopy: { fontSize: 15, lineHeight: 22, color: palette.muted, marginTop: 8 },
+  resultCard: { backgroundColor: palette.surface, borderRadius: 22, padding: 20, marginVertical: 24 },
+  summaryMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 14,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.line,
+  },
+  resultHeading: { fontSize: 16, lineHeight: 20, fontWeight: '800', color: palette.text },
+  period: { fontSize: 12, lineHeight: 20, fontWeight: '700', color: palette.primary },
+  summaryInsight: {
+    marginBottom: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: palette.accent,
     overflow: 'hidden',
   },
-  trackLineActive: {
-    height: '100%',
-    backgroundColor: palette.primary,
-  },
-  nodesRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  trackNode: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: palette.surface,
-    borderWidth: 2,
-    borderColor: palette.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  trackNodePast: {
-    borderColor: palette.primary,
-    backgroundColor: palette.accent,
-  },
-  trackNodeSelected: {
-    backgroundColor: palette.primary,
-    borderColor: palette.primary,
-    transform: [{ scale: 1.2 }],
-  },
-  nodeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: palette.muted,
-  },
-  nodeTextSelected: {
-    color: '#ffffff',
-  },
-  sliderLabels: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  sliderMin: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: palette.muted,
-  },
-  sliderMax: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: palette.muted,
-  },
-  textContainer: { marginTop: 10 },
-  textInput: {
-    backgroundColor: palette.surface,
-    borderRadius: 16,
-    padding: 18,
-    borderWidth: 1.5,
-    borderColor: palette.line,
-    color: palette.text,
-    fontSize: 15,
-    lineHeight: 22,
-    minHeight: 120,
-    textAlignVertical: 'top',
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderTopWidth: 1,
-    borderTopColor: palette.line,
-    backgroundColor: palette.surface,
-  },
-  actionBtn: {
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: palette.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionBtnDisabled: { opacity: 0.6 },
-  actionBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: palette.muted,
-    marginBottom: 16,
-  },
-  secondaryBtn: {
-    paddingVertical: 10,
+  summaryStatement: {
+    backgroundColor: palette.accentSoft,
     paddingHorizontal: 18,
-    borderRadius: 10,
-    backgroundColor: palette.light,
+    paddingVertical: 22,
   },
-  secondaryBtnText: {
+  summaryStatementText: {
     fontSize: 14,
+    lineHeight: 21,
     fontWeight: '600',
     color: palette.text,
+    textAlign: 'center',
   },
-
-   summaryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#dcfce7',
-    color: '#15803d',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  summarySubtitle: {
-    fontSize: 14,
-    color: '#475569',
-    marginBottom: 16,
-  },
-  feedbackCard: {
-    backgroundColor: '#f0fdf4',
-    borderColor: '#bbf7d0',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 16,
-    width: '100%',
-    maxWidth: 400,
-  },
-  feedbackBody: {
-    fontSize: 14,
-    color: '#166534',
-    lineHeight: 20,
-  },
-  summaryList: {
-    gap: 12,
-    marginBottom: 24,
-    width: '100%',
-    maxWidth: 400,
-  },
-  summaryCard: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 8,
-    padding: 14,
-  },
-  summaryQuestionNumber: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#64748b',
-    textTransform: 'uppercase',
-    marginBottom: 4,
-  },
-  summaryQuestionPrompt: {
-    fontSize: 14,
-    color: '#1e293b',
-    fontWeight: '500',
-    marginBottom: 6,
-  },
-  summaryAnswerText: {
-    fontSize: 14,
-    color: '#2563eb',
-  },
-  summaryAnswerLabel: {
-    color: '#475569',
-    fontWeight: '600',
-  },
-  primaryBtn: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    paddingHorizontal: 36,
-    borderRadius: 8,
-    minWidth: 200,
+  guideButton: {
+    minHeight: 54,
+    backgroundColor: palette.accentSoft,
+    borderTopWidth: 1,
+    borderTopColor: palette.accent,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+    gap: 10,
   },
-  primaryBtnText: {
-    color: '#ffffff',
+  guideIcon: { fontSize: 19, fontWeight: '800', color: palette.text },
+  guideText: { fontSize: 13, fontWeight: '800', color: palette.text },
+  guideArrow: { fontSize: 22, color: palette.text },
+  resultSection: { paddingVertical: 10 },
+  resultSectionBorder: { borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 18 },
+  resultSectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    lineHeight: 21,
+    fontWeight: '800',
+    color: palette.primary,
+    marginBottom: 10,
   },
-  container: {
-    paddingVertical: 50,
+  resultItem: { marginBottom: 10 },
+  resultLabel: { fontSize: 13, lineHeight: 19, fontWeight: '700', color: palette.text },
+  result: { fontSize: 13, lineHeight: 20, color: palette.text, marginTop: 3 },
+  summaryFooter: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  saved: { fontSize: 12, fontWeight: '700', color: palette.success, flex: 1 },
+  closeButton: {
+    minWidth: 96,
+    minHeight: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    flexGrow: 1,
   },
-  redoBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: '#cbd5e1',
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    minWidth: 200,
-    marginTop: 6,
-    marginBottom: 20,
-  },
-  redoBtnText: {
-    color: '#475569',
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  closeText: { fontSize: 13, fontWeight: '800', color: palette.text },
 });

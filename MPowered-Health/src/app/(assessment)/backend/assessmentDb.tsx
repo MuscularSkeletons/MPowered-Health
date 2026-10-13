@@ -8,6 +8,11 @@ const TABLE_MAP: Record<string, string> = {
   'My Management': 'management_assessment',
 };
 
+export interface CurrentWeeklyAssessmentState {
+  completedCategories: string[];
+  answersByCategory: Record<string, Record<string, any>>;
+}
+
 // Helper to get Monday of the current week (YYYY-MM-DD)
 function getCurrentWeekStartDate(): string {
   const d = new Date();
@@ -23,6 +28,122 @@ function getCurrentWeekStartDate(): string {
   return year + '-' + month + '-' + date; 
 }
 
+function localDateFromIso(value: string): Date {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function localIsoDate(value: Date): string {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const day = String(value.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+async function getAuthenticatedUserId(): Promise<string> {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    throw new Error(`Unable to verify your account: ${error.message}`);
+  }
+
+  if (!user) {
+    throw new Error('Please sign in again before saving your assessment.');
+  }
+
+  return user.id;
+}
+
+/** Returns the number of consecutive weeks in which the signed-in user checked in. */
+export async function getWeeklyAssessmentStreak(): Promise<number> {
+  const activeUserId = await getAuthenticatedUserId();
+  const { data, error } = await supabase
+    .from('assessment')
+    .select('week_start')
+    .eq('user_id', activeUserId)
+    .order('week_start', { ascending: false });
+
+  if (error) {
+    throw new Error(`Unable to load your weekly streak: ${error.message}`);
+  }
+
+  const completedWeeks = new Set(
+    (data || [])
+      .map((row) => row.week_start)
+      .filter((weekStart): weekStart is string => typeof weekStart === 'string'),
+  );
+
+  if (!completedWeeks.size) return 0;
+
+  const currentWeek = getCurrentWeekStartDate();
+  const cursor = localDateFromIso(currentWeek);
+
+  // A streak remains active during the current week before the person checks in.
+  // In that case, begin counting from the previous completed week.
+  if (!completedWeeks.has(currentWeek)) cursor.setDate(cursor.getDate() - 7);
+
+  let streak = 0;
+  while (completedWeeks.has(localIsoDate(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 7);
+  }
+
+  return streak;
+}
+
+/**
+ * Loads this week's saved answers without creating an empty assessment.
+ * This keeps the home-screen progress accurate after the app is reopened.
+ */
+export async function getCurrentWeeklyAssessmentState(): Promise<CurrentWeeklyAssessmentState> {
+  const activeUserId = await getAuthenticatedUserId();
+  const weekStart = getCurrentWeekStartDate();
+  const { data: assessment, error: assessmentError } = await supabase
+    .from('assessment')
+    .select('assessment_id')
+    .eq('week_start', weekStart)
+    .eq('user_id', activeUserId)
+    .maybeSingle();
+
+  if (assessmentError) {
+    throw new Error(`Unable to load this week's progress: ${assessmentError.message}`);
+  }
+
+  if (!assessment) {
+    return { completedCategories: [], answersByCategory: {} };
+  }
+
+  const categoryRecords = await Promise.all(
+    Object.entries(TABLE_MAP).map(async ([categoryTitle, tableName]) => {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*')
+        .eq('assessment_id', assessment.assessment_id)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Unable to load ${categoryTitle}: ${error.message}`);
+      }
+
+      return [categoryTitle, data] as const;
+    }),
+  );
+
+  const completedCategories: string[] = [];
+  const answersByCategory: Record<string, Record<string, any>> = {};
+
+  categoryRecords.forEach(([categoryTitle, record]) => {
+    if (!record) return;
+    completedCategories.push(categoryTitle);
+    answersByCategory[categoryTitle] = record;
+  });
+
+  return { completedCategories, answersByCategory };
+}
+
 /**
  * Gets the active assessment_id for the current week,
  * or creates one if it doesn't exist yet.
@@ -31,12 +152,16 @@ export async function getOrCreateCurrentWeeklyAssessment(
   userId: string | null = null
 ): Promise<string | number> {
   const weekStart = getCurrentWeekStartDate();
+  const activeUserId = userId || (await getAuthenticatedUserId());
 
-  // Look for an existing record for this week
+  // A weekly assessment belongs to one user. Filtering only by week can select
+  // another person's record or make maybeSingle fail when several people have
+  // completed an assessment in the same week.
   const query = supabase
     .from('assessment')
     .select('assessment_id')
-    .eq('week_start', weekStart);
+    .eq('week_start', weekStart)
+    .eq('user_id', activeUserId);
 
   const { data: existing, error: fetchError } = await query.maybeSingle();
 
@@ -52,6 +177,7 @@ export async function getOrCreateCurrentWeeklyAssessment(
   // If assessment for that week doesn't exist, create it
   const newRecord = {
     week_start: weekStart,
+    user_id: activeUserId,
   };
 
   const { data: created, error: insertError } = await supabase
@@ -92,13 +218,11 @@ export async function submitAssessmentAnswers(
     assessment_id: assessmentId,
   };
 
-  console.log('Submitting to:', tableName, 'with assessment_id:', assessmentId);
-
   const { data, error } = await supabase
     .from(tableName)
-    
-    //user updates their response in the same week will replace the pervious answer
-    .upsert(payload, {onConflict: 'assessment_id',})
+
+    // Updating the same assessment in the same week replaces its previous answers.
+    .upsert(payload, { onConflict: 'assessment_id' })
     .select();
 
   if (error) {

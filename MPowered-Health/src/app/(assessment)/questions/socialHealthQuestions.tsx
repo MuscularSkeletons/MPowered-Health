@@ -86,7 +86,7 @@ export const socialHealthQuestions: SocialHealthQuestionsConfig = {
 
     {
       id: 'relation_impact',
-      title: 'Relation with others',
+      title: 'Relationships with others',
       prompt:
         'Over the past week, how much has pain interfered with your relationships with other people?',
       kind: 'score',
@@ -137,9 +137,13 @@ export function calculateSocialScore(answers: Record<string, any>): {
   totalScore: number;
   impactLevel: string;
 } {
-  const enjoymentScore = Number(answers.enjoyment_impact);
-  const relationshipScore = Number(answers.relation_impact);
-  const moodScore = Number(answers.mood_impact);
+  const scoreOrZero = (value: unknown) => {
+    const score = Number(value);
+    return Number.isFinite(score) ? score : 0;
+  };
+  const enjoymentScore = scoreOrZero(answers.enjoyment_impact);
+  const relationshipScore = scoreOrZero(answers.relation_impact);
+  const moodScore = scoreOrZero(answers.mood_impact);
   const socialLifeScore = getSectionScore(answers.social_life, socialScales.life);
   const travellingScore = getSectionScore(
     answers.travelling,

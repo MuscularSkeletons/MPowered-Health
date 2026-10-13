@@ -1,4 +1,4 @@
-export const perconalCareScales: Record<string, string[]> = {
+export const personalCareScales: Record<string, string[]> = {
   washing: [
     'I can look after myself normally without causing extra pain',
     'I can look after myself normally, but it causes extra pain',
@@ -73,7 +73,7 @@ export const personalCareQuestions: PersonalCareQuestionsConfig = {
       title: 'Personal care (washing, dressing, etc.)',
       prompt: 'Select the MOST relevant statement:',
       kind: 'single',
-      options: perconalCareScales.washing,
+      options: personalCareScales.washing,
     },
 
     {
@@ -81,7 +81,7 @@ export const personalCareQuestions: PersonalCareQuestionsConfig = {
       title: 'Sleeping',
       prompt: 'Select the MOST relevant statement:',
       kind: 'single',
-      options: perconalCareScales.sleeping,
+      options: personalCareScales.sleeping,
     },
 
     {
@@ -114,11 +114,11 @@ export function calculatePersonalCareScore(answers: Record<string, any>): {
 } {
   const washingScore = getSectionScore(
     answers.personal_care_impact,
-    perconalCareScales.washing
+    personalCareScales.washing
   );
   const sleepingScore = getSectionScore(
     answers.sleeping_impact,
-    perconalCareScales.sleeping
+    personalCareScales.sleeping
   );
 
   // Each answer weighted 1 point
