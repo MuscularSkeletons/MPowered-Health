@@ -85,3 +85,58 @@ function first<T>(value: OneOrMany<T> | undefined): T | null {
 const one = (value: string | null | undefined): string[] => (value ? [value] : []);
 const score = (value: number): string[] => [String(value)];
 
+
+// Row to answers converting (in the question-index layout used by shared/health-records/summaries)
+
+export function painAnswers(row: PainRow): AssessmentAnswers {
+  return {
+    0: [...(row.pain_location ?? [])], // areas
+    1: [...(row.pain_characteristics ?? [])],
+    2: score(row.current_pain),
+    3: score(row.mildest_pain),
+    4: score(row.worst_pain),
+    5: score(row.average_pain),
+  };
+}
+
+export function movementAnswers(row: MovementRow): AssessmentAnswers {
+  return {
+    0: one(row.active_hour),
+    1: [...(row.general_impacts ?? [])],
+    2: one(row.walking_impact),
+    3: one(row.lifting_impact),
+    4: one(row.sitting_impact),
+    5: one(row.standing_impact),
+    6: one(row.movement_reflection),
+  };
+}
+
+export function personalCareAnswers(row: PersonalCareRow): AssessmentAnswers {
+  return {
+    0: [...(row.activities_impact ?? [])],
+    1: one(row.personal_care_impact),
+    2: one(row.sleeping_impact),
+    3: one(row.care_reflection),
+  };
+}
+
+export function socialAnswers(row: SocialRow): AssessmentAnswers {
+  return {
+    0: one(row.social_life),
+    1: one(row.travelling),
+    2: score(row.mood_impact),
+    3: score(row.relation_impact),
+    4: score(row.enjoyment_impact),
+    5: one(row.general_mood),
+    6: one(row.mood_trigger),
+  };
+}
+
+export function managementAnswers(row: ManagementRow): AssessmentAnswers {
+  return {
+    0: [...(row.medication ?? [])],
+    1: one(row.otc_medication),
+    2: one(row.exercise_frequency),
+    3: one(row.emotion_strategies),
+  };
+}
