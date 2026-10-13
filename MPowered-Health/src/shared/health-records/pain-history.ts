@@ -133,4 +133,19 @@ export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup
   }
   return [...groups.values()];
 }
+
+
+/** Reads the requested pain score from a history record. */
+export function painMetricValue(record: PainAssessmentRecord, metric: PainMetric) {
+  // Keep chart metric selection in one place for the screen and PDF report.
+  return metric === 'Worst' ? record.worst : metric === 'Mildest' ? record.mildest : record.average;
+}
  
+/** Formats the completion date for display. */
+export function painRecordDate(record: PainAssessmentRecord, compact = false) {
+  // Charts use DD/MM; lists and reports use a readable date.
+  const date = new Date(record.completedAt);
+  return compact
+    ? `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`
+    : date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+}
