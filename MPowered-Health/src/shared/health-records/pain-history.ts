@@ -121,3 +121,16 @@ export function getLatestAssessmentAnswers(): HealthSnapshot['latest'] {
 }
 
 
+
+/** Groups pain records by the areas where pain was reported. */
+export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup[] {
+  // Group weeks by their complete area combination, oldest first.
+  const groups = new Map<string, PainAreaGroup>();
+  for (const record of [...history].sort((a, b) => a.completedAt.localeCompare(b.completedAt))) {
+    const key = painAreaKey(record.areas);
+    if (!groups.has(key)) groups.set(key, { key, label: JSON.parse(key).join(', '), records: [] });
+    groups.get(key)!.records.push(clone(record));
+  }
+  return [...groups.values()];
+}
+ 
