@@ -189,3 +189,61 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
 
   return { painRecords: painRecords.reverse(), latest };
 }
+
+
+// Retention
+
+/** The earliest date an assessment may have and still be shown. */
+export function retentionCutoff(now = new Date()): Date {
+  const cutoff = new Date(now);
+  cutoff.setMonth(cutoff.getMonth() - RETENTION_MONTHS);
+  return cutoff;
+}
+
+// Weeks (Monday to Sunday, device-local time)
+// Note: assessment.week_start ISNT used bs its default is the day the row was inserted, not a Monday.
+
+const pad = (value: number) => String(value).padStart(2, '0');
+const isoDay = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+/** Monday 00:00 (local) of the week containing the date. */
+export function weekStartOf(date: Date): Date {
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const daysSinceMonday = (day.getDay() + 6) % DAYS_PER_WEEK; // Sunday (0) counts as day 6
+  day.setDate(day.getDate() - daysSinceMonday);
+  return day;
+}
+
+/** "18-24 May", or "27 Apr-03 May" when the week spans two months. */
+export function weekLabel(start: Date): string {
+  const end = new Date(start);
+  end.setDate(end.getDate() + DAYS_PER_WEEK - 1);
+  const from = pad(start.getDate());
+  const to = pad(end.getDate());
+  return start.getMonth() === end.getMonth()
+    ? `${from}-${to} ${MONTHS[start.getMonth()]}`
+    : `${from} ${MONTHS[start.getMonth()]}-${to} ${MONTHS[end.getMonth()]}`;
+}
+
+export interface WeeklyPainRow {
+  weekStart: string; // local YYYY-MM-DD of the Monday
+  label: string;
+  record: PainAssessmentRecord;
+}
+
+/** One row per week, newest first. If a week has several assessments the latest one is used. */
+export function weeklyPainRows(records: PainAssessmentRecord[]): WeeklyPainRow[] {
+  const byWeek = new Map<string, PainAssessmentRecord>();
+  for (const record of records) {
+    const key = isoDay(weekStartOf(new Date(record.completedAt)));
+    const existing = byWeek.get(key);
+    if (!existing || record.completedAt > existing.completedAt) byWeek.set(key, record);
+  }
+  return [...byWeek.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([key, record]) => ({
+      weekStart: key,
+      label: weekLabel(new Date(`${key}T00:00:00`)), // no offset, so parsed as local time
+      record,
+    }));
+}
