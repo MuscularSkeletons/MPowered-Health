@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { palette } from '../../constants/colours';
+import { palette } from '../../constants/profile/ui';
 import { submitAssessmentAnswers } from './backend/assessmentDb';
 
 interface Question {
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     color: palette.text,
   },
   stepBadge: {
-    backgroundColor: palette.accentSoft,
+    backgroundColor: palette.accent,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   },
   tagPill: {
     alignSelf: 'flex-start',
-    backgroundColor: palette.accentSoft,
+    backgroundColor: palette.accent,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 8,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   scoreBubble: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    backgroundColor: palette.accentSoft,
+    backgroundColor: palette.accent,
     paddingHorizontal: 22,
     paddingVertical: 10,
     borderRadius: 18,
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
   },
   trackNodePast: {
     borderColor: palette.primary,
-    backgroundColor: palette.accentSoft,
+    backgroundColor: palette.accent,
   },
   trackNodeSelected: {
     backgroundColor: palette.primary,

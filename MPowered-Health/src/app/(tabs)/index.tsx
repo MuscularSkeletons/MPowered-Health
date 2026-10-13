@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ASSESSMENT_QUESTIONS } from '../(assessment)/questions/index';
 import AssessmentScreen from '../(assessment)/assessmentScreen';
-import { palette } from '../../constants/colours';
+import { palette } from '../../constants/profile/ui';
 
 const ASSESSMENTS = [
   { id: 'My Pain', title: 'My Pain' },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   assessment: {
     height: 72,
     borderRadius: 16,
-    backgroundColor: palette.accentSoft,
+    backgroundColor: palette.background,
     paddingHorizontal: 18,
     flexDirection: 'row',
     alignItems: 'center',
