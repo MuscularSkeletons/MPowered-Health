@@ -6,7 +6,7 @@ export function getPainLocationQuestions(latestPainLocations: string[] | null): 
             'Could pain in different areas be related, or are they likely separate issues?',
         ];
     }
-    var painLocationsString;
+    let painLocationsString;
     // convert pain locations to string depending on the number of locations
     if (latestPainLocations.length === 1) {
         painLocationsString = latestPainLocations[0];
