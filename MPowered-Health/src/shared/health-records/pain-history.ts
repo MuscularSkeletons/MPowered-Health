@@ -72,14 +72,14 @@ export async function loadPainHistory() {
     return;
   }
   const snapshot = await fetchHealthSnapshot(userId);
-  // The account changed while the request was running - so then drop the result and not show it.
+  // The account changed while the request was running: drop the result rather than show it.
   if (requestGeneration !== generation) return;
   records = snapshot.painRecords;
   latest = snapshot.latest;
 }
 
 /**
- * Snce sssessments are submitted by  assessment feature, (which writes to supabase), this
+ * Since sssessments are submitted by  assessment feature, (which writes to supabase), this
  * exports so existing imports compile, and fails if not.
  */
 export async function savePainAssessment(
