@@ -79,3 +79,18 @@ function useMedicationStore() {
 
   return { list, save, remove, error, duplicateOf };
 }
+
+const Context = createContext<ReturnType<typeof useMedicationStore> | null>(null);
+
+/** Shares the prescription list across its list and editor screens. */
+export function MedicationProvider({ children }: { children: ReactNode }) {
+  const value = useMedicationStore();
+  return <Context.Provider value={value}>{children}</Context.Provider>;
+}
+
+/** Reads the prescription list and available update actions. */
+export function useMedications() {
+  const value = useContext(Context);
+  if (!value) throw new Error('MedicationProvider is required');
+  return value;
+}
