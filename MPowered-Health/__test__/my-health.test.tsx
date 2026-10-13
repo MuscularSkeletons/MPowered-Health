@@ -12,6 +12,11 @@ describe("objects rendering", () => {
 
 //todo: navigation tests
 describe("navigation tests", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+    
     test("pressing on health tracking records navigates to records", async() => {
         await render();
     })
