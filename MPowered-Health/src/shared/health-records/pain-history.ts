@@ -57,3 +57,23 @@ export function painAreaKey(areas: string[]) {
   // Trim, un-duplicate, and sort so "Back, Knee" items always have one stable key.
   return JSON.stringify([...new Set(areas.map((area) => area.trim()).filter(Boolean))].sort());
 }
+
+/**
+ * Loads the account's history (18 months) from db into memory.
+ *
+ * @throws If the request fails, so session boundary can retry.
+ */
+export async function loadPainHistory() {
+  const requestGeneration = generation;
+  const userId = accountId;
+  if (!userId) {
+    records = [];
+    latest = {};
+    return;
+  }
+  const snapshot = await fetchHealthSnapshot(userId);
+  // The account changed while the request was running - so then drop the result and not show it.
+  if (requestGeneration !== generation) return;
+  records = snapshot.painRecords;
+  latest = snapshot.latest;
+}
