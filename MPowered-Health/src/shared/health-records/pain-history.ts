@@ -98,3 +98,26 @@ export function clearPainHistoryMemory() {
   records = [];
   latest = {};
 }
+
+
+/**
+ * Returns copies of the current pain-history records, oldest first.
+ *
+ * @returns New record and answer objects that callers can sort or edit w/o changing loaded history.
+ */
+export function getPainHistory() {
+  // Screens receive copies and can sort or filter them safely!
+  return records.map(clone);
+}
+ 
+/** The newest answers for each assessment type, for restoring the profile and summaries. */
+export function getLatestAssessmentAnswers(): HealthSnapshot['latest'] {
+  return Object.fromEntries(
+    Object.entries(latest).map(([type, entry]) => [
+      type,
+      { completedAt: entry.completedAt, answers: cloneAnswers(entry.answers) },
+    ]),
+  );
+}
+
+
