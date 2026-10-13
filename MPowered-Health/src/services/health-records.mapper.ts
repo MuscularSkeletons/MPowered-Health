@@ -140,3 +140,52 @@ export function managementAnswers(row: ManagementRow): AssessmentAnswers {
     3: one(row.emotion_strategies),
   };
 }
+
+
+/** Builds the record the charts, history and PDFs read, from an assessment and its pain row. */
+export function toPainRecord(assessment: AssessmentRow, pain: PainRow): PainAssessmentRecord {
+  // Trim, un-duplicate and sort so "Back, Knee" always forms one group.
+  const areas = [...new Set((pain.pain_location ?? []).map((area) => area.trim()).filter(Boolean))].sort();
+  return {
+    id: assessment.assessment_id,
+    completedAt: new Date(assessment.date).toISOString(),
+    areas,
+    current: pain.current_pain,
+    mildest: pain.mildest_pain,
+    worst: pain.worst_pain,
+    average: pain.average_pain,
+    answers: { ...painAnswers(pain), 0: areas },
+  };
+}
+
+/** Turns the assessments (with their children) into the pain history plus the latest answers per type. */
+export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
+  const newestFirst = [...rows].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  const painRecords: PainAssessmentRecord[] = [];
+  const latest: HealthSnapshot['latest'] = {};
+
+  for (const row of newestFirst) {
+    const completedAt = new Date(row.date).toISOString();
+    // Rows are newest first, so the first answers seen for a type are the latest.
+    const remember = (type: AssessmentId, answers: AssessmentAnswers) => {
+      if (!latest[type]) latest[type] = { answers, completedAt };
+    };
+
+    const pain = first(row.pain_assessment);
+    if (pain) {
+      const record = toPainRecord(row, pain);
+      painRecords.push(record);
+      remember('pain', record.answers);
+    }
+    const movement = first(row.movement_assessment);
+    if (movement) remember('movement', movementAnswers(movement));
+    const personal = first(row.personal_care_assessment);
+    if (personal) remember('personal', personalCareAnswers(personal));
+    const social = first(row.social_health_assessment);
+    if (social) remember('social', socialAnswers(social));
+    const management = first(row.management_assessment);
+    if (management) remember('management', managementAnswers(management));
+  }
+
+  return { painRecords: painRecords.reverse(), latest };
+}
