@@ -77,3 +77,24 @@ export async function loadPainHistory() {
   records = snapshot.painRecords;
   latest = snapshot.latest;
 }
+
+/**
+ * Snce sssessments are submitted by  assessment feature, (which writes to supabase), this
+ * exports so existing imports compile, and fails if not.
+ */
+export async function savePainAssessment(
+  _answers: AssessmentAnswers,
+  _now = new Date(),
+): Promise<PainAssessmentRecord> {
+  throw new Error('Pain assessments are saved by the assessment feature, not by My Health.');
+}
+ 
+/** Nothing is written locally, so no need to wait for saves. */
+export async function finishPainHistoryWrites() {}
+ 
+/** Clears the pain records in memory rn. */
+export function clearPainHistoryMemory() {
+  // Clear the session copy after account deletion or reset.
+  records = [];
+  latest = {};
+}
