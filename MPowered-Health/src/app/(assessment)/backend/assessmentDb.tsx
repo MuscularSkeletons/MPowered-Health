@@ -96,7 +96,9 @@ export async function submitAssessmentAnswers(
 
   const { data, error } = await supabase
     .from(tableName)
-    .insert(payload)
+    
+    //user updates their response in the same week will replace the pervious answer
+    .upsert(payload, {onConflict: 'assessment_id',})
     .select();
 
   if (error) {
