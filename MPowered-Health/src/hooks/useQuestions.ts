@@ -16,6 +16,46 @@ export const useQuestions = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
 
+    const loadQuestions = async () => {
+        if (!user) {
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const {data: questionsData, error: questionsError } = await supabase
+            .from("Question")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false });
+
+            if (questionsError) {
+                console.error("Error loading questions:", questionsError);
+                throw questionsError;
+            }
+
+            if (!questionsData || questionsData.length === 0) {
+                setQuestions([]);
+                return;
+            }
+
+            const formattedQuestions: Question[] = questionsData.map((question) => ({
+                id: question.question_id,
+                user_id: question.user_id,
+                question: question.question,
+                answer: question.answer || null,
+                created_at: question.created_at,
+                updated_at: question.updated_at,
+            }));
+
+            setQuestions(formattedQuestions);
+        } catch (error) {
+            console.error("Error loading questions:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         loadQuestions();
     }, []);
@@ -109,46 +149,6 @@ export const useQuestions = () => {
             throw error;
         }
     }
-
-    const loadQuestions = async () => {
-        if (!user) {
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const {data: questionsData, error: questionsError } = await supabase
-            .from("Question")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("updated_at", { ascending: false });
-
-            if (questionsError) {
-                console.error("Error loading questions:", questionsError);
-                throw questionsError;
-            }
-
-            if (!questionsData || questionsData.length === 0) {
-                setQuestions([]);
-                return;
-            }
-
-            const formattedQuestions: Question[] = questionsData.map((question) => ({
-                id: question.question_id,
-                user_id: question.user_id,
-                question: question.question,
-                answer: question.answer || null,
-                created_at: question.created_at,
-                updated_at: question.updated_at,
-            }));
-
-            setQuestions(formattedQuestions);
-        } catch (error) {
-            console.error("Error loading questions:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const refreshQuestions = async () => {
         await loadQuestions();
