@@ -70,7 +70,7 @@ function useMedicationStore() {
    * The list changes only on success, so a failed save never looks saved!
    */
   const save = async (draft: MedicationDraft, id?: string) => {
-    if (!medicationReady(draft) || !userId || saving.current) return false;
+    if (!medicationReady(draft) || isDuplicate(draft, list, id) || !userId || saving.current) return false;
     saving.current = true;
     setError('');
     try {
