@@ -4,10 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity, 
   Modal,
-  Pressable,
   Alert,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
@@ -17,6 +15,7 @@ import { palette } from "@/constants/profile/ui";
 import { useState } from "react";
 import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
 import { sexOptions, diagnosisOptions, painConditionsOptions } from '@/constants/profile/profile-options';
+import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
 
 // temporary UI reusing auth ui
 import {
@@ -26,55 +25,6 @@ import {
   authStyles,
   ChoiceButton,
 } from '@/components/auth/auth-ui';
-
-function ModalActions({
-  isSaving,
-  onCancel,
-  onSave,
-}: {
-  isSaving: boolean;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  return (
-    <View style={styles.buttonOptions}>
-      <Pressable
-        accessibilityRole="button"
-        disabled={isSaving}
-        onPress={onCancel}
-        style={({ pressed }) => [
-          styles.button,
-          styles.buttonCancel,
-          pressed && !isSaving && styles.buttonPressed,
-          isSaving && styles.buttonDisabled,
-        ]}
-      >
-        <Text style={styles.buttonCancelText}>Cancel</Text>
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ busy: isSaving, disabled: isSaving }}
-        disabled={isSaving}
-        onPress={onSave}
-        style={({ pressed }) => [
-          styles.button,
-          styles.buttonSave,
-          pressed && !isSaving && styles.buttonPressed,
-          isSaving && styles.buttonSaving,
-        ]}
-      >
-        {isSaving ? (
-          <View style={styles.savingContent}>
-            <ActivityIndicator size="small" color={palette.text} />
-            <Text style={styles.buttonSaveText}>Saving…</Text>
-          </View>
-        ) : (
-          <Text style={styles.buttonSaveText}>Save</Text>
-        )}
-      </Pressable>
-    </View>
-  );
-}
 
 function ProfileRow({
   label,
@@ -110,8 +60,7 @@ function ProfileRow({
 export default function ManageProfile() {
   const router = useRouter();
   const { edit } = useLocalSearchParams<{ edit?: string }>();
-  const openedFromSettings = edit === 'password';
-  const { user, updateUser, updateUserDraft, updateAuthUserEmail, updateAuthUserPassword } = useAuth();
+  const { user, updateUser, updateUserDraft, updateAuthUserEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   // pop-up to edit a detail
@@ -346,49 +295,6 @@ export default function ManageProfile() {
     }
   };
 
-  // update password
-  const [showCurrPasswordEdit, setShowCurrPasswordEdit] = useState(openedFromSettings);
-  const [currPassword, setCurrPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [showCurrPassword, setShowCurrPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-
-  const closePasswordEditor = () => {
-    setShowCurrPasswordEdit(false);
-    setAuthError(null);
-    setCurrPassword('');
-    setNewPassword('');
-    if (openedFromSettings) {
-      router.back();
-    }
-  };
-
-  const handleUpdatePassword = async () => {
-    if (!currPassword || !newPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-    setIsLoading(true);
-    setAuthError(null);
-    try {
-      if (!user) throw new Error('User not authenticated');
-      await updateAuthUserPassword(currPassword, newPassword);
-      setCurrPassword('');
-      setNewPassword('');
-      setShowCurrPasswordEdit(false);
-      if (openedFromSettings) {
-        router.back();
-      }
-      Alert.alert('Password updated', 'Your password has been changed successfully.');
-    } catch (error) {
-      const userError = toUserError(error);
-      setAuthError(userError);
-      Alert.alert('Error', userError.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <AuthScreen>
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
@@ -479,9 +385,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit name</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit name</Text>
             <AuthInput
               testID="name-input"
               label="Name"
@@ -508,9 +414,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit sex</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit sex</Text>
             <View style={authStyles.choices}>
               {sexOptions.map((option) => (
                 <ChoiceButton
@@ -535,9 +441,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit year of birth</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit year of birth</Text>
             <AuthInput
               testID="birth-year-input"
               label="Year of birth"
@@ -564,9 +470,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit diagnosis</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit diagnosis</Text>
             <View style={authStyles.choices}>
               <ChoiceButton
                 label={diagnosisOptions[0]}
@@ -593,9 +499,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit pain conditions</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit pain conditions</Text>
             <ScrollView>
             <View style={authStyles.choices}>
               {painConditionsOptions.map((condition) => (
@@ -623,9 +529,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Edit other condition</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Edit other condition</Text>
             <AuthInput
               testID="other-conditions-input"
               label="Other condition"
@@ -651,9 +557,9 @@ export default function ManageProfile() {
         transparent={true} 
         animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Change email address</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Change email address</Text>
             <AuthInput
               label="Email address"
               placeholder="you@example.com"
@@ -677,62 +583,6 @@ export default function ManageProfile() {
           </View>
         </View>
       </Modal>
-
-      <Modal 
-        visible={showCurrPasswordEdit} 
-        transparent={true} 
-        animationType="fade"
-        >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text style={styles.modalTitle}>Change password</Text>
-            <Text style={styles.modalDescription}>Confirm your current password, then choose a new one.</Text>
-            <AuthInput
-              label="Current password"
-              placeholder="Enter your current password"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-              value={currPassword}
-              onChangeText={(value) => {
-                setCurrPassword(value);
-                setAuthError(null);
-              }}
-              secure
-              reveal={showCurrPassword}
-              onToggleReveal={() => setShowCurrPassword((visible) => !visible)}
-            />
-            <AuthInput
-              label="New password"
-              placeholder="Enter a new password"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="new-password"
-              editable={!isLoading}
-              value={newPassword}
-              onChangeText={(value) => {
-                setNewPassword(value);
-                setAuthError(null);
-              }}
-              secure
-              reveal={showNewPassword}
-              onToggleReveal={() => setShowNewPassword((visible) => !visible)}
-              onSubmitEditing={() => void handleUpdatePassword()}
-            />
-            {authError ? (
-              <Text accessibilityRole="alert" style={authStyles.error}>
-                {authError.message}
-              </Text>
-            ) : null}
-            <ModalActions
-              isSaving={isLoading}
-              onCancel={closePasswordEditor}
-              onSave={() => void handleUpdatePassword()}
-            />
-          </View>
-        </View>
-      </Modal>
-
     </AuthScreen>
   
   );
@@ -796,67 +646,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: 'rgba(58,48,53,0.48)',
-  },
-  editInterface: {
-    width: '100%',
-    maxWidth: 520,
-    maxHeight: '88%',
-    backgroundColor: palette.surface,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: palette.line,
-    shadowColor: palette.text,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    elevation: 8,
-    borderRadius: 24,
-  },
-  modalTitle: { fontSize: 24, lineHeight: 30, fontWeight: '800', color: palette.text, marginBottom: 8 },
-  modalDescription: { fontSize: 13, lineHeight: 20, color: palette.muted, marginBottom: 8 },
-  buttonOptions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 10,
-    paddingTop: 22,
-  },
-  button: {
-    minWidth: 96,
-    minHeight: 46,
-    borderRadius: 23,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonCancel: {
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.line,
-  },
-  buttonSave: {
-    backgroundColor: palette.primary,
-    flex: 1,
-    maxWidth: 220,
-    shadowColor: palette.primaryDark,
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
-  buttonPressed: { opacity: 0.78, transform: [{ scale: 0.985 }] },
-  buttonDisabled: { opacity: 0.45 },
-  buttonSaving: { backgroundColor: palette.disabledBackground, shadowOpacity: 0, elevation: 0 },
-  savingContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  buttonCancelText: { color: palette.text, fontWeight: '800' },
-  buttonSaveText: { color: palette.text, fontWeight: '800' },
 })

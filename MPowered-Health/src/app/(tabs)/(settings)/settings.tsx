@@ -4,13 +4,23 @@ import {
   StyleSheet,
   Alert,
   Pressable,
+  Modal,
 } from "react-native";
 import { useAuth } from "@/context/authcontext";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import { openBrowserAsync } from 'expo-web-browser';
-import { AuthIntro, AuthScreen } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
+import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
+import { useState } from "react";
+import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
+// temporary UI reusing auth ui
+import {
+  AuthInput,
+  AuthIntro,
+  AuthScreen,
+  authStyles,
+} from '@/components/auth/auth-ui';
 
 function SettingRow({
   icon,
@@ -55,7 +65,7 @@ function SettingRow({
 }
 
 export default function Settings() {
-  const { user, signOut, deleteUser } = useAuth();
+  const { user, signOut, deleteUser, updateAuthUserPassword } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -75,7 +85,7 @@ export default function Settings() {
         style: 'destructive',
       }
     ])
-  }
+  };
 
   const handleDelete = async () => {
     if (!user) throw new Error('User not authenticated');
@@ -96,7 +106,7 @@ export default function Settings() {
         style: 'destructive',
       }
     ])
-  }
+  };
 
   /** Opens a policy without losing the current onboarding screen. */
   const openPolicy = async (url: string) => {
@@ -105,7 +115,41 @@ export default function Settings() {
     } catch {
       Alert.alert('Unable to open page', 'Please try again.');
     }
-  }
+  };
+
+  // update authentication info
+    const [authError, setAuthError] = useState<AuthUserError | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+  // update password
+    const [showCurrPasswordEdit, setShowCurrPasswordEdit] = useState(false);
+    const [currPassword, setCurrPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [showCurrPassword, setShowCurrPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+  
+    const handleUpdatePassword = async () => {
+      if (!currPassword || !newPassword) {
+        Alert.alert('Error', 'Please fill in all fields');
+        return;
+      }
+      setIsLoading(true);
+      setAuthError(null);
+      try {
+        if (!user) throw new Error('User not authenticated');
+        await updateAuthUserPassword(currPassword, newPassword);
+        setCurrPassword('');
+        setNewPassword('');
+        setShowCurrPasswordEdit(false);
+        Alert.alert('Password updated', 'Your password has been changed successfully.');
+      } catch (error) {
+        const userError = toUserError(error);
+        setAuthError(userError);
+        Alert.alert('Error', userError.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   return (
     <AuthScreen>
@@ -170,7 +214,7 @@ export default function Settings() {
           icon="lock-closed-outline"
           title="Password and Security"
           description="Change the password used to sign in"
-          onPress={() => router.push('/(tabs)/(settings)/profile?edit=password')}
+          onPress={() => setShowCurrPasswordEdit(true)}
         />
         <View style={styles.divider} />
         <SettingRow
@@ -192,6 +236,61 @@ export default function Settings() {
         />
       </View>
       <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+
+      <Modal 
+        visible={showCurrPasswordEdit} 
+        transparent={true} 
+        animationType="fade"
+        >
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Change password</Text>
+            <Text style={modalStyles.modalDescription}>Confirm your current password, then choose a new one.</Text>
+            <AuthInput
+              label="Current password"
+              placeholder="Enter your current password"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!isLoading}
+              value={currPassword}
+              onChangeText={(value) => {
+                setCurrPassword(value);
+                setAuthError(null);
+              }}
+              secure
+              reveal={showCurrPassword}
+              onToggleReveal={() => setShowCurrPassword((visible) => !visible)}
+            />
+            <AuthInput
+              label="New password"
+              placeholder="Enter a new password"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="new-password"
+              editable={!isLoading}
+              value={newPassword}
+              onChangeText={(value) => {
+                setNewPassword(value);
+                setAuthError(null);
+              }}
+              secure
+              reveal={showNewPassword}
+              onToggleReveal={() => setShowNewPassword((visible) => !visible)}
+              onSubmitEditing={() => void handleUpdatePassword()}
+            />
+            {authError ? (
+              <Text accessibilityRole="alert" style={authStyles.error}>
+                {authError.message}
+              </Text>
+            ) : null}
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowCurrPasswordEdit(false)}
+              onSave={() => void handleUpdatePassword()}
+            />
+          </View>
+        </View>
+      </Modal>
     </AuthScreen>
   );
 }
