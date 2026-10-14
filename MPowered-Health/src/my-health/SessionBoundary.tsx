@@ -17,7 +17,8 @@ export function HealthSessionBoundary({ userId, children }: { userId: string; ch
     let active = true;
     resetAssessmentSession();
     setPainHistoryAccount(userId);
-    // Load history and prescriptions together so if either fails the user gets one retry screen.
+    // Load both history and prescription at once. loadPrescriptions records a failure instead of throwing, so only a pain-history
+    // failure shows this retry screen and a prescriptions failure is shown on the prescriptions screen.
     Promise.all([loadPainHistory(), userId === SIGNED_OUT ? Promise.resolve() : loadPrescriptions(userId)])
       .then(() => {
         if (!active) return;
@@ -25,7 +26,9 @@ export function HealthSessionBoundary({ userId, children }: { userId: string; ch
         restoreAssessmentSession();
         setStatus('ready');
       })
-      .catch(() => {
+      .catch((cause) => {
+        // In development, show why the load failed maybe? The message holds has an error code.
+        if (__DEV__) console.warn('Health records load failed:', cause instanceof Error ? cause.message : cause);
         if (active) setStatus('error');
       });
     return () => {
