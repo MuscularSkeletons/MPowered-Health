@@ -190,7 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(userProfile);
         if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
-      
+
     } catch (error) {
       console.error("Error updating user:", error);
       throw error;
@@ -211,9 +211,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (data.user) {
       const userProfile = await fetchUserProfile(data.user.id);
+      if (!userProfile) {
+        console.error("Error fetching user profile.");
+        return; // abort early - do not set user profile to null
+      }
       setUser(userProfile);
       console.log("User profile information fetched and set");
-    }    
+    }
   }
 
   const updateAuthUserPassword = async (currPassword: string, newPassword: string) => {
