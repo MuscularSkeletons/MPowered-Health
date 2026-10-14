@@ -105,7 +105,7 @@ const one = (value: string | null | undefined): string[] => (value ? [value] : [
 const score = (value: number): string[] => [String(value)];
 
 
-// Row to answers converting (in the question-index layout used by shared/health-records/summaries)
+// Row to answers converting (in the question-index format used by shared/health-records/summaries)
 
 export function painAnswers(row: PainRow): AssessmentAnswers {
   return {
