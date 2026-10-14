@@ -14,7 +14,7 @@ export default function PrescriptionEditorScreen() {
 
 /** Displays the prescription fields and save controls using the editor’s current values. */
 function Editor({ id }: { id?: string }) {
-  const { draft, change, validName, validStrength, ready, save, missing } = useMedicationEditor(id);
+  const { draft, change, validName, validStrength, duplicate, ready, save, missing, } = useMedicationEditor(id);
   const { name, strength, unit, form, repeat } = draft;
   if (missing)
     return (
@@ -37,7 +37,7 @@ function Editor({ id }: { id?: string }) {
         label="Medication name"
         value={name}
         set={(value) => change('name', value)}
-        error={!validName ? 'Medication name is required.' : undefined}
+        error={!validName ? 'Medication name is required.' : duplicate ? 'You have already added a prescription with this name, strength and unit.' : undefined}
       />
       <Field
         label="Strength"

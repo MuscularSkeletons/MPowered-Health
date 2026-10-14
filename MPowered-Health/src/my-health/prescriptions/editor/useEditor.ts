@@ -28,12 +28,15 @@ export function useMedicationEditor(id?: string) {
   const change = (field: keyof MedicationDraft, value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
 
+    const duplicate = store.duplicateOf(draft, id);
+
   return {
     draft,
     change,
     validName: !!draft.name.trim(),
     validStrength: validStrength(draft.strength),
-    ready: medicationReady(draft),
+    duplicate,
+    ready: medicationReady(draft) && !duplicate,
     save: () => store.save(draft, id),
     // A stale edit link must be reported instead of silently creating a replacement.
     missing: !!id && !existing,
