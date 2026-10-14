@@ -24,7 +24,7 @@ export const useQuestions = () => {
         setIsLoading(true);
         try {
             const {data: questionsData, error: questionsError } = await supabase
-            .from("Question")
+            .from("question")
             .select("*")
             .eq("user_id", user.id)
             .order("updated_at", { ascending: false });
@@ -66,7 +66,7 @@ export const useQuestions = () => {
         }
 
         try {
-            const {error} = await supabase.from("Question").insert({
+            const {error} = await supabase.from("question").insert({
                 user_id: user.id,
                 question: question,
             })
@@ -94,7 +94,7 @@ export const useQuestions = () => {
 
         try {
             const {error} = await supabase
-            .from("Question")
+            .from("question")
             .delete()
             .match({
                 question_id: questionId
@@ -127,7 +127,7 @@ export const useQuestions = () => {
 
         try {
             const { error, data } = await supabase
-                .from("Question")
+                .from("question")
                 .update({
                     answer: answer,
                     updated_at: new Date().toISOString(),
