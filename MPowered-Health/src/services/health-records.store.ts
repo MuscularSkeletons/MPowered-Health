@@ -6,6 +6,7 @@
  */
 import type { AssessmentAnswers } from "@/types/assessment";
 import { fetchHealthSnapshot } from "@/services/health-records.services";
+import type { HealthSnapshot } from "@/services/health-records.mapper";
 
 export type PainAssessmentRecord = {
   id: string;
@@ -30,12 +31,14 @@ const SIGNED_OUT = "signed-out";
 let accountId: string | null = null;
 let generation = 0;
 let records: PainAssessmentRecord[] = [];
+let latestAssessments: HealthSnapshot["latest"] = {};
 
 /** Select an account without exposing another account's saved assessments. */
 export function setHealthRecordsAccount(userId: string) {
   generation += 1;
   accountId = userId === SIGNED_OUT ? null : userId;
   records = [];
+  latestAssessments = {};
 }
 
 /** Copies answers so callers cannot change the stored lists. */
@@ -79,12 +82,14 @@ export async function loadHealthRecords() {
   // The account changed while the request was running: drop the result rather than show it.
   if (requestGeneration !== generation) return;
   records = snapshot.painRecords;
+  latestAssessments = snapshot.latest;
 }
 
 /** Clears the pain records in memory rn. */
 export function clearHealthRecords() {
   // Clear the session copy after account deletion or reset.
   records = [];
+  latestAssessments = {};
 }
 
 /**
@@ -95,6 +100,21 @@ export function clearHealthRecords() {
 export function getPainHistory() {
   // Screens receive copies and can sort or filter them safely!
   return records.map(clone);
+}
+
+/** Returns a safe copy of the newest answers recorded for each assessment category. */
+export function getLatestAssessments(): HealthSnapshot["latest"] {
+  return Object.fromEntries(
+    Object.entries(latestAssessments).map(([type, assessment]) => [
+      type,
+      assessment
+        ? {
+            ...assessment,
+            answers: cloneAnswers(assessment.answers),
+          }
+        : assessment,
+    ]),
+  ) as HealthSnapshot["latest"];
 }
 
 /** Groups pain records by the areas where pain was reported. */

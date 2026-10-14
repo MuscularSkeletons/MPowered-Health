@@ -3,6 +3,8 @@
 import { buildHealthRecordsHtml } from '@/lib/health-records-report';
 import type { PainAssessmentRecord, PainMetric } from '@/services/health-records.store';
 import { printHtml } from '@/lib/document-export';
+import { palette } from '@/constants/profile/ui';
+import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -46,7 +48,7 @@ export function PrintPdfButton({
     <View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Print health tracking PDF"
+        accessibilityLabel="Print pain records PDF"
         disabled={printing || !records.length}
         onPress={printPdf}
         style={({ pressed }) => [
@@ -55,9 +57,7 @@ export function PrintPdfButton({
           (printing || !records.length) && s.printLoading,
         ]}
       >
-        <View style={s.pdfBadge}>
-          <Text style={s.pdfBadgeText}>PDF</Text>
-        </View>
+        <Feather name="printer" size={16} color={palette.success} />
         <Text style={s.printText}>{printing ? 'Creating…' : 'Print PDF'}</Text>
       </Pressable>
       {error ? (

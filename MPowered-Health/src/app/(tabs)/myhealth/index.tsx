@@ -117,20 +117,18 @@ export default function MyHealthScreen() {
           <Pressable
             accessibilityRole="button"
             style={({ pressed }) => [styles.quick, pressed && styles.quickPressed]}
-            onPress={() => router.push('/(tabs)/myhealth/health-records')}
+            onPress={() => router.push('/(tabs)/myhealth/profile')}
           >
-            <Text style={styles.quickLabel}>PAIN HISTORY</Text>
-            <Text style={styles.quickText}>Health tracking records</Text>
-            <Text style={styles.quickArrow}>View records ›</Text>
+            <Text style={styles.quickText}>My health profile</Text>
+            <Text style={styles.quickArrow}>View ›</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
             style={({ pressed }) => [styles.quick, pressed && styles.quickPressed]}
             onPress={() => router.push('/(tabs)/myhealth/prescriptions')}
           >
-            <Text style={styles.quickLabel}>MEDICATIONS</Text>
             <Text style={styles.quickText}>My prescriptions</Text>
-            <Text style={styles.quickArrow}>View list ›</Text>
+            <Text style={styles.quickArrow}>View ›</Text>
           </Pressable>
         </View>
 
@@ -157,7 +155,7 @@ export default function MyHealthScreen() {
             style={({ pressed }) => [styles.historyButton, pressed && styles.quickPressed]}
             onPress={() => router.push('/(tabs)/myhealth/health-records')}
           >
-            <Text style={styles.historyButtonText}>View full pain history</Text>
+            <Text style={styles.historyButtonText}>View all pain records</Text>
           </Pressable>
         </View>
         <Text style={styles.sponsor}>Supported by ABBVIE</Text>

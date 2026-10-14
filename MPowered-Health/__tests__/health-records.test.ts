@@ -4,6 +4,10 @@ import {
 } from '@/services/health-records.mapper';
 import { groupPainHistory } from '@/services/health-records.store';
 import { buildHealthRecordsHtml } from '@/lib/health-records-report';
+import {
+  profileReportHtml,
+  profileReportText,
+} from '@/components/my-health/profile-report';
 
 jest.mock('@/services/health-records.services', () => ({ fetchHealthSnapshot: jest.fn() }));
 
@@ -49,4 +53,20 @@ it('escapes user-provided labels in the printable report', () => {
 
   expect(report).toContain('&lt;Back &amp; Knee&gt;');
   expect(report).not.toContain('<Back & Knee>');
+});
+
+it('builds safe printable and shareable health profile reports', () => {
+  const profile = {
+    updatedAt: '15 October 2026',
+    sections: [
+      {
+        title: 'My Pain',
+        items: [['Pain location', '<Back & Knee>']] as [string, string][],
+      },
+    ],
+  };
+
+  expect(profileReportHtml(profile)).toContain('&lt;Back &amp; Knee&gt;');
+  expect(profileReportHtml(profile)).not.toContain('<Back & Knee>');
+  expect(profileReportText(profile)).toContain('Pain location: <Back & Knee>');
 });

@@ -1,5 +1,5 @@
 /** Defines the colors, spacing, and layout used by My Health / health records. */
-import { palette } from '@/constants/profile/ui';
+import { palette, radius, spacing } from '@/constants/profile/ui';
 import { StyleSheet } from 'react-native';
 export const healthRecordStyles = StyleSheet.create({
   printError: { color: palette.error, fontSize: 12, maxWidth: 160, marginTop: 6 },
@@ -71,40 +71,19 @@ export const healthRecordStyles = StyleSheet.create({
   },
   print: {
     minHeight: 42,
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    backgroundColor: palette.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    shadowColor: palette.primaryDark,
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  printPressed: {
-    backgroundColor: palette.primaryDark,
-    transform: [{ scale: 0.97 }],
-  },
-  printLoading: { opacity: 0.72 },
-  pdfBadge: {
-    height: 26,
-    minWidth: 30,
-    borderRadius: 8,
-    backgroundColor: palette.light,
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 5,
+    gap: 6,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: palette.light,
+    backgroundColor: palette.surface,
   },
-  pdfBadgeText: {
-    fontSize: 8,
-    fontWeight: '900',
-    letterSpacing: 0.4,
-    color: palette.primaryDark,
-  },
-  printText: { fontSize: 11, fontWeight: '800', color: palette.text },
+  printPressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
+  printLoading: { opacity: 0.45 },
+  printText: { fontSize: 12, fontWeight: '800', color: palette.success },
   tabs: {
     height: 48,
     backgroundColor: palette.selectionBackground,
@@ -192,7 +171,7 @@ export const healthRecordStyles = StyleSheet.create({
   segmentItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   segmentOn: { backgroundColor: palette.selectionBackground },
   segmentText: { fontSize: 11, color: palette.text },
-  segmentTextOn: { fontWeight: '800', color: palette.primaryDark },
+  segmentTextOn: { fontWeight: '800', color: palette.success },
   table: {
     marginTop: 16,
     borderWidth: 1,
@@ -241,5 +220,5 @@ export const healthRecordStyles = StyleSheet.create({
     marginBottom: 8,
   },
   historyItem: { fontSize: 13, lineHeight: 27, color: palette.text },
-  historyArrow: { color: palette.primary },
+  historyArrow: { color: palette.success },
 });

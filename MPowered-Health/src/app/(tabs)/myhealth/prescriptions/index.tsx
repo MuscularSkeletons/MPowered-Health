@@ -36,7 +36,7 @@ export default function PrescriptionsScreen() {
                     router.push({ pathname: '/(tabs)/myhealth/prescriptions/edit', params: { id: item.id } });
                   }}
                 >
-                  <Feather name="edit-2" size={21} color={palette.primary} />
+                  <Feather name="edit-2" size={21} color={palette.success} />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"

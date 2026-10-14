@@ -95,11 +95,11 @@ const s = StyleSheet.create({
   action: {
     minHeight: 52,
     borderRadius: radius.pill,
-    backgroundColor: palette.primary,
+    backgroundColor: palette.success,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 22,
-    shadowColor: palette.primaryDark,
+    shadowColor: palette.success,
     shadowOpacity: 0.16,
     shadowRadius: 12,
     shadowOffset: {
@@ -109,17 +109,18 @@ const s = StyleSheet.create({
     elevation: 2,
   },
   pressed: {
-    backgroundColor: palette.primaryDark,
+    backgroundColor: palette.success,
+    opacity: 0.84,
     transform: [
       {
         scale: 0.985,
       },
     ],
   },
-  disabled: { backgroundColor: palette.disabledBackground, shadowOpacity: 0, elevation: 0 },
-  disabledText: { color: palette.disabledText },
+  disabled: { backgroundColor: palette.surfaceSoft, shadowOpacity: 0, elevation: 0 },
+  disabledText: { color: palette.muted },
   actionText: {
-    color: '#fff',
+    color: palette.text,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.1,

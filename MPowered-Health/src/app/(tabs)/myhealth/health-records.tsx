@@ -38,7 +38,7 @@ export default function HealthRecords() {
           <Text style={s.back}>‹ Back</Text>
         </Pressable>
         <View style={s.titleRow}>
-          <Text style={s.title}>My health tracking records</Text>
+          <Text style={s.title}>Records</Text>
           <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
         </View>
         <View style={s.tabs}>
