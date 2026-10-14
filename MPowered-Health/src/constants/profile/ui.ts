@@ -1,15 +1,16 @@
-// Shared color tokens keep every screen aligned with the warm, natural brand palette.
+// Shared color tokens mirror the assessment UI without changing feature structure.
 export const palette = {
   primary: '#FF8A80',
   secondary: '#4DB6E8',
   accent: '#FFD166',
-  light: '#B8E6D0',
+  accentSoft: '#FFF4CC',
+  light: '#D1E5D3',
   primaryDark: '#D96B64',
   text: '#3A3035',
   muted: '#746A70',
   background: '#FFF7F0',
   surface: '#FFFFFF',
-  surfaceSoft: '#F0FBF7',
+  surfaceSoft: '#F6FAF6',
   line: '#F0DCD7',
   success: '#67A96B',
   error: '#D85F68',
@@ -17,7 +18,7 @@ export const palette = {
   pressedBackground: '#FFF0EC',
   disabledBackground: '#F3D6D1',
   disabledText: '#A47C76',
-  selectionBackground: '#EEF7E9',
+  selectionBackground: '#EDF5ED',
 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
 
