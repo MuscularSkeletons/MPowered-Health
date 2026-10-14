@@ -51,7 +51,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll",
-    "test:my-health": "node --test tests/pain-history.test.cjs tests/pain-profile-export.test.cjs"
+    "test:my-health": "jest __tests__/my-health.test.tsx --runInBand"
   },
   "jest": {
     "preset": "jest-expo"

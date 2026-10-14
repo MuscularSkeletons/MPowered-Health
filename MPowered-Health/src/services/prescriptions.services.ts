@@ -12,7 +12,7 @@ import {
   type PrescriptionDraft,
   type PrescriptionItem,
   type PrescriptionRow,
-} from '../my-health/prescriptions/state/prescriptions.mapper';
+} from './prescriptions.mapper';
 
 /** Error messages carry only the error code, never prescription details. */
 const failure = (action: string, code?: string) => new Error(`Could not ${action} (${code ?? 'unknown'}).`);

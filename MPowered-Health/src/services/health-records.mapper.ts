@@ -2,8 +2,8 @@
  * Helpers that turn Supabase rows into the shapes the My Health screens read.
  * No network or React imports here, so every function can be unit tested!
  */
-import type { AssessmentAnswers, AssessmentId } from '@/shared/health-records/assessment-types';
-import type { PainAssessmentRecord } from '@/shared/health-records/pain-history';
+import type { AssessmentAnswers, AssessmentId } from "@/types/assessment";
+import type { PainAssessmentRecord } from "@/services/health-records.store";
 
 /** Assessments older than this are removed by the cleanup job and must never be shown. */
 export const RETENTION_MONTHS = 18;
@@ -13,10 +13,28 @@ const DAYS_PER_WEEK = 7;
 const MIN_INSIGHT_SPAN_DAYS = 28;
 /** The overview design plots three weekly points. */
 const INSIGHT_POINTS = 3;
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 /** The order assessment types are listed within a week, matching the design. */
-const TYPE_ORDER: AssessmentId[] = ['pain', 'movement', 'personal', 'social', 'management'];
-
+const TYPE_ORDER: AssessmentId[] = [
+  "pain",
+  "movement",
+  "personal",
+  "social",
+  "management",
+];
 
 // Row shapes
 
@@ -71,7 +89,10 @@ export interface AssessmentRow {
   management_assessment: OneOrMany<ManagementRow>;
 }
 
-export type LatestAssessment = { answers: AssessmentAnswers; completedAt: string };
+export type LatestAssessment = {
+  answers: AssessmentAnswers;
+  completedAt: string;
+};
 
 /** One completed assessment inside a week. Pass 'answers' to the summary builder for 'type'. */
 export interface WeekEntry {
@@ -83,8 +104,8 @@ export interface WeekEntry {
 
 /** A Monday-to-Sunday week and the latest assessment of each type completed in it. */
 export interface WeekGroup {
-  weekStart: string; 
-  label: string; 
+  weekStart: string;
+  label: string;
   entries: WeekEntry[]; // in TYPE_ORDER - types with no assessment that week are absent
 }
 
@@ -101,11 +122,11 @@ function first<T>(value: OneOrMany<T> | undefined): T | null {
   if (Array.isArray(value)) return value[0] ?? null;
   return value ?? null;
 }
-const one = (value: string | null | undefined): string[] => (value ? [value] : []);
+const one = (value: string | null | undefined): string[] =>
+  value ? [value] : [];
 const score = (value: number): string[] => [String(value)];
 
-
-// Row to answers converting (in the question-index format used by shared/health-records/summaries)
+// Convert database rows to the question-index format used by assessment summaries.
 
 export function painAnswers(row: PainRow): AssessmentAnswers {
   return {
@@ -159,13 +180,19 @@ export function managementAnswers(row: ManagementRow): AssessmentAnswers {
   };
 }
 
-
 /** Trim, un-duplicate and sort so "Back, Knee" always forms one group. */
 const normalizeAreas = (pain: PainRow): string[] =>
-  [...new Set((pain.pain_location ?? []).map((area) => area.trim()).filter(Boolean))].sort();
+  [
+    ...new Set(
+      (pain.pain_location ?? []).map((area) => area.trim()).filter(Boolean),
+    ),
+  ].sort();
 
 /** Builds the record the charts, history and PDFs read, from an assessment and its pain row. */
-export function toPainRecord(assessment: AssessmentRow, pain: PainRow): PainAssessmentRecord {
+export function toPainRecord(
+  assessment: AssessmentRow,
+  pain: PainRow,
+): PainAssessmentRecord {
   const areas = normalizeAreas(pain);
   return {
     id: assessment.assessment_id,
@@ -180,26 +207,31 @@ export function toPainRecord(assessment: AssessmentRow, pain: PainRow): PainAsse
 }
 
 /** The assessment types are on one row with their answers. */
-function answersByType(row: AssessmentRow): [AssessmentId, AssessmentAnswers][] {
+function answersByType(
+  row: AssessmentRow,
+): [AssessmentId, AssessmentAnswers][] {
   const found: [AssessmentId, AssessmentAnswers][] = [];
   const pain = first(row.pain_assessment);
-  if (pain) found.push(['pain', { ...painAnswers(pain), 0: normalizeAreas(pain) }]);
+  if (pain)
+    found.push(["pain", { ...painAnswers(pain), 0: normalizeAreas(pain) }]);
   const movement = first(row.movement_assessment);
-  if (movement) found.push(['movement', movementAnswers(movement)]);
+  if (movement) found.push(["movement", movementAnswers(movement)]);
   const personal = first(row.personal_care_assessment);
-  if (personal) found.push(['personal', personalCareAnswers(personal)]);
+  if (personal) found.push(["personal", personalCareAnswers(personal)]);
   const social = first(row.social_health_assessment);
-  if (social) found.push(['social', socialAnswers(social)]);
+  if (social) found.push(["social", socialAnswers(social)]);
   const management = first(row.management_assessment);
-  if (management) found.push(['management', managementAnswers(management)]);
+  if (management) found.push(["management", managementAnswers(management)]);
   return found;
 }
 
 /** Turns the assessments (with their children) into the pain history plus the latest answers per type and week groups. */
 export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
-  const newestFirst = [...rows].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  const newestFirst = [...rows].sort(
+    (a, b) => Date.parse(b.date) - Date.parse(a.date),
+  );
   const painRecords: PainAssessmentRecord[] = [];
-  const latest: HealthSnapshot['latest'] = {};
+  const latest: HealthSnapshot["latest"] = {};
   const weeks = new Map<string, WeekGroup>();
 
   for (const row of newestFirst) {
@@ -213,7 +245,8 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
 
     const start = weekStartOf(new Date(row.date));
     const key = isoDay(start);
-    if (!weeks.has(key)) weeks.set(key, { weekStart: key, label: weekLabel(start), entries: [] });
+    if (!weeks.has(key))
+      weeks.set(key, { weekStart: key, label: weekLabel(start), entries: [] });
     const week = weeks.get(key)!;
 
     for (const [type, answers] of found) {
@@ -221,18 +254,26 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
       if (!latest[type]) latest[type] = { answers, completedAt };
       // ...and the first seen within a week are that week's latest.
       if (!week.entries.some((entry) => entry.type === type)) {
-        week.entries.push({ type, assessmentId: row.assessment_id, completedAt, answers });
+        week.entries.push({
+          type,
+          assessmentId: row.assessment_id,
+          completedAt,
+          answers,
+        });
       }
     }
   }
 
-  const weekList = [...weeks.values()].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
+  const weekList = [...weeks.values()].sort((a, b) =>
+    b.weekStart.localeCompare(a.weekStart),
+  );
   for (const week of weekList) {
-    week.entries.sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
+    week.entries.sort(
+      (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type),
+    );
   }
   return { painRecords: painRecords.reverse(), latest, weeks: weekList };
 }
-
 
 // Retention
 
@@ -242,7 +283,11 @@ export function retentionCutoff(now = new Date()): Date {
   const day = cutoff.getDate();
   cutoff.setDate(1); // move to the 1st first, so changing the month cannot overflow
   cutoff.setMonth(cutoff.getMonth() - RETENTION_MONTHS);
-  const daysInTargetMonth = new Date(cutoff.getFullYear(), cutoff.getMonth() + 1, 0).getDate();
+  const daysInTargetMonth = new Date(
+    cutoff.getFullYear(),
+    cutoff.getMonth() + 1,
+    0,
+  ).getDate();
   cutoff.setDate(Math.min(day, daysInTargetMonth));
   return cutoff;
 }
@@ -250,8 +295,9 @@ export function retentionCutoff(now = new Date()): Date {
 // Weeks (Monday to Sunday, device-local time)
 // Note: assessment.week_start ISNT used bs its default is the day the row was inserted, not a Monday.
 
-const pad = (value: number) => String(value).padStart(2, '0');
-const isoDay = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+const pad = (value: number) => String(value).padStart(2, "0");
+const isoDay = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
 /** Monday 00:00 (local) of the week containing the date. */
 export function weekStartOf(date: Date): Date {
@@ -279,19 +325,28 @@ export interface WeeklyPainRow {
 }
 
 /** One row per week, newest first. If a week has several assessments latest one is used. */
-export function weeklyPainRows(records: PainAssessmentRecord[]): WeeklyPainRow[] {
-  const byWeek = new Map<string, { start: Date; record: PainAssessmentRecord }>();
+export function weeklyPainRows(
+  records: PainAssessmentRecord[],
+): WeeklyPainRow[] {
+  const byWeek = new Map<
+    string,
+    { start: Date; record: PainAssessmentRecord }
+  >();
   for (const record of records) {
     const start = weekStartOf(new Date(record.completedAt));
     const key = isoDay(start);
     const existing = byWeek.get(key);
-    if (!existing || record.completedAt > existing.record.completedAt) byWeek.set(key, { start, record });
+    if (!existing || record.completedAt > existing.record.completedAt)
+      byWeek.set(key, { start, record });
   }
   return [...byWeek.entries()]
     .sort(([a], [b]) => b.localeCompare(a))
-    .map(([key, { start, record }]) => ({ weekStart: key, label: weekLabel(start), record }));
+    .map(([key, { start, record }]) => ({
+      weekStart: key,
+      label: weekLabel(start),
+      record,
+    }));
 }
-
 
 // Numbers shown on the overview and profile
 
@@ -302,29 +357,46 @@ export function averagePainOverDays(
   now = new Date(),
 ): number | null {
   const since = now.getTime() - days * MS_PER_DAY;
-  const recent = records.filter((record) => Date.parse(record.completedAt) >= since);
+  const recent = records.filter(
+    (record) => Date.parse(record.completedAt) >= since,
+  );
   if (!recent.length) return null;
-  return Math.round(recent.reduce((sum, record) => sum + record.average, 0) / recent.length);
+  return Math.round(
+    recent.reduce((sum, record) => sum + record.average, 0) / recent.length,
+  );
 }
 
-export type PainDirection = 'increased' | 'decreased' | 'unchanged';
+export type PainDirection = "increased" | "decreased" | "unchanged";
 export interface PainInsight {
   direction: PainDirection;
   points: { date: string; value: number }[]; // oldest first
 }
 
 /** The overview card: null until a month of data exists, then up to three weekly average points. */
-export function painInsight(records: PainAssessmentRecord[]): PainInsight | null {
+export function painInsight(
+  records: PainAssessmentRecord[],
+): PainInsight | null {
   if (!records.length) return null;
   const times = records.map((record) => Date.parse(record.completedAt));
-  if (Math.max(...times) - Math.min(...times) < MIN_INSIGHT_SPAN_DAYS * MS_PER_DAY) return null;
+  if (
+    Math.max(...times) - Math.min(...times) <
+    MIN_INSIGHT_SPAN_DAYS * MS_PER_DAY
+  )
+    return null;
 
   const points = weeklyPainRows(records)
     .slice(0, INSIGHT_POINTS)
     .reverse()
-    .map((row) => ({ date: row.record.completedAt, value: row.record.average }));
+    .map((row) => ({
+      date: row.record.completedAt,
+      value: row.record.average,
+    }));
   if (points.length < 2) return null;
 
   const change = points[points.length - 1].value - points[0].value;
-  return { direction: change > 0 ? 'increased' : change < 0 ? 'decreased' : 'unchanged', points };
+  return {
+    direction:
+      change > 0 ? "increased" : change < 0 ? "decreased" : "unchanged",
+    points,
+  };
 }
