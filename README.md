@@ -4,6 +4,25 @@
 ## About
 MPowered Health is an app designed for users with musculoskeletal conditions to empower them to take charge of their health. The app's core features allow users to record weekly assessments concerning their health and prepare questions to ask healthcare professional/s. 
 
+## Repository Structure
+
+```js
+MPowered-Health/
+├── __test__/
+├── assets/
+├── src/
+│   ├── app/
+│   │   └── (auth)/          // authentication and onboarding
+│   │   └── (tabs)/          // core function of app
+│   ├── components/          // shared UI components
+│   ├── constants/           // shared variables
+│   ├── context/             // shared state
+│   ├── hooks/               // shared logic
+│   ├── lib/
+│   │   └── supabase/        // code to store supabase migration
+│   ├── navigation/
+```
+
 ## Contributors
 - <a href="https://github.com/Sher-Wen">Sher-Wen Chan</a>: sherwenc@student.unimelb.edu.au
 - <a href="https://github.com/hsienweic">Hsien-wei Chen</a>: hsienweic@student.unimelb.edu.au
