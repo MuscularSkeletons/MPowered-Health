@@ -1,9 +1,10 @@
-// Shared color tokens mirror the assessment UI without changing feature structure.
+// Shared color tokens keep every screen aligned with the warm, natural brand palette.
 export const palette = {
   primary: '#FF8A80',
   secondary: '#4DB6E8',
   accent: '#FFD166',
   accentSoft: '#FFF4CC',
+  // Green surfaces are the main green (#67A96B) mixed with white at different strengths.
   light: '#D1E5D3',
   primaryDark: '#D96B64',
   text: '#3A3035',

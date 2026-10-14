@@ -21,7 +21,7 @@ export default function StorePainConditions() {
     setPainConditions((selected) =>
       selected.includes(condition)
         ? selected.filter((item) => item !== condition)
-        : [...selected, condition].sort(),
+        : [...selected, condition],
     );
   };
   const handleComplete = () => {
