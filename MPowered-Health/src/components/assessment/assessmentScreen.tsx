@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -12,9 +12,9 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthHeader, PrimaryButton } from '../auth/auth-ui';
-import { palette } from '../../constants/profile/ui';
-import { submitAssessmentAnswers } from '../../lib/assessmentDb';
+import { AuthHeader, PrimaryButton } from '@/components/auth/auth-ui';
+import { palette } from '@/constants/profile/ui';
+import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 
 interface Question {
   id: string;

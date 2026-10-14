@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,15 +8,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
-import { ASSESSMENT_QUESTIONS } from '../../../constants/questions/index';
-import AssessmentScreen from '../../../components/assessment/assessmentScreen';
-import { palette } from '../../../constants/profile/ui';
-import { AuthHeader } from '../../../components/auth/auth-ui';
-import { useAuth } from '../../../context/authcontext';
+import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessmentQuestions';
+import AssessmentScreen from '@/components/assessment/assessmentScreen';
+import { palette } from '@/constants/profile/ui';
+import { AuthHeader } from '@/components/auth/auth-ui';
+import { useAuth } from '@/context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,
   getWeeklyAssessmentStreak,
-} from '../../../lib/assessmentDb';
+} from '@/hooks/useAssessments';
 
 const ASSESSMENTS = [
   { id: 'My Pain', title: 'My Pain' },
