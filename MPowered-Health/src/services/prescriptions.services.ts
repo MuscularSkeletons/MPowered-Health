@@ -20,7 +20,7 @@ const failure = (action: string, code?: string) => new Error(`Could not ${action
 /** Oldest first, matching how the list screen appends new prescriptions. */
 export async function listPrescriptions(userId: string): Promise<PrescriptionItem[]> {
   const { data, error } = await supabase
-    .from('Prescription')
+    .from('prescription')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: true });
@@ -30,7 +30,7 @@ export async function listPrescriptions(userId: string): Promise<PrescriptionIte
 
 export async function createPrescription(userId: string, draft: PrescriptionDraft): Promise<PrescriptionItem> {
   const { data, error } = await supabase
-    .from('Prescription')
+    .from('prescription')
     .insert(draftToInsert(draft, userId))
     .select()
     .single();
@@ -41,7 +41,7 @@ export async function createPrescription(userId: string, draft: PrescriptionDraf
 /** Fails (rather than silently doing nothing) if the row no longer exists or isn't the users. */
 export async function updatePrescription(id: string, draft: PrescriptionDraft): Promise<PrescriptionItem> {
   const { data, error } = await supabase
-    .from('Prescription')
+    .from('prescription')
     .update(draftToUpdate(draft))
     .eq('prescription_id', id)
     .select()
@@ -51,6 +51,6 @@ export async function updatePrescription(id: string, draft: PrescriptionDraft): 
 }
 
 export async function deletePrescription(id: string): Promise<void> {
-  const { error } = await supabase.from('Prescription').delete().eq('prescription_id', id);
+  const { error } = await supabase.from('prescription').delete().eq('prescription_id', id);
   if (error) throw failure('remove the prescription', error.code);
 }
