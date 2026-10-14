@@ -79,8 +79,12 @@ export default function Settings() {
         text: 'Sign Out',
         onPress: async () => {
           console.log('Sign Out Pressed');
-          await signOut();
-          router.replace("/(auth)/login");
+          try {
+            await signOut();
+            router.replace("/(auth)/login");
+          } catch (error) {
+            Alert.alert('Error', 'There was an error signing out. Please try again.');
+          }
         },
         style: 'destructive',
       }
@@ -100,8 +104,13 @@ export default function Settings() {
         text: 'Delete Account',
         onPress: async () => {
           console.log('Delete pressed');
-          await deleteUser();
-          router.replace("/(auth)/splashscreen");
+          try {
+            await deleteUser();
+            console.log('User successfully deleted');
+            router.replace("/(auth)/splashscreen");
+          } catch (error) {
+            Alert.alert('Error', 'There was an error deleting your account. Please try again.');
+          }
         },
         style: 'destructive',
       }
