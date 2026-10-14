@@ -9,10 +9,17 @@ import { useMedications } from '../state/StoreProvider';
 
 /** Lists prescriptions and provides controls for adding or editing them. */
 export default function PrescriptionsScreen() {
-  const { list, remove } = useMedications();
+  const { list, remove, loadFailed, reload } = useMedications();
   return (
     <Shell title="My Prescriptions" onBack={() => router.replace('/(tabs)/myhealth')}>
-      {!list.length ? <Text style={s.copy}>Prescription list is empty</Text> : null}
+      {loadFailed ? (
+        <>
+          <Text style={s.copy}>Your prescriptions could not be loaded.</Text>
+          <ActionButton label="Retry" onPress={reload} />
+        </>
+      ) : !list.length ? (
+        <Text style={s.copy}>Prescription list is empty</Text>
+      ) : null}
       <View style={s.list}>
         {list.map((item) => {
           const m = medicationLabel(item);
@@ -45,6 +52,7 @@ export default function PrescriptionsScreen() {
       </View>
       <ActionButton
         label="Add prescription"
+        disabled={loadFailed}
         onPress={() => {
           router.push('/(tabs)/myhealth/prescriptions/new');
         }}

@@ -1,25 +1,107 @@
+import { useAuth } from '@/context/authcontext';
+import {
+  createPrescription,
+  deletePrescription,
+  listPrescriptions,
+  updatePrescription,
+} from '@/services/prescriptions.services';
+import { isDuplicate } from '@/my-health/prescriptions/state/prescriptions.mapper';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
-import { medicationReady, saveMedication, type Medication, type MedicationDraft } from './model';
+import { medicationReady, type Medication, type MedicationDraft } from './model';
 
-/** Keeps the prescription list and its update actions in memory. */
+// The session boundary loads the list before any screen mounts, so the list is correct on the first
+// render and a failed load is recorded here instead of thrown so only the prescriptions screen reports it
+// (with a retry), and the rest of My Health stays available.
+let preloaded: { userId: string; list: Medication[]; failed: boolean } | null = null;
+// Bumped on every clear, so a request that started for a previous account cannot land late and
+// overwrite the list loaded for the current one.
+let generation = 0;
+
+/** Loads this account's prescriptions. Never throws - a failure is recorded for the prescriptions screen. */
+export async function loadPrescriptions(userId: string) {
+  const requestGeneration = generation;
+  let list: Medication[] = [];
+  let failed = false;
+  try {
+    list = await listPrescriptions(userId);
+  } catch {
+    failed = true;
+  }
+  if (requestGeneration !== generation) return;
+  preloaded = { userId, list, failed };
+}
+
+/** Forgets the loaded list when the account changes or the boundary unmounts. */
+export function clearPrescriptions() {
+  generation += 1;
+  preloaded = null;
+}
+
+/** Keeps the prescription list and its update actions, saving every change to supabase. */
 function useMedicationStore() {
-  // Prescriptions remain in memory for this signed-in session.
-  const [list, setList] = useState<Medication[]>([]);
-  const sequence = useRef(0);
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  const [list, setList] = useState<Medication[]>(() =>
+    preloaded && preloaded.userId === userId ? preloaded.list : [],
+  );
 
-  /** Adds or updates a prescription in the current list. */
-  const save = (draft: MedicationDraft, id?: string) => {
-    if (!medicationReady(draft)) return false;
-    // The counter keeps two additions in the same millisecond from sharing an ID.
-    const key = id ?? `medication-${Date.now()}-${sequence.current++}`;
-    setList((items) => saveMedication(items, draft, key));
-    return true;
+  // True when the first load failed. The list screen shows an error and a retry instead of
+  // "Prescription list is empty", which would be wrong for a list that just didn't load.
+  const [loadFailed, setLoadFailed] = useState(
+    () => !!preloaded && preloaded.userId === userId && preloaded.failed,
+  );
+  const [error, setError] = useState('');
+  // Blocks a second save while one is running, so double tap can't make two prescriptions.
+  const saving = useRef(false);
+
+  /** Tries the load again after a failure. */
+  const reload = async () => {
+    if (!userId) return;
+    try {
+      setList(await listPrescriptions(userId));
+      setLoadFailed(false);
+    } catch {
+      setLoadFailed(true);
+    }
   };
 
-  /** Removes the prescription with the selected ID. */
-  const remove = (id: string) => setList((items) => items.filter((item) => item.id !== id));
+  /**
+   * Adds or updates a prescription. True only after Supabase accepts the change.
+   * The list changes only on success, so a failed save never looks saved!
+   */
+  const save = async (draft: MedicationDraft, id?: string) => {
+    if (!medicationReady(draft) || isDuplicate(draft, list, id) || !userId || saving.current) return false;
+    saving.current = true;
+    setError('');
+    try {
+      const saved = id ? await updatePrescription(id, draft) : await createPrescription(userId, draft);
+      setList((items) => (id ? items.map((item) => (item.id === id ? saved : item)) : [...items, saved]));
+      return true;
+    } catch {
+      setError('The prescription could not be saved. Please try again.');
+      return false;
+    } finally {
+      saving.current = false;
+    }
+  };
 
-  return { list, save, remove };
+  /** Removes the prescription from Supabase, then from the list. */
+  const remove = async (id: string) => {
+    setError('');
+    try {
+      await deletePrescription(id);
+      setList((items) => items.filter((item) => item.id !== id));
+      return true;
+    } catch {
+      setError('The prescription could not be removed. Please try again.');
+      return false;
+    }
+  };
+
+  /** True when another prescription already has this name, strength and unit */
+  const duplicateOf = (draft: MedicationDraft, id?: string) => isDuplicate(draft, list, id);
+
+  return { list, save, remove, error, duplicateOf, loadFailed, reload };
 }
 
 const Context = createContext<ReturnType<typeof useMedicationStore> | null>(null);

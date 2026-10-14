@@ -1,9 +1,9 @@
 import { getPainHistory } from './pain-history';
 import { getDemoPainHistory } from './demo-history';
 
-// Backend handoff: remove this fallback once the history loader reads real assessments.
-// Keep demo rows outside the writable store so saving a real result never persists fixtures.
-export const DEMO_HISTORY_ENABLED = true;
+// Demo rows were for UI development only, with real history now from Supabase, so a user with no
+// assessments needs to see the empty states.
+export const DEMO_HISTORY_ENABLED = false;
 
 export function getDisplayPainHistory() {
   const records = getPainHistory();
