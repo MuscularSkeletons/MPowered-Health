@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       // fetch all user info from db for the given user id
       const { data, error } = await supabase
-        .from("User")
+        .from("user")
         .select("*")
         .eq("user_id", userId)
         .single();
@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // update values in db
       const { error, data } = await supabase
-        .from("User")
+        .from("user")
         .update(updateData)
         .eq("user_id", user.id)
         .select()
