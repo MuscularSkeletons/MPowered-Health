@@ -47,22 +47,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from("user")
         .select("*")
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
       
         if (error) {
-          console.error("Error fetching user profile:", error);
-          return null; // abort function early
-        }
-
-        if (!data) {
-          console.error("User profile data not found");
-          return null; // abort function early
+          if (__DEV__) console.debug('User profile request failed:', error.code);
+          throw error;
         }
 
         const authUser = await supabase.auth.getUser(); // gets info about a user currently logged in
         if (!authUser.data.user) {
-          console.error("No authenticated user found");
+          if (__DEV__) console.debug('No authenticated user was available for the profile.');
           return null; // abort function early
+        }
+
+        // A newly authenticated account may not have completed its public profile yet.
+        // Keep it signed in so the onboarding flow can create that row on completion.
+        if (!data) {
+          return {
+            id: userId,
+            name: '',
+            email: authUser.data.user.email || '',
+            onboardingComplete: false,
+          };
         }
 
         // return the user
@@ -79,8 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
     } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
+      throw error;
     }
   }
 
@@ -153,8 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // update values in db
       const { error, data } = await supabase
         .from("user")
-        .update(updateData)
-        .eq("user_id", user.id)
+        .upsert({ user_id: user.id, ...updateData }, { onConflict: 'user_id' })
         .select()
         .single();
 
@@ -169,7 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
     } catch (error) {
-      console.error("Error updating user:", error);
+      if (__DEV__) console.debug('User profile save failed.');
       throw error;
     }
   };
@@ -189,8 +193,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("User not logged in");
         setUser(null); // user is not logged in
       }
-    } catch (error) {
-      console.error("Error checking session", error);
+    } catch {
+      if (__DEV__) console.debug('Saved session could not load its profile.');
       setUser(null);
     } finally {
       setIsLoading(false); // finished checking session so can proceed

@@ -17,6 +17,7 @@ export const AUTH_ERROR_CODES = [
   'session_expired',
   'refresh_token_not_found',
   'validation_failed',
+  'current_password_invalid',
 ] as const;
  
 export type AuthErrorCode = typeof AUTH_ERROR_CODES[number];
@@ -94,10 +95,14 @@ const ERRORS: Record<AuthErrorCode, AuthUserError> = {
     message: 'That email address looks invalid. Double-check the format.',
     field: 'email',
   },
+  current_password_invalid: {
+    message: 'Current password is incorrect.',
+    field: 'password',
+  },
 };
  
 const FALLBACK: AuthUserError = {
-  message: 'Something went wrong. Please try again.',
+  message: 'We could not complete that request. Check your connection and try again.',
 };
  
 /**
@@ -112,6 +117,13 @@ export function toUserError(error: unknown): AuthUserError {
  
   if (code && code in ERRORS) {
     return ERRORS[code];
+  }
+
+  if (authError.status === 401 && /api key/i.test(authError.message ?? '')) {
+    return {
+      message: 'The app connection is not configured correctly. Please contact support.',
+      action: 'contact_support',
+    };
   }
  
   // Unknown code: log for triage, show fallback

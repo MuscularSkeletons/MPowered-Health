@@ -47,5 +47,5 @@ export default function Onboarding() {
 
 const styles = StyleSheet.create({
   policy: { fontSize: 15, lineHeight: 23, color: palette.muted },
-  link: { color: palette.primaryDark, textDecorationLine: 'underline' },
+  link: { color: palette.primary, textDecorationLine: 'underline' },
 });
