@@ -25,7 +25,7 @@ export default function TabsLayout() {
             tabBarIconStyle: { marginTop: 2 },
             tabBarLabelStyle: { marginTop: 2, fontSize: 11, fontWeight: '600' },
             tabBarInactiveTintColor: palette.muted,
-            tabBarActiveTintColor: palette.primary,
+            tabBarActiveTintColor: palette.success,
         }}>
 
         <Tabs.Screen 
