@@ -1,12 +1,10 @@
 import { 
   Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+  StyleSheet,  
   View,
   ScrollView,
   Alert,
   Modal,
-  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/profile/ui";
@@ -24,7 +22,6 @@ import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
-  AuthScreen,
   ChoiceButton,
   PrimaryButton,
   authStyles,

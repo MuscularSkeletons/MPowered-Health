@@ -6,7 +6,6 @@ import {
   View,
   Alert,
   Modal,
-  Pressable,
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,10 +20,7 @@ import { ModalActions, modalStyles } from '@/components/ui/modal-ui';
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
-  AuthScreen,
-  ChoiceButton,
   PrimaryButton,
-  authStyles,
   AuthInput,
 } from '@/components/auth/auth-ui';
 
