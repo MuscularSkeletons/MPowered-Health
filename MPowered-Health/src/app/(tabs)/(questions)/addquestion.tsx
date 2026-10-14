@@ -20,6 +20,7 @@ import {
 } from "@/constants/questions/questions";
 import { useAuth } from "@/context/authcontext";
 import { useQuestions } from "@/hooks/useQuestions";
+import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
@@ -193,11 +194,11 @@ export default function AddQuestion() {
       <Modal
         visible={showQuestionPreview}
         transparent={true}
-        animationType="slide"
+        animationType="fade"
         >
-        <View style={styles.centredView}>
-          <View style={styles.editInterface}>
-            <Text>Add Question</Text>
+        <View style={modalStyles.centredView}>
+          <View style={modalStyles.editInterface}>
+            <Text style={modalStyles.modalTitle}>Add Question</Text>
             <AuthInput
               testID="custom-question-input"
               label="Question"
@@ -209,18 +210,11 @@ export default function AddQuestion() {
               onSubmitEditing={handleAddQuestion}
               editable={!isLoading}
             />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowQuestionPreview(!showQuestionPreview)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable style={[styles.button, styles.buttonSave]} onPress={handleAddQuestion}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowQuestionPreview(false)}
+              onSave={() => void handleAddQuestion()}
+            />
           </View>
         </View>
       </Modal>
@@ -249,42 +243,5 @@ const styles = StyleSheet.create({
   },
   save: {
     marginTop: 10,
-  },  
-  centredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editInterface: {
-    backgroundColor: 'white',
-    margin: 10,
-    padding: 50,
-    paddingLeft: 100,
-    paddingRight: 100,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderRadius: 20,
-  },
-  buttonOptions: {
-    flexDirection: 'row',
-    paddingTop: 20,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 15,
-    elevation: 2,
-    marginHorizontal: 10,
-  },
-  buttonCancel: {
-    backgroundColor: palette.line,
-  },
-  buttonSave: {
-    backgroundColor: palette.primary,
   },
 });

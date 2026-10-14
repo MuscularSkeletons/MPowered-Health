@@ -17,6 +17,7 @@ import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
 import { formatTimeAgo } from "@/lib/date-helper";
 import { Ionicons } from "@expo/vector-icons";
+import { ModalActions, modalStyles } from '@/components/ui/modal-ui';
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
@@ -123,11 +124,11 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
       <Modal
           visible={showAnswerPreview}
           transparent={true}
-          animationType="slide"
+          animationType="fade"
           >
-          <View style={styles.centredView}>
-            <View style={styles.editInterface}>
-              <Text>{question.question}</Text>
+          <View style={modalStyles.centredView}>
+            <View style={modalStyles.editInterface}>
+              <Text style={modalStyles.modalTitle}>{question.question}</Text>
               <AuthInput
                 testID="answer-input"
                 label="Answer"
@@ -139,18 +140,11 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
                 onSubmitEditing={handleAnswer}
                 editable={!isLoading}
               />
-              <View style={styles.buttonOptions}>
-                <Pressable 
-                  style={[styles.button, styles.buttonCancel]} 
-                  onPress={() => setShowAnswerPreview(!showAnswerPreview)}
-                  disabled={isLoading}
-                  >
-                  <Text>Cancel</Text>
-                </Pressable>
-                <Pressable style={[styles.button, styles.buttonSave]} onPress={handleAnswer}>
-                  <Text>Save</Text>
-                </Pressable>
-              </View>
+              <ModalActions
+                isSaving={isLoading}
+                onCancel={() => setShowAnswerPreview(false)}
+                onSave={() => void handleAnswer()}
+              />
             </View>
           </View>
         </Modal>
@@ -315,42 +309,5 @@ const styles = StyleSheet.create({
   delete: {
     fontSize: 20,
     paddingRight: 5,
-  },
-  centredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editInterface: {
-    backgroundColor: 'white',
-    margin: 10,
-    padding: 50,
-    paddingLeft: 100,
-    paddingRight: 100,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderRadius: 20,
-  },
-  buttonOptions: {
-    flexDirection: 'row',
-    paddingTop: 20,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 15,
-    elevation: 2,
-    marginHorizontal: 10,
-  },
-  buttonCancel: {
-    backgroundColor: palette.line,
-  },
-  buttonSave: {
-    backgroundColor: palette.primary,
   },
 });
