@@ -1,3 +1,4 @@
+[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/development/LICENSE)
 # MPowered-Health
 
 ## About
