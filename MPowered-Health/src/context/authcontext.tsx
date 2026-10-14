@@ -141,7 +141,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) throw error;
 
-    console.log("Delete request added to DeleteRequest table. Awaiting manual delete by admin.");
+    console.log("Delete request added to delete_request table. Awaiting manual delete by admin.");
 
     // sign the user out
     await supabase.auth.signOut();
@@ -190,8 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(userProfile);
         if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
-      console.log("user draft data", data);
-
+      
     } catch (error) {
       console.error("Error updating user:", error);
       throw error;

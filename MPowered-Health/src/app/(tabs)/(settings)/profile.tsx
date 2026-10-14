@@ -79,13 +79,13 @@ export default function ManageProfile() {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        name: trimmedName 
-      });
       // update supabase
       await updateUser({
         name: trimmedName,
+      });
+      // update locally
+      updateUserDraft({ 
+        name: trimmedName 
       });
       setShowNameEdit(false);
     } catch (error) {
@@ -110,13 +110,13 @@ export default function ManageProfile() {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        birthsex: birthsex 
-      });
       // update supabase
       await updateUser({
         birthsex: birthsex,
+      });
+      // update locally
+      updateUserDraft({ 
+        birthsex: birthsex 
       });
       setShowBirthsexEdit(false);
     } catch (error) {
@@ -146,13 +146,13 @@ export default function ManageProfile() {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        birthyear: numericBirthYear 
-      });
       // update supabase
       await updateUser({
         birthyear: numericBirthYear,
+      });
+      // update locally
+      updateUserDraft({ 
+        birthyear: numericBirthYear 
       });
       setShowBirthYearEdit(false);
     } catch (error) {
@@ -174,13 +174,13 @@ export default function ManageProfile() {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        formalDiagnosis: hasDiagnosis, 
-      });
       // update supabase
       await updateUser({
         formalDiagnosis: hasDiagnosis,
+      });
+      // update locally
+      updateUserDraft({ 
+        formalDiagnosis: hasDiagnosis, 
       });
       setShowDiagnosisEdit(false);
     } catch (error) {
@@ -209,12 +209,12 @@ export default function ManageProfile() {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        painConditions: painConditions,
-      });
       // update supabase
       await updateUser({
+        painConditions: painConditions,
+      });
+      // update locally
+      updateUserDraft({ 
         painConditions: painConditions,
       });
       setShowConditionsEdit(false);
@@ -239,15 +239,15 @@ export default function ManageProfile() {
     updatedOtherCondition = trimmedOtherCondition || null;
     setIsLoading(true);
     try {
-      if (!user) throw new Error('User not authenticated');
-      // update locally
-      updateUserDraft({ 
-        otherCondition: updatedOtherCondition,
-      });      
+      if (!user) throw new Error('User not authenticated'); 
       // update supabase
       await updateUser({
         otherCondition: updatedOtherCondition,
       });
+      // update locally
+      updateUserDraft({ 
+        otherCondition: updatedOtherCondition,
+      });  
       setShowOtherConditionEdit(false);
     } catch (error) {
       console.error(error);
