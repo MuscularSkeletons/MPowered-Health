@@ -6,8 +6,10 @@ import {
   Modal,
   Pressable,
   Alert,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { Ionicons } from "@expo/vector-icons";
@@ -21,15 +23,94 @@ import {
   AuthInput,
   AuthIntro,
   AuthScreen,
-  PrimaryButton,
   authStyles,
   ChoiceButton,
 } from '@/components/auth/auth-ui';
-import { ScrollView } from 'react-native';
+
+function ModalActions({
+  isSaving,
+  onCancel,
+  onSave,
+}: {
+  isSaving: boolean;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <View style={styles.buttonOptions}>
+      <Pressable
+        accessibilityRole="button"
+        disabled={isSaving}
+        onPress={onCancel}
+        style={({ pressed }) => [
+          styles.button,
+          styles.buttonCancel,
+          pressed && !isSaving && styles.buttonPressed,
+          isSaving && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={styles.buttonCancelText}>Cancel</Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ busy: isSaving, disabled: isSaving }}
+        disabled={isSaving}
+        onPress={onSave}
+        style={({ pressed }) => [
+          styles.button,
+          styles.buttonSave,
+          pressed && !isSaving && styles.buttonPressed,
+          isSaving && styles.buttonSaving,
+        ]}
+      >
+        {isSaving ? (
+          <View style={styles.savingContent}>
+            <ActivityIndicator size="small" color={palette.text} />
+            <Text style={styles.buttonSaveText}>Saving…</Text>
+          </View>
+        ) : (
+          <Text style={styles.buttonSaveText}>Save</Text>
+        )}
+      </Pressable>
+    </View>
+  );
+}
+
+function ProfileRow({
+  label,
+  value,
+  onPress,
+  last = false,
+}: {
+  label: string;
+  value: string;
+  onPress: () => void;
+  last?: boolean;
+}) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Edit ${label.toLowerCase()}`}
+      activeOpacity={0.68}
+      onPress={onPress}
+      style={[styles.settingItem, last && styles.settingItemLast]}
+    >
+      <View style={styles.settingCopy}>
+        <Text style={styles.settingMeta}>{label}</Text>
+        <Text style={styles.settingLabel} numberOfLines={2}>{value}</Text>
+      </View>
+      <View style={styles.editIcon}>
+        <Ionicons name="pencil-outline" size={17} color={palette.primaryDark} />
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 
 export default function ManageProfile() {
   const router = useRouter();
+  const { edit } = useLocalSearchParams<{ edit?: string }>();
+  const openedFromSettings = edit === 'password';
   const { user, updateUser, updateUserDraft, updateAuthUserEmail, updateAuthUserPassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,13 +138,12 @@ export default function ManageProfile() {
       await updateUser({
         name: trimmedName,
       });
+      setShowNameEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your name was not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowNameEdit(!showNameEdit);
     }
   }
 
@@ -89,13 +169,12 @@ export default function ManageProfile() {
       await updateUser({
         birthsex: birthsex,
       });
+      setShowBirthsexEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your sex was not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowBirthsexEdit(!showBirthsexEdit);
     }
   }
 
@@ -126,13 +205,12 @@ export default function ManageProfile() {
       await updateUser({
         birthyear: numericBirthYear,
       });
+      setShowBirthYearEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your year of birth was not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowBirthYearEdit(!showBirthYearEdit);
     }
   }
 
@@ -155,13 +233,12 @@ export default function ManageProfile() {
       await updateUser({
         formalDiagnosis: hasDiagnosis,
       });
+      setShowDiagnosisEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your diagnosis status was not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowDiagnosisEdit(!showDiagnosisEdit);
     }
   }
 
@@ -191,13 +268,12 @@ export default function ManageProfile() {
       await updateUser({
         painConditions: painConditions,
       });
+      setShowConditionsEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your pain conditions were not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowConditionsEdit(!showConditionsEdit);
     }
   };
 
@@ -211,12 +287,7 @@ export default function ManageProfile() {
     }
     const trimmedOtherCondition = otherCondition.trim();
     let updatedOtherCondition: string | null;
-    if (!trimmedOtherCondition) {
-      console.log("Setting other condition to null");
-      updatedOtherCondition = null;
-    } else {
-      updatedOtherCondition = trimmedOtherCondition;
-    }
+    updatedOtherCondition = trimmedOtherCondition || null;
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
@@ -228,13 +299,12 @@ export default function ManageProfile() {
       await updateUser({
         otherCondition: updatedOtherCondition,
       });
+      setShowOtherConditionEdit(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to complete. Please try again.');
+      Alert.alert('Unable to save', 'Your other condition was not updated. Please try again.');
     } finally {
       setIsLoading(false);
-      // close modal
-      setShowOtherConditionEdit(!showOtherConditionEdit);
     }
   };
 
@@ -262,8 +332,11 @@ export default function ManageProfile() {
       if (!user) throw new Error('User not authenticated');
       await updateAuthUserEmail(email.trim());
       // close modal
-      setShowEmailEdit(!showEmailEdit);
-      Alert.alert('A confirmation email has been sent to ' + email.trim() + '. Please confirm the address to update your email.');
+      setShowEmailEdit(false);
+      Alert.alert(
+        'Check your email',
+        `We sent a confirmation link to ${email.trim()}. Open it to finish updating your email address.`,
+      );
     } catch (error) {
       const userError = toUserError(error);
       setAuthError(userError);
@@ -274,11 +347,21 @@ export default function ManageProfile() {
   };
 
   // update password
-  const [showCurrPasswordEdit, setShowCurrPasswordEdit] = useState(false);
+  const [showCurrPasswordEdit, setShowCurrPasswordEdit] = useState(openedFromSettings);
   const [currPassword, setCurrPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showCurrPassword, setShowCurrPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const closePasswordEditor = () => {
+    setShowCurrPasswordEdit(false);
+    setAuthError(null);
+    setCurrPassword('');
+    setNewPassword('');
+    if (openedFromSettings) {
+      router.back();
+    }
+  };
 
   const handleUpdatePassword = async () => {
     if (!currPassword || !newPassword) {
@@ -290,10 +373,13 @@ export default function ManageProfile() {
     try {
       if (!user) throw new Error('User not authenticated');
       await updateAuthUserPassword(currPassword, newPassword);
-      // for debugging purposes - to delete
-      console.log("Password updated to", newPassword);
-      // close modal
-      setShowCurrPasswordEdit(!showCurrPasswordEdit);
+      setCurrPassword('');
+      setNewPassword('');
+      setShowCurrPasswordEdit(false);
+      if (openedFromSettings) {
+        router.back();
+      }
+      Alert.alert('Password updated', 'Your password has been changed successfully.');
     } catch (error) {
       const userError = toUserError(error);
       setAuthError(userError);
@@ -308,110 +394,94 @@ export default function ManageProfile() {
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
         sectionLabel="PROFILE"
-        title="Edit your profile"
-        description="Edit your information or update your security details"
+        title="Profile details"
+        description="Keep your personal and health information up to date."
       />
-      
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => { 
-          setName(user?.name ?? ''); 
-          setShowNameEdit(!showNameEdit);
-        }}>
-        <Text style={styles.settingLabel}>{user?.name || "No Name"}</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+
+      <Text style={[styles.groupLabel, styles.firstGroupLabel]}>PERSONAL DETAILS</Text>
+      <View style={styles.settingsGroup}>
+        <ProfileRow
+          label="NAME"
+          value={user?.name || 'Not provided'}
+          onPress={() => {
+            setName(user?.name ?? '');
+            setShowNameEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => {
-          setBirthsex(user?.birthsex ?? '');
-          setShowBirthsexEdit(!showBirthsexEdit);
-        }}>
-        <Text style={styles.settingLabel}>{user?.birthsex || "Prefer not to say"}</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+        <ProfileRow
+          label="SEX"
+          value={user?.birthsex || 'Prefer not to say'}
+          onPress={() => {
+            setBirthsex(user?.birthsex ?? '');
+            setShowBirthsexEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => {
-          setBirthYear(user?.birthyear?.toString() ?? '');
-          setShowBirthYearEdit(!showBirthYearEdit);
-        }}>
-        <Text style={styles.settingLabel}>{user?.birthyear || "No birth year"}</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+        <ProfileRow
+          label="YEAR OF BIRTH"
+          value={user?.birthyear?.toString() || 'Not provided'}
+          last
+          onPress={() => {
+            setBirthYear(user?.birthyear?.toString() ?? '');
+            setShowBirthYearEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => {
-          setHasDiagnosis(user?.formalDiagnosis ?? null);
-          setShowDiagnosisEdit(!showDiagnosisEdit);
-        }}>
-        {user?.formalDiagnosis === true ?
-        <Text style={styles.settingLabel}>Have formal diagnosis</Text> :
-        user?.formalDiagnosis === false ?
-        <Text style={styles.settingLabel}>Have no formal diagnosis</Text> :
-        <Text style={styles.settingLabel}>No diagnosis given</Text>}
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+      </View>
+
+      <Text style={styles.groupLabel}>HEALTH INFORMATION</Text>
+      <View style={styles.settingsGroup}>
+        <ProfileRow
+          label="DIAGNOSIS"
+          value={
+            user?.formalDiagnosis === true
+              ? 'Formal diagnosis recorded'
+              : user?.formalDiagnosis === false
+                ? 'No formal diagnosis'
+                : 'Not provided'
+          }
+          onPress={() => {
+            setHasDiagnosis(user?.formalDiagnosis ?? null);
+            setShowDiagnosisEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => {
-          setPainConditions(user?.painConditions ?? []);
-          setShowConditionsEdit(!showConditionsEdit);
-        }}>
-        <Text style={styles.settingLabel}>Edit Conditions</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+        <ProfileRow
+          label="PAIN CONDITIONS"
+          value={user?.painConditions?.length ? user.painConditions.join(', ') : 'None selected'}
+          onPress={() => {
+            setPainConditions(user?.painConditions ?? []);
+            setShowConditionsEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem} 
-        onPress={() => {
-          setOtherCondition(user?.otherCondition ?? '');
-          setShowOtherConditionEdit(!showOtherConditionEdit);
-        }}>
-        <Text style={styles.settingLabel}>{user?.otherCondition || "No other condition"}</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+        <ProfileRow
+          label="OTHER CONDITION"
+          value={user?.otherCondition || 'None added'}
+          last
+          onPress={() => {
+            setOtherCondition(user?.otherCondition ?? '');
+            setShowOtherConditionEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}
-        onPress={() => {
-          setEmail(user?.email ?? '');
-          setShowEmailEdit(!showEmailEdit);
-        }}>
-        <Text style={styles.settingLabel}>{user?.email || "No email"}</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
+      </View>
+
+      <Text style={styles.groupLabel}>ACCOUNT DETAILS</Text>
+      <View style={styles.settingsGroup}>
+        <ProfileRow
+          label="EMAIL ADDRESS"
+          value={user?.email || 'Not provided'}
+          last
+          onPress={() => {
+            setEmail(user?.email ?? '');
+            setShowEmailEdit(true);
+          }}
         />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settingItem}
-        onPress={() => {
-          setShowCurrPasswordEdit(!showCurrPasswordEdit);
-        }}>
-        <Text style={styles.settingLabel}>Change password</Text>
-        <Ionicons 
-            name={"create-outline"}
-            style={styles.settingValue}
-        />
-      </TouchableOpacity>
-      
+      </View>
       <Modal 
         visible={showNameEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Name</Text>
+            <Text style={styles.modalTitle}>Edit name</Text>
             <AuthInput
               testID="name-input"
               label="Name"
@@ -424,18 +494,11 @@ export default function ManageProfile() {
               onSubmitEditing={handleUpdateName}
               editable={!isLoading}
             />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowNameEdit(!showNameEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateName}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowNameEdit(false)}
+              onSave={() => void handleUpdateName()}
+            />
           </View>
         </View>
       </Modal>
@@ -443,11 +506,11 @@ export default function ManageProfile() {
       <Modal 
         visible={showBirthsexEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Birth Sex</Text>
+            <Text style={styles.modalTitle}>Edit sex</Text>
             <View style={authStyles.choices}>
               {sexOptions.map((option) => (
                 <ChoiceButton
@@ -458,18 +521,11 @@ export default function ManageProfile() {
                 />
               ))}
             </View>
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowBirthsexEdit(!showBirthsexEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateBirthsex}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowBirthsexEdit(false)}
+              onSave={() => void handleUpdateBirthsex()}
+            />
           </View>
         </View>
       </Modal>
@@ -477,11 +533,11 @@ export default function ManageProfile() {
       <Modal 
         visible={showBirthYearEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Birth Year</Text>
+            <Text style={styles.modalTitle}>Edit year of birth</Text>
             <AuthInput
               testID="birth-year-input"
               label="Year of birth"
@@ -494,18 +550,11 @@ export default function ManageProfile() {
               onSubmitEditing={handleUpdateBirthYear}
               editable={!isLoading}
             />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowBirthYearEdit(!showBirthYearEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateBirthYear}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowBirthYearEdit(false)}
+              onSave={() => void handleUpdateBirthYear()}
+            />
           </View>
         </View>
       </Modal>
@@ -513,11 +562,11 @@ export default function ManageProfile() {
       <Modal 
         visible={showDiagnosisEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Diagnosis</Text>
+            <Text style={styles.modalTitle}>Edit diagnosis</Text>
             <View style={authStyles.choices}>
               <ChoiceButton
                 label={diagnosisOptions[0]}
@@ -530,18 +579,11 @@ export default function ManageProfile() {
                 onPress={() => setHasDiagnosis(false)}
               />
             </View>
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowDiagnosisEdit(!showDiagnosisEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateDiagnosis}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowDiagnosisEdit(false)}
+              onSave={() => void handleUpdateDiagnosis()}
+            />
           </View>
         </View>
       </Modal>
@@ -549,11 +591,11 @@ export default function ManageProfile() {
       <Modal 
         visible={showConditionsEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Conditions</Text>
+            <Text style={styles.modalTitle}>Edit pain conditions</Text>
             <ScrollView>
             <View style={authStyles.choices}>
               {painConditionsOptions.map((condition) => (
@@ -567,18 +609,11 @@ export default function ManageProfile() {
               ))}
             </View>
             </ScrollView>
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowConditionsEdit(!showConditionsEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateConditions}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowConditionsEdit(false)}
+              onSave={() => void handleUpdateConditions()}
+            />
           </View>
         </View>
       </Modal>
@@ -586,33 +621,27 @@ export default function ManageProfile() {
       <Modal 
         visible={showOtherConditionEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Other Conditions</Text>
+            <Text style={styles.modalTitle}>Edit other condition</Text>
             <AuthInput
               testID="other-conditions-input"
-              label="Other conditions"
+              label="Other condition"
               placeholder={user?.otherCondition || 'Type conditions or symptoms'}
               inputMode="text"
               autoCorrect
               value={otherCondition}
               onChangeText={setOtherCondition}
               onSubmitEditing={handleUpdateOtherCondition}
+              editable={!isLoading}
             />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowOtherConditionEdit(!showOtherConditionEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateOtherCondition}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowOtherConditionEdit(false)}
+              onSave={() => void handleUpdateOtherCondition()}
+            />
           </View>
         </View>
       </Modal>
@@ -620,11 +649,11 @@ export default function ManageProfile() {
       <Modal 
         visible={showEmailEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Edit Email</Text>
+            <Text style={styles.modalTitle}>Change email address</Text>
             <AuthInput
               label="Email address"
               placeholder="you@example.com"
@@ -640,18 +669,11 @@ export default function ManageProfile() {
                 setAuthError(null);
               }}
             />
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowEmailEdit(!showEmailEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdateEmail}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={() => setShowEmailEdit(false)}
+              onSave={() => void handleUpdateEmail()}
+            />
           </View>
         </View>
       </Modal>
@@ -659,12 +681,12 @@ export default function ManageProfile() {
       <Modal 
         visible={showCurrPasswordEdit} 
         transparent={true} 
-        animationType="slide"
+        animationType="fade"
         >
         <View style={styles.centredView}>
           <View style={styles.editInterface}>
-            <Text>Update your password</Text>
-            <Text>Please enter your existing password and your new password.</Text>
+            <Text style={styles.modalTitle}>Change password</Text>
+            <Text style={styles.modalDescription}>Confirm your current password, then choose a new one.</Text>
             <AuthInput
               label="Current password"
               placeholder="Enter your current password"
@@ -702,18 +724,11 @@ export default function ManageProfile() {
                 {authError.message}
               </Text>
             ) : null}
-            <View style={styles.buttonOptions}>
-              <Pressable 
-                style={[styles.button, styles.buttonCancel]} 
-                onPress={() => setShowCurrPasswordEdit(!showCurrPasswordEdit)}
-                disabled={isLoading}
-                >
-                <Text>Cancel</Text>
-              </Pressable>
-              <Pressable  style={[styles.button, styles.buttonSave]} onPress={handleUpdatePassword}>
-                <Text>Save</Text>
-              </Pressable>
-            </View>
+            <ModalActions
+              isSaving={isLoading}
+              onCancel={closePasswordEditor}
+              onSave={() => void handleUpdatePassword()}
+            />
           </View>
         </View>
       </Modal>
@@ -724,59 +739,124 @@ export default function ManageProfile() {
 }
 
 const styles = StyleSheet.create({
+  groupLabel: {
+    marginTop: 22,
+    marginBottom: 9,
+    marginLeft: 2,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '800',
+    letterSpacing: 1.05,
+    color: palette.muted,
+  },
+  firstGroupLabel: { marginTop: 0 },
+  settingsGroup: {
+    backgroundColor: palette.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: palette.line,
+    paddingHorizontal: 16,
+    overflow: 'hidden',
+    shadowColor: palette.text,
+    shadowOpacity: 0.035,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
+  },
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    backgroundColor: palette.surface,
-    borderRadius: 12,
-    marginBottom: 8,
+    minHeight: 76,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.line,
+  },
+  settingItemLast: { borderBottomWidth: 0 },
+  settingCopy: { flex: 1, paddingRight: 14 },
+  settingMeta: {
+    fontSize: 9,
+    lineHeight: 13,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+    color: palette.muted,
+    marginBottom: 3,
   },
   settingLabel: {
-    fontSize: 20,
-    color: palette.success,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700',
+    color: palette.text,
   },
-  settingValue: {
-    fontSize: 25,
-    color: palette.success,
+  editIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    backgroundColor: palette.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
+    backgroundColor: 'rgba(58,48,53,0.48)',
   },
   editInterface: {
-    backgroundColor: 'white',
-    margin: 10,
-    padding: 50,
-    paddingLeft: 100,
-    paddingRight: 100,
-    shadowColor: '#000',
+    width: '100%',
+    maxWidth: 520,
+    maxHeight: '88%',
+    backgroundColor: palette.surface,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: palette.line,
+    shadowColor: palette.text,
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderRadius: 20,
+    shadowOpacity: 0.2,
+    shadowRadius: 18,
+    elevation: 8,
+    borderRadius: 24,
   },
+  modalTitle: { fontSize: 24, lineHeight: 30, fontWeight: '800', color: palette.text, marginBottom: 8 },
+  modalDescription: { fontSize: 13, lineHeight: 20, color: palette.muted, marginBottom: 8 },
   buttonOptions: {
     flexDirection: 'row',
-    paddingTop: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 10,
+    paddingTop: 22,
   },
   button: {
-    borderRadius: 20,
-    padding: 15,
-    elevation: 2,
-    marginHorizontal: 10,
+    minWidth: 96,
+    minHeight: 46,
+    borderRadius: 23,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonCancel: {
-    backgroundColor: palette.line,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.line,
   },
   buttonSave: {
     backgroundColor: palette.primary,
+    flex: 1,
+    maxWidth: 220,
+    shadowColor: palette.primaryDark,
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
+  buttonPressed: { opacity: 0.78, transform: [{ scale: 0.985 }] },
+  buttonDisabled: { opacity: 0.45 },
+  buttonSaving: { backgroundColor: palette.disabledBackground, shadowOpacity: 0, elevation: 0 },
+  savingContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  buttonCancelText: { color: palette.text, fontWeight: '800' },
+  buttonSaveText: { color: palette.text, fontWeight: '800' },
 })

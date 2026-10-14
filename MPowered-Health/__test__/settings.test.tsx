@@ -30,10 +30,11 @@ jest.mock('expo-web-browser', () => ({
 describe("objects rendering on screen", () => {
     test("objects are rendered on screen" , async() =>{
         await render(<Settings/>);
-        expect(screen.getByText("SETTINGS")).toBeTruthy();
-        expect(screen.getByText("Edit Your Profile")).toBeTruthy();
+        expect(screen.getByText("Settings")).toBeTruthy();
+        expect(screen.getByText("Personalise your experience and control your account.")).toBeTruthy();
         expect(screen.getByRole('button', {name : "Edit Profile"})).toBeTruthy();
         expect(screen.getByRole('button', {name : "Notifications"})).toBeTruthy();
+        expect(screen.getByRole('button', {name : "Password and Security"})).toBeTruthy();
         expect(screen.getByRole('link', {name : "Privacy Policy"})).toBeTruthy();
         expect(screen.getByRole('link', {name : "Terms and Conditions"})).toBeTruthy();
         expect(screen.getByText("Sign Out")).toBeTruthy();
@@ -163,7 +164,7 @@ describe("sign out tests", () => {
         //do not call sign out
         expect(mockSignOut).not.toHaveBeenCalled();
         console.log("sign out was not called");
-        expect(screen.getByText("SETTINGS")).toBeTruthy();
+        expect(screen.getByText("Settings")).toBeTruthy();
     })
 
     test("pressing sign out on sign out alert signs out the user and navigates to login", async() => {
@@ -228,7 +229,7 @@ describe("delete account tests", () => {
         //do not call delete account
         expect(mockDeleteUser).not.toHaveBeenCalled();
         console.log("delete account was not called");
-        expect(screen.getByText("SETTINGS")).toBeTruthy();
+        expect(screen.getByText("Settings")).toBeTruthy();
     })
 
     test("pressing delete account on alert deletes the account and navigates to splash screen", async() => {

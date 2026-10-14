@@ -1,8 +1,8 @@
 import ManageProfile from "@/app/(tabs)/(settings)/profile";
 import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
 import { diagnosisOptions, painConditionsOptions } from "@/constants/profile/profile-options";
-import { render, screen, fireEvent, userEvent, waitFor } from "@testing-library/react-native";
-import { Alert, Modal } from "react-native";
+import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
+import { Alert } from "react-native";
 
 const mockUser = {
     name: "Jane",
@@ -40,18 +40,18 @@ describe("objects rendered on screen", () => {
     test("objects are rendered on screen correctly", async() => {
         await render(<ManageProfile/>);
         expect(screen.getByText("PROFILE")).toBeTruthy();
-        expect(screen.getByText("Edit your profile")).toBeTruthy();
-        expect(screen.getByText("Edit your information or update your security details")).toBeTruthy();
+        expect(screen.getByText("Profile details")).toBeTruthy();
+        expect(screen.getByText("Keep your personal and health information up to date.")).toBeTruthy();
 
         //user info
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Female")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy();  
-        expect(screen.getByText("Have formal diagnosis")).toBeTruthy();
-        expect(screen.getByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Formal diagnosis recorded")).toBeTruthy();
+        expect(screen.getByText(`${painConditionsOptions[0]}, ${painConditionsOptions[2]}`)).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();    
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
-        expect(screen.getByText("Change password")).toBeTruthy();
+        expect(screen.queryByText("Change password")).toBeNull();
     })
 })
 
@@ -70,7 +70,7 @@ describe("editing name tests", () => {
 
         //modal should open
         console.log("open up name editor modal");
-        expect(screen.getByText("Edit Name")).toBeTruthy();
+        expect(screen.getByText("Edit name")).toBeTruthy();
         expect(screen.getByText("Name")).toBeTruthy();
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
@@ -85,7 +85,7 @@ describe("editing name tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Jane"));
-        expect(screen.getByText("Edit Name")).toBeTruthy();
+        expect(screen.getByText("Edit name")).toBeTruthy();
 
         //get the input field and make the edit
         const nameInput = screen.getByTestId("name-input");
@@ -105,7 +105,7 @@ describe("editing name tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Jane"));
-        expect(screen.getByText("Edit Name")).toBeTruthy();
+        expect(screen.getByText("Edit name")).toBeTruthy();
 
         const nameInput = screen.getByTestId("name-input");
         fireEvent.changeText(nameInput, "John");
@@ -125,7 +125,7 @@ describe("editing name tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Jane"));
-        expect(screen.getByText("Edit Name")).toBeTruthy();
+        expect(screen.getByText("Edit name")).toBeTruthy();
 
         //get the input field and make the edit
         const nameInput = screen.getByTestId("name-input");
@@ -154,7 +154,7 @@ describe("editing birthsex tests", () => {
 
         //modal should open
         console.log("open up birthsex editor modal");
-        expect(screen.getByText("Edit Birth Sex")).toBeTruthy();
+        expect(screen.getByText("Edit sex")).toBeTruthy();
         expect(screen.getByText("Male")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
@@ -167,7 +167,7 @@ describe("editing birthsex tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Female"));
-        expect(screen.getByText("Edit Birth Sex")).toBeTruthy();
+        expect(screen.getByText("Edit sex")).toBeTruthy();
 
         fireEvent.press(screen.getByText("Male"));
         await user.press(screen.getByText("Save"));
@@ -181,7 +181,7 @@ describe("editing birthsex tests", () => {
 
         //open the modal
         await user.press(screen.getByText("Female"));
-        expect(screen.getByText("Edit Birth Sex")).toBeTruthy();
+        expect(screen.getByText("Edit sex")).toBeTruthy();
 
         fireEvent.press(screen.getByText("Male"));
 
@@ -210,7 +210,7 @@ describe("editing birth year tests", () => {
 
         //modal should open
         console.log("open up birth year modal");
-        expect(screen.getByText("Edit Birth Year")).toBeTruthy();
+        expect(screen.getByText("Edit year of birth")).toBeTruthy();
         expect(screen.getByText("Year of birth")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
@@ -306,10 +306,10 @@ describe("editing conditions tests (scrollable list)", () => {
         await render(<ManageProfile/>);
 
         //clicking on conditions to edit
-        await user.press(screen.getByText("Edit Conditions"));
+        await user.press(screen.getByRole('button', { name: 'Edit pain conditions' }));
 
         //modal should open
-        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit pain conditions")).toBeTruthy();
         expect(screen.getByText(painConditionsOptions[0])).toBeTruthy();
         expect(screen.getByText(painConditionsOptions[1])).toBeTruthy();
         expect(screen.getByText("Cancel"));
@@ -320,10 +320,10 @@ describe("editing conditions tests (scrollable list)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        await user.press(screen.getByText("Edit Conditions"));
+        await user.press(screen.getByRole('button', { name: 'Edit pain conditions' }));
 
         //modal should open
-        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[5]));
         await user.press(screen.getByText(painConditionsOptions[10]));
@@ -339,10 +339,10 @@ describe("editing conditions tests (scrollable list)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        await user.press(screen.getByText("Edit Conditions"));
+        await user.press(screen.getByRole('button', { name: 'Edit pain conditions' }));
 
         //modal should open
-        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[0]));
         console.log("removing", painConditionsOptions[0], "from conditions list");
@@ -356,10 +356,10 @@ describe("editing conditions tests (scrollable list)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        await user.press(screen.getByText("Edit Conditions"));
+        await user.press(screen.getByRole('button', { name: 'Edit pain conditions' }));
 
         //modal should open
-        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[0]));
         await user.press(screen.getByText(painConditionsOptions[2]));
@@ -375,17 +375,17 @@ describe("editing conditions tests (scrollable list)", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
 
-        await user.press(screen.getByText("Edit Conditions"));
+        await user.press(screen.getByRole('button', { name: 'Edit pain conditions' }));
 
         //modal should open
-        expect(screen.getAllByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[1]));
         await user.press(screen.getByText(painConditionsOptions[3]));
        
         await user.press(screen.getByText("Cancel"));
 
-        expect(screen.getByText("Edit Conditions")).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Edit pain conditions' })).toBeTruthy();
     })
 })
 
@@ -400,11 +400,11 @@ describe("editing diagnosis tests", () => {
         await render(<ManageProfile/>);
 
         //clicking on diagnosis to edit
-        await user.press(screen.getByText("Have formal diagnosis"));
+        await user.press(screen.getByText("Formal diagnosis recorded"));
 
         //modal should open
         console.log("open up diagnosis modal");
-        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        expect(screen.getByText("Edit diagnosis")).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[0])).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[1])).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
@@ -418,10 +418,10 @@ describe("editing diagnosis tests", () => {
         await render(<ManageProfile/>);
 
         //clicking on diagnosis to edit
-        await user.press(screen.getByText("Have formal diagnosis"));
+        await user.press(screen.getByText("Formal diagnosis recorded"));
 
         //modal should open
-        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        expect(screen.getByText("Edit diagnosis")).toBeTruthy();
         await fireEvent.press(screen.getByText(diagnosisOptions[1]));
 
         //save the edit
@@ -435,16 +435,16 @@ describe("editing diagnosis tests", () => {
         const user = userEvent.setup();
         await render(<ManageProfile/>);
         //clicking on diagnosis to edit
-        await user.press(screen.getByText("Have formal diagnosis"));
+        await user.press(screen.getByText("Formal diagnosis recorded"));
 
         //modal should open
-        expect(screen.getByText("Edit Diagnosis")).toBeTruthy();
+        expect(screen.getByText("Edit diagnosis")).toBeTruthy();
         await fireEvent.press(screen.getByText(diagnosisOptions[1]));
 
         //save the edit
         await user.press(screen.getByText("Cancel"));
 
-        expect(screen.getByText("Have formal diagnosis"));
+        expect(screen.getByText("Formal diagnosis recorded"));
         expect(mockUpdateUser).not.toHaveBeenCalled();
 
     })
@@ -465,8 +465,8 @@ describe("editing other conditions tests (text input)", () => {
 
         //modal should open
         console.log("open up other conditions modal");
-        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
-        expect(screen.getByText("Other conditions")).toBeTruthy();
+        expect(screen.getByText("Edit other condition")).toBeTruthy();
+        expect(screen.getByText("Other condition")).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
@@ -479,7 +479,7 @@ describe("editing other conditions tests (text input)", () => {
 
         //open the modal
         await user.press(screen.getByText("Frequent headaches"));
-        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit other condition")).toBeTruthy();
 
         //get the input field and make the edit
         const conditionsInput = screen.getByTestId("other-conditions-input");
@@ -497,7 +497,7 @@ describe("editing other conditions tests (text input)", () => {
 
         //open the modal
         await user.press(screen.getByText("Frequent headaches"));
-        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit other condition")).toBeTruthy();
 
         //get the input field and make the edit
         const conditionsInput = screen.getByTestId("other-conditions-input");
@@ -515,7 +515,7 @@ describe("editing other conditions tests (text input)", () => {
 
         //open the modal
         await user.press(screen.getByText("Frequent headaches"));
-        expect(screen.getByText("Edit Other Conditions")).toBeTruthy();
+        expect(screen.getByText("Edit other condition")).toBeTruthy();
 
         //get the input field and make the edit
         const conditionsInput = screen.getByTestId("other-conditions-input");
@@ -538,7 +538,7 @@ describe("editing email tests (rendering)", () => {
 
         //modal should open
         console.log("open up email editor modal");
-        expect(screen.getByText("Edit Email")).toBeTruthy();
+        expect(screen.getByText("Change email address")).toBeTruthy();
         expect(screen.getByText("Email address")).toBeTruthy();
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
@@ -548,23 +548,10 @@ describe("editing email tests (rendering)", () => {
     //email editing functionality will be tested manually
 })
 
-describe("editing password tests (rendering)" , () => {
-    test("pressing on change password opens up the editor", async() => {
-        const user = userEvent.setup();
+describe("password placement", () => {
+    test("password controls are not mixed with profile details", async() => {
         await render(<ManageProfile/>);
 
-        //clicking on password to edit
-        await user.press(screen.getByText("Change password"));
-
-        //modal should open
-        console.log("open up password editor modal");
-        expect(screen.getByText("Update your password")).toBeTruthy();
-        expect(screen.getByText("Please enter your existing password and your new password.")).toBeTruthy();
-        expect(screen.getByText("Current password")).toBeTruthy();
-        expect(screen.getByText("New password")).toBeTruthy();
-        expect(screen.getByText("Cancel")).toBeTruthy();
-        expect(screen.getByText("Save")).toBeTruthy();
+        expect(screen.queryByText("Change password")).toBeNull();
     })
-
-    //password editing functionality will be tested manually
 })
