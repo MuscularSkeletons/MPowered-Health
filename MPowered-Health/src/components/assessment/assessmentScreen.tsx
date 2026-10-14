@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthHeader, PrimaryButton } from '../../components/auth/auth-ui';
+import { AuthHeader, PrimaryButton } from '../auth/auth-ui';
 import { palette } from '../../constants/profile/ui';
 import { submitAssessmentAnswers } from './backend/assessmentDb';
 

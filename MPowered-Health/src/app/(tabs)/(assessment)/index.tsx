@@ -8,15 +8,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
-import { ASSESSMENT_QUESTIONS } from '../(assessment)/questions/index';
-import AssessmentScreen from '../(assessment)/assessmentScreen';
-import { palette } from '../../constants/profile/ui';
-import { AuthHeader } from '../../components/auth/auth-ui';
-import { useAuth } from '../../context/authcontext';
+import { ASSESSMENT_QUESTIONS } from '../../../constants/questions/index';
+import AssessmentScreen from '../../../components/assessment/assessmentScreen';
+import { palette } from '../../../constants/profile/ui';
+import { AuthHeader } from '../../../components/auth/auth-ui';
+import { useAuth } from '../../../context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,
   getWeeklyAssessmentStreak,
-} from '../(assessment)/backend/assessmentDb';
+} from '../../../lib/assessmentDb';
 
 const ASSESSMENTS = [
   { id: 'My Pain', title: 'My Pain' },

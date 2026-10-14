@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase/client';
+import { supabase } from '../lib/supabase/client';
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
