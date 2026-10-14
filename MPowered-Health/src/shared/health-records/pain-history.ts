@@ -6,7 +6,7 @@
  */
 import type { AssessmentAnswers } from '@/shared/health-records/assessment-types';
 import { fetchHealthSnapshot } from '@/services/health-records.services';
-import type { HealthSnapshot } from '@/services/health-records.mapper';
+import type { HealthSnapshot, WeekGroup } from '@/services/health-records.mapper';
  
 export type PainAssessmentRecord = {
   id: string;
@@ -28,6 +28,7 @@ let accountId: string | null = null;
 let generation = 0;
 let records: PainAssessmentRecord[] = [];
 let latest: HealthSnapshot['latest'] = {};
+let weeks: WeekGroup[] = [];
  
 /** Select an account without exposing another account's saved assessments. */
 export function setPainHistoryAccount(userId: string) {
@@ -35,12 +36,13 @@ export function setPainHistoryAccount(userId: string) {
   accountId = userId === SIGNED_OUT ? null : userId;
   records = [];
   latest = {};
+  weeks = [];
 }
  
 /** Copies answers so callers cannot change the stored lists. */
 const cloneAnswers = (answers: AssessmentAnswers): AssessmentAnswers =>
   Object.fromEntries(Object.entries(answers).map(([key, values]) => [key, [...values]]));
- 
+
 /**
  * Copies a record so callers cannot change the stored object through a shared reference.
  *
@@ -69,6 +71,7 @@ export async function loadPainHistory() {
   if (!userId) {
     records = [];
     latest = {};
+    weeks = [];
     return;
   }
   const snapshot = await fetchHealthSnapshot(userId);
@@ -76,10 +79,11 @@ export async function loadPainHistory() {
   if (requestGeneration !== generation) return;
   records = snapshot.painRecords;
   latest = snapshot.latest;
+  weeks = snapshot.weeks;
 }
 
 /**
- * Since sssessments are submitted by  assessment feature, (which writes to supabase), this
+ * Since assessments are submitted by  assessment feature, (which writes to supabase), this
  * exports so existing imports compile, and fails if not.
  */
 export async function savePainAssessment(
@@ -97,6 +101,7 @@ export function clearPainHistoryMemory() {
   // Clear the session copy after account deletion or reset.
   records = [];
   latest = {};
+  weeks = [];
 }
 
 
@@ -112,15 +117,27 @@ export function getPainHistory() {
  
 /** The newest answers for each assessment type, for restoring the profile and summaries. */
 export function getLatestAssessmentAnswers(): HealthSnapshot['latest'] {
-  return Object.fromEntries(
+  const copy = Object.fromEntries(
     Object.entries(latest).map(([type, entry]) => [
       type,
       { completedAt: entry.completedAt, answers: cloneAnswers(entry.answers) },
     ]),
   );
+  return copy as HealthSnapshot['latest'];
 }
 
-
+/**
+ * The user's assessments grouped by Monday through Sunday weeks (newest first) for the History tab.
+ *
+ * Each week lists the latest assessment of every type completed in it. Pass an entry's 'answers' to
+ * the summary builder for its 'type' to show the summary screen.
+ */
+export function getAssessmentWeeks(): WeekGroup[] {
+  return weeks.map((week) => ({
+    ...week,
+    entries: week.entries.map((entry) => ({ ...entry, answers: cloneAnswers(entry.answers) })),
+  }));
+}
 
 /** Groups pain records by the areas where pain was reported. */
 export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup[] {
@@ -133,7 +150,6 @@ export function groupPainHistory(history: PainAssessmentRecord[]): PainAreaGroup
   }
   return [...groups.values()];
 }
-
 
 /** Reads the requested pain score from a history record. */
 export function painMetricValue(record: PainAssessmentRecord, metric: PainMetric) {
