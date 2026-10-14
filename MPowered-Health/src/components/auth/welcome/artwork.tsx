@@ -2,11 +2,11 @@ import { StyleSheet, View } from 'react-native';
 import { Image, type ImageSource } from 'expo-image';
 import { palette } from '@/constants/profile/ui';
 
-// Each splash page uses a back preview and a front preview to create depth.
+// Reuse the current approved preview pair until the remaining screenshots arrive.
 const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
   [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
-  [require('@/assets/splash/health-home.png'), require('@/assets/splash/health-records.png')],
-  [require('@/assets/splash/care-home.png'), require('@/assets/splash/plan-appointment.png')],
+  [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
+  [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
 ];
 
 /**
