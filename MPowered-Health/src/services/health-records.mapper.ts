@@ -239,7 +239,11 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
 /** The earliest date an assessment may have and still be shown. */
 export function retentionCutoff(now = new Date()): Date {
   const cutoff = new Date(now);
+  const day = cutoff.getDate();
+  cutoff.setDate(1); // move to the 1st first, so changing the month cannot overflow
   cutoff.setMonth(cutoff.getMonth() - RETENTION_MONTHS);
+  const daysInTargetMonth = new Date(cutoff.getFullYear(), cutoff.getMonth() + 1, 0).getDate();
+  cutoff.setDate(Math.min(day, daysInTargetMonth));
   return cutoff;
 }
 
