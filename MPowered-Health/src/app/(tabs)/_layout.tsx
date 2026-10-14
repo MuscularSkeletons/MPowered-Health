@@ -29,7 +29,7 @@ export default function TabsLayout() {
         }}>
 
         <Tabs.Screen 
-            name="index" 
+            name="(assessment)" 
             options={{
                 title: 'Pain Tracker',
                 tabBarIcon: ({ color, size, focused }) => (
