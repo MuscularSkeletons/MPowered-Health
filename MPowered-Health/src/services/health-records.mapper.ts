@@ -14,6 +14,8 @@ const MIN_INSIGHT_SPAN_DAYS = 28;
 /** The overview design plots three weekly points. */
 const INSIGHT_POINTS = 3;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** The order assessment types are listed within a week, matching the design. */
+const TYPE_ORDER: AssessmentId[] = ['pain', 'movement', 'personal', 'social', 'management'];
 
 
 // Row shapes
@@ -70,11 +72,29 @@ export interface AssessmentRow {
 }
 
 export type LatestAssessment = { answers: AssessmentAnswers; completedAt: string };
+
+/** One completed assessment inside a week. Pass 'answers' to the summary builder for 'type'. */
+export interface WeekEntry {
+  type: AssessmentId;
+  assessmentId: string;
+  completedAt: string;
+  answers: AssessmentAnswers;
+}
+
+/** A Monday-to-Sunday week and the latest assessment of each type completed in it. */
+export interface WeekGroup {
+  weekStart: string; 
+  label: string; 
+  entries: WeekEntry[]; // in TYPE_ORDER - types with no assessment that week are absent
+}
+
 export interface HealthSnapshot {
   /** Oldest first, matching what groupPainHistory expects. */
   painRecords: PainAssessmentRecord[];
   /** The newest answers for each assessment type that has any data. */
   latest: Partial<Record<AssessmentId, LatestAssessment>>;
+  /** Newest week first, for the History tab with week, then assessment type, then summary. */
+  weeks: WeekGroup[];
 }
 
 function first<T>(value: OneOrMany<T> | undefined): T | null {
@@ -140,10 +160,13 @@ export function managementAnswers(row: ManagementRow): AssessmentAnswers {
 }
 
 
+/** Trim, un-duplicate and sort so "Back, Knee" always forms one group. */
+const normalizeAreas = (pain: PainRow): string[] =>
+  [...new Set((pain.pain_location ?? []).map((area) => area.trim()).filter(Boolean))].sort();
+
 /** Builds the record the charts, history and PDFs read, from an assessment and its pain row. */
 export function toPainRecord(assessment: AssessmentRow, pain: PainRow): PainAssessmentRecord {
-  // Trim, un-duplicate and sort so "Back, Knee" always forms one group.
-  const areas = [...new Set((pain.pain_location ?? []).map((area) => area.trim()).filter(Boolean))].sort();
+  const areas = normalizeAreas(pain);
   return {
     id: assessment.assessment_id,
     completedAt: new Date(assessment.date).toISOString(),
@@ -156,36 +179,58 @@ export function toPainRecord(assessment: AssessmentRow, pain: PainRow): PainAsse
   };
 }
 
-/** Turns the assessments (with their children) into the pain history plus the latest answers per type. */
+/** The assessment types are on one row with their answers. */
+function answersByType(row: AssessmentRow): [AssessmentId, AssessmentAnswers][] {
+  const found: [AssessmentId, AssessmentAnswers][] = [];
+  const pain = first(row.pain_assessment);
+  if (pain) found.push(['pain', { ...painAnswers(pain), 0: normalizeAreas(pain) }]);
+  const movement = first(row.movement_assessment);
+  if (movement) found.push(['movement', movementAnswers(movement)]);
+  const personal = first(row.personal_care_assessment);
+  if (personal) found.push(['personal', personalCareAnswers(personal)]);
+  const social = first(row.social_health_assessment);
+  if (social) found.push(['social', socialAnswers(social)]);
+  const management = first(row.management_assessment);
+  if (management) found.push(['management', managementAnswers(management)]);
+  return found;
+}
+
+/** Turns the assessments (with their children) into the pain history plus the latest answers per type and week groups. */
 export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
   const newestFirst = [...rows].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
   const painRecords: PainAssessmentRecord[] = [];
   const latest: HealthSnapshot['latest'] = {};
+  const weeks = new Map<string, WeekGroup>();
 
   for (const row of newestFirst) {
+    const found = answersByType(row);
+    if (!found.length) continue; // an assessment with no child rows has nothing to show
+
     const completedAt = new Date(row.date).toISOString();
     // Rows are newest first, so the first answers seen for a type are the latest.
-    const remember = (type: AssessmentId, answers: AssessmentAnswers) => {
-      if (!latest[type]) latest[type] = { answers, completedAt };
-    };
-
     const pain = first(row.pain_assessment);
-    if (pain) {
-      const record = toPainRecord(row, pain);
-      painRecords.push(record);
-      remember('pain', record.answers);
+    if (pain) painRecords.push(toPainRecord(row, pain));
+
+    const start = weekStartOf(new Date(row.date));
+    const key = isoDay(start);
+    if (!weeks.has(key)) weeks.set(key, { weekStart: key, label: weekLabel(start), entries: [] });
+    const week = weeks.get(key)!;
+
+    for (const [type, answers] of found) {
+      // Rows are newest first, so the first answers seen for a type are the latest overall...
+      if (!latest[type]) latest[type] = { answers, completedAt };
+      // ...and the first seen within a week are that week's latest.
+      if (!week.entries.some((entry) => entry.type === type)) {
+        week.entries.push({ type, assessmentId: row.assessment_id, completedAt, answers });
+      }
     }
-    const movement = first(row.movement_assessment);
-    if (movement) remember('movement', movementAnswers(movement));
-    const personal = first(row.personal_care_assessment);
-    if (personal) remember('personal', personalCareAnswers(personal));
-    const social = first(row.social_health_assessment);
-    if (social) remember('social', socialAnswers(social));
-    const management = first(row.management_assessment);
-    if (management) remember('management', managementAnswers(management));
   }
 
-  return { painRecords: painRecords.reverse(), latest };
+  const weekList = [...weeks.values()].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
+  for (const week of weekList) {
+    week.entries.sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
+  }
+  return { painRecords: painRecords.reverse(), latest, weeks: weekList };
 }
 
 
@@ -231,19 +276,16 @@ export interface WeeklyPainRow {
 
 /** One row per week, newest first. If a week has several assessments latest one is used. */
 export function weeklyPainRows(records: PainAssessmentRecord[]): WeeklyPainRow[] {
-  const byWeek = new Map<string, PainAssessmentRecord>();
+  const byWeek = new Map<string, { start: Date; record: PainAssessmentRecord }>();
   for (const record of records) {
-    const key = isoDay(weekStartOf(new Date(record.completedAt)));
+    const start = weekStartOf(new Date(record.completedAt));
+    const key = isoDay(start);
     const existing = byWeek.get(key);
-    if (!existing || record.completedAt > existing.completedAt) byWeek.set(key, record);
+    if (!existing || record.completedAt > existing.record.completedAt) byWeek.set(key, { start, record });
   }
   return [...byWeek.entries()]
     .sort(([a], [b]) => b.localeCompare(a))
-    .map(([key, record]) => ({
-      weekStart: key,
-      label: weekLabel(new Date(`${key}T00:00:00`)), // no offset, so parsed as local time
-      record,
-    }));
+    .map(([key, { start, record }]) => ({ weekStart: key, label: weekLabel(start), record }));
 }
 
 
