@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // add user id to delete requests table
       const { error } = await supabase
-        .from("DeleteRequest")
+        .from("delete_request")
         .insert({ user_id: user.id });
 
     if (error) throw error;
