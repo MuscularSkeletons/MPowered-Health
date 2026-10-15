@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/context/authcontext";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 export interface Question {
     id: string;
