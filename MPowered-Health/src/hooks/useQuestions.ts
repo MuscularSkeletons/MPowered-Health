@@ -251,7 +251,6 @@ export const useQuestions = () => {
                 average_pain: painAssessmentData.average_pain,
                 current_pain: painAssessmentData.current_pain,
             });
-            console.log(formattedPainAssessment);
             setPainAssessment(formattedPainAssessment);
             
         } catch (error) {
