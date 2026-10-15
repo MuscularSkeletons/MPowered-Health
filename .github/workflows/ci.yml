@@ -49,7 +49,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/upload-code-coverage@v1
         with:
-          files: ./MPowered-Health/coverage/cobertura-coverage.xml
+          file: ./MPowered-Health/coverage/cobertura-coverage.xml
           label: code-coverage
 
   supabase:
