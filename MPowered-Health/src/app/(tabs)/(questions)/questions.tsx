@@ -151,7 +151,7 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
 export default function Questions() {
   const router = useRouter();
   const { user } = useAuth();
-  const { questions, refreshQuestions } = useQuestions();
+  const { questions, refreshQuestions, retrievePainAssessment } = useQuestions();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -163,6 +163,22 @@ export default function Questions() {
       console.error("Error refreshing questions", error);
     } finally {
       setRefreshing(false);
+    }
+  }
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAddQuestion = async () => {
+    setIsLoading(true);
+    try {
+      if (!user) throw new Error('User not authenticated');
+      await retrievePainAssessment();
+      router.push("/(tabs)/(questions)/addquestion");
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Fetching pain data.');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -190,7 +206,7 @@ export default function Questions() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
       />     
 
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/(tabs)/(questions)/addquestion")}>
+      <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>

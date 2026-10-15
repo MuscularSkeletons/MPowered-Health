@@ -5,10 +5,11 @@ import {
   ScrollView,
   Alert,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/profile/ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { 
   getPainLocationQuestions,
@@ -33,7 +34,7 @@ export default function AddQuestion() {
   const { user } = useAuth();
 
   const [questions, setQuestions] = useState<string[]>([]);
-  const { createQuestion } = useQuestions();
+  const { createQuestion, painAssessment, retrievePainAssessment, isPainAssessmentLoading } = useQuestions();
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleQuestions = (question: string) => {
@@ -44,8 +45,14 @@ export default function AddQuestion() {
     );
   };
 
-  const painLocationQuestions = getPainLocationQuestions(null); // TODO when integrate with assessments as need access to assessment hook
-  const painIntensityQuestions = getPainIntensityQuestions(null, null, null, null); // TODO
+  const painLocationQuestions = getPainLocationQuestions(painAssessment?.pain_location || null);
+  const painIntensityQuestions = getPainIntensityQuestions(
+    painAssessment?.current_pain || null, 
+    painAssessment?.mildest_pain || null,
+    painAssessment?.worst_pain || null, 
+    painAssessment?.average_pain || null
+  );
+
   const painImpactQuestions = getPainImpactQuestions();
   const painManagementQuestions = getPainManagementQuestions();
   const [customQuestions, setCustomQuestions] = useState<string[]>([]);
@@ -110,6 +117,18 @@ export default function AddQuestion() {
       setCustomQuestion('');
       setShowQuestionPreview(!showQuestionPreview);
     }
+  }
+
+  useEffect(() => {
+    retrievePainAssessment();
+  }, []);
+
+  if (isPainAssessmentLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
