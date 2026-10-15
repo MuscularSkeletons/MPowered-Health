@@ -135,7 +135,7 @@ export const useQuestions = () => {
         }
 
         try {
-            const { error, data } = await supabase
+            const { error } = await supabase
                 .from("question")
                 .update({
                     answer: answer,
@@ -272,5 +272,6 @@ export const useQuestions = () => {
         retrievePainAssessment, 
         painAssessment, 
         isPainAssessmentLoading, 
+        isLoading,
     };
 }
