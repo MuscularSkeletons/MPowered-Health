@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/profile/ui";
-import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useState, useCallback } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
 import { formatTimeAgo } from "@/lib/date-helper";
@@ -158,6 +158,12 @@ export default function Questions() {
   const { questions, updateAnswer, deleteQuestion, refreshQuestions, retrievePainAssessment } = useQuestions();
 
   const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshQuestions();
+    }, [refreshQuestions]),
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);

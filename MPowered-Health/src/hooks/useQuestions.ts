@@ -65,10 +65,6 @@ export const useQuestions = () => {
         }
     }, [user]);
 
-    useEffect(() => {
-        loadQuestions();
-    }, [loadQuestions]);
-
     const createQuestion = async (question: string) => {
         if (!user) {
             throw new Error("User not authenticated");
