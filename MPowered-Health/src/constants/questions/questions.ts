@@ -13,7 +13,8 @@ export function getPainLocationQuestions(latestPainLocations: string[] | null): 
     } else if (latestPainLocations.length === 2) {
         painLocationsString = latestPainLocations.join(' and ').toLowerCase();
     } else {
-        painLocationsString = latestPainLocations.slice(0, -1).join(', ').toLowerCase() + ', and ' + latestPainLocations[-1].toLowerCase();
+        painLocationsString = latestPainLocations.slice(0, -1).join(', ').toLowerCase() 
+            + ', and ' + latestPainLocations[latestPainLocations.length -1].toLowerCase();
     }
 
     if (latestPainLocations.length === 1) {
