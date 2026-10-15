@@ -59,7 +59,6 @@ function ProfileRow({
 
 export default function ManageProfile() {
   const router = useRouter();
-  const { edit } = useLocalSearchParams<{ edit?: string }>();
   const { user, updateUser, updateUserDraft, updateAuthUserEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -575,6 +574,11 @@ export default function ManageProfile() {
                 setAuthError(null);
               }}
             />
+            {authError ? (
+              <Text accessibilityRole="alert" style={authStyles.error}>
+                {authError.message}
+              </Text>
+            ) : null}
             <ModalActions
               isSaving={isLoading}
               onCancel={() => setShowEmailEdit(false)}
