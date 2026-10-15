@@ -125,7 +125,7 @@ export default function AddQuestion() {
 
   if (isPainAssessmentLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.loadingScreen}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -258,5 +258,11 @@ const styles = StyleSheet.create({
   },
   save: {
     marginTop: 10,
+  },
+  loadingScreen: {
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: palette.background,
   },
 });
