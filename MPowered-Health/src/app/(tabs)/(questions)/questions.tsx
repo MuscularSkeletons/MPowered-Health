@@ -32,7 +32,7 @@ interface QuestionCardProps {
 const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => { 
 
   const { user } = useAuth();
-  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = () => {
     Alert.alert("Delete Question", "Are you sure you want to delete this question?", [
@@ -43,14 +43,14 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
       {
         text: 'Delete',
         onPress: async () => {
-          setIsLoadingDelete(true);
+          setIsLoading(true);
           try {
             await onDelete(question.id);
             console.log("Deleted a question");
           } catch (error) {
             Alert.alert("Error", "Error deleting question. Please refresh and try again");
           } finally {
-            setIsLoadingDelete(false);
+            setIsLoading(false);
           }
         },
         style: 'destructive',
@@ -60,7 +60,6 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
 
   const [showAnswerPreview, setShowAnswerPreview] = useState(false);
   const [answer, setAnswer] = useState('');
-  const [isLoadingAnswer, setIsLoadingAnswer] = useState(false);
   const handleAnswer = async () => {
     if (!user) {
       return;
@@ -70,7 +69,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
       Alert.alert('Error', 'Please enter an answer');
       return;
     }
-    setIsLoadingAnswer(true);
+    setIsLoading(true);
     try {
       if (!user) {
         throw new Error('User not authenticated');
@@ -82,7 +81,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');
     } finally {
-      setIsLoadingAnswer(false);
+      setIsLoading(false);
       // close modal
       setShowAnswerPreview(!showAnswerPreview);
     }
@@ -101,7 +100,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
               }
             </Text>
           </View>
-          <TouchableOpacity onPress={handleDelete} disabled={isLoadingDelete}>
+          <TouchableOpacity onPress={handleDelete} disabled={isLoading}>
             <Ionicons 
               name={"trash-outline"}
               style={styles.delete}
@@ -117,7 +116,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
         </View>
         </View>
         <View style={styles.answerButton}>
-          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoadingAnswer}/>
+          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoading}/>
         </View>
       </View>
 
@@ -138,10 +137,10 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
                 value={answer}
                 onChangeText={setAnswer}
                 onSubmitEditing={handleAnswer}
-                editable={!isLoadingAnswer}
+                editable={!isLoading}
               />
               <ModalActions
-                isSaving={isLoadingAnswer}
+                isSaving={isLoading}
                 onCancel={() => setShowAnswerPreview(false)}
                 onSave={() => void handleAnswer()}
               />
