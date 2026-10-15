@@ -46,7 +46,7 @@ function PainTrend({ records }: { records: PainAssessmentRecord[] }) {
       width: length,
       height: LINE_THICKNESS,
       borderRadius: 2,
-      backgroundColor: palette.success,
+      backgroundColor: palette.chart,
       transform: [{ rotate: `${angle}deg` }],
     };
   };
@@ -116,7 +116,7 @@ export default function MyHealthScreen() {
         <View style={styles.quickRow}>
           <Pressable
             accessibilityRole="button"
-            style={({ pressed }) => [styles.quick, pressed && styles.quickPressed]}
+            style={({ pressed }) => [styles.quick, styles.quickPink, pressed && styles.quickPressed]}
             onPress={() => router.push('/(tabs)/myhealth/profile')}
           >
             <Text style={styles.quickText}>My health profile</Text>
@@ -124,11 +124,11 @@ export default function MyHealthScreen() {
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            style={({ pressed }) => [styles.quick, pressed && styles.quickPressed]}
+            style={({ pressed }) => [styles.quick, styles.quickGreen, pressed && styles.quickPressed]}
             onPress={() => router.push('/(tabs)/myhealth/prescriptions')}
           >
-            <Text style={styles.quickText}>My prescriptions</Text>
-            <Text style={styles.quickArrow}>View ›</Text>
+            <Text style={[styles.quickText, styles.quickTextOnDark]}>My prescriptions</Text>
+            <Text style={[styles.quickArrow, styles.quickArrowOnDark]}>View ›</Text>
           </Pressable>
         </View>
 

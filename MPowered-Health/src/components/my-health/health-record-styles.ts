@@ -30,7 +30,7 @@ export const healthRecordStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.line,
   },
-  dropdownSelected: { backgroundColor: palette.selectionBackground, borderColor: palette.success },
+  dropdownSelected: { backgroundColor: palette.selectionBackground, borderColor: palette.primary },
   optionLabel: { color: palette.text, fontSize: 14, fontWeight: '700', lineHeight: 21 },
   chartFrame: {
     marginTop: 14,
@@ -53,7 +53,7 @@ export const healthRecordStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '700',
-    color: palette.success,
+    color: palette.primary,
     paddingVertical: 12,
   },
   titleRow: {
@@ -101,9 +101,9 @@ export const healthRecordStyles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
-  tabOn: { borderBottomColor: palette.success },
+  tabOn: { borderBottomColor: palette.primary },
   tabText: { fontSize: 12, color: palette.text },
-  tabTextOn: { fontWeight: '800', color: palette.success },
+  tabTextOn: { fontWeight: '800', color: palette.primary },
   chartHead: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,7 +148,7 @@ export const healthRecordStyles = StyleSheet.create({
   area: {
     backgroundColor: palette.selectionBackground,
     borderTopWidth: 2,
-    borderTopColor: palette.success,
+    borderTopColor: palette.chart,
   },
   point: {
     position: 'absolute',
@@ -156,7 +156,7 @@ export const healthRecordStyles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: palette.success,
+    backgroundColor: palette.chart,
   },
   axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
   axisText: { fontSize: 7, color: palette.muted },
@@ -172,7 +172,7 @@ export const healthRecordStyles = StyleSheet.create({
   segmentItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   segmentOn: { backgroundColor: palette.selectionBackground },
   segmentText: { fontSize: 11, color: palette.text },
-  segmentTextOn: { fontWeight: '800', color: palette.success },
+  segmentTextOn: { fontWeight: '800', color: palette.primary },
   table: {
     marginTop: 16,
     borderWidth: 1,

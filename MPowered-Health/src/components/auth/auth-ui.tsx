@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   poweredMark: { width: 78, height: 34, position: 'relative' },
   logoM: { position: 'absolute', left: 0, bottom: 0, fontSize: 30, lineHeight: 33, fontWeight: '800', color: palette.text },
   logoPowered: { position: 'absolute', left: 25, top: 0, fontSize: 14, lineHeight: 16, fontWeight: '800', color: palette.text },
-  logoHealth: { fontSize: 25, lineHeight: 30, fontWeight: '800', color: palette.success, marginLeft: 12 },
+  logoHealth: { fontSize: 25, lineHeight: 30, fontWeight: '800', color: palette.primary, marginLeft: 12 },
   content: {
     flexGrow: 1,
     width: '100%',

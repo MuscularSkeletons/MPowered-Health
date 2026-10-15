@@ -82,11 +82,11 @@ export function TrackingChart({
             {value}
           </SvgText>
         ))}
-        {values.length > 1 ? <Polygon points={area} fill={palette.light} fillOpacity="0.46" /> : null}
+        {values.length > 1 ? <Polygon points={area} fill={palette.chartSoft} fillOpacity="0.62" /> : null}
         <Polyline
           points={points}
           fill="none"
-          stroke={palette.success}
+          stroke={palette.chart}
           strokeWidth="2"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -97,7 +97,7 @@ export function TrackingChart({
             cx={x(index)}
             cy={y(value)}
             r="3.2"
-            fill={palette.success}
+            fill={palette.chart}
           />
         ))}
         {chartDates.map((date, index) =>

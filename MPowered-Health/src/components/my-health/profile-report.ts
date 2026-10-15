@@ -39,11 +39,11 @@ export function profileReportText(report: PainProfileReport) {
 /** Creates an isolated A4 document so app navigation and controls never appear in the PDF. */
 export function profileReportHtml(report: PainProfileReport) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My health profile</title><style>
-  @page{size:A4;margin:16mm}*{box-sizing:border-box}body{margin:0;color:#3A3035;font:12pt/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-wrap:anywhere;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .brand{border-bottom:3px solid #D1E5D3;padding-bottom:12px;white-space:nowrap}.m{font-size:36px;font-weight:900}.powered{font-size:14px;font-weight:800;vertical-align:top}.health{font-size:27px;font-weight:900;color:#67A96B;margin-left:8px}
-  h1{font-size:25px;line-height:1.2;margin:22px 0 4px}.intro{color:#746A70;margin:0 0 18px}.meta{display:inline-block;background:#EDF5ED;color:#3A3035;border-radius:999px;padding:5px 10px;font-size:10pt;font-weight:700;margin-bottom:8px}
-  section{margin-top:14px;padding:14px;border:1px solid #D1E5D3;border-radius:14px;break-inside:avoid;page-break-inside:avoid}h2{margin:0 0 10px;color:#3A3035;font-size:16pt;border-bottom:1px solid #D1E5D3;padding-bottom:8px}.row{margin-bottom:9px;break-inside:avoid}.row:last-child{margin-bottom:0}dt{color:#746A70;font-size:9pt;font-weight:700}dd{margin:1px 0 0;white-space:pre-wrap}
-  .footer{margin-top:18px;padding-top:10px;border-top:1px solid #D1E5D3;color:#746A70;font-size:9pt}
+  @page{size:A4;margin:16mm}*{box-sizing:border-box}body{margin:0;color:#1E3038;font:12pt/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-wrap:anywhere;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .brand{border-bottom:3px solid #CCCDF1;padding-bottom:12px;white-space:nowrap}.m{font-size:36px;font-weight:900}.powered{font-size:14px;font-weight:800;vertical-align:top}.health{font-size:27px;font-weight:900;color:#9B91D3;margin-left:8px}
+  h1{font-size:25px;line-height:1.2;margin:22px 0 4px}.intro{color:#68787E;margin:0 0 18px}.meta{display:inline-block;background:#E9E8F5;color:#1E3038;border-radius:999px;padding:5px 10px;font-size:10pt;font-weight:700;margin-bottom:8px}
+  section{margin-top:14px;padding:14px;border:1px solid #CCCDF1;border-radius:14px;break-inside:avoid;page-break-inside:avoid}h2{margin:0 0 10px;color:#1E3038;font-size:16pt;border-bottom:1px solid #CCCDF1;padding-bottom:8px}.row{margin-bottom:9px;break-inside:avoid}.row:last-child{margin-bottom:0}dt{color:#68787E;font-size:9pt;font-weight:700}dd{margin:1px 0 0;white-space:pre-wrap}
+  .footer{margin-top:18px;padding-top:10px;border-top:1px solid #CCCDF1;color:#68787E;font-size:9pt}
   </style></head><body><div class="brand"><span class="m">M</span><sup class="powered">Powered</sup><span class="health">Health</span></div><h1>My health profile</h1><div class="meta">${escapeHtml(report.updatedAt ? `Updated ${report.updatedAt}` : 'No completed assessments yet')}</div><p class="intro">Latest answers across all five assessment categories.</p>${report.sections
     .map(
       (section) =>

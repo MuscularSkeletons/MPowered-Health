@@ -89,7 +89,7 @@ const s = StyleSheet.create({
     fontSize: 25,
     lineHeight: 30,
     fontWeight: '800',
-    color: palette.success,
+    color: palette.primary,
     marginLeft: 12,
   },
   action: {
@@ -120,7 +120,7 @@ const s = StyleSheet.create({
   disabled: { backgroundColor: palette.surfaceSoft, shadowOpacity: 0, elevation: 0 },
   disabledText: { color: palette.muted },
   actionText: {
-    color: palette.text,
+    color: palette.surface,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.1,
