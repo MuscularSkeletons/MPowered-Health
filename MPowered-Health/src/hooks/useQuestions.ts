@@ -11,6 +11,15 @@ export interface Question {
     updated_at: string;
 }
 
+// extract the relevant pain assessment data to pass to question mapper
+export interface PainAssessment {
+    pain_location: string[];
+    worst_pain: number;
+    mildest_pain: number;
+    average_pain: number;
+    current_pain: number;
+}
+
 export const useQuestions = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -154,5 +163,115 @@ export const useQuestions = () => {
         await loadQuestions();
     };
 
-    return { createQuestion, deleteQuestion, updateAnswer, refreshQuestions, questions };
+    // Helper to get Monday of the current week (YYYY-MM-DD)
+    function getCurrentWeekStartDate(): string {
+        const d = new Date();
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // monday
+        d.setDate(diff);
+        // Get the local date
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0'); //two digits format for months
+        const date = String(d.getDate()).padStart(2, '0'); ////two digits format for date
+        
+        return year + '-' + month + '-' + date; 
+    };
+    
+    // retrieve the current week's assessment id
+    // TODO: integrate with assessment feature code
+        /**
+     * Gets the active assessment_id for the current week,
+     * or returns null
+     */
+    const getCurrentWeeklyAssessmentID = async (): Promise<string | null> => {
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
+        const weekStart = getCurrentWeekStartDate();
+        try {
+            const { data, error } = await supabase
+                .from('assessment')
+                .select('assessment_id')
+                .eq('week_start', weekStart)
+                .eq('user_id', user.id)
+                .single();        
+            if (error) {
+                console.error('Error fetching assessment ID:', error);
+                return null;
+            }
+            if (data) {
+                console.log(data.assessment_id);
+                return data.assessment_id;
+            }
+            return null;
+        } catch (error) {
+            console.error('Error retrieving assessment ID:', error);
+            return null;
+        }
+    };
+
+    const [painAssessment, setPainAssessment] = useState<PainAssessment | null>(null); 
+    const [isPainAssessmentLoading, setIsPainAssessmentLoading] = useState(false);
+    
+    // retrieve pain assessment data or if incomplete return null 
+    // TODO: integrate with assessment feature code
+    const retrievePainAssessment = async () => {
+        if (!user) {
+            throw new Error("User not authenticated");
+        }
+        setIsPainAssessmentLoading(true);
+        try {
+            const assessmentID = await getCurrentWeeklyAssessmentID();
+            console.log(assessmentID);
+            if (assessmentID === null) {
+                console.log("No pain assessment completed this week");
+                setPainAssessment(null);
+                return;
+            }
+            const {data: painAssessmentData, error: painAssessmentError } = await supabase
+            .from("pain_assessment")
+            .select("*")
+            .eq("assessment_id", assessmentID)
+            .single();
+            if (painAssessmentError) {
+                console.error("Error retrieving pain assessment data:", painAssessmentError);
+                setPainAssessment(null);
+                return;
+            }
+            if (!painAssessmentData) {
+                console.log("No pain assessment completed this week");
+                setPainAssessment(null);
+                return;
+            }
+            
+            const formattedPainAssessment: PainAssessment = ({
+                pain_location: painAssessmentData.pain_location,
+                worst_pain: painAssessmentData.worst_pain,
+                mildest_pain: painAssessmentData.mildest_pain,
+                average_pain: painAssessmentData.average_pain,
+                current_pain: painAssessmentData.current_pain,
+            });
+            console.log(formattedPainAssessment);
+            setPainAssessment(formattedPainAssessment);
+            
+        } catch (error) {
+            console.error("Error retrieving pain assesment data:", error);
+            setPainAssessment(null);
+            return;
+        } finally {
+            setIsPainAssessmentLoading(false);
+        }
+    };
+
+
+    return { 
+        createQuestion, 
+        deleteQuestion, 
+        updateAnswer, 
+        refreshQuestions, 
+        questions,
+        retrievePainAssessment, 
+        painAssessment, 
+        isPainAssessmentLoading, 
+    };
 }
