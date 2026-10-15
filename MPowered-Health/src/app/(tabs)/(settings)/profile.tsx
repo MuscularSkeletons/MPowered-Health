@@ -7,7 +7,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { Ionicons } from "@expo/vector-icons";
