@@ -26,13 +26,13 @@ import {
 
 interface QuestionCardProps {
   question: Question;
-  currentUserId?: string;
+  onDelete: (questionId: string) => Promise<void>;
+  onUpdate: (questionId: string, answer: string) => Promise<void>;
 }
-const QuestionCard = ({question, currentUserId}: QuestionCardProps) => { 
+const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => { 
 
   const { user } = useAuth();
-  const { updateAnswer, deleteQuestion } = useQuestions();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 
   const handleDelete = () => {
     Alert.alert("Delete Question", "Are you sure you want to delete this question?", [
@@ -43,11 +43,14 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
       {
         text: 'Delete',
         onPress: async () => {
+          setIsLoadingDelete(true);
           try {
-            await deleteQuestion(question.id);
+            await onDelete(question.id);
             console.log("Deleted a question");
           } catch (error) {
             Alert.alert("Error", "Error deleting question. Please refresh and try again");
+          } finally {
+            setIsLoadingDelete(false);
           }
         },
         style: 'destructive',
@@ -57,6 +60,7 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
 
   const [showAnswerPreview, setShowAnswerPreview] = useState(false);
   const [answer, setAnswer] = useState('');
+  const [isLoadingAnswer, setIsLoadingAnswer] = useState(false);
   const handleAnswer = async () => {
     if (!user) {
       return;
@@ -66,19 +70,19 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
       Alert.alert('Error', 'Please enter an answer');
       return;
     }
-    setIsLoading(true);
+    setIsLoadingAnswer(true);
     try {
       if (!user) {
         throw new Error('User not authenticated');
       }
 
       // update supabase
-      await updateAnswer(question.id, trimmedAnswer);
+      await onUpdate(question.id, trimmedAnswer);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsLoadingAnswer(false);
       // close modal
       setShowAnswerPreview(!showAnswerPreview);
     }
@@ -97,7 +101,7 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
               }
             </Text>
           </View>
-          <TouchableOpacity onPress={handleDelete}>
+          <TouchableOpacity onPress={handleDelete} disabled={isLoadingDelete}>
             <Ionicons 
               name={"trash-outline"}
               style={styles.delete}
@@ -113,7 +117,7 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
         </View>
         </View>
         <View style={styles.answerButton}>
-          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}}/>
+          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoadingAnswer}/>
         </View>
       </View>
 
@@ -134,10 +138,10 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
                 value={answer}
                 onChangeText={setAnswer}
                 onSubmitEditing={handleAnswer}
-                editable={!isLoading}
+                editable={!isLoadingAnswer}
               />
               <ModalActions
-                isSaving={isLoading}
+                isSaving={isLoadingAnswer}
                 onCancel={() => setShowAnswerPreview(false)}
                 onSave={() => void handleAnswer()}
               />
@@ -151,7 +155,7 @@ const QuestionCard = ({question, currentUserId}: QuestionCardProps) => {
 export default function Questions() {
   const router = useRouter();
   const { user } = useAuth();
-  const { questions, refreshQuestions, retrievePainAssessment } = useQuestions();
+  const { questions, updateAnswer, deleteQuestion, refreshQuestions, retrievePainAssessment } = useQuestions();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -183,7 +187,7 @@ export default function Questions() {
   }
 
   const renderQuestion = ({item}: {item: Question}) => (
-    <QuestionCard question={item} currentUserId={user?.id}></QuestionCard>
+    <QuestionCard question={item} onDelete={deleteQuestion} onUpdate={updateAnswer}></QuestionCard>
   );
 
   return (
@@ -206,7 +210,7 @@ export default function Questions() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
       />     
 
-      <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()}>
+      <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()} disabled={isLoading}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
