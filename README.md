@@ -1,2 +1,31 @@
+[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/development/LICENSE)
 # MPowered-Health
-IT Project
+
+## About
+MPowered Health is an app designed for users with musculoskeletal conditions to empower them to take charge of their health. The app's core features allow users to record weekly assessments concerning their health and prepare questions to ask healthcare professional/s. 
+
+## Repository Structure
+
+```js
+MPowered-Health/
+├── __test__/
+├── assets/
+├── src/
+│   ├── app/
+│   │   └── (auth)/          // authentication and onboarding
+│   │   └── (tabs)/          // core function of app
+│   ├── components/          // shared UI components
+│   ├── constants/           // shared variables
+│   ├── context/             // shared state
+│   ├── hooks/               // shared logic
+│   ├── lib/
+│   │   └── supabase/        // code to store supabase migration
+│   ├── navigation/
+```
+
+## Contributors
+- <a href="https://github.com/Sher-Wen">Sher-Wen Chan</a>: sherwenc@student.unimelb.edu.au
+- <a href="https://github.com/hsienweic">Hsien-wei Chen</a>: hsienweic@student.unimelb.edu.au
+- <a href="https://github.com/s-tut-i">Stuti Gupta</a>: ssgupta@student.unimelb.edu.au
+- <a href="https://github.com/ichko-io">Ichinkhorloo Myanganbayar</a>: imyanganbaya@student.unimelb.edu.au
+- <a href="https://github.com/lara-pawar">Laranya Pawar</a>: pawal@student.unimelb.edu.au

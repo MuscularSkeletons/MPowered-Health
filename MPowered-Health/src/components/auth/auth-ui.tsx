@@ -177,11 +177,11 @@ export function ChoiceButton({
 export const authStyles = StyleSheet.create({
   actions: { gap: 10, marginTop: 28 },
   secondaryAction: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  secondaryText: { color: palette.primaryDark, fontSize: 13, fontWeight: '700' },
+  secondaryText: { color: palette.primary, fontSize: 13, fontWeight: '700' },
   helper: { color: palette.muted, fontSize: 13, lineHeight: 20, marginTop: 8 },
   error: { color: palette.error, fontSize: 13, lineHeight: 20, marginTop: 12 },
   choices: { gap: 12, marginTop: 12 },
-  back: { alignSelf: 'flex-start', paddingVertical: 12, color: palette.primaryDark, fontWeight: '700' },
+  back: { alignSelf: 'flex-start', paddingVertical: 12, color: palette.primary, fontWeight: '700' },
 });
 
 const styles = StyleSheet.create({
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   poweredMark: { width: 78, height: 34, position: 'relative' },
   logoM: { position: 'absolute', left: 0, bottom: 0, fontSize: 30, lineHeight: 33, fontWeight: '800', color: palette.text },
   logoPowered: { position: 'absolute', left: 25, top: 0, fontSize: 14, lineHeight: 16, fontWeight: '800', color: palette.text },
-  logoHealth: { fontSize: 25, lineHeight: 30, fontWeight: '800', color: palette.success, marginLeft: 12 },
+  logoHealth: { fontSize: 25, lineHeight: 30, fontWeight: '800', color: palette.primary, marginLeft: 12 },
   content: {
     flexGrow: 1,
     width: '100%',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   compactContent: { justifyContent: 'flex-start', paddingTop: 24, paddingBottom: 72 },
   intro: { marginBottom: 26 },
   introMeta: { minHeight: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primaryDark },
+  sectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: palette.primary },
   progress: { fontSize: 11, fontWeight: '700', color: palette.muted },
   title: { marginTop: 8, fontSize: 29, lineHeight: 36, fontWeight: '800', letterSpacing: -0.6, color: palette.text },
   description: { marginTop: 10, fontSize: 15, lineHeight: 23, color: palette.muted },

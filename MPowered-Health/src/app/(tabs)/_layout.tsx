@@ -29,7 +29,7 @@ export default function TabsLayout() {
         }}>
 
         <Tabs.Screen 
-            name="index" 
+            name="(assessment)" 
             options={{
                 title: 'Pain Tracker',
                 tabBarIcon: ({ color, size, focused }) => (
@@ -68,7 +68,7 @@ export default function TabsLayout() {
             }}
         />
         <Tabs.Screen 
-            name="settings" 
+            name="(settings)" 
             options={{
                 title: 'Settings',
                 tabBarIcon: ({ color, size, focused }) => (

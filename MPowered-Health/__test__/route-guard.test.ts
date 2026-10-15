@@ -16,7 +16,7 @@ describe('session routing', () => {
     const user = { onboardingComplete: true };
     expect(requiredSessionRoute({ user, rootSegment: '(auth)', nestedSegment: 'activation' })).toBeNull();
     expect(requiredSessionRoute({ user, rootSegment: '(tabs)' })).toBeNull();
-    expect(requiredSessionRoute({ user, rootSegment: '(auth)', nestedSegment: 'login' })).toBe('/(tabs)');
+    expect(requiredSessionRoute({ user, rootSegment: '(auth)', nestedSegment: 'login' })).toBe('/(tabs)/(assessment)');
   });
 
   it('opens activation when the saved profile becomes complete while still in onboarding', () => {

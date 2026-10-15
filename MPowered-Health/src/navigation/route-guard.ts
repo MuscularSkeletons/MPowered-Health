@@ -22,5 +22,5 @@ export function requiredSessionRoute({
   // Saving the profile changes the session before the onboarding screen unmounts.
   // Send that transition to activation instead of skipping straight to the tabs.
   if (inOnboardingSection) return '/(auth)/activation';
-  return inTabsSection || inActivationScreen ? null : '/(tabs)';
+  return inTabsSection || inActivationScreen ? null : '/(tabs)/(assessment)';
 }
