@@ -2,11 +2,11 @@ import { StyleSheet, View } from 'react-native';
 import { Image, type ImageSource } from 'expo-image';
 import { palette } from '@/constants/profile/ui';
 
-// Reuse the current approved preview pair until the remaining screenshots arrive.
+// Each welcome page previews a different pair of app screens.
 const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
   [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
-  [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
-  [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
+  [require('@/assets/splash/health-home.png'), require('@/assets/splash/health-records.png')],
+  [require('@/assets/splash/settings-home.png'), require('@/assets/splash/profile-details.png')],
 ];
 
 /**
