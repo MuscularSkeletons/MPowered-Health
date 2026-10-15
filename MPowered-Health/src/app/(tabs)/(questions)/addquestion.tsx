@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 36,
     flexGrow: 1,
     width: '100%',
     maxWidth: 560,
