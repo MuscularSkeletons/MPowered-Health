@@ -208,7 +208,7 @@ export const useQuestions = () => {
             console.error('Error retrieving assessment ID:', error);
             return null;
         }
-    }, []);
+    }, [user]);
 
     const [painAssessment, setPainAssessment] = useState<PainAssessment | null>(null); 
     const [isPainAssessmentLoading, setIsPainAssessmentLoading] = useState(false);
