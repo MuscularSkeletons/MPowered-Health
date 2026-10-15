@@ -63,7 +63,7 @@ export const useQuestions = () => {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         loadQuestions();
@@ -183,7 +183,7 @@ export const useQuestions = () => {
      * Gets the active assessment_id for the current week,
      * or returns null
      */
-    const getCurrentWeeklyAssessmentID = async (): Promise<string | null> => {
+    const getCurrentWeeklyAssessmentID = useCallback(async (): Promise<string | null> => {
         if (!user) {
             throw new Error("User not authenticated");
         }
@@ -208,7 +208,7 @@ export const useQuestions = () => {
             console.error('Error retrieving assessment ID:', error);
             return null;
         }
-    };
+    }, []);
 
     const [painAssessment, setPainAssessment] = useState<PainAssessment | null>(null); 
     const [isPainAssessmentLoading, setIsPainAssessmentLoading] = useState(false);
@@ -260,7 +260,7 @@ export const useQuestions = () => {
         } finally {
             setIsPainAssessmentLoading(false);
         }
-    }, []);
+    }, [getCurrentWeeklyAssessmentID, user]);
 
 
     return { 
