@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/context/authcontext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export interface Question {
     id: string;
@@ -25,7 +25,7 @@ export const useQuestions = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
 
-    const loadQuestions = async () => {
+    const loadQuestions = useCallback(async () => {
         if (!user) {
             return;
         }
@@ -63,11 +63,11 @@ export const useQuestions = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadQuestions();
-    }, []);
+    }, [loadQuestions]);
 
     const createQuestion = async (question: string) => {
         if (!user) {
@@ -215,7 +215,7 @@ export const useQuestions = () => {
     
     // retrieve pain assessment data or if incomplete return null 
     // TODO: integrate with assessment feature code
-    const retrievePainAssessment = async () => {
+    const retrievePainAssessment = useCallback(async () => {
         if (!user) {
             throw new Error("User not authenticated");
         }
@@ -260,7 +260,7 @@ export const useQuestions = () => {
         } finally {
             setIsPainAssessmentLoading(false);
         }
-    };
+    }, []);
 
 
     return { 
