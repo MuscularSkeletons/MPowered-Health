@@ -9,11 +9,11 @@ export function getPainLocationQuestions(latestPainLocations: string[] | null): 
     let painLocationsString;
     // convert pain locations to string depending on the number of locations
     if (latestPainLocations.length === 1) {
-        painLocationsString = latestPainLocations[0];
+        painLocationsString = latestPainLocations[0].toLowerCase();
     } else if (latestPainLocations.length === 2) {
-        painLocationsString = latestPainLocations.join(' and ');
+        painLocationsString = latestPainLocations.join(' and ').toLowerCase();
     } else {
-        painLocationsString = latestPainLocations.slice(0, -1).join(', ') + ', and ' + latestPainLocations.slice(-1);
+        painLocationsString = latestPainLocations.slice(0, -1).join(', ').toLowerCase() + ', and ' + latestPainLocations[-1].toLowerCase();
     }
 
     if (latestPainLocations.length === 1) {
