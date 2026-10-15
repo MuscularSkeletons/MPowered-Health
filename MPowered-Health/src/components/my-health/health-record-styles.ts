@@ -124,7 +124,8 @@ export const healthRecordStyles = StyleSheet.create({
     paddingHorizontal: 14,
     justifyContent: 'center',
   },
-  filterText: { fontSize: 11, color: palette.text },
+  filterContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  filterText: { flexShrink: 1, fontSize: 11, color: palette.text },
   chart: {
     height: 190,
     backgroundColor: palette.surface,
@@ -166,7 +167,7 @@ export const healthRecordStyles = StyleSheet.create({
     borderColor: palette.line,
     borderRadius: 17,
     overflow: 'hidden',
-    marginTop: 18,
+    marginTop: 12,
   },
   segmentItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   segmentOn: { backgroundColor: palette.selectionBackground },

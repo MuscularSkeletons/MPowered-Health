@@ -4,6 +4,8 @@ import { healthRecordStyles as s } from '@/components/my-health/health-record-st
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
 import { MhaHeader } from '@/components/my-health/app-ui';
+import { palette } from '@/constants/profile/ui';
+import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,7 +40,7 @@ export default function HealthRecords() {
           <Text style={s.back}>‹ Back</Text>
         </Pressable>
         <View style={s.titleRow}>
-          <Text style={s.title}>Records</Text>
+          <Text style={s.title}>Pain records</Text>
           <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
         </View>
         <View style={s.tabs}>
@@ -64,9 +66,29 @@ export default function HealthRecords() {
             style={s.filter}
             onPress={() => setDropdownOpen(true)}
           >
-            <Text style={s.filterText}>{selected?.label ?? 'No pain areas yet'} ⌄</Text>
+            <View style={s.filterContent}>
+              <Text numberOfLines={1} style={s.filterText}>
+                {selected?.label ?? 'No pain areas yet'}
+              </Text>
+              <Feather name="chevron-down" size={16} color={palette.muted} />
+            </View>
           </Pressable>
         </View>
+        {records.length && tab === 'chart' ? (
+          <View style={s.segment}>
+            {(['Average', 'Worst', 'Mildest'] as const).map((label) => (
+              <Pressable
+                key={label}
+                accessibilityRole="button"
+                accessibilityState={{ selected: metric === label }}
+                style={[s.segmentItem, metric === label && s.segmentOn]}
+                onPress={() => setMetric(label)}
+              >
+                <Text style={[s.segmentText, metric === label && s.segmentTextOn]}>{label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
         {!records.length ? (
           <View style={s.empty}>
             <Text style={s.historyDate}>No pain assessments recorded yet</Text>
@@ -84,19 +106,6 @@ export default function HealthRecords() {
         ) : tab === 'chart' ? (
           <>
             <TrackingChart metric={metric} records={records} />
-            <View style={s.segment}>
-              {(['Average', 'Worst', 'Mildest'] as const).map((label) => (
-                <Pressable
-                  key={label}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: metric === label }}
-                  style={[s.segmentItem, metric === label && s.segmentOn]}
-                  onPress={() => setMetric(label)}
-                >
-                  <Text style={[s.segmentText, metric === label && s.segmentTextOn]}>{label}</Text>
-                </Pressable>
-              ))}
-            </View>
             <View style={s.table}>
               <View style={[s.tableRow, s.tableFirst]}>
                 {['Recorded', 'Average', 'Worst', 'Mildest'].map((label, index) => (
