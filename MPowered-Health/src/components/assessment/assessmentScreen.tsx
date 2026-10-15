@@ -346,7 +346,7 @@ export default function AssessmentScreen({
               maxLength={currentQ.kind === 'number' ? 2 : undefined}
               multiline={currentQ.kind === 'text'}
               placeholder={currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
-              placeholderTextColor="#81798A"
+              placeholderTextColor={palette.muted}
               style={[styles.input, currentQ.kind === 'text' && styles.textArea]}
             />
           ) : (
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  optionOn: { backgroundColor: '#EDF5ED', borderColor: palette.success },
+  optionOn: { backgroundColor: palette.secondary, borderColor: palette.success },
   optionText: { flex: 1, fontSize: 14, lineHeight: 20, color: palette.text, paddingRight: 10 },
   optionTextOn: { fontWeight: '700' },
   box: {

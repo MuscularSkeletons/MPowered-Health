@@ -50,7 +50,7 @@ export default function Login() {
       } else {
         await AsyncStorage.removeItem(SAVED_EMAIL_KEY);
       }
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/(assessment)');
     } catch (error) {
       const userError = toUserError(error);
       setAuthError(userError);

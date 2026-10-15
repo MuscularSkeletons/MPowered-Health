@@ -48,7 +48,7 @@ function SettingRow({
         <Ionicons
           name={icon}
           size={21}
-          color={danger ? palette.error : palette.primary}
+          color={palette.chart}
         />
       </View>
       <View style={styles.rowCopy}>
@@ -58,7 +58,7 @@ function SettingRow({
       <Ionicons
         name={link ? 'open-outline' : 'chevron-forward'}
         size={19}
-        color={danger ? palette.error : palette.muted}
+        color={palette.chart}
       />
     </Pressable>
   );
@@ -82,7 +82,7 @@ export default function Settings() {
           try {
             await signOut();
             router.replace("/(auth)/login");
-          } catch (error) {
+          } catch {
             Alert.alert('Error', 'There was an error signing out. Please try again.');
           }
         },
@@ -108,7 +108,7 @@ export default function Settings() {
             await deleteUser();
             console.log('User successfully deleted');
             router.replace("/(auth)/splashscreen");
-          } catch (error) {
+          } catch {
             Alert.alert('Error', 'There was an error deleting your account. Please try again.');
           }
         },
@@ -169,7 +169,7 @@ export default function Settings() {
 
       <View style={styles.profileCard}>
         <View style={styles.avatar}>
-          <Ionicons name="person-outline" size={27} color={palette.success} />
+          <Ionicons name="person-outline" size={27} color={palette.chart} />
         </View>
         <View style={styles.profileCopy}>
           <Text style={styles.greeting}>SIGNED IN AS</Text>
@@ -306,13 +306,13 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   profileCard: {
-    backgroundColor: palette.selectionBackground,
+    backgroundColor: palette.success,
     borderRadius: 24,
     padding: 17,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: palette.light,
+    borderColor: palette.success,
     shadowColor: palette.success,
     shadowOpacity: 0.08,
     shadowRadius: 14,
@@ -335,9 +335,9 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   profileCopy: { flex: 1, marginLeft: 14 },
-  greeting: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: palette.muted, marginBottom: 4 },
-  profileName: { fontSize: 19, lineHeight: 24, fontWeight: '800', color: palette.text },
-  profileEmail: { fontSize: 12, lineHeight: 17, color: palette.muted, marginTop: 3 },
+  greeting: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: palette.surface, marginBottom: 4 },
+  profileName: { fontSize: 19, lineHeight: 24, fontWeight: '800', color: palette.surface },
+  profileEmail: { fontSize: 12, lineHeight: 17, color: palette.surface, marginTop: 3 },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
-  dangerCard: { borderColor: '#F4D3D6', backgroundColor: '#FFF7F7' },
+  dangerCard: { borderColor: palette.accent, backgroundColor: palette.accentSoft },
   row: { minHeight: 76, flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 2 },
   rowPressed: { opacity: 0.65 },
   rowIcon: {
@@ -382,11 +382,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowIconDanger: { backgroundColor: '#FCEAEC' },
+  rowIconDanger: { backgroundColor: palette.accent },
   rowCopy: { flex: 1, marginLeft: 13, marginRight: 8 },
   rowTitle: { fontSize: 15, fontWeight: '800', color: palette.text },
   rowDescription: { fontSize: 12, lineHeight: 17, color: palette.muted, marginTop: 3 },
-  dangerText: { color: palette.error },
+  dangerText: { color: palette.chart },
   divider: { height: 1, backgroundColor: palette.line, marginLeft: 55 },
   sponsor: {
     fontSize: 11,

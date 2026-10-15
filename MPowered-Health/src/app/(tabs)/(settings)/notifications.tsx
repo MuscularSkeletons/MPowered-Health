@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  noticeIconText: { color: palette.success, fontWeight: '800' },
+  noticeIconText: { color: palette.chart, fontWeight: '800' },
   noticeCopy: { flex: 1, marginLeft: 12 },
   noticeTitle: { color: palette.text, fontSize: 14, fontWeight: '800' },
   noticeText: { color: palette.muted, fontSize: 12, lineHeight: 18, marginTop: 4 },

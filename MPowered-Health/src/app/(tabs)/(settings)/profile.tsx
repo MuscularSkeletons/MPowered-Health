@@ -50,7 +50,7 @@ function ProfileRow({
         <Text style={styles.settingLabel} numberOfLines={2}>{value}</Text>
       </View>
       <View style={styles.editIcon}>
-        <Ionicons name="pencil-outline" size={17} color={palette.primaryDark} />
+        <Ionicons name="pencil-outline" size={17} color={palette.chart} />
       </View>
     </TouchableOpacity>
   );
