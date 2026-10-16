@@ -196,7 +196,6 @@ export const useQuestions = () => {
                 return null;
             }
             if (data) {
-                console.log(data.assessment_id);
                 return data.assessment_id;
             }
             return null;

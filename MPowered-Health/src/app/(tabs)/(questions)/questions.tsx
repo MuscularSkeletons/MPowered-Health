@@ -46,7 +46,6 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
           setIsLoading(true);
           try {
             await onDelete(question.id);
-            console.log("Deleted a question");
           } catch (error) {
             console.error(error);
             Alert.alert("Error", "Error deleting question. Please refresh and try again");
