@@ -9,7 +9,7 @@ export default function MyHealthLayout() {
   return (
     <HealthDataBoundary key={user?.id ?? 'signed-out'} userId={user?.id ?? 'signed-out'}>
       <MedicationProvider>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="(prescriptions)" />
           <Stack.Screen name="health-records" />

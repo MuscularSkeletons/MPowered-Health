@@ -6,8 +6,7 @@ import { getLatestAssessments } from '@/services/health-records.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const categories: {
   id: AssessmentId;

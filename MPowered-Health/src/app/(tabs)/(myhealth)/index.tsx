@@ -9,8 +9,7 @@ import {
 } from '@/services/health-records.store';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, Text, View } from 'react-native';
 
 const CHART_SIDE_GUTTER = 24;
 const CHART_BASELINE = 82;

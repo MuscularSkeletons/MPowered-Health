@@ -8,7 +8,6 @@ import { palette } from '@/constants/profile/ui';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * Displays recorded pain history and the controls for filtering and exporting it.
