@@ -23,6 +23,7 @@ import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
+  AuthHeader,
   ChoiceButton,
   PrimaryButton,
   authStyles,
@@ -132,123 +133,133 @@ export default function AddQuestion() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
-          sectionLabel="Questions"
-          title="Add Questions"
-          description="Questions are generated based on your assessment answers. Please complete your assessments for accurate suggestions."
-        />
-      <ScrollView>
-        <Text>Click the checkbox next to any questions you wish to add to your appointment plan.</Text>
-        <View style={authStyles.choices}>
-          <Text style={styles.sectionTitle}>Pain Location</Text>
-          {painLocationQuestions.map((question) => (
-            <ChoiceButton
-              key={question}
-              label={question}
-              multiple
-              selected={questions.includes(question)}
-              onPress={() => toggleQuestions(question)}
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <View style={styles.body}>
+        <AuthHeader />
+        <View style={styles.content}>
+          <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
+          <AuthIntro
+              sectionLabel="Questions"
+              title="Add Questions"
+              description="Questions are generated based on your assessment answers. Please complete your assessments for accurate suggestions."
             />
-          ))}
-        </View>
-        <View style={authStyles.choices}>
-          <Text style={styles.sectionTitle}>Pain Intensity</Text>
-          {painIntensityQuestions.map((question) => (
-            <ChoiceButton
-              key={question}
-              label={question}
-              multiple
-              selected={questions.includes(question)}
-              onPress={() => toggleQuestions(question)}
-            />
-          ))}
-        </View>
-        <View style={authStyles.choices}>
-          <Text style={styles.sectionTitle}>Pain Impact</Text>
-          {painImpactQuestions.map((question) => (
-            <ChoiceButton
-              key={question}
-              label={question}
-              multiple
-              selected={questions.includes(question)}
-              onPress={() => toggleQuestions(question)}
-            />
-          ))}
-        </View>
-        <View style={authStyles.choices}>
-          <Text style={styles.sectionTitle}>Management</Text>
-          {painManagementQuestions.map((question) => (
-            <ChoiceButton
-              key={question}
-              label={question}
-              multiple
-              selected={questions.includes(question)}
-              onPress={() => toggleQuestions(question)}
-            />
-          ))}
-        </View>
-        <View style={authStyles.choices}>
-          <Text style={styles.sectionTitle}>Other</Text>
-          {customQuestions.map((question) => (
-            <ChoiceButton
-              key={question}
-              label={question}
-              multiple
-              selected={questions.includes(question)}
-              onPress={() => toggleQuestions(question)}
-            />
-          ))}
-          <PrimaryButton label='Add your own question' onPress={() => {setShowQuestionPreview(!showQuestionPreview)}}/>
-        </View>
-      </ScrollView>
-      <View style={styles.save}>
-        <PrimaryButton label="Save" disabled={!questions.length} loading={isLoading} onPress={handleSave} />
-      </View>
-
-      <Modal
-        visible={showQuestionPreview}
-        transparent={true}
-        animationType="fade"
-        >
-        <View style={modalStyles.centredView}>
-          <View style={modalStyles.editInterface}>
-            <Text style={modalStyles.modalTitle}>Add Question</Text>
-            <AuthInput
-              testID="custom-question-input"
-              label="Question"
-              placeholder={'Enter your question'}
-              inputMode="text"
-              autoCorrect={false}
-              value={customQuestion}
-              onChangeText={setCustomQuestion}
-              onSubmitEditing={handleAddQuestion}
-              editable={!isLoading}
-            />
-            <ModalActions
-              isSaving={isLoading}
-              onCancel={() => setShowQuestionPreview(false)}
-              onSave={() => void handleAddQuestion()}
-            />
+          <ScrollView>
+            <Text>Click the checkbox next to any questions you wish to add to your appointment plan.</Text>
+            <View style={authStyles.choices}>
+              <Text style={styles.sectionTitle}>Pain Location</Text>
+              {painLocationQuestions.map((question) => (
+                <ChoiceButton
+                  key={question}
+                  label={question}
+                  multiple
+                  selected={questions.includes(question)}
+                  onPress={() => toggleQuestions(question)}
+                />
+              ))}
+            </View>
+            <View style={authStyles.choices}>
+              <Text style={styles.sectionTitle}>Pain Intensity</Text>
+              {painIntensityQuestions.map((question) => (
+                <ChoiceButton
+                  key={question}
+                  label={question}
+                  multiple
+                  selected={questions.includes(question)}
+                  onPress={() => toggleQuestions(question)}
+                />
+              ))}
+            </View>
+            <View style={authStyles.choices}>
+              <Text style={styles.sectionTitle}>Pain Impact</Text>
+              {painImpactQuestions.map((question) => (
+                <ChoiceButton
+                  key={question}
+                  label={question}
+                  multiple
+                  selected={questions.includes(question)}
+                  onPress={() => toggleQuestions(question)}
+                />
+              ))}
+            </View>
+            <View style={authStyles.choices}>
+              <Text style={styles.sectionTitle}>Management</Text>
+              {painManagementQuestions.map((question) => (
+                <ChoiceButton
+                  key={question}
+                  label={question}
+                  multiple
+                  selected={questions.includes(question)}
+                  onPress={() => toggleQuestions(question)}
+                />
+              ))}
+            </View>
+            <View style={authStyles.choices}>
+              <Text style={styles.sectionTitle}>Other</Text>
+              {customQuestions.map((question) => (
+                <ChoiceButton
+                  key={question}
+                  label={question}
+                  multiple
+                  selected={questions.includes(question)}
+                  onPress={() => toggleQuestions(question)}
+                />
+              ))}
+              <PrimaryButton label='Add your own question' onPress={() => {setShowQuestionPreview(!showQuestionPreview)}}/>
+            </View>
+          </ScrollView>
+          <View style={styles.save}>
+            <PrimaryButton label="Save" disabled={!questions.length} loading={isLoading} onPress={handleSave} />
           </View>
+
+          <Modal
+            visible={showQuestionPreview}
+            transparent={true}
+            animationType="fade"
+            >
+            <View style={modalStyles.centredView}>
+              <View style={modalStyles.editInterface}>
+                <Text style={modalStyles.modalTitle}>Add Question</Text>
+                <AuthInput
+                  testID="custom-question-input"
+                  label="Question"
+                  placeholder={'Enter your question'}
+                  inputMode="text"
+                  autoCorrect={false}
+                  value={customQuestion}
+                  onChangeText={setCustomQuestion}
+                  onSubmitEditing={handleAddQuestion}
+                  editable={!isLoading}
+                />
+                <ModalActions
+                  isSaving={isLoading}
+                  onCancel={() => setShowQuestionPreview(false)}
+                  onSave={() => void handleAddQuestion()}
+                />
+              </View>
+            </View>
+          </Modal>
         </View>
-      </Modal>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: { 
     flex: 1, 
-    backgroundColor: palette.background,
+    backgroundColor: palette.surface 
+  },
+  body: { 
+    flex: 1, 
+    backgroundColor: palette.background 
+  },
+  content: {
+    width: '100%',
+    maxWidth: 680,
     alignSelf: 'center',
-    justifyContent: 'flex-start',
     paddingHorizontal: 24,
     paddingTop: 24,
-    flexGrow: 1,
-    width: '100%',
-    maxWidth: 560,
+    flex: 1,
   },
   sectionTitle: {
     marginTop: 16, 

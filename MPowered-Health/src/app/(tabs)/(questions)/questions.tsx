@@ -20,6 +20,7 @@ import { ModalActions, modalStyles } from '@/components/ui/modal-ui';
 // temporary UI - to be replaced by settings specific UI
 import {
   AuthIntro,
+  AuthHeader,
   PrimaryButton,
   AuthInput,
 } from '@/components/auth/auth-ui';
@@ -196,43 +197,45 @@ export default function Questions() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <AuthIntro
-        sectionLabel="Q&A"
-        title="Questions & Answers"
-        description="Add questions you would like to discuss with your healthcare professional/s."
-      />
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <View style={styles.body}>
+        <AuthHeader />
+        <View style={styles.content}>
+          <AuthIntro
+            sectionLabel="Q&A"
+            title="Questions & Answers"
+            description="Add questions you would like to discuss with your healthcare professional/s."
+          />
 
-      {/* render questions */}
-      <FlatList 
-        data={questions} 
-        renderItem={renderQuestion} 
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={
-          questions.length === 0 ? styles.emptyContent : styles.content
-        }
-        ListEmptyComponent={<Text style={styles.emptyContentText}>No questions created yet. Press the + button to start adding questions!</Text>}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
-      />     
+          {/* render questions */}
+          <FlatList 
+            data={questions} 
+            renderItem={renderQuestion} 
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={
+              questions.length === 0 ? styles.emptyContent : styles.qaContent
+            }
+            ListEmptyComponent={<Text style={styles.emptyContentText}>No questions created yet. Press the + button to start adding questions!</Text>}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+          />     
 
-      <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()} disabled={isLoading}>
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()} disabled={isLoading}>
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: { 
     flex: 1, 
-    backgroundColor: palette.background,
-    alignSelf: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    flexGrow: 1,
-    width: '100%',
-    maxWidth: 560,
+    backgroundColor: palette.surface 
+  },
+  body: { 
+    flex: 1, 
+    backgroundColor: palette.background 
   },
   title: {
     marginTop: 8, 
@@ -271,7 +274,20 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   content: {
-    paddingBottom: 100,
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    flex: 1,
+  },
+  qaContent: {
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 112,
   },
   emptyContent: {
     alignItems: "center",
@@ -279,6 +295,9 @@ const styles = StyleSheet.create({
     backgroundColor: palette.light,
     overflow: "hidden",
     padding: 16,
+    width: '100%',
+    maxWidth: 680,
+    alignSelf: 'center',
 
   },
   emptyContentText: {
