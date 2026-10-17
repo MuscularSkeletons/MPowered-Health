@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { MedicationProvider } from '@/context/prescriptions-context';
-import PrescriptionEditor from '@/app/(tabs)/myhealth/prescriptions/edit';
-import Prescriptions from '@/app/(tabs)/myhealth/prescriptions';
+import PrescriptionEditor from '@/app/(tabs)/(myhealth)/(prescriptions)/edit';
+import Prescriptions from '@/app/(tabs)/(myhealth)/(prescriptions)';
 import type { Medication } from '@/types/prescription';
 
 let mockParams: { id?: string } = {};
