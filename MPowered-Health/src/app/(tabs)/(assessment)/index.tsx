@@ -5,17 +5,20 @@ import {
   View,
   ScrollView,
   Pressable,
+  TextInput
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessmentQuestions';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
+import WeeklyReflectionScreen from '@/constants/assessmentQuestions/WeeklyReflection';
 import { palette } from '@/constants/profile/ui';
 import { AuthHeader } from '@/components/auth/auth-ui';
 import { useAuth } from '@/context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,
   getWeeklyAssessmentStreak,
+  getWeeklyReflection,
 } from '@/hooks/useAssessments';
 
 const ASSESSMENTS = [
@@ -45,6 +48,10 @@ export default function HomeScreen() {
   const [completedList, setCompletedList] = useState<AssessmentId[]>([]);
   const [streak, setStreak] = useState(0);
 
+  const [isEditingReflection, setIsEditingReflection] = useState(false);
+  const [weeklyReflection, setWeeklyReflection] = useState('');
+  
+
   const [savedAnswersByCat, setSavedAnswersByCat] = useState<
     Partial<Record<AssessmentId, Record<string, any>>>
   >({});
@@ -59,13 +66,18 @@ export default function HomeScreen() {
 
   const refreshWeeklyProgress = useCallback(async () => {
     try {
-      const weeklyState = await getCurrentWeeklyAssessmentState();
+      const [weeklyState, reflectionText] = await Promise.all([
+      getCurrentWeeklyAssessmentState(),
+      getWeeklyReflection(),
+      ]);
+
       setCompletedList(
         weeklyState.completedCategories.filter((title): title is AssessmentId =>
           ASSESSMENTS.some((assessment) => assessment.id === title),
         ),
       );
       setSavedAnswersByCat(weeklyState.answersByCategory);
+      setWeeklyReflection(reflectionText);
     } catch {
       // Keep any in-session progress visible if the network is temporarily unavailable.
     }
@@ -81,6 +93,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       setActiveCategoryId(null);
+      setIsEditingReflection(false);
       void refreshWeeklyProgress();
       void refreshStreak();
     });
@@ -90,8 +103,8 @@ export default function HomeScreen() {
 
   // If a category is selected, render the active questionnaire flow
   if (activeCategoryId) {
-  const categoryData = ASSESSMENT_QUESTIONS[activeCategoryId];
-  const isAlreadyDone = completedList.includes(activeCategoryId);
+    const categoryData = ASSESSMENT_QUESTIONS[activeCategoryId];
+    const isAlreadyDone = completedList.includes(activeCategoryId);
 
   return (
     <AssessmentScreen
@@ -114,16 +127,31 @@ export default function HomeScreen() {
     />
   );
 }
+  // Weekly refelction
+  if (isEditingReflection) {
+      return (
+        <WeeklyReflectionScreen
+          initialText={weeklyReflection}
+          onBack={() => setIsEditingReflection(false)}
+          onSaved={(text) => {
+            setWeeklyReflection(text);
+          }}
+        />
+      );
+    }
+
 
   // Otherwise, render the Overview UI
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
-      <ScrollView
-        style={styles.body}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      
+        <ScrollView
+          style={styles.body}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+
+        >
         {/* Banner */}
         <View style={styles.banner}>
           <Text style={styles.greeting}>Good morning, {name} ☀️</Text>
@@ -172,10 +200,10 @@ export default function HomeScreen() {
                 : "This week's progress"}
             </Text>
             <Text style={styles.progressCount}>
-              {completedList.length}/{ASSESSMENTS.length} assessments
-            </Text>
+                {completedList.length}/{ASSESSMENTS.length} assessments
+              </Text>
+            </View>
           </View>
-        </View>
 
         {/* Assessment Card List */}
         <View style={styles.panel}>
@@ -208,11 +236,51 @@ export default function HomeScreen() {
             );
           })}
         </View>
+        
+        {/* Weekly Reflection Card */}
+        <Pressable
+          onPress={() => setIsEditingReflection(true)}
+          style={({ pressed }) => [
+            styles.reflectionCard,
+            pressed && styles.pressed,
+          ]}
+        >
+          <View style={styles.reflectionHeader}>
+            <View style={styles.reflectionTitleContainer}>
+              <Text style={styles.reflectionTitle}>Weekly Reflection</Text>
+              <Text style={styles.reflectionSubtitle}>
+                {weeklyReflection
+                  ? 'Tap to review or edit your notes'
+                  : 'Add notes on triggers, wins, or thoughts'}
+              </Text>
+            </View>
+            <View style={styles.optionalBadge}>
+              <Text style={styles.optionalText}>Optional</Text>
+            </View>
+          </View>
+
+          {weeklyReflection ? (
+            <View style={styles.reflectionPreviewBox}>
+              <Text style={styles.reflectionPreviewText} numberOfLines={2}>
+                &ldquo;{weeklyReflection}&rdquo;
+              </Text>
+            </View>
+          ) : null}
+
+          <View style={styles.recordRow}>
+            <Text style={styles.recordText}>
+              {weeklyReflection ? 'Edit reflection' : 'Write reflection'}
+            </Text>
+            <Text style={styles.arrow}>›</Text>
+          </View>
+        </Pressable>
         <Text style={styles.sponsor}>Supported by ABBVIE</Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
+      
+
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.surface },
@@ -379,5 +447,68 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 24,
   },
-  
+  /* Reflection Button Card */
+  reflectionPreviewBox: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  reflectionPreviewText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#334155',
+    fontStyle: 'italic',
+  },
+  recordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
+  reflectionCard: {
+  backgroundColor: '#ffffff',
+  borderRadius: 20,
+  padding: 20,
+  marginTop: 18,
+  borderWidth: 1.5,
+  borderColor: '#E2E8F0',
+  gap: 12,
+  overflow: 'hidden', 
+},
+reflectionHeader: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  width: '100%',
+},
+reflectionTitleContainer: {
+  flex: 1, 
+  paddingRight: 12,
+},
+reflectionTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#1E293B',
+  marginBottom: 2,
+},
+reflectionSubtitle: {
+  fontSize: 13,
+  color: '#64748B',
+  lineHeight: 18,
+},
+optionalBadge: {
+  backgroundColor: '#F1F5F9',
+  paddingHorizontal: 8,
+  paddingVertical: 3,
+  borderRadius: 8,
+  alignSelf: 'flex-start',
+},
+optionalText: {
+  fontSize: 11,
+  fontWeight: '700',
+  color: '#64748B',
+  textTransform: 'uppercase',
+},
 });

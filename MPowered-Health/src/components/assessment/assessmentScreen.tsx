@@ -16,6 +16,7 @@ import { AuthHeader, PrimaryButton } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 
+
 interface Question {
   id: string;
   title: string;
@@ -154,6 +155,8 @@ export default function AssessmentScreen({
   const [isFinished, setIsFinished] = useState(initialCompleted);
   const [summaryMessage, setSummaryMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [otherText, setOtherText] = useState('');
+
   const scrollRef = useRef<ScrollView>(null);
   const questions = categoryData?.questions || [];
   const currentQ = questions[currentIndex];
@@ -162,10 +165,16 @@ export default function AssessmentScreen({
   const currentScore = typeof selectedValue === 'number' ? selectedValue : 0;
   const currentText = typeof selectedValue === 'string' ? selectedValue : '';
   const isLast = currentIndex === questions.length - 1;
+
+  const isLocationQuestion = currentQ?.id === 'pain_location';
+  const hasSelectedOther = isLocationQuestion && selectedMulti.includes('Other');
+
   const valid = Boolean(
     currentQ?.optional ||
       selectedValue === 0 ||
-      (Array.isArray(selectedValue) ? selectedValue.length : String(selectedValue ?? '').trim()),
+      (Array.isArray(selectedValue)
+        ? selectedValue.length && (!hasSelectedOther || otherText.trim().length > 0)
+        : String(selectedValue ?? '').trim()),
   );
 
   useEffect(() => {
@@ -174,28 +183,35 @@ export default function AssessmentScreen({
 
   const select = (value: string | number) => {
     if (currentQ.kind === 'multi') {
-      const next = selectedMulti.includes(String(value))
-        ? selectedMulti.filter((item) => item !== value)
-        : [...selectedMulti, String(value)];
+      const stringVal = String(value);
+      const isRemoving = selectedMulti.includes(stringVal);
+      const next = isRemoving
+        ? selectedMulti.filter((item) => item !== stringVal)
+        : [...selectedMulti, stringVal];
+
+      if (stringVal === 'Other' && isRemoving) {
+        setOtherText('');
+      }
+
       setAnswers((previous) => ({ ...previous, [currentQ.id]: next }));
       return;
     }
     setAnswers((previous) => ({ ...previous, [currentQ.id]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (finalAnswers: Record<string, any>) => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const calculated = categoryData.calculateScore?.(answers);
+      const calculated = categoryData.calculateScore?.(finalAnswers);
       setSummaryMessage(calculated?.summaryMessage || null);
       await submitAssessmentAnswers(
         categoryData.title,
-        answers,
+        finalAnswers,
         calculated?.extraFields || {},
         assessmentId,
       );
-      onComplete?.(answers);
+      onComplete?.(finalAnswers);
       setIsFinished(true);
     } catch (error: any) {
       const message = error?.message || 'Failed to save responses. Please try again.';
@@ -208,10 +224,45 @@ export default function AssessmentScreen({
 
   const next = () => {
     if (!valid) return;
-    if (isLast) handleSubmit();
+
+    let updatedAnswers = { ...answers };
+
+    if (isLocationQuestion && hasSelectedOther) {
+      const trimmed = otherText.trim();
+      const existingOptions = (currentQ.options || []).filter(
+        (opt) => opt.toLowerCase() !== 'other',
+      );
+
+      const isDuplicate = existingOptions.some(
+        (opt) => opt.toLowerCase() === trimmed.toLowerCase(),
+      );
+
+      if (isDuplicate) {
+        Alert.alert(
+          'Location Already Listed',
+          `"${trimmed}" is already an option in the list. Please select it from the options above.`,
+        );
+        return;
+      }
+
+      const finalLocations = selectedMulti
+        .filter((loc) => loc !== 'Other')
+        .concat(asSentence(trimmed));
+
+      updatedAnswers = {
+        ...answers,
+        [currentQ.id]: finalLocations,
+      };
+      setAnswers(updatedAnswers);
+    }
+
+    if (isLast) handleSubmit(updatedAnswers);
     else setCurrentIndex((index) => index + 1);
   };
 
+  
+
+  
   if (!questions.length) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
@@ -356,8 +407,9 @@ export default function AssessmentScreen({
                   ? selectedMulti.includes(option)
                   : selectedValue === option;
                 return (
+                  <View key={option}>
                   <Pressable
-                    key={option}
+                    
                     onPress={() => select(option)}
                     style={[styles.option, on && styles.optionOn]}
                   >
@@ -371,6 +423,21 @@ export default function AssessmentScreen({
                       <Text style={styles.tick}>{on ? '✓' : ''}</Text>
                     </View>
                   </Pressable>
+
+                  {/* pop-up textinput when "Other" is selected */}
+                    {isLocationQuestion && option === 'Other' && on ? (
+                      <View style={styles.otherInputContainer}>
+                        <TextInput
+                          value={otherText}
+                          onChangeText={setOtherText}
+                          placeholder="Please specify location (e.g., Wrist, Elbow)"
+                          placeholderTextColor="#81798A"
+                          style={styles.otherTextInput}
+                          autoFocus
+                        />
+                      </View>
+                    ) : null}
+                  </View>
                 );
               })}
             </View>
@@ -636,4 +703,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   closeText: { fontSize: 13, fontWeight: '800', color: palette.text },
+
+  otherInputContainer: {
+    marginTop: 8,
+    marginBottom: 6,
+    paddingHorizontal: 4,
+  },
+  otherTextInput: {
+    borderWidth: 1.5,
+    borderColor: palette.primary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: palette.text,
+    backgroundColor: '#ffffff',
+  },
 });
