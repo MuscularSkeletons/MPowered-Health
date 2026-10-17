@@ -190,7 +190,7 @@ export const useQuestions = () => {
                 .select('assessment_id')
                 .eq('week_start', weekStart)
                 .eq('user_id', user.id)
-                .single();        
+                .maybeSingle();        
             if (error) {
                 console.error('Error fetching assessment ID:', error);
                 return null;
