@@ -4,6 +4,10 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
+    backgroundColor: palette.surface,
+  },
+  body: {
+    flex: 1,
     backgroundColor: palette.background,
   },
   content: {
