@@ -102,7 +102,7 @@ const ERRORS: Record<AuthErrorCode, AuthUserError> = {
 };
  
 const FALLBACK: AuthUserError = {
-  message: 'Something went wrong. Please try again.',
+  message: 'We could not complete that request. Check your connection and try again.',
 };
  
 /**
@@ -117,6 +117,13 @@ export function toUserError(error: unknown): AuthUserError {
  
   if (code && code in ERRORS) {
     return ERRORS[code];
+  }
+
+  if (authError.status === 401 && /api key/i.test(authError.message ?? '')) {
+    return {
+      message: 'The app connection is not configured correctly. Please contact support.',
+      action: 'contact_support',
+    };
   }
  
   // Unknown code: log for triage, show fallback

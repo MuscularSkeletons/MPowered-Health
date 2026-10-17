@@ -1,12 +1,18 @@
-// Shared color tokens keep the app aligned with the cool pastel brand palette.
+// Shared color tokens keep every screen aligned with the calm pastel brand palette.
 export const palette = {
   primary: '#9B91D3',
-  secondary: '#CBE5F1',
+  primaryDark: '#756AB2',
+  secondary: '#D1E6ED',
   accent: '#F0CBEA',
   accentSoft: '#F9EAF6',
   light: '#CCCDF1',
-  primaryDark: '#756AB2',
   chart: '#CF5FA8',
+  chartSoft: '#F0CBEA',
+  pinkBorder: '#D8B6D2',
+  softBlue: '#D1E6ED',
+  blueBorder: '#AFCBD4',
+  softGreen: '#D7EECE',
+  greenBorder: '#003A4B',
   text: '#1E3038',
   muted: '#68787E',
   background: '#E9F2F4',
