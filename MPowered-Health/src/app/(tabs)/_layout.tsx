@@ -3,8 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/profile/ui";
 
 // Specifies layout for tabs 
-// TODO: change placeholder icons to actual icons for each tab
-
 export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ 
