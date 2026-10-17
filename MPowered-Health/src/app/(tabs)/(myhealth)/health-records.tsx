@@ -98,7 +98,7 @@ export default function HealthRecords() {
             <Pressable
               accessibilityRole="button"
               style={s.more}
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('/(tabs)/(assessment)')}
             >
               <Text style={s.moreText}>Open Pain Tracker</Text>
             </Pressable>

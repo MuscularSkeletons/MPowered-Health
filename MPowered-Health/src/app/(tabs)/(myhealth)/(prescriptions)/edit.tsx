@@ -22,7 +22,7 @@ function Editor({ id }: { id?: string }) {
         <Text>This prescription is no longer available.</Text>
         <ActionButton
           label="Back to prescriptions"
-          onPress={() => router.replace('/(tabs)/myhealth/prescriptions')}
+          onPress={() => router.replace('/(tabs)/(myhealth)/(prescriptions)')}
         />
       </Shell>
     );
@@ -68,7 +68,7 @@ function Editor({ id }: { id?: string }) {
         onPress={async () => {
           if (!(await save())) return;
           if (router.canGoBack()) router.back();
-          else router.replace('/(tabs)/myhealth/prescriptions');
+          else router.replace('/(tabs)/(myhealth)/(prescriptions)');
         }}
       />
     </Shell>

@@ -33,7 +33,7 @@ export default function PrescriptionsScreen() {
                   accessibilityLabel={`Edit ${m}`}
                   style={s.iconButton}
                   onPress={() => {
-                    router.push({ pathname: '/(tabs)/myhealth/prescriptions/edit', params: { id: item.id } });
+                    router.push({ pathname: '/(tabs)/(myhealth)/(prescriptions)/edit', params: { id: item.id } });
                   }}
                 >
                   <Feather name="edit-2" size={21} color={palette.success} />
@@ -55,7 +55,7 @@ export default function PrescriptionsScreen() {
         label="Add prescription"
         disabled={loadFailed}
         onPress={() => {
-          router.push('/(tabs)/myhealth/prescriptions/edit');
+          router.push('./edit');
         }}
       />
     </Shell>
