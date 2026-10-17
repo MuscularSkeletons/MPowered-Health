@@ -12,7 +12,7 @@ export default function ActivationScreen() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => router.replace('/(tabs)'), 5000);
+    const timer = setTimeout(() => router.replace('/(tabs)/(assessment)'), 5000);
     return () => clearTimeout(timer);
   }, [router]);
 

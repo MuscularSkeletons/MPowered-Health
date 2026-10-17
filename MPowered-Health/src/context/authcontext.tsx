@@ -17,7 +17,7 @@ export interface User {
   birthyear?: number;
   formalDiagnosis?: boolean;
   painConditions?: string[];
-  otherCondition?: string;
+  otherCondition?: string | null;
   onboardingComplete?: boolean;
 }
 
@@ -26,9 +26,12 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteUser: () => Promise<void>;
   updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
+  updateAuthUserEmail: (email: string) => Promise<void>;
+  updateAuthUserPassword: (currPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // TODO: implement sign in using email and password
+  // TODO: implement sign in using email auth
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
       email,
@@ -107,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // handles user sign up using an email and pasword authentication method
+  // handles user sign up using an email and password authentication method
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -128,7 +131,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-  }
+  };
+
+
+  // delete user - adds user id to delete requests table and signs user out
+  const deleteUser = async () => {
+    // check user logged in
+    if (!user) return;
+
+    // add user id to delete requests table
+      const { error } = await supabase
+        .from("delete_request")
+        .insert({ user_id: user.id });
+
+    if (error) throw error;
+
+    console.log("Delete request added to delete_request table. Awaiting manual delete by admin.");
+
+    // sign the user out
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   // Onboarding screens build one local profile before the completed screen saves it.
   const updateUserDraft = (userData: Partial<User>) => {
@@ -178,6 +201,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // functions that updates info related to authentication i.e. email and password
+  const updateAuthUserEmail = async (email: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      email: email.trim(),
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      if (!userProfile) {
+        console.error("Error fetching user profile.");
+        return; // abort early - do not set user profile to null
+      }
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
+  const updateAuthUserPassword = async (currPassword: string, newPassword: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      current_password: currPassword,
+      password: newPassword,
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
   // check if there is an existing session - automatically runs when open the app
   const checkSession = async () => {
     setIsLoading(true);
@@ -211,7 +276,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
+        value={{ 
+          user, 
+          signIn, 
+          signUp, 
+          signOut, 
+          deleteUser,
+          updateUserDraft, 
+          updateUser, 
+          isLoading,
+          updateAuthUserEmail,
+          updateAuthUserPassword, }}
     >
         {children}
     </AuthContext.Provider>
