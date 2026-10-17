@@ -3,7 +3,7 @@ import { TrackingChart } from '@/components/my-health/tracking-chart';
 import { healthRecordStyles as s } from '@/components/my-health/health-record-styles';
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
-import { MhaHeader } from '@/components/my-health/app-ui';
+import { AuthHeader } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -34,7 +34,7 @@ export default function HealthRecords() {
   } = useHealthRecords();
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      <MhaHeader />
+      <AuthHeader />
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         <Pressable accessibilityRole="button" onPress={() => router.back()}>
           <Text style={s.back}>‹ Back</Text>

@@ -1,4 +1,4 @@
-import { MhaHeader } from '@/components/my-health/app-ui';
+import { AuthHeader } from '@/components/auth/auth-ui';
 import { ProfileExportActions } from '@/components/my-health/profile-export-actions';
 import type { PainProfileReport } from '@/components/my-health/profile-report';
 import { layout, palette, radius, spacing } from '@/constants/profile/ui';
@@ -122,7 +122,7 @@ export default function LatestAssessmentScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <MhaHeader />
+      <AuthHeader />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Pressable accessibilityRole="button" onPress={() => router.back()}>
           <Text style={styles.back}>‹ Back</Text>

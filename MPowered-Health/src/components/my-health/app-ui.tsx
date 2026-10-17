@@ -1,24 +1,6 @@
 /** Provides the header and action button shared by My Health screens. */
 import { palette, radius } from '@/constants/profile/ui';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-/**
- * Displays the shared MPowered header.
- *
- * Render the shared MPowered Health wordmark at the top of screens.
- */
-export function MhaHeader() {
-  return (
-    <View style={s.header}>
-      <View style={s.logoLockup}>
-        <View style={s.poweredMark}>
-          <Text style={s.centerM}>M</Text>
-          <Text style={s.centerPowered}>Powered</Text>
-        </View>
-        <Text style={s.centerHealth}>Health</Text>
-      </View>
-    </View>
-  );
-}
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 /**
  * Displays a styled action button with optional disabled state.

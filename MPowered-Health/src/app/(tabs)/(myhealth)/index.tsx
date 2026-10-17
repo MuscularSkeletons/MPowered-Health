@@ -1,4 +1,4 @@
-import { MhaHeader } from '@/components/my-health/app-ui';
+import { AuthHeader } from '@/components/auth/auth-ui';
 import { overviewStyles as styles } from '@/components/my-health/overview-styles';
 import { palette } from '@/constants/profile/ui';
 import {
@@ -105,7 +105,7 @@ export default function MyHealthScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <MhaHeader />
+      <AuthHeader />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.eyebrow}>MY HEALTH</Text>
         <Text style={styles.pageTitle}>Understand your health over time</Text>

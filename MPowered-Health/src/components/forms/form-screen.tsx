@@ -1,5 +1,5 @@
 import { styles } from '@/components/forms/styles';
-import { MhaHeader } from '@/components/my-health/app-ui';
+import { AuthHeader } from '@/components/auth/auth-ui';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ export function Shell({
 }) {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <MhaHeader />
+      <AuthHeader />
       <ScrollView contentContainerStyle={styles.content}>
         <Pressable onPress={onBack}>
           <Text style={styles.back}>‹ Back</Text>
