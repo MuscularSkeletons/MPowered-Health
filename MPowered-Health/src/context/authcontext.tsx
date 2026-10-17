@@ -17,7 +17,7 @@ export interface User {
   birthyear?: number;
   formalDiagnosis?: boolean;
   painConditions?: string[];
-  otherCondition?: string;
+  otherCondition?: string | null;
   onboardingComplete?: boolean;
 }
 
@@ -26,8 +26,12 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteUser: () => Promise<void>;
+  updateUserDraft: (userData: Partial<User>) => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
+  updateAuthUserEmail: (email: string) => Promise<void>;
+  updateAuthUserPassword: (currPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,36 +41,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
 
-  // run checkSession when first render the app
-  useEffect(() => {
-    checkSession();
-  }, []);
-
   // get the user information from supabase for the user with that userId (check if user authenticated)
   // checks if user information exists when they sign-in/sign-up
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
       // fetch all user info from db for the given user id
       const { data, error } = await supabase
-        .from("User")
+        .from("user")
         .select("*")
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
       
         if (error) {
-          console.error("Error fetching user profile:", error);
-          return null; // abort function early
-        }
-
-        if (!data) {
-          console.error("User profile data not found");
-          return null; // abort function early
+          if (__DEV__) console.debug('User profile request failed:', error.code);
+          throw error;
         }
 
         const authUser = await supabase.auth.getUser(); // gets info about a user currently logged in
         if (!authUser.data.user) {
-          console.error("No authenticated user found");
+          if (__DEV__) console.debug('No authenticated user was available for the profile.');
           return null; // abort function early
+        }
+
+        // A newly authenticated account may not have completed its public profile yet.
+        // Keep it signed in so the onboarding flow can create that row on completion.
+        if (!data) {
+          return {
+            id: userId,
+            name: '',
+            email: authUser.data.user.email || '',
+            onboardingComplete: false,
+          };
         }
 
         // return the user
@@ -83,12 +88,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
     } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
+      throw error;
     }
   }
 
-  // TODO: implement sign in using email and password
+  // TODO: implement sign in using email auth
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
       email,
@@ -106,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // handles user sign up using an email and pasword authentication method
+  // handles user sign up using an email and password authentication method
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -127,7 +131,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-  }
+  };
+
+
+  // delete user - adds user id to delete requests table and signs user out
+  const deleteUser = async () => {
+    // check user logged in
+    if (!user) return;
+
+    // add user id to delete requests table
+      const { error } = await supabase
+        .from("delete_request")
+        .insert({ user_id: user.id });
+
+    if (error) throw error;
+
+    console.log("Delete request added to delete_request table. Awaiting manual delete by admin.");
+
+    // sign the user out
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  // Onboarding screens build one local profile before the completed screen saves it.
+  const updateUserDraft = (userData: Partial<User>) => {
+    if (!user) return;
+    setUser((current) => current ? { ...current, ...userData } : current);
+    // Log field names only so health answers and personal details stay out of logs.
+    if (__DEV__) console.log('User draft updated locally:', Object.keys(userData));
+  };
 
   // update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
@@ -148,9 +180,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // update values in db
       const { error, data } = await supabase
-        .from("User")
-        .update(updateData)
-        .eq("user_id", user.id)
+        .from("user")
+        .upsert({ user_id: user.id, ...updateData }, { onConflict: 'user_id' })
         .select()
         .single();
 
@@ -158,17 +189,59 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // update the change here
       if (data) {
-        console.log(data);
+        if (__DEV__) console.log('User profile saved:', Object.keys(updateData));
         const userProfile = await fetchUserProfile(data.user_id);
         setUser(userProfile);
-        console.log("updated change locally (?)");
+        if (__DEV__ && userProfile) console.log('Local user refreshed from saved profile');
       }
 
     } catch (error) {
-      console.error("Error updating user:", error);
+      if (__DEV__) console.debug('User profile save failed.');
       throw error;
     }
   };
+
+  // functions that updates info related to authentication i.e. email and password
+  const updateAuthUserEmail = async (email: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      email: email.trim(),
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      if (!userProfile) {
+        console.error("Error fetching user profile.");
+        return; // abort early - do not set user profile to null
+      }
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
+  const updateAuthUserPassword = async (currPassword: string, newPassword: string) => {
+    // check user logged in
+    if (!user) return;
+
+    // update values in db
+    const { data, error } = await supabase.auth.updateUser({
+      current_password: currPassword,
+      password: newPassword,
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
 
   // check if there is an existing session - automatically runs when open the app
   const checkSession = async () => {
@@ -185,17 +258,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("User not logged in");
         setUser(null); // user is not logged in
       }
-    } catch (error) {
-      console.error("Error checking session", error);
+    } catch {
+      if (__DEV__) console.debug('Saved session could not load its profile.');
       setUser(null);
     } finally {
       setIsLoading(false); // finished checking session so can proceed
     }
   }; 
 
+  // Restore the saved login when this provider first appears.
+  useEffect(() => {
+    void Promise.resolve().then(checkSession);
+    // Check the saved login only once when the app opens.
+    // Checking again while the user answers questions could erase their unsaved answers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUser, isLoading }}
+        value={{ 
+          user, 
+          signIn, 
+          signUp, 
+          signOut, 
+          deleteUser,
+          updateUserDraft, 
+          updateUser, 
+          isLoading,
+          updateAuthUserEmail,
+          updateAuthUserPassword, }}
     >
         {children}
     </AuthContext.Provider>

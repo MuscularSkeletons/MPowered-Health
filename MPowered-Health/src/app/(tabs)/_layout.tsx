@@ -9,16 +9,27 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ 
             headerShown: false,
+            sceneStyle: { backgroundColor: palette.background },
             tabBarStyle: {
-                paddingTop: 10,
-                backgroundColor: palette.surfaceSoft, 
+                height: 76,
+                paddingTop: 4,
+                paddingBottom: 12,
+                paddingHorizontal: 18,
+                backgroundColor: palette.background,
+                borderTopWidth: 1,
+                borderTopColor: palette.line,
+                elevation: 0,
+                shadowOpacity: 0,
             },
-            tabBarInactiveTintColor: palette.accent,
-            tabBarActiveTintColor: palette.secondary,
+            tabBarItemStyle: { paddingVertical: 2 },
+            tabBarIconStyle: { marginTop: 2 },
+            tabBarLabelStyle: { marginTop: 2, fontSize: 11, fontWeight: '600' },
+            tabBarInactiveTintColor: palette.muted,
+            tabBarActiveTintColor: palette.primary,
         }}>
 
         <Tabs.Screen 
-            name="index" 
+            name="(assessment)" 
             options={{
                 title: 'Pain Tracker',
                 tabBarIcon: ({ color, size, focused }) => (
@@ -57,7 +68,7 @@ export default function TabsLayout() {
             }}
         />
         <Tabs.Screen 
-            name="settings" 
+            name="(settings)" 
             options={{
                 title: 'Settings',
                 tabBarIcon: ({ color, size, focused }) => (
