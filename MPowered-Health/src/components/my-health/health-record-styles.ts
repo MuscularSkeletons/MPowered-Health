@@ -40,7 +40,8 @@ export const healthRecordStyles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
-  safe: { flex: 1, backgroundColor: palette.background },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  body: { flex: 1, backgroundColor: palette.background },
   content: {
     width: '100%',
     maxWidth: 680,

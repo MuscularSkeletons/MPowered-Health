@@ -1,6 +1,6 @@
 import { PrintPdfButton } from '@/components/my-health/print-pdf-button';
 import { TrackingChart } from '@/components/my-health/tracking-chart';
-import { healthRecordStyles as s } from '@/components/my-health/health-record-styles';
+import { healthRecordStyles as styles } from '@/components/my-health/health-record-styles';
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
 import { AuthHeader } from '@/components/auth/auth-ui';
@@ -33,174 +33,176 @@ export default function HealthRecords() {
     newestFirst,
   } = useHealthRecords();
   return (
-    <SafeAreaView style={s.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()}>
-          <Text style={s.back}>‹ Back</Text>
-        </Pressable>
-        <View style={s.titleRow}>
-          <Text style={s.title}>Pain records</Text>
-          <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
-        </View>
-        <View style={s.tabs}>
-          {(['Chart', 'History'] as const).map((label) => (
-            <Pressable
-              key={label}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: tab === label.toLowerCase() }}
-              style={[s.tab, tab === label.toLowerCase() && s.tabOn]}
-              onPress={() => setTab(label.toLowerCase() as 'chart' | 'history')}
-            >
-              <Text style={[s.tabText, tab === label.toLowerCase() && s.tabTextOn]}>{label}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={s.chartHead}>
-          <Text style={s.metricTitle}>Pain intensity</Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Pain areas: ${selected?.label ?? 'No assessments yet'}`}
-            accessibilityState={{ expanded: dropdownOpen, disabled: !groups.length }}
-            disabled={!groups.length}
-            style={s.filter}
-            onPress={() => setDropdownOpen(true)}
-          >
-            <View style={s.filterContent}>
-              <Text numberOfLines={1} style={s.filterText}>
-                {selected?.label ?? 'No pain areas yet'}
-              </Text>
-              <Feather name="chevron-down" size={16} color={palette.muted} />
-            </View>
+      <View style={styles.body}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Pressable accessibilityRole="button" onPress={() => router.back()}>
+            <Text style={styles.back}>‹ Back</Text>
           </Pressable>
-        </View>
-        {records.length && tab === 'chart' ? (
-          <View style={s.segment}>
-            {(['Average', 'Worst', 'Mildest'] as const).map((label) => (
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>Pain records</Text>
+            <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
+          </View>
+          <View style={styles.tabs}>
+            {(['Chart', 'History'] as const).map((label) => (
               <Pressable
                 key={label}
-                accessibilityRole="button"
-                accessibilityState={{ selected: metric === label }}
-                style={[s.segmentItem, metric === label && s.segmentOn]}
-                onPress={() => setMetric(label)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: tab === label.toLowerCase() }}
+                style={[styles.tab, tab === label.toLowerCase() && styles.tabOn]}
+                onPress={() => setTab(label.toLowerCase() as 'chart' | 'history')}
               >
-                <Text style={[s.segmentText, metric === label && s.segmentTextOn]}>{label}</Text>
+                <Text style={[styles.tabText, tab === label.toLowerCase() && styles.tabTextOn]}>{label}</Text>
               </Pressable>
             ))}
           </View>
-        ) : null}
-        {!records.length ? (
-          <View style={s.empty}>
-            <Text style={s.historyDate}>No pain assessments recorded yet</Text>
-            <Text style={s.emptyCopy}>
-              Records will appear here when pain assessments are available.
-            </Text>
+          <View style={styles.chartHead}>
+            <Text style={styles.metricTitle}>Pain intensity</Text>
             <Pressable
               accessibilityRole="button"
-              style={s.more}
-              onPress={() => router.push('/(tabs)/(assessment)')}
+              accessibilityLabel={`Pain areas: ${selected?.label ?? 'No assessments yet'}`}
+              accessibilityState={{ expanded: dropdownOpen, disabled: !groups.length }}
+              disabled={!groups.length}
+              style={styles.filter}
+              onPress={() => setDropdownOpen(true)}
             >
-              <Text style={s.moreText}>Open Pain Tracker</Text>
+              <View style={styles.filterContent}>
+                <Text numberOfLines={1} style={styles.filterText}>
+                  {selected?.label ?? 'No pain areas yet'}
+                </Text>
+                <Feather name="chevron-down" size={16} color={palette.muted} />
+              </View>
             </Pressable>
           </View>
-        ) : tab === 'chart' ? (
-          <>
-            <TrackingChart metric={metric} records={records} />
-            <View style={s.table}>
-              <View style={[s.tableRow, s.tableFirst]}>
-                {['Recorded', 'Average', 'Worst', 'Mildest'].map((label, index) => (
-                  <Text key={label} style={[s.cell, s.tableHeading, index === 0 && s.dateCell]}>
-                    {label}
-                  </Text>
+          {records.length && tab === 'chart' ? (
+            <View style={styles.segment}>
+              {(['Average', 'Worst', 'Mildest'] as const).map((label) => (
+                <Pressable
+                  key={label}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: metric === label }}
+                  style={[styles.segmentItem, metric === label && styles.segmentOn]}
+                  onPress={() => setMetric(label)}
+                >
+                  <Text style={[styles.segmentText, metric === label && styles.segmentTextOn]}>{label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+          {!records.length ? (
+            <View style={styles.empty}>
+              <Text style={styles.historyDate}>No pain assessments recorded yet</Text>
+              <Text style={styles.emptyCopy}>
+                Records will appear here when pain assessments are available.
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                style={styles.more}
+                onPress={() => router.push('/(tabs)/(assessment)')}
+              >
+                <Text style={styles.moreText}>Open Pain Tracker</Text>
+              </Pressable>
+            </View>
+          ) : tab === 'chart' ? (
+            <>
+              <TrackingChart metric={metric} records={records} />
+              <View style={styles.table}>
+                <View style={[styles.tableRow, styles.tableFirst]}>
+                  {['Recorded', 'Average', 'Worst', 'Mildest'].map((label, index) => (
+                    <Text key={label} style={[styles.cell, styles.tableHeading, index === 0 && styles.dateCell]}>
+                      {label}
+                    </Text>
+                  ))}
+                </View>
+                {rows.map((record) => (
+                  <View key={record.id} style={styles.tableRow}>
+                    {[painRecordDate(record), record.average, record.worst, record.mildest].map(
+                      (value, index) => (
+                        <Text key={index} style={[styles.cell, index === 0 && styles.dateCell]}>
+                          {value}
+                        </Text>
+                      ),
+                    )}
+                  </View>
                 ))}
               </View>
-              {rows.map((record) => (
-                <View key={record.id} style={s.tableRow}>
-                  {[painRecordDate(record), record.average, record.worst, record.mildest].map(
-                    (value, index) => (
-                      <Text key={index} style={[s.cell, index === 0 && s.dateCell]}>
-                        {value}
-                      </Text>
-                    ),
-                  )}
+              {records.length > 4 ? (
+                <Pressable
+                  accessibilityRole="button"
+                  style={styles.more}
+                  onPress={() => setExpanded((value) => !value)}
+                >
+                  <Text style={styles.moreText}>
+                    {expanded ? 'Show fewer records' : 'See more records'}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </>
+          ) : (
+            <View style={styles.history}>
+              {newestFirst.map((record) => (
+                <View key={record.id} style={styles.historyGroup}>
+                  <Text style={styles.historyDate}>{painRecordDate(record)}</Text>
+                  <Text style={styles.historyItem}>My Pain · {selected?.label}</Text>
+                  <Text style={styles.emptyCopy}>
+                    Average {record.average}/10 · Worst {record.worst}/10 · Mildest {record.mildest}
+                    /10
+                  </Text>
                 </View>
               ))}
             </View>
-            {records.length > 4 ? (
+          )}
+        </ScrollView>
+        <Modal
+          visible={dropdownOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setDropdownOpen(false)}
+        >
+          <View style={styles.overlay}>
+            <View style={styles.dropdown} accessibilityViewIsModal>
+              <Text style={styles.historyDate} accessibilityRole="header">
+                Choose pain areas
+              </Text>
+              <Text style={styles.emptyCopy}>
+                Each option shows assessments with exactly that combination of areas.
+              </Text>
+              <ScrollView style={styles.dropdownList}>
+                {groups.map((group) => (
+                  <Pressable
+                    key={group.key}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: selected?.key === group.key }}
+                    style={[styles.dropdownOption, selected?.key === group.key && styles.dropdownSelected]}
+                    onPress={() => {
+                      setSelectedKey(group.key);
+                      setExpanded(false);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    <Text style={styles.optionLabel}>
+                      {group.label}
+                      {selected?.key === group.key ? ' ✓' : ''}
+                    </Text>
+                    <Text style={styles.emptyCopy}>
+                      {group.records.length}{' '}
+                      {group.records.length === 1 ? 'assessment' : 'assessments'}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
               <Pressable
                 accessibilityRole="button"
-                style={s.more}
-                onPress={() => setExpanded((value) => !value)}
+                style={styles.more}
+                onPress={() => setDropdownOpen(false)}
               >
-                <Text style={s.moreText}>
-                  {expanded ? 'Show fewer records' : 'See more records'}
-                </Text>
+                <Text style={styles.moreText}>Close</Text>
               </Pressable>
-            ) : null}
-          </>
-        ) : (
-          <View style={s.history}>
-            {newestFirst.map((record) => (
-              <View key={record.id} style={s.historyGroup}>
-                <Text style={s.historyDate}>{painRecordDate(record)}</Text>
-                <Text style={s.historyItem}>My Pain · {selected?.label}</Text>
-                <Text style={s.emptyCopy}>
-                  Average {record.average}/10 · Worst {record.worst}/10 · Mildest {record.mildest}
-                  /10
-                </Text>
-              </View>
-            ))}
+            </View>
           </View>
-        )}
-      </ScrollView>
-      <Modal
-        visible={dropdownOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setDropdownOpen(false)}
-      >
-        <View style={s.overlay}>
-          <View style={s.dropdown} accessibilityViewIsModal>
-            <Text style={s.historyDate} accessibilityRole="header">
-              Choose pain areas
-            </Text>
-            <Text style={s.emptyCopy}>
-              Each option shows assessments with exactly that combination of areas.
-            </Text>
-            <ScrollView style={s.dropdownList}>
-              {groups.map((group) => (
-                <Pressable
-                  key={group.key}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected?.key === group.key }}
-                  style={[s.dropdownOption, selected?.key === group.key && s.dropdownSelected]}
-                  onPress={() => {
-                    setSelectedKey(group.key);
-                    setExpanded(false);
-                    setDropdownOpen(false);
-                  }}
-                >
-                  <Text style={s.optionLabel}>
-                    {group.label}
-                    {selected?.key === group.key ? ' ✓' : ''}
-                  </Text>
-                  <Text style={s.emptyCopy}>
-                    {group.records.length}{' '}
-                    {group.records.length === 1 ? 'assessment' : 'assessments'}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            <Pressable
-              accessibilityRole="button"
-              style={s.more}
-              onPress={() => setDropdownOpen(false)}
-            >
-              <Text style={s.moreText}>Close</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 }

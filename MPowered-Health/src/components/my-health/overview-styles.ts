@@ -2,7 +2,14 @@ import { layout, palette, radius, spacing } from '@/constants/profile/ui';
 import { StyleSheet } from 'react-native';
 
 export const overviewStyles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
+  safe: { 
+    flex: 1, 
+    backgroundColor: palette.surface 
+  },
+  body: { 
+    flex: 1, 
+    backgroundColor: palette.background 
+  },
   content: {
     width: '100%',
     maxWidth: layout.maxContentWidth,

@@ -123,46 +123,49 @@ export default function LatestAssessmentScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()}>
-          <Text style={styles.back}>‹ Back</Text>
-        </Pressable>
-        <Text style={styles.eyebrow}>LATEST ASSESSMENT</Text>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>My health profile</Text>
-          <ProfileExportActions report={report} disabled={!updatedAt} />
-        </View>
-        <Text style={styles.intro}>Your newest answers across all five assessment categories.</Text>
-        <Text style={styles.updated}>
-          {updatedAt ? `Updated ${updatedLabel}` : 'No completed assessments yet'}
-        </Text>
+      <View style={styles.body}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Pressable accessibilityRole="button" onPress={() => router.back()}>
+            <Text style={styles.back}>‹ Back</Text>
+          </Pressable>
+          <Text style={styles.eyebrow}>LATEST ASSESSMENT</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>My health profile</Text>
+            <ProfileExportActions report={report} disabled={!updatedAt} />
+          </View>
+          <Text style={styles.intro}>Your newest answers across all five assessment categories.</Text>
+          <Text style={styles.updated}>
+            {updatedAt ? `Updated ${updatedLabel}` : 'No completed assessments yet'}
+          </Text>
 
-        {categories.map((category) => {
-          const assessment = latest[category.id];
-          return (
-            <View key={category.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{category.title}</Text>
+          {categories.map((category) => {
+            const assessment = latest[category.id];
+            return (
+              <View key={category.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{category.title}</Text>
+                  {assessment ? (
+                    <Text style={styles.cardDate}>{formatDate(assessment.completedAt)}</Text>
+                  ) : null}
+                </View>
+                <View style={styles.rule} />
                 {assessment ? (
-                  <Text style={styles.cardDate}>{formatDate(assessment.completedAt)}</Text>
-                ) : null}
+                  <AnswerRows answers={assessment.answers} labels={category.labels} />
+                ) : (
+                  <Text style={styles.empty}>No assessment recorded yet.</Text>
+                )}
               </View>
-              <View style={styles.rule} />
-              {assessment ? (
-                <AnswerRows answers={assessment.answers} labels={category.labels} />
-              ) : (
-                <Text style={styles.empty}>No assessment recorded yet.</Text>
-              )}
-            </View>
-          );
-        })}
-      </ScrollView>
+            );
+          })}
+        </ScrollView>
+        </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  body: { flex: 1, backgroundColor: palette.background },
   content: {
     width: '100%',
     maxWidth: layout.maxContentWidth,

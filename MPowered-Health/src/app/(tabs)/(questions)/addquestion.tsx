@@ -134,8 +134,8 @@ export default function AddQuestion() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
+      <AuthHeader />
       <View style={styles.body}>
-        <AuthHeader />
         <View style={styles.content}>
           <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
           <AuthIntro

@@ -106,60 +106,62 @@ export default function MyHealthScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <AuthHeader />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow}>MY HEALTH</Text>
-        <Text style={styles.pageTitle}>Understand your health over time</Text>
-        <Text style={styles.pageCopy}>
-          Review your pain trends and keep your prescriptions in one place.
-        </Text>
+      <View style={styles.body}> 
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Text style={styles.eyebrow}>MY HEALTH</Text>
+          <Text style={styles.pageTitle}>Understand your health over time</Text>
+          <Text style={styles.pageCopy}>
+            Review your pain trends and keep your prescriptions in one place.
+          </Text>
 
-        <View style={styles.quickRow}>
-          <Pressable
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.quick, styles.quickPink, pressed && styles.quickPressed]}
-            onPress={() => router.push('/(tabs)/(myhealth)/profile')}
-          >
-            <Text style={styles.quickText}>My health profile</Text>
-            <Text style={styles.quickArrow}>View ›</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.quick, styles.quickGreen, pressed && styles.quickPressed]}
-            onPress={() => router.push('/(tabs)/(myhealth)/(prescriptions)')}
-          >
-            <Text style={[styles.quickText, styles.quickTextOnDark]}>My prescriptions</Text>
-            <Text style={[styles.quickArrow, styles.quickArrowOnDark]}>View ›</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.insights}>
-          <View style={styles.insightMeta}>
-            <View style={styles.insightTitleGroup}>
-              <Text style={styles.insightHeading}>Average pain trend</Text>
-              <Text style={styles.insightLabel}>Your five most recent pain assessments</Text>
-            </View>
-            <Text style={styles.recordCount}>{records.length} records</Text>
+          <View style={styles.quickRow}>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.quick, styles.quickPink, pressed && styles.quickPressed]}
+              onPress={() => router.push('/(tabs)/(myhealth)/profile')}
+            >
+              <Text style={styles.quickText}>My health profile</Text>
+              <Text style={styles.quickArrow}>View ›</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.quick, styles.quickGreen, pressed && styles.quickPressed]}
+              onPress={() => router.push('/(tabs)/(myhealth)/(prescriptions)')}
+            >
+              <Text style={[styles.quickText, styles.quickTextOnDark]}>My prescriptions</Text>
+              <Text style={[styles.quickArrow, styles.quickArrowOnDark]}>View ›</Text>
+            </Pressable>
           </View>
-          {recentRecords.length ? (
-            <PainTrend records={recentRecords} />
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>No pain records yet</Text>
-              <Text style={styles.emptyCopy}>
-                Complete a pain assessment to see your progress here.
-              </Text>
+
+          <View style={styles.insights}>
+            <View style={styles.insightMeta}>
+              <View style={styles.insightTitleGroup}>
+                <Text style={styles.insightHeading}>Average pain trend</Text>
+                <Text style={styles.insightLabel}>Your five most recent pain assessments</Text>
+              </View>
+              <Text style={styles.recordCount}>{records.length} records</Text>
             </View>
-          )}
-          <Pressable
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.historyButton, pressed && styles.quickPressed]}
-            onPress={() => router.push('/(tabs)/(myhealth)/health-records')}
-          >
-            <Text style={styles.historyButtonText}>View all pain records</Text>
-          </Pressable>
-        </View>
-        <Text style={styles.sponsor}>Supported by ABBVIE</Text>
-      </ScrollView>
+            {recentRecords.length ? (
+              <PainTrend records={recentRecords} />
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>No pain records yet</Text>
+                <Text style={styles.emptyCopy}>
+                  Complete a pain assessment to see your progress here.
+                </Text>
+              </View>
+            )}
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.historyButton, pressed && styles.quickPressed]}
+              onPress={() => router.push('/(tabs)/(myhealth)/health-records')}
+            >
+              <Text style={styles.historyButtonText}>View all pain records</Text>
+            </Pressable>
+          </View>
+          <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
