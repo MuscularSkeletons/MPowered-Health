@@ -12,7 +12,7 @@ import { useMedications } from '@/context/prescriptions-context';
 export default function PrescriptionsScreen() {
   const { list, remove, loadFailed, reload } = useMedications();
   return (
-    <Shell title="My prescriptions" onBack={() => router.back()}>
+    <Shell title="Prescriptions List" onBack={() => router.back()}>
       {loadFailed ? (
         <>
           <Text style={styles.copy}>Your prescriptions could not be loaded.</Text>

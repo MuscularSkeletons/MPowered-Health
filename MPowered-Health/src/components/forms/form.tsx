@@ -8,7 +8,11 @@ import {
     Pressable,
     Modal,
 } from 'react-native';
-import { Screen } from '@/components/ui/common';
+import { 
+    Screen, 
+    Intro,
+    commonStyles,
+} from '@/components/ui/common';
 import { router } from 'expo-router';
 import { useState } from 'react';
 
@@ -24,10 +28,11 @@ export function Shell({
 }) {
   return (
     <Screen>
-        <Pressable onPress={onBack}>
-            <Text style={styles.back}>‹ Back</Text>
-        </Pressable>
-        <Text style={styles.title}>{title}</Text>
+        <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+        <Intro
+            sectionLabel="PRESCRIPTIONS"
+            title={title}
+        />
         {children}
     </Screen>
   );
@@ -143,21 +148,6 @@ export function SelectField({
 }
 
 export const styles = StyleSheet.create({
-  back: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: palette.primary,
-    paddingVertical: 14,
-  },
-  title: {
-    fontSize: 29,
-    lineHeight: 35,
-    fontWeight: '800',
-    letterSpacing: -0.6,
-    color: palette.text,
-    marginTop: 8,
-    marginBottom: 8,
-  },
   fieldError: { color: palette.error, fontSize: 12, marginTop: 6 },
   input: {
     minHeight: 56,

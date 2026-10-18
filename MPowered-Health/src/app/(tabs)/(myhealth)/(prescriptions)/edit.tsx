@@ -16,7 +16,7 @@ function Editor({ id }: { id?: string }) {
   const { name, strength, unit, form, repeat, frequency } = draft;
   if (missing)
     return (
-      <Shell title="My Prescriptions">
+      <Shell title="Prescriptions List">
         <Text>This prescription is no longer available.</Text>
         <ActionButton
           label="Back to prescriptions"
@@ -26,7 +26,7 @@ function Editor({ id }: { id?: string }) {
     );
   return (
     <Shell
-      title={!id ? 'Add prescription' : 'Edit prescription'}
+      title={!id ? 'Add Prescription' : 'Edit Prescription'}
       onBack={() => router.back()}
     >
       <Field

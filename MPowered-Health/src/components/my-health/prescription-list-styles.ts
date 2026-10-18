@@ -6,7 +6,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   list: {
     gap: 12,
-    marginVertical: 18,
+    marginBottom: 18,
   },
   med: {
     backgroundColor: palette.surface,
