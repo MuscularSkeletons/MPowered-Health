@@ -46,7 +46,6 @@ export const personalCareQuestions: PersonalCareQuestionsConfig = {
     const { totalScore, impactLevel } = calculatePersonalCareScore(answers);
     return {
       extraFields: {
-        care_score: totalScore,
         impact_level: impactLevel,
       },
       summaryMessage: impactLevel,

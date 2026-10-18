@@ -232,3 +232,49 @@ export async function submitAssessmentAnswers(
 
   return data;
 }
+
+/**
+ * Saves the weekly reflection text directly to the parent 'assessment' taBLE.
+ */
+export async function saveWeeklyReflection(
+  reflectionText: string,
+  explicitAssessmentId: string | number | null = null
+) {
+  const assessmentId =
+    explicitAssessmentId || (await getOrCreateCurrentWeeklyAssessment());
+
+  const { data, error } = await supabase
+    .from('assessment')
+    .update({ weekly_reflection: reflectionText })
+    .eq('assessment_id', assessmentId)
+    .select();
+
+  if (error) {
+    console.error('Error saving weekly reflection:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Retrieves the current week's reflection text.
+ */
+export async function getWeeklyReflection(): Promise<string> {
+  const activeUserId = await getAuthenticatedUserId();
+  const weekStart = getCurrentWeekStartDate();
+
+  const { data, error } = await supabase
+    .from('assessment')
+    .select('weekly_reflection')
+    .eq('week_start', weekStart)
+    .eq('user_id', activeUserId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error loading reflection:', error);
+    return '';
+  }
+
+  return data?.weekly_reflection || '';
+}
