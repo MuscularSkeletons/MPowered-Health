@@ -15,7 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthHeader, PrimaryButton } from '@/components/auth/auth-ui';
 import { palette } from '@/constants/profile/ui';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
-
+import { useMedications } from '@/context/prescriptions-context';
+import { medicationLabel } from '@/types/prescription';
 
 interface Question {
   id: string;
@@ -157,8 +158,21 @@ export default function AssessmentScreen({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [otherText, setOtherText] = useState('');
 
+  const { list, loadFailed } = useMedications();
+
   const scrollRef = useRef<ScrollView>(null);
-  const questions = categoryData?.questions || [];
+
+  const questions = (categoryData?.questions || []).map((question) => {
+    if (question.id === 'medication') {
+      return {
+        ...question,
+        options: list.map((medication) => medicationLabel(medication))
+      };
+    } else {
+      return question;
+    }
+  });
+
   const currentQ = questions[currentIndex];
   const selectedValue = currentQ ? answers[currentQ.id] : undefined;
   const selectedMulti: string[] = Array.isArray(selectedValue) ? selectedValue : [];
@@ -380,6 +394,17 @@ export default function AssessmentScreen({
           <Text style={styles.title}>{currentQ.title}</Text>
           <Text style={styles.prompt}>{currentQ.prompt}</Text>
 
+          {/* display messages related to status of prescriptions */}   
+          <View>
+            {
+              currentQ.id === 'medication' && loadFailed ? (
+                <Text style={styles.copy}>Your prescriptions could not be loaded.</Text>
+              ) : currentQ.id === 'medication' && list.length === 0 ? (
+                <Text style={styles.copy}>No prescriptions added yet.</Text>
+              ) : null
+            }
+          </View>
+
           {currentQ.kind === 'score' ? (
             <>
               <View style={styles.score}>
@@ -403,7 +428,7 @@ export default function AssessmentScreen({
               placeholderTextColor={palette.muted}
               style={[styles.input, currentQ.kind === 'text' && styles.textArea]}
             />
-          ) : (
+          ) : ( 
             <View style={styles.options}>
               {currentQ.options?.map((option) => {
                 const on = currentQ.kind === 'multi'
@@ -721,5 +746,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.text,
     backgroundColor: '#ffffff',
+  },
+  copy: {
+    fontSize: 15,
+    lineHeight: 23,
+    color: palette.muted,
+    marginTop: 40,
+    fontStyle: 'italic',
   },
 });

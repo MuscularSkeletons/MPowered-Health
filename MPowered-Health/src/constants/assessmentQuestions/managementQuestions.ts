@@ -12,11 +12,6 @@ export const managementQuestions = {
             helper:
                 'Not taking medications? You can continue without selecting an option. This list is generated from your medication records.',
             options: [
-                'Perindopril arginine 5 mg — Once daily',
-                'Candesartan 16 mg — Once daily',
-                'Amlodipine 5 mg — Once daily',
-                'Vitamin D3 1000 IU — Once daily',
-                'Raloxifene 60 mg — Once daily',
             ],
         },
 
