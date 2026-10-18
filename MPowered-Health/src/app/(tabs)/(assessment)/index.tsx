@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessmentQuestions';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
-import WeeklyReflectionScreen from '@/constants/assessmentQuestions/WeeklyReflection';
+import WeeklyReflectionScreen from '@/constants/assessmentQuestions/weeklyReflection';
 import { palette } from '@/constants/profile/ui';
 import { AuthHeader } from '@/components/auth/auth-ui';
 import { useAuth } from '@/context/authcontext';
