@@ -59,7 +59,7 @@ export const movementQuestions: MovementQuestionsConfig = {
   tip: 'Explore tips on managing movement',
 
   calculateScore: (answers: Record<string, any>) => {
-    const { totalScore, impactLevel } = calculateMovementScore(answers);
+    const { impactLevel } = calculateMovementScore(answers);
     return {
       extraFields: {
         impact_level: impactLevel,

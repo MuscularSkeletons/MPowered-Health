@@ -50,7 +50,7 @@ export const socialHealthQuestions: SocialHealthQuestionsConfig = {
   tip: 'Explore tips on managing emotions',
 
   calculateScore: (answers: Record<string, any>) => {
-    const { totalScore, impactLevel } = calculateSocialScore(answers);
+    const { impactLevel } = calculateSocialScore(answers);
     return {
       extraFields: {
         impact_level: impactLevel,

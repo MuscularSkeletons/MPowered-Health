@@ -43,7 +43,7 @@ export const personalCareQuestions: PersonalCareQuestionsConfig = {
   tip: 'Explore tips on daily living',
 
   calculateScore: (answers: Record<string, any>) => {
-    const { totalScore, impactLevel } = calculatePersonalCareScore(answers);
+    const { impactLevel } = calculatePersonalCareScore(answers);
     return {
       extraFields: {
         impact_level: impactLevel,
