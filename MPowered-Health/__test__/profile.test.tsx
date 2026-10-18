@@ -40,7 +40,7 @@ describe("objects rendered on screen", () => {
     test("objects are rendered on screen correctly", async() => {
         await render(<ManageProfile/>);
         expect(screen.getByText("PROFILE")).toBeTruthy();
-        expect(screen.getByText("Profile details")).toBeTruthy();
+        expect(screen.getByText("Profile Details")).toBeTruthy();
         expect(screen.getByText("Keep your personal and health information up to date.")).toBeTruthy();
 
         //user info

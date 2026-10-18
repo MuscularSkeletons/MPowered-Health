@@ -35,13 +35,19 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
   await render(<MedicationProvider><PrescriptionEditor /><Prescriptions /></MedicationProvider>);
   expect(screen.getByText('No prescriptions added yet.')).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+
   await fireEvent.changeText(screen.getByLabelText('Medication name'), 'Test medicine');
   await fireEvent.changeText(screen.getByLabelText('Strength'), '0');
   expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+
   await fireEvent.changeText(screen.getByLabelText('Strength'), '5');
+  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+
+  await fireEvent.changeText(screen.getByLabelText('Repeat every'), '1');
   await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
-  await waitFor(() => expect(screen.getByText('Test medicine 5 mg — Every day')).toBeTruthy());
-  await fireEvent.press(screen.getByRole('button', { name: 'Edit Test medicine 5 mg — Every day' }));
+
+  await waitFor(() => expect(screen.getByText('Test medicine 5 mg — Once daily')).toBeTruthy());
+  await fireEvent.press(screen.getByRole('button', { name: 'Edit Test medicine 5 mg — Once daily' }));
   const destination = jest.mocked(router.push).mock.calls[0][0];
   if (typeof destination === 'string' || typeof destination.params?.id !== 'string') {
     throw new Error('Edit navigation must include the prescription ID');
@@ -49,10 +55,14 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
   mockParams = { id: destination.params.id };
   await screen.rerender(<MedicationProvider><PrescriptionEditor /><Prescriptions /></MedicationProvider>);
   await fireEvent.changeText(screen.getByLabelText('Strength'), '10');
+  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+
+  await fireEvent.changeText(screen.getByLabelText('Repeat every'), '1');
   await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
+  
   await waitFor(() => expect(screen.getByText('Test medicine 10 mg — Every day')).toBeTruthy());
   expect(screen.queryByText('Test medicine 5 mg — Every day')).toBeNull();
-  await fireEvent.press(screen.getByRole('button', { name: 'Delete Test medicine 10 mg — Every day' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Delete Test medicine 10 mg — Once daily' }));
   await waitFor(() => expect(screen.getByText('No prescriptions added yet.')).toBeTruthy());
 });
 
