@@ -162,6 +162,7 @@ export default function Settings() {
   return (
     <Screen>
       <Intro
+        sectionLabel="CONTROL CENTRE"
         title="Settings"
         description="Personalise your experience and control your account."
       />

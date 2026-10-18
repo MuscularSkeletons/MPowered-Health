@@ -138,7 +138,7 @@ export default function AddQuestion() {
         <View style={styles.content}>
           <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
           <Intro
-              sectionLabel="Questions"
+              sectionLabel="QUESTIONS"
               title="Add Questions"
               description="Questions are generated based on your assessment answers. Please complete your assessments for accurate suggestions."
             />

@@ -201,8 +201,8 @@ export default function Questions() {
       <View style={styles.body}>
         <View style={styles.content}>
           <Intro
-            sectionLabel="Q&A"
-            title="Questions & Answers"
+            sectionLabel="YOUR QUESTIONS"
+            title="Appointment Preparation"
             description="Add questions you would like to discuss with your healthcare professional/s."
           />
 

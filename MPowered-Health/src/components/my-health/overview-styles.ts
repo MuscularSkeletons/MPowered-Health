@@ -2,45 +2,7 @@ import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { StyleSheet } from 'react-native';
 
 export const overviewStyles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
-    backgroundColor: palette.surface 
-  },
-  body: { 
-    flex: 1, 
-    backgroundColor: palette.background 
-  },
-  content: {
-    width: '100%',
-    maxWidth: layout.maxContentWidth,
-    alignSelf: 'center',
-    paddingHorizontal: layout.screenGutter,
-    paddingTop: layout.screenTop,
-    paddingBottom: layout.screenBottom,
-  },
-  eyebrow: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 1.4,
-    color: palette.primary,
-    marginBottom: spacing.sm,
-  },
-  pageTitle: {
-    maxWidth: 520,
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: '800',
-    letterSpacing: -0.6,
-    color: palette.text,
-  },
-  pageCopy: {
-    maxWidth: 520,
-    marginTop: spacing.sm,
-    fontSize: 16,
-    lineHeight: 24,
-    color: palette.muted,
-  },
-  quickRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl },
+  quickRow: { flexDirection: 'row', gap: spacing.md },
   quick: {
     flex: 1,
     borderRadius: radius.lg,

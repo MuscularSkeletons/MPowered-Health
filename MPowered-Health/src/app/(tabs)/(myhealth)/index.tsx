@@ -1,4 +1,7 @@
-import { Screen } from '@/components/ui/common';
+import { 
+  Screen,
+  Intro, 
+} from '@/components/ui/common';
 import { overviewStyles as styles } from '@/components/my-health/overview-styles';
 import { palette } from '@/constants/ui/styling';
 import {
@@ -104,11 +107,11 @@ export default function MyHealthScreen() {
 
   return (
     <Screen>
-      <Text style={styles.eyebrow}>MY HEALTH</Text>
-      <Text style={styles.pageTitle}>Understand your health over time</Text>
-      <Text style={styles.pageCopy}>
-        Review your pain trends and keep your prescriptions in one place.
-      </Text>
+      <Intro
+        sectionLabel="MY HEALTH"
+        title="Understand your health over time"
+        description="Review your pain trends and keep your prescriptions in one place."
+      />
 
       <View style={styles.quickRow}>
         <Pressable
