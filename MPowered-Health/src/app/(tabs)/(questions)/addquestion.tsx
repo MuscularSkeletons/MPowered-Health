@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
   },
   save: {
     marginTop: 10,
+    marginBottom: 10,
   },
   loadingScreen: {
     flex: 1, 

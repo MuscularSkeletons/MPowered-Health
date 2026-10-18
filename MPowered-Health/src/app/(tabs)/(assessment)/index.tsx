@@ -3,16 +3,14 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessmentQuestions';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import WeeklyReflectionScreen from '@/constants/assessmentQuestions/weeklyReflection';
 import { palette } from '@/constants/profile/ui';
-import { Header } from '@/components/ui/common';
+import { Screen } from '@/components/ui/common';
 import { useAuth } from '@/context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,
@@ -142,156 +140,137 @@ export default function HomeScreen() {
 
   // Otherwise, render the Overview UI
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <Header />
-      
-        <ScrollView
-          style={styles.body}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+    <Screen>
+      {/* Banner */}
+      <View style={styles.banner}>
+        <Text style={styles.greeting}>Good morning, {name} ☀️</Text>
+        <View style={styles.bannerTitleRow}>
+          <Text style={styles.bannerTitle}>Let&apos;s build your</Text>
+          <BrandWord />
+          <Text style={styles.bannerTitle}>plan.</Text>
+        </View>
+        <Text style={styles.bannerCopy}>
+          Assess your pain intensity and its impacts weekly to create an empowered plan.
+        </Text>
 
-        >
-        {/* Banner */}
-        <View style={styles.banner}>
-          <Text style={styles.greeting}>Good morning, {name} ☀️</Text>
-          <View style={styles.bannerTitleRow}>
-            <Text style={styles.bannerTitle}>Let&apos;s build your</Text>
-            <BrandWord />
-            <Text style={styles.bannerTitle}>plan.</Text>
+        {/* Streak Card */}
+        <View style={styles.streak}>
+          <View style={styles.streakIcon}>
+            <Text style={styles.streakSpark}>✦</Text>
           </View>
-          <Text style={styles.bannerCopy}>
-            Assess your pain intensity and its impacts weekly to create an empowered plan.
+          <View>
+            <Text style={styles.streakValue}>
+              {streak === 0 ? 'No streak yet' : `${streak} ${streak === 1 ? 'week' : 'weeks'}`}
+            </Text>
+            <Text style={styles.streakLabel}>
+              {streak === 0 ? 'Complete an assessment to begin' : 'Current assessment streak'}
+            </Text>
+          </View>
+          <Text style={styles.streakEncouragement}>
+            {streak === 0 ? 'Start today' : 'Keep it going'}
           </Text>
+        </View>
+      </View>
 
-          {/* Streak Card */}
-          <View style={styles.streak}>
-            <View style={styles.streakIcon}>
-              <Text style={styles.streakSpark}>✦</Text>
-            </View>
-            <View>
-              <Text style={styles.streakValue}>
-                {streak === 0 ? 'No streak yet' : `${streak} ${streak === 1 ? 'week' : 'weeks'}`}
-              </Text>
-              <Text style={styles.streakLabel}>
-                {streak === 0 ? 'Complete an assessment to begin' : 'Current assessment streak'}
-              </Text>
-            </View>
-            <Text style={styles.streakEncouragement}>
-              {streak === 0 ? 'Start today' : 'Keep it going'}
+      {/* Progress Bar */}
+      <View style={styles.progressBlock}>
+        <View style={styles.track}>
+          <View
+            style={[
+              styles.trackFill,
+              { width: `${(completedList.length / ASSESSMENTS.length) * 100}%` },
+            ]}
+          />
+        </View>
+        <View style={styles.progressHead}>
+          <Text style={styles.progressLabel}>
+            {completedList.length === ASSESSMENTS.length
+              ? '✨ You completed all tasks'
+              : "This week's progress"}
+          </Text>
+          <Text style={styles.progressCount}>
+              {completedList.length}/{ASSESSMENTS.length} assessments
             </Text>
           </View>
         </View>
 
-        {/* Progress Bar */}
-        <View style={styles.progressBlock}>
-          <View style={styles.track}>
-            <View
-              style={[
-                styles.trackFill,
-                { width: `${(completedList.length / ASSESSMENTS.length) * 100}%` },
+      {/* Assessment Card List */}
+      <View style={styles.panel}>
+        <Text style={styles.sectionTitle}>This week&apos;s assessment</Text>
+        {ASSESSMENTS.map((item) => {
+          const isDone = completedList.includes(item.id);
+          return (
+            <Pressable
+              key={item.id}
+              onPress={() => setActiveCategoryId(item.id)}
+              style={({ pressed }) => [
+                styles.assessment,
+                pressed && styles.pressed,
               ]}
-            />
-          </View>
-          <View style={styles.progressHead}>
-            <Text style={styles.progressLabel}>
-              {completedList.length === ASSESSMENTS.length
-                ? '✨ You completed all tasks'
-                : "This week's progress"}
+            >
+              <View style={styles.assessmentCopy}>
+                <Text style={styles.assessmentTitle}>{item.title}</Text>
+                {isDone && (
+                  <Text style={styles.updated}>Updated this week</Text>
+                )}
+              </View>
+
+              <View style={styles.record}>
+                <Text style={styles.recordText}>
+                  {isDone ? 'View summary' : 'Record'}
+                </Text>
+                <Text style={styles.arrow}>›</Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+      
+      {/* Weekly Reflection Card */}
+      <Pressable
+        onPress={() => setIsEditingReflection(true)}
+        style={({ pressed }) => [
+          styles.reflectionCard,
+          pressed && styles.pressed,
+        ]}
+      >
+        <View style={styles.reflectionHeader}>
+          <View style={styles.reflectionTitleContainer}>
+            <Text style={styles.reflectionTitle}>Weekly Reflection</Text>
+            <Text style={styles.reflectionSubtitle}>
+              {weeklyReflection
+                ? 'Tap to review or edit your notes'
+                : 'Add notes on triggers, wins, or thoughts'}
             </Text>
-            <Text style={styles.progressCount}>
-                {completedList.length}/{ASSESSMENTS.length} assessments
-              </Text>
-            </View>
           </View>
-
-        {/* Assessment Card List */}
-        <View style={styles.panel}>
-          <Text style={styles.sectionTitle}>This week&apos;s assessment</Text>
-          {ASSESSMENTS.map((item) => {
-            const isDone = completedList.includes(item.id);
-            return (
-              <Pressable
-                key={item.id}
-                onPress={() => setActiveCategoryId(item.id)}
-                style={({ pressed }) => [
-                  styles.assessment,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <View style={styles.assessmentCopy}>
-                  <Text style={styles.assessmentTitle}>{item.title}</Text>
-                  {isDone && (
-                    <Text style={styles.updated}>Updated this week</Text>
-                  )}
-                </View>
-
-                <View style={styles.record}>
-                  <Text style={styles.recordText}>
-                    {isDone ? 'View summary' : 'Record'}
-                  </Text>
-                  <Text style={styles.arrow}>›</Text>
-                </View>
-              </Pressable>
-            );
-          })}
+          <View style={styles.optionalBadge}>
+            <Text style={styles.optionalText}>Optional</Text>
+          </View>
         </View>
-        
-        {/* Weekly Reflection Card */}
-        <Pressable
-          onPress={() => setIsEditingReflection(true)}
-          style={({ pressed }) => [
-            styles.reflectionCard,
-            pressed && styles.pressed,
-          ]}
-        >
-          <View style={styles.reflectionHeader}>
-            <View style={styles.reflectionTitleContainer}>
-              <Text style={styles.reflectionTitle}>Weekly Reflection</Text>
-              <Text style={styles.reflectionSubtitle}>
-                {weeklyReflection
-                  ? 'Tap to review or edit your notes'
-                  : 'Add notes on triggers, wins, or thoughts'}
-              </Text>
-            </View>
-            <View style={styles.optionalBadge}>
-              <Text style={styles.optionalText}>Optional</Text>
-            </View>
-          </View>
 
-          {weeklyReflection ? (
-            <View style={styles.reflectionPreviewBox}>
-              <Text style={styles.reflectionPreviewText} numberOfLines={2}>
-                &ldquo;{weeklyReflection}&rdquo;
-              </Text>
-            </View>
-          ) : null}
-
-          <View style={styles.recordRow}>
-            <Text style={styles.recordText}>
-              {weeklyReflection ? 'Edit reflection' : 'Write reflection'}
+        {weeklyReflection ? (
+          <View style={styles.reflectionPreviewBox}>
+            <Text style={styles.reflectionPreviewText} numberOfLines={2}>
+              &ldquo;{weeklyReflection}&rdquo;
             </Text>
-            <Text style={styles.arrow}>›</Text>
           </View>
-        </Pressable>
-        <Text style={styles.sponsor}>Supported by ABBVIE</Text>
-      </ScrollView>
-    </SafeAreaView>
+        ) : null}
+
+        <View style={styles.recordRow}>
+          <Text style={styles.recordText}>
+            {weeklyReflection ? 'Edit reflection' : 'Write reflection'}
+          </Text>
+          <Text style={styles.arrow}>›</Text>
+        </View>
+      </Pressable>
+      <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+    </Screen>
   );
 }
       
 
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.surface },
-  body: { flex: 1, backgroundColor: palette.background },
-  content: {
-    width: '100%',
-    maxWidth: 680,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 112,
-  },
   banner: { backgroundColor: 'transparent', paddingVertical: 4 },
   greeting: { fontSize: 14, lineHeight: 20, fontWeight: '600', color: palette.text },
   bannerTitle: {
