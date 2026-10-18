@@ -1,6 +1,89 @@
+// contains UI components for form including input and drop down menus. Currently used by prescriptions feature
+
 import { palette, radius, spacing } from '@/constants/profile/ui';
+import { StyleSheet } from 'react-native';
+import { 
+    Text, 
+    TextInput, 
+    View,
+    Pressable,
+    Modal,
+} from 'react-native';
+import { AuthScreen } from '@/components/auth/auth-ui';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+
+/** Wraps a form in the shared page layout and back navigation. */
+export function Shell({
+  title,
+  children,
+  onBack = () => router.back(),
+}: {
+  title: string;
+  children: React.ReactNode;
+  onBack?: () => void;
+}) {
+  return (
+    <AuthScreen>
+        <Pressable onPress={onBack}>
+            <Text style={styles.back}>‹ Back</Text>
+        </Pressable>
+        <Text style={styles.title}>{title}</Text>
+        {children}
+    </AuthScreen>
+  );
+}
+
+/** Displays a labeled form input for either numeric and text values. */
+export function Field({
+  label,
+  value,
+  set,
+  error,
+  editable = true,
+  input = 'text',
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  set: (v: string) => void;
+  error?: string;
+  editable?: boolean;
+  input?: 'text' | 'decimal';
+  multiline?: boolean;
+}) {
+
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        value={value}
+        editable={editable}
+        onChangeText={(text) => set(text)}
+        accessibilityLabel={label}
+        autoCapitalize={'sentences'}
+        keyboardType={input === 'decimal' ? 'decimal-pad' : 'default'}
+        inputMode={input === 'decimal' ? 'decimal' : 'text'}
+        placeholder={label}
+        placeholderTextColor={palette.muted}
+        style={[
+          styles.input,
+          multiline
+            ? {
+                minHeight: 130,
+              }
+            : null,
+        ]}
+        multiline={multiline}
+      />
+      {error ? (
+        <Text accessibilityLiveRegion="polite" style={styles.fieldError}>
+          {error}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
 
 /** Displays one compact form value and opens its available options in a modal sheet. */
 export function SelectField({
@@ -60,7 +143,34 @@ export function SelectField({
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+  back: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: palette.primary,
+    paddingVertical: 14,
+  },
+  title: {
+    fontSize: 29,
+    lineHeight: 35,
+    fontWeight: '800',
+    letterSpacing: -0.6,
+    color: palette.text,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  fieldError: { color: palette.error, fontSize: 12, marginTop: 6 },
+  input: {
+    minHeight: 56,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: '#fff',
+    padding: 15,
+    fontSize: 15,
+    color: palette.text,
+    textAlignVertical: 'top',
+  },
   field: { marginBottom: spacing.lg },
   label: { marginBottom: spacing.sm, fontSize: 14, fontWeight: '700', color: palette.text },
   control: {
