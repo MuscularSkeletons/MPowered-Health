@@ -254,9 +254,9 @@ export default function HomeScreen() {
               &ldquo;{weeklyReflection}&rdquo;
             </Text>
           </View>
-        ) : null}
+        ) : null }
 
-        <View style={styles.recordRow}>
+        <View style={styles.reflectButton}>
           <Text style={styles.reflectText}>
             {weeklyReflection ? 'Edit reflection' : 'Write reflection'}
           </Text>
@@ -371,6 +371,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     gap: 12,
+    borderWidth: 1,
+    borderColor: palette.line,
   },
   sectionTitle: {
     fontSize: 17,
@@ -431,12 +433,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: palette.line,
   },
   reflectionPreviewText: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#334155',
+    color: palette.text,
     fontStyle: 'italic',
   },
   recordRow: {
@@ -446,12 +448,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   reflectionCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: palette.surface,
     borderRadius: 20,
     padding: 20,
     marginTop: 18,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderWidth: 1,
+    borderColor: palette.line,
     gap: 12,
     overflow: 'hidden', 
   },
@@ -468,16 +470,16 @@ const styles = StyleSheet.create({
   reflectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1E293B',
+    color: palette.text,
     marginBottom: 2,
   },
   reflectionSubtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: palette.muted,
     lineHeight: 18,
   },
   optionalBadge: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: palette.secondary,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
@@ -486,7 +488,7 @@ const styles = StyleSheet.create({
   optionalText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: palette.muted,
     textTransform: 'uppercase',
   },
   reflectText: { 
@@ -499,4 +501,10 @@ const styles = StyleSheet.create({
     lineHeight: 18, 
     color: palette.text, 
   },
+  reflectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  }
 });

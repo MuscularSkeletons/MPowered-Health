@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionalBadge: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: palette.secondary,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -98,15 +98,15 @@ const styles = StyleSheet.create({
   optionalText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: palette.muted,
     textTransform: 'uppercase',
   },
   textArea: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: palette.surface,
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderWidth: 1,
+    borderColor: palette.line,
     color: palette.text,
     fontSize: 15,
     lineHeight: 22,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   helper: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#94A3B8',
+    color: palette.disabledText,
     textAlign: 'center',
   },
 });
