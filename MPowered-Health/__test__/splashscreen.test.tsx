@@ -21,7 +21,7 @@ jest.mock('expo-router', () => ({
 }))
 
 //mocking the slide show component
-jest.mock('@/components/auth/welcome/artwork', () => ({
+jest.mock('@/components/splash/artwork', () => ({
     SplashArtwork: () => null,
 }))
 
