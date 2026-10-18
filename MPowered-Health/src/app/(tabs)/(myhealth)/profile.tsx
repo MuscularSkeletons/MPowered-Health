@@ -1,4 +1,8 @@
-import { Screen } from '@/components/ui/common';
+import { 
+  Screen,
+  Intro,
+  commonStyles,
+} from '@/components/ui/common';
 import { ProfileExportActions } from '@/components/my-health/profile-export-actions';
 import type { PainProfileReport } from '@/components/my-health/profile-report';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
@@ -6,7 +10,7 @@ import { getLatestAssessments } from '@/services/health-records.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 const categories: {
   id: AssessmentId;
@@ -121,15 +125,15 @@ export default function LatestAssessmentScreen() {
 
   return (
     <Screen>
-      <Pressable accessibilityRole="button" onPress={() => router.back()}>
-        <Text style={styles.back}>‹ Back</Text>
-      </Pressable>
-      <Text style={styles.eyebrow}>LATEST ASSESSMENT</Text>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
+        sectionLabel="LATEST ASSESSMENT"
+        title="My Health Profile"
+        description='Your newest answers across all five assessment categories.'
+      />
       <View style={styles.titleRow}>
-        <Text style={styles.title}>My health profile</Text>
         <ProfileExportActions report={report} disabled={!updatedAt} />
       </View>
-      <Text style={styles.intro}>Your newest answers across all five assessment categories.</Text>
       <Text style={styles.updated}>
         {updatedAt ? `Updated ${updatedLabel}` : 'No completed assessments yet'}
       </Text>
@@ -158,34 +162,15 @@ export default function LatestAssessmentScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.surface },
-  body: { flex: 1, backgroundColor: palette.background },
-  content: {
-    width: '100%',
-    maxWidth: layout.maxContentWidth,
-    alignSelf: 'center',
-    paddingHorizontal: layout.screenGutter,
-    paddingTop: spacing.sm,
-    paddingBottom: layout.screenBottom,
-  },
-  back: { color: palette.primary, fontSize: 14, fontWeight: '700', paddingVertical: spacing.md },
-  eyebrow: {
-    marginTop: spacing.sm,
-    color: palette.primary,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-  },
   titleRow: {
-    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
+    alignSelf: 'flex-end',
   },
-  title: { flexShrink: 1, color: palette.text, fontSize: 30, lineHeight: 36, fontWeight: '800' },
-  intro: { marginTop: spacing.sm, color: palette.muted, fontSize: 15, lineHeight: 22 },
   updated: { marginTop: spacing.sm, marginBottom: spacing.xl, color: palette.muted, fontSize: 12 },
   card: {
     marginBottom: spacing.lg,

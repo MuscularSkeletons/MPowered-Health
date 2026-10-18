@@ -3,7 +3,11 @@ import { TrackingChart } from '@/components/my-health/tracking-chart';
 import { healthRecordStyles as styles } from '@/components/my-health/health-record-styles';
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
-import { Screen } from '@/components/ui/common';
+import { 
+  Screen,
+  Intro,
+  commonStyles,
+} from '@/components/ui/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -33,11 +37,12 @@ export default function HealthRecords() {
   } = useHealthRecords();
   return (
     <Screen>
-      <Pressable accessibilityRole="button" onPress={() => router.back()}>
-        <Text style={styles.back}>‹ Back</Text>
-      </Pressable>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
       <View style={styles.titleRow}>
-        <Text style={styles.title}>Pain records</Text>
+        <Intro
+          sectionLabel="PAIN RECORDS"
+          title="Pain Records"
+        />
         <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
       </View>
       <View style={styles.tabs}>
