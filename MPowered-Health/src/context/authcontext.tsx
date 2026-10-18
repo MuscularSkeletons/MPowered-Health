@@ -181,7 +181,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // update values in db
       const { error, data } = await supabase
         .from("user")
-        .upsert({ user_id: user.id, ...updateData }, { onConflict: 'user_id' })
+        .update(updateData)
+        .eq("user_id", user.id)
         .select()
         .single();
 
