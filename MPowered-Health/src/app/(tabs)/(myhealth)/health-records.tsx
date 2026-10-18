@@ -205,4 +205,3 @@ export default function HealthRecords() {
     </Screen>
   );
 }
-// Group chart, filter, history, and modal styles in one section.

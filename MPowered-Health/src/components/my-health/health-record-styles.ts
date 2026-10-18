@@ -69,7 +69,6 @@ export const healthRecordStyles = StyleSheet.create({
     borderColor: palette.line,
     overflow: 'hidden',
     flexDirection: 'row',
-    marginTop: 20,
   },
   tab: {
     flex: 1,
