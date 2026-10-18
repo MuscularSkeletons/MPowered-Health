@@ -40,7 +40,7 @@ export default function HealthRecords() {
       <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
       <View style={styles.titleRow}>
         <Intro
-          sectionLabel="PAIN RECORDS"
+          sectionLabel="TRACKING RECORDS"
           title="Pain Records"
         />
         <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
