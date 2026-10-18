@@ -71,7 +71,6 @@ CREATE TABLE public.pain_assessment (
 CREATE TABLE public.movement_assessment (
   movement_assessment_id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
-  movement_score smallint NOT NULL,
   movement_reflection text,
   assessment_id uuid UNIQUE,
   standing_impact text NOT NULL,
@@ -95,7 +94,6 @@ CREATE TABLE public.movement_assessment (
 CREATE TABLE public.personal_care_assessment (
   personal_assmt_id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
-  care_score smallint NOT NULL,
   care_reflection text,
   assessment_id uuid UNIQUE,
   activities_impact ARRAY NOT NULL,
@@ -116,7 +114,6 @@ CREATE TABLE public.personal_care_assessment (
 CREATE TABLE public.social_health_assessment (
   social_health_assmt_id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
-  social_score smallint NOT NULL,
   mood_impact smallint NOT NULL,
   relation_impact smallint NOT NULL,
   enjoyment_impact smallint NOT NULL,
