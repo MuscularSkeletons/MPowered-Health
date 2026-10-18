@@ -1,5 +1,5 @@
 /** Provides the header and action button shared by My Health screens. */
-import { palette, radius } from '@/constants/profile/ui';
+import { palette, radius } from '@/constants/ui/styling';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 /**

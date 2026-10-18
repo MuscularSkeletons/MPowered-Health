@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { palette } from "@/constants/profile/ui";
+import { palette } from "@/constants/ui/styling";
 import { useState, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";

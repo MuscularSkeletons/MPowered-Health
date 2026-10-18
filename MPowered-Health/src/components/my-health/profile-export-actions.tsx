@@ -4,7 +4,7 @@ import {
   profileReportHtml,
   profileReportText,
 } from '@/components/my-health/profile-report';
-import { palette, radius, spacing } from '@/constants/profile/ui';
+import { palette, radius, spacing } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';

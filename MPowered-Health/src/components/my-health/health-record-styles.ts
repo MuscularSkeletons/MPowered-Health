@@ -1,5 +1,5 @@
 /** Defines the colors, spacing, and layout used by My Health / health records. */
-import { palette, radius, spacing } from '@/constants/profile/ui';
+import { palette, radius, spacing } from '@/constants/ui/styling';
 import { StyleSheet } from 'react-native';
 export const healthRecordStyles = StyleSheet.create({
   printError: { color: palette.error, fontSize: 12, maxWidth: 160, marginTop: 6 },

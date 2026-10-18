@@ -5,7 +5,7 @@ import {
   painMetricValue,
   painRecordDate,
 } from '@/services/health-records.store';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from 'react-native-svg';
 

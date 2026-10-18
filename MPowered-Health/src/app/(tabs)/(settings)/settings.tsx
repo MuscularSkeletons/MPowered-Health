@@ -10,7 +10,7 @@ import { useAuth } from "@/context/authcontext";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import { openBrowserAsync } from 'expo-web-browser';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { useState } from "react";
 import { ModalActions, modalStyles } from "@/components/ui/modal-ui";

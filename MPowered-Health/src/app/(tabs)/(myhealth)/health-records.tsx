@@ -4,7 +4,7 @@ import { healthRecordStyles as styles } from '@/components/my-health/health-reco
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
 import { Screen } from '@/components/ui/common';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';

@@ -5,7 +5,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import { palette } from "@/constants/profile/ui";
+import { palette } from "@/constants/ui/styling";
 
 export function ModalActions({
   isSaving,

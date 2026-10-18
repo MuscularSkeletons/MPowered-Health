@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { palette } from "@/constants/profile/ui";
+import { palette } from "@/constants/ui/styling";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { 

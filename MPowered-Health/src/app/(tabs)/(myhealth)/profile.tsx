@@ -1,7 +1,7 @@
 import { Screen } from '@/components/ui/common';
 import { ProfileExportActions } from '@/components/my-health/profile-export-actions';
 import type { PainProfileReport } from '@/components/my-health/profile-report';
-import { layout, palette, radius, spacing } from '@/constants/profile/ui';
+import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { getLatestAssessments } from '@/services/health-records.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
 import { router, useFocusEffect } from 'expo-router';

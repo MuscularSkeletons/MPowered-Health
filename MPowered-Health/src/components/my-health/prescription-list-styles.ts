@@ -1,5 +1,5 @@
 /** Defines the colors, spacing, and layout used by My Health / prescriptions / prescription list. */
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { StyleSheet } from 'react-native';
 
 

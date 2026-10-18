@@ -12,7 +12,7 @@ import {
   type TextInputProps,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 
 /** Displays the MPowered Health wordmark used throughout account setup. */
 export function Header() {

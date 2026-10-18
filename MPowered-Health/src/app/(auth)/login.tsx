@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import {
   Input,

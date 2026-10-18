@@ -5,7 +5,7 @@ import {
   Screen,
   commonStyles,
 } from '@/components/ui/common';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 
 // TODO: implement notifications in separate sprint if have time to do
 export default function ManageNotifications() {

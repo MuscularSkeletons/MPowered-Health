@@ -4,7 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/authcontext';
 import { Header } from '@/components/ui/common';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { requiredSessionRoute } from '@/navigation/route-guard';
 
 /** Shows the green brand initial while restoring the session. */

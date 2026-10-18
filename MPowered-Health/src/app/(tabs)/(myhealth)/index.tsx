@@ -1,6 +1,6 @@
 import { Screen } from '@/components/ui/common';
 import { overviewStyles as styles } from '@/components/my-health/overview-styles';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import {
   getPainHistory,
   loadHealthRecords,

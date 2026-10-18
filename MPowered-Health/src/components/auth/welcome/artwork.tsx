@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Image, type ImageSource } from 'expo-image';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 
 // Each welcome page previews a different pair of app screens.
 const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [

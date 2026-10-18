@@ -3,7 +3,7 @@
 import { buildHealthRecordsHtml } from '@/lib/health-records-report';
 import type { PainAssessmentRecord, PainMetric } from '@/services/health-records.store';
 import { printHtml } from '@/lib/document-export';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';

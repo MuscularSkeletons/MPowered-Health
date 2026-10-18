@@ -1,4 +1,4 @@
-import { layout, palette, radius, spacing } from '@/constants/profile/ui';
+import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { StyleSheet } from 'react-native';
 
 export const overviewStyles = StyleSheet.create({

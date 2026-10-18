@@ -1,7 +1,7 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { openBrowserAsync } from 'expo-web-browser';
 import { useRouter } from 'expo-router';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/ui/common';
 
 /** Introduces profile setup and links to the terms and privacy policy. */

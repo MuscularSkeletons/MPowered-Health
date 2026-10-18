@@ -1,6 +1,5 @@
 // contains UI components for form including input and drop down menus. Currently used by prescriptions feature
-
-import { palette, radius, spacing } from '@/constants/profile/ui';
+import { palette, radius, spacing } from '@/constants/ui/styling';
 import { 
     StyleSheet,
     Text, 

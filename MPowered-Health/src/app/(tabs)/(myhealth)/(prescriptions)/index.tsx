@@ -1,7 +1,7 @@
 import { styles } from '@/components/my-health/prescription-list-styles';
 import { Shell } from '@/components/forms/form';
 import { ActionButton } from '@/components/my-health/app-ui';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';

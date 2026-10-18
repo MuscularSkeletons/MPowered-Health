@@ -1,5 +1,5 @@
 /** Defines the splash carousel layout; shared account forms use auth-ui.tsx. */
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.surface },

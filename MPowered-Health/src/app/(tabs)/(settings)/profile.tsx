@@ -11,7 +11,7 @@ import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authcontext';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { Ionicons } from "@expo/vector-icons";
-import { palette } from "@/constants/profile/ui";
+import { palette } from "@/constants/ui/styling";
 import { useState } from "react";
 import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
 import { sexOptions, diagnosisOptions, painConditionsOptions } from '@/constants/profile/profile-options';

@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { PrimaryButton, Screen, Intro, commonStyles, } from '@/components/ui/common';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { saveWeeklyReflection } from '@/hooks/useAssessments';
 
 interface WeeklyReflectionScreenProps {

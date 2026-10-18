@@ -8,8 +8,8 @@ import {
 import { useNavigation } from 'expo-router';
 import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessmentQuestions';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
-import WeeklyReflectionScreen from '@/constants/assessmentQuestions/weeklyReflection';
-import { palette } from '@/constants/profile/ui';
+import WeeklyReflectionScreen from '@/components/assessment/weeklyReflection';
+import { palette } from '@/constants/ui/styling';
 import { Screen } from '@/components/ui/common';
 import { useAuth } from '@/context/authcontext';
 import {
