@@ -124,7 +124,7 @@ export default function HomeScreen() {
     />
   );
 }
-  // Weekly refelction
+  // Weekly reflection
   if (isEditingReflection) {
       return (
         <WeeklyReflectionScreen
@@ -257,10 +257,10 @@ export default function HomeScreen() {
         ) : null}
 
         <View style={styles.recordRow}>
-          <Text style={styles.recordText}>
+          <Text style={styles.reflectText}>
             {weeklyReflection ? 'Edit reflection' : 'Write reflection'}
           </Text>
-          <Text style={styles.arrow}>›</Text>
+          <Text style={styles.reflectArrow}>›</Text>
         </View>
       </Pressable>
       <Text style={styles.sponsor}>Supported by ABBVIE</Text>
@@ -446,47 +446,57 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   reflectionCard: {
-  backgroundColor: '#ffffff',
-  borderRadius: 20,
-  padding: 20,
-  marginTop: 18,
-  borderWidth: 1.5,
-  borderColor: '#E2E8F0',
-  gap: 12,
-  overflow: 'hidden', 
-},
-reflectionHeader: {
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  width: '100%',
-},
-reflectionTitleContainer: {
-  flex: 1, 
-  paddingRight: 12,
-},
-reflectionTitle: {
-  fontSize: 16,
-  fontWeight: '700',
-  color: '#1E293B',
-  marginBottom: 2,
-},
-reflectionSubtitle: {
-  fontSize: 13,
-  color: '#64748B',
-  lineHeight: 18,
-},
-optionalBadge: {
-  backgroundColor: '#F1F5F9',
-  paddingHorizontal: 8,
-  paddingVertical: 3,
-  borderRadius: 8,
-  alignSelf: 'flex-start',
-},
-optionalText: {
-  fontSize: 11,
-  fontWeight: '700',
-  color: '#64748B',
-  textTransform: 'uppercase',
-},
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 18,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    gap: 12,
+    overflow: 'hidden', 
+  },
+  reflectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  reflectionTitleContainer: {
+    flex: 1, 
+    paddingRight: 12,
+  },
+  reflectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 2,
+  },
+  reflectionSubtitle: {
+    fontSize: 13,
+    color: '#64748B',
+    lineHeight: 18,
+  },
+  optionalBadge: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  optionalText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
+  reflectText: { 
+    fontSize: 12, 
+    fontWeight: '700', 
+    color: palette.text, 
+  },
+  reflectArrow: { 
+    fontSize: 18, 
+    lineHeight: 18, 
+    color: palette.text, 
+  },
 });
