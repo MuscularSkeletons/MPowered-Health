@@ -1,9 +1,11 @@
 import StoreBirthSex from '../src/app/(auth)/(onboarding)/birthsex';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { sexOptions } from "@/constants/profile/profile-options";
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -15,6 +17,14 @@ jest.mock("@/context/authcontext", () => ({
         updateUserDraft: mockUpdateUserDraft,
         isLoading: false,
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
 }))
 
 describe ("birthsex options are rendered on screen", () => {
@@ -55,7 +65,9 @@ describe("Birthsex selection", () => {
 
         fireEvent.press(screen.getByText(sexOptions[0]));
 
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
     })
 
     test("successfully select an option", async() => {
@@ -63,14 +75,14 @@ describe("Birthsex selection", () => {
 
         fireEvent.press(screen.getByText(sexOptions[0]));
 
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
         
         fireEvent.press(screen.getByRole("button", {name: "Continue"}));
         expect(mockUpdateUserDraft).toHaveBeenCalledWith({birthsex: sexOptions[0]});
     })
 })
-
-//todo: navigation bug
 
 describe("navigation", () => {
 
@@ -83,21 +95,20 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByText(sexOptions[0]));
 
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
         
         fireEvent.press(screen.getByRole("button", {name: "Continue"}));
         expect(mockUpdateUserDraft).toHaveBeenCalledWith({birthsex: sexOptions[0]});
-
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/birthyear');
     })
 
     test("navigate to previous page when back button is pressed", async() => {
         await render(<StoreBirthSex/>);
 
-        fireEvent.press(screen.getByText("< Back"));
+        fireEvent.press(screen.getByText("‹ Back"));
 
-        //todo: navigate to name page
-        expect("").toBeTruthy();
+        expect(mockBack).toHaveBeenCalled();
     })
 })

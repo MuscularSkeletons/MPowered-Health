@@ -1,8 +1,10 @@
 import StoreDiagnosis from '../src/app/(auth)/(onboarding)/diagnosis';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -16,6 +18,14 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }))
 
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
+}))
+
 describe("objects are rendered on screen", () => {
 
     test('options are rendered on screen correctly', async() => {
@@ -27,7 +37,7 @@ describe("objects are rendered on screen", () => {
         expect(screen.getByText("Yes, I have")).toBeTruthy();
         expect(screen.getByText("No, I haven’t")).toBeTruthy();      
         expect(screen.getByRole("button", {name: "Continue"})).toBeTruthy();
-        expect(screen.getByText("< Back")).toBeTruthy();
+        expect(screen.getByText("‹ Back")).toBeTruthy();
     })  
 })
 
@@ -46,13 +56,18 @@ describe("selecting diagnosis options", () => {
         await render(<StoreDiagnosis/>);
 
         fireEvent.press(screen.getByText("Yes, I have"));
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
     })
 
     test("successfully select an option", async() => {
         await render(<StoreDiagnosis/>);
 
         fireEvent.press(screen.getByText("Yes, I have"));
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
         fireEvent.press(screen.getByRole("button", {name: "Continue"}));
 
         //update user selection
@@ -71,10 +86,21 @@ describe("navigation tests", () => {
     test("pressing continue will navigate to next page", async() => {
         await render(<StoreDiagnosis/>);
 
+        fireEvent.press(screen.getByText("Yes, I have"));
+        await waitFor (() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
+        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
+
+        //update user selection
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({formalDiagnosis: true});
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/conditions');
+        
     })
 
     test("pressing back will navigate to the previous page", async() => {
         await render(<StoreDiagnosis/>);
-        
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
     })
 })

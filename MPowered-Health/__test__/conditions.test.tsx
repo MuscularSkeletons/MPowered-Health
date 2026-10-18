@@ -1,9 +1,11 @@
 import StorePainConditions from '../src/app/(auth)/(onboarding)/conditions';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor} from '@testing-library/react-native';
 import { painConditionsOptions } from "@/constants/profile/profile-options";
 
-const mockUser = jest.fn(() => Promise.resolve('mocked user'));
+const mockUser = jest.fn();
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -15,6 +17,14 @@ jest.mock("@/context/authcontext", () => ({
         updateUserDraft: mockUpdateUserDraft,
         isLoading: false,
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
 }))
 
 describe ("objects are rendered on screen", () => {
@@ -30,7 +40,7 @@ describe ("objects are rendered on screen", () => {
         expect(screen.getByText("Tell us about the pain you’re experiencing")).toBeTruthy();
         expect(screen.getByText("Select any musculoskeletal or chronic pain conditions that apply.")).toBeTruthy();
         expect(screen.getByRole("button", {name: "Continue"})).toBeTruthy();
-        expect(screen.getByText("< Back")).toBeTruthy();
+        expect(screen.getByText("‹ Back")).toBeTruthy();
         expect(screen.getByText("Skip")).toBeTruthy();
     })
 
@@ -42,7 +52,6 @@ describe ("objects are rendered on screen", () => {
         });
     })
 })
-
 
 describe('selecting options', () => {
 
@@ -59,45 +68,59 @@ describe('selecting options', () => {
     test("continue button should be enabled if a condition is selected", async() => {
         await render(<StorePainConditions/>);
 
-        fireEvent.press(screen.getByText(painConditionsOptions[0]));
+        await fireEvent.press(screen.getByText(painConditionsOptions[0]));
 
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await waitFor(() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
     })
     
     test('successfully select an option', async() => {
         await render (<StorePainConditions/>);
-        fireEvent.press(screen.getByText(painConditionsOptions[0]));
-        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
+
+        await fireEvent.press(screen.getByText(painConditionsOptions[0]));
+        await waitFor(() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
+        await fireEvent.press(screen.getByRole("button", {name: "Continue"}));
 
         //update user selection
-        expect(mockUpdateUserDraft).toHaveBeenCalledWith({painConditionsOptions : [painConditionsOptions[0]]});
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({painConditions : [painConditionsOptions[0]]});
     })
 
     test('successfully select multiple options', async() => {
         await render (<StorePainConditions/>);
-        fireEvent.press(screen.getByText(painConditionsOptions[0]));
-        fireEvent.press(screen.getByText(painConditionsOptions[1]));
-        fireEvent.press(screen.getByText(painConditionsOptions[5]));
-        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
+        await fireEvent.press(screen.getByText(painConditionsOptions[0]));
+        await fireEvent.press(screen.getByText(painConditionsOptions[1]));
+        await fireEvent.press(screen.getByText(painConditionsOptions[5]));
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
+        await fireEvent.press(screen.getByRole("button", {name: "Continue"}));
 
         //update user selection
-        expect(mockUpdateUserDraft).toHaveBeenCalledWith({painConditions: [painConditionsOptions[0], painConditionsOptions[1], painConditionsOptions[5]]});
+        await expect(mockUpdateUserDraft).toHaveBeenCalledWith({painConditions: [painConditionsOptions[0], painConditionsOptions[1], painConditionsOptions[5]]});
     })
 
     test("previously selected option can be deselected", async() => {
         await render(<StorePainConditions/>);
-        fireEvent.press(screen.getByText(painConditionsOptions[0]));
-        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        await fireEvent.press(screen.getByText(painConditionsOptions[0]));
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
 
         //unselect the option
-        fireEvent.press(screen.getByText(painConditionsOptions[0]));
+        await fireEvent.press(screen.getByText(painConditionsOptions[0]));
 
-        //continue button should be disabled
-        expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
+        await waitFor(() => {
+            //continue button should be disabled
+            expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
+        })
     })
 })
 
-//todo: navigation
 describe("navigation tests", () => {
 
     beforeEach(() => {
@@ -107,15 +130,28 @@ describe("navigation tests", () => {
     test("successfully navigate to next page", async() => {
         await render(<StorePainConditions/>);
 
+        fireEvent.press(screen.getByText(painConditionsOptions[0]));
+        await waitFor(() => {
+            expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
+        })
+        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
+
+        //update user selection
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({painConditions : [painConditionsOptions[0]]});
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/miscconditions');
+
     })
 
     test("pressing skip should navigate to next page without any conditions being selected", async() => {
         await render(<StorePainConditions/>);
+        fireEvent.press(screen.getByText("Skip"));
+        expect(mockPush).toHaveBeenCalledWith("/(auth)/(onboarding)/miscconditions");
 
     })
 
     test("pressing the back button should navigate to the previous page", async() => {
         await render(<StorePainConditions/>);
-
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
     })
 })

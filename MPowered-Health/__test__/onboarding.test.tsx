@@ -3,9 +3,18 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { openBrowserAsync } from 'expo-web-browser';
 import { Alert } from 'react-native';
 
+const mockPush = jest.fn();
+
 //mocking the web browser
 jest.mock('expo-web-browser', () => ({
     openBrowserAsync: jest.fn()
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+    })
 }))
 
 describe("rendering objects", () => {
@@ -14,7 +23,9 @@ describe("rendering objects", () => {
         expect(screen.getByText("GET STARTED")).toBeTruthy();
         expect(screen.getByText("Hello 👋🏻")).toBeTruthy();
         expect(screen.getByText("A few quick questions so we can make MPowered Health more relevant for you.")).toBeTruthy();
-        expect(screen.getByText("By continuing, you agree to MPowered’s Terms and Conditions and Privacy Policy")).toBeTruthy();
+
+        //use regex to handle the text chunks easily
+        expect(screen.getByText(/By continuing, you agree to MPowered’s Terms and Conditions and Privacy Policy/i)).toBeTruthy();
         expect(screen.getByRole("button", {name:"Continue"})).toBeTruthy();
     })
 })
@@ -59,12 +70,11 @@ describe("url link tests", () => {
     })
 })
 
-//todo: navigation tests
 describe("navigation test", () => {
     test("pressing continue button moves to the next screen", async() => {
         await render(<Onboarding/>);
         fireEvent.press(screen.getByRole("button", {name:"Continue"}));
-        
-        //todo: navigate to name screen
+
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/name');
     })
 })

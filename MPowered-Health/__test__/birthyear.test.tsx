@@ -3,9 +3,10 @@ import { fireEvent, render, screen, userEvent } from '@testing-library/react-nat
 import { Alert } from 'react-native';
 import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
 
-
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -17,6 +18,14 @@ jest.mock("@/context/authcontext", () => ({
         updateUserDraft : mockUpdateUserDraft,
         isLoading: false,
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
 }))
 
 describe ("objects are rendered on screen", () => {
@@ -65,33 +74,27 @@ describe("input validation", () => {
         await render(<StoreBirthYear/>);
 
         expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
-        //fireEvent.press(screen.getByRole("button", {name: "Continue"}));
-        //expect(Alert.alert).toHaveBeenCalledWith("Error", "no input detected");
     })
 
-    test("year shorter than 4 characters is entered", async() => {
+    test("continue button is disabled if year shorter than 4 characters is entered", async() => {
         await render(<StoreBirthYear/>);
-        jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
         const user = userEvent.setup();
         await user.type(yearInput, "199");
 
         expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
-        //expect(Alert.alert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');
     })
 
-    test("year longer than 4 characters is entered", async() => {
+    test("if trying to enter a year longer than 4 characters, only allow the first 4 characters", async() => {
         await render(<StoreBirthYear/>);
-        jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
         const user = userEvent.setup();
         await user.type(yearInput, "19978");
 
-        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
-        expect(Alert.alert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');
+        expect(yearInput.props.value).toBe("1997");
     })
 
-    test("entered year is below the allowed range", async() => {
+    test("throw an error if entered year is below the allowed range", async() => {
         await render(<StoreBirthYear/>);
         jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
@@ -102,7 +105,7 @@ describe("input validation", () => {
         expect(Alert.alert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');     
     })
 
-    test("entered year is above the allowed range", async() => {
+    test("throw an error if entered year is above the allowed range", async() => {
         await render(<StoreBirthYear/>);
         jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
@@ -113,7 +116,7 @@ describe("input validation", () => {
         expect(Alert.alert).toHaveBeenCalledWith('Error', 'Please enter a valid four-digit year');     
     })
 
-    test("user enters a valid year", async() => {
+    test("user enters a valid year and can press continue", async() => {
         await render(<StoreBirthYear/>);
         jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
@@ -121,6 +124,7 @@ describe("input validation", () => {
         const year = 1997;
         await user.type(yearInput, String(year));
 
+        expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
         fireEvent.press(screen.getByRole("button", {name: "Continue"}));
         expect(Alert.alert).not.toHaveBeenCalled();
         expect(mockUpdateUserDraft).toHaveBeenCalledWith({birthyear: year});
@@ -134,7 +138,7 @@ describe("navigation", () => {
         jest.clearAllMocks();
     })
 
-    test('birth sex selected and navigate to next screen', async() => {
+    test('birth year selected and navigate to next screen', async() => {
         await render(<StoreBirthYear/>);
         jest.spyOn(Alert, "alert");
         const yearInput = screen.getByPlaceholderText("YYYY");
@@ -143,21 +147,19 @@ describe("navigation", () => {
 
         fireEvent.press(screen.getByRole("button", {name: "Continue"}));
         expect(Alert.alert).not.toHaveBeenCalled();
-        //todo: navigate to next page
+        expect(mockPush).toHaveBeenCalledWith("/(auth)/(onboarding)/diagnosis");
     })
 
     test('user skips the question', async() => {
         await render(<StoreBirthYear/>);
         fireEvent.press(screen.getByText("Skip"));
-        //todo: navigate to next page
-        expect("").toBeTruthy();
+        expect(mockPush).toHaveBeenCalledWith("/(auth)/(onboarding)/diagnosis");
     })
 
     test('user presses the back button', async() => {
         await render(<StoreBirthYear/>);
         fireEvent.press(screen.getByText("‹ Back"));
-        //todo: navigate to previous page
-        expect("").toBeTruthy();
+        expect(mockBack).toHaveBeenCalled();
     })
 })
 

@@ -1,9 +1,10 @@
 import StoreName from '../src/app/(auth)/(onboarding)/name';
 import {render, screen, fireEvent, userEvent} from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -15,6 +16,14 @@ jest.mock("@/context/authcontext", () => ({
         updateUserDraft: mockUpdateUserDraft,
         isLoading: false,
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
 }))
 
 describe("rendering objects on screen", () => {
@@ -29,7 +38,7 @@ describe("rendering objects on screen", () => {
         expect(screen.getByText("Name")).toBeTruthy();        
         expect(screen.getByPlaceholderText("Type your name")).toBeTruthy();
         expect(screen.getByRole("button", {name:"Continue"})).toBeTruthy();
-        expect(screen.getByText("< Back")).toBeTruthy();
+        expect(screen.getByText("‹ Back")).toBeTruthy();
     });
 
 })
@@ -73,17 +82,14 @@ describe("name validation", () => {
         jest.clearAllMocks();
     })
 
-    test("throw an error for name containing only white spaces", async() => {
-        const spyAlert = jest.spyOn(Alert, "alert");
+    test("continue button should be disabled if entered name only contains whitespaces", async() => {
         await render(<StoreName/>);
 
         const nameInput = screen.getByPlaceholderText("Type your name");
         const user = userEvent.setup();
 
         await user.type(nameInput, " ");
-        fireEvent.press(screen.getByRole("button", {name:"Continue"}));
-        expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter your name');
-
+        expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();
     })
 
     test("successfully enter the name" , async() => {
@@ -99,7 +105,7 @@ describe("name validation", () => {
         expect(mockUpdateUserDraft).toHaveBeenCalledWith({name: userName});
     })
 
-    test("for a name with a whitespace, remove the whitespace and save the name", async() => {
+    test("for a name with a whitespace, remove the whitespace at the end and save the name", async() => {
         await render(<StoreName/>);
 
         const nameInput = screen.getByPlaceholderText("Type your name");
@@ -113,7 +119,6 @@ describe("name validation", () => {
     })
 })
 
-//todo: navigation
 describe("navigation", () => {
 
     beforeEach(() => {
@@ -122,12 +127,24 @@ describe("navigation", () => {
 
     test("pressing continue navigates to the next screen", async() => {
         await render(<StoreName/>);
-        //todo: navigate to next screen
+       
+        const nameInput = screen.getByPlaceholderText("Type your name");
+        const user = userEvent.setup();
+
+        const userName = "Jane";
+        await user.type(nameInput, userName);
+
+        fireEvent.press(screen.getByRole("button", {name:"Continue"}));   
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({name: userName});
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/birthsex');
+        
     })
 
     test("pressing back navigates to the previous screen", async() => {
         await render(<StoreName/>);
-        //todo: navigate to splash screen
+   
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
     })
 })
 

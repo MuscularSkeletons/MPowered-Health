@@ -49,8 +49,9 @@ describe("updating user profile", () => {
     test("when finish setup is pressed, the user profile is updated", async() => {
         await render(<CompleteOnboarding/>);
 
-        fireEvent.press(screen.getByRole("button", {name: "Finish setup"}));
-        await expect(mockUpdateUser).toHaveBeenCalledWith({
+        await fireEvent.press(screen.getByRole("button", {name: "Finish setup"}));
+        await waitFor(() => {
+            expect(mockUpdateUser).toHaveBeenCalledWith({
             name: "Jane",
             birthsex: "Female",
             birthyear: "1997",
@@ -58,7 +59,8 @@ describe("updating user profile", () => {
             painConditions: [painConditionsOptions[0], painConditionsOptions[2]],
             otherCondition: "Frequent headaches",
             onboardingComplete: true,
-        })
+            })
+        }) 
     })
 
     test("show an error if updating the user profile fails", async() => {
@@ -68,9 +70,10 @@ describe("updating user profile", () => {
         const profileError = new Error("Failed to update profile");
         mockUpdateUser.mockRejectedValueOnce(profileError);
 
-        fireEvent.press(screen.getByRole("button", {name: "Finish setup"}));
+        await fireEvent.press(screen.getByRole("button", {name: "Finish setup"}));
 
-        await waitFor(() => expect(spyAlert).toHaveBeenCalledWith('Error', 'Failed to complete. Please try again.'));
-
+        await waitFor(() => {
+            expect(spyAlert).toHaveBeenCalledWith('Error', 'Failed to complete. Please try again.')
+        });
     })
 })

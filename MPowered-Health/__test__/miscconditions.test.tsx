@@ -3,6 +3,8 @@ import { fireEvent, render, screen, userEvent } from "@testing-library/react-nat
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -16,6 +18,14 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }))
 
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        back: mockBack,
+    })
+}))
+
 describe("rendering objects", () => {
     test("objects are rendered on screen properly", async() => {
         await render(<StoreOtherConditions/>);
@@ -27,7 +37,7 @@ describe("rendering objects", () => {
         expect(screen.getByPlaceholderText("Type conditions or symptoms")).toBeTruthy();      
         expect(screen.getByRole("button", {name: "Continue"})).toBeTruthy();
         expect(screen.getByText("Skip")).toBeTruthy();
-        expect(screen.getByText("< Back")).toBeTruthy();
+        expect(screen.getByText("‹ Back")).toBeTruthy();
     })
 })
 
@@ -53,7 +63,7 @@ describe("input functionality", () => {
         expect(screen.getByRole("button", {name: "Continue"})).toBeEnabled();
     })  
 
-    test("whitespace does not enable the continue button", async() => {
+    test("entering whitespace does not enable the continue button", async() => {
         await render(<StoreOtherConditions/>);
         const user = userEvent.setup();
         const conditionInput = screen.getByPlaceholderText("Type conditions or symptoms");
@@ -62,7 +72,7 @@ describe("input functionality", () => {
         expect(screen.getByRole("button", {name: "Continue"})).toBeDisabled();       
     })
 
-    test("successdully enter a condition" , async() => {
+    test("successfully enter a condition" , async() => {
         await render(<StoreOtherConditions/>);
         const user = userEvent.setup();
         const conditionInput = screen.getByPlaceholderText("Type conditions or symptoms");
@@ -87,14 +97,27 @@ describe("navigation tests", () => {
     test("pressing continue will navigate to next page", async() => {
         await render(<StoreOtherConditions/>);
 
+        const user = userEvent.setup();
+        const conditionInput = screen.getByPlaceholderText("Type conditions or symptoms");
+        const condition = "Migranies";
+
+        await user.type(conditionInput, condition);
+        fireEvent.press(screen.getByRole("button", {name: "Continue"}));
+
+        //update user input
+        expect(mockUpdateUserDraft).toHaveBeenCalledWith({otherCondition:condition});        
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/completed');
     })
 
     test("pressing skip will navigate to the next screen", async() => {
         await render(<StoreOtherConditions/>);
+        fireEvent.press(screen.getByText("Skip"));
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/(onboarding)/completed');
     })
 
     test("pressing back will navigate to the previous page", async() => {
         await render(<StoreOtherConditions/>);
-        
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
     })
 })
