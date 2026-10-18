@@ -47,10 +47,10 @@ export default function AddQuestion() {
 
   const painLocationQuestions = getPainLocationQuestions(painAssessment?.pain_location || null);
   const painIntensityQuestions = getPainIntensityQuestions(
-    painAssessment?.current_pain || null, 
-    painAssessment?.mildest_pain || null,
-    painAssessment?.worst_pain || null, 
-    painAssessment?.average_pain || null
+    painAssessment?.current_pain ?? null, 
+    painAssessment?.mildest_pain ?? null,
+    painAssessment?.worst_pain ?? null, 
+    painAssessment?.average_pain ?? null
   );
 
   const painImpactQuestions = getPainImpactQuestions();
