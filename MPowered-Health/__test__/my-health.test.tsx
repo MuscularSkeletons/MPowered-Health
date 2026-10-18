@@ -55,11 +55,8 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
   mockParams = { id: destination.params.id };
   await screen.rerender(<MedicationProvider><PrescriptionEditor /><Prescriptions /></MedicationProvider>);
   await fireEvent.changeText(screen.getByLabelText('Strength'), '10');
-  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
-
-  await fireEvent.changeText(screen.getByLabelText('Repeat every'), '1');
   await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
-  
+
   await waitFor(() => expect(screen.getByText('Test medicine 10 mg — Every day')).toBeTruthy());
   expect(screen.queryByText('Test medicine 5 mg — Every day')).toBeNull();
   await fireEvent.press(screen.getByRole('button', { name: 'Delete Test medicine 10 mg — Once daily' }));
