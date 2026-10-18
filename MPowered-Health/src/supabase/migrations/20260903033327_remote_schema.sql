@@ -162,7 +162,6 @@ CREATE TABLE public.prescription (
   form text NOT NULL,
   frequency text NOT NULL,
   number_of_repeat smallint NOT NULL,
-  time_out time without time zone NOT NULL,
   user_id uuid NOT NULL,
   CONSTRAINT prescription_pkey PRIMARY KEY (prescription_id),
   CONSTRAINT prescription_user_id_fkey
