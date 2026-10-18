@@ -7,6 +7,8 @@ const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockSignIn = jest.fn();
+const mockPush = jest.fn();
+const mockReplace = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -19,13 +21,16 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }))
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-    AsyncStorage: () => ({
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        replace: mockReplace,
     })
 }))
+
+jest.mock('@react-native-async-storage/async-storage', () => 
+    require('@react-native-async-storage/async-storage/jest/async-storage-mock'))
 
 
 describe('The screen renders all the components properly', () => {
@@ -53,7 +58,7 @@ describe('The screen renders all the components properly', () => {
         expect(screen.getByRole("button", {name: "Show Password"})).toBeTruthy();
         expect(screen.getByRole("button", {name: "Sign in"})).toBeTruthy();
         expect(screen.getByText("New to MPowered Health? Get started")).toBeTruthy();
-        expect(screen.getByText("< Back")).toBeTruthy();
+        expect(screen.getByText("‹ Back")).toBeTruthy();
     })    
 })
 
@@ -117,6 +122,7 @@ describe("sign in process and remembering email functionality", () => {
     
     beforeEach(() => {
         jest.clearAllMocks();
+        (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     }) 
 
     //both tests are successful sign ins
@@ -128,8 +134,7 @@ describe("sign in process and remembering email functionality", () => {
         const passwordInput = screen.getByPlaceholderText("Enter your password");
         await user.type(passwordInput, "Password123!");
         //default is true
-        //fireEvent.press(screen.getByRole("checkbox"));
-        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+        await fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
 
         //calling sign in and saving the email address
         await waitFor(() => {
@@ -145,8 +150,8 @@ describe("sign in process and remembering email functionality", () => {
         await user.type(emailInput, "email-test@example.com");
         const passwordInput = screen.getByPlaceholderText("Enter your password");
         await user.type(passwordInput, "Password123!");
-        fireEvent.press(screen.getByRole("checkbox"));
-        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+        await fireEvent.press(screen.getByRole("checkbox"));
+        await fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
 
         //calling sign in but not saving the email address
         await waitFor(() => {
@@ -199,7 +204,6 @@ describe("password visibility", () => {
     })
 })
 
-//todo: navigation tests
 describe("navigation tests", () => {
     
     beforeEach(() => {
@@ -208,10 +212,31 @@ describe("navigation tests", () => {
 
     test("pressing sign in navigates to dashboard", async() => {
         await render(<Login/>);
+        const user = userEvent.setup();
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        await user.type(emailInput, "email-test@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter your password");
+        await user.type(passwordInput, "Password123!");
+        await fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+
+        await waitFor(() => {
+            expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
+        })
+        expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(assessment)');
+
     })
 
     test("pressing get started navigates to sign up page", async() => {
         await render(<Login/>);
+
+        await fireEvent.press(screen.getByText("New to MPowered Health? Get started"));
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/signup');
+    })
+
+    test('pressing back navigates to splash screen', async() => {
+        await render(<Login/>);
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockReplace).toHaveBeenCalledWith('/(auth)/splashscreen');
     })
 })
 
@@ -228,7 +253,7 @@ describe('Authentication tests', () => {
         await user.type(emailInput, "email-test@example.com");
         const passwordInput = screen.getByPlaceholderText("Enter your password");
         await user.type(passwordInput, "Password123!");
-        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+        await fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
 
         await waitFor(() => {
             expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
@@ -248,11 +273,15 @@ describe('Authentication tests', () => {
         const passwordInput = screen.getByPlaceholderText("Enter your password");
         await user.type(emailInput, 'email-test@example.com');
         await user.type(passwordInput, 'Password123!');
-        fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
+        await fireEvent.press(screen.getByRole("button", {name: "Sign in"}));
 
-        await expect(mockSignIn).toHaveBeenCalled();
+        await waitFor(() => {
+            expect(mockSignIn).toHaveBeenCalled();
+        })
 
-        expect(spyAlert).toHaveBeenCalledWith('Error', 'The email or password is incorrect.');
+        await waitFor(() => {
+            expect(spyAlert).toHaveBeenCalledWith('Error', 'We could not complete that request. Check your connection and try again.');
+        })
     })
 })
 

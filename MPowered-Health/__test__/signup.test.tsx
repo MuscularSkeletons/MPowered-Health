@@ -1,9 +1,10 @@
 import Signup from '../src/app/(auth)/signup';
-import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { fireEvent, render, screen, userEvent} from '@testing-library/react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockSignUp = jest.fn();
+const mockPush = jest.fn();
+const mockReplace = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -14,6 +15,14 @@ jest.mock("@/context/authcontext", () => ({
         updateUser: jest.fn(),
         isLoading: false,
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        replace: mockReplace,
+    })
 }))
 
 describe ('Sign up rendering', () => {
@@ -128,7 +137,6 @@ describe("Check password mismatches", () => {
     test("show the inline error if passwords are not equal", async() => {
         await render (<Signup/>);
         const user = userEvent.setup();
-        const spyAlert = jest.spyOn(Alert,"alert");
         const emailInput = screen.getByPlaceholderText("you@example.com");
         const passwordInput = screen.getByPlaceholderText("Enter a password");
         const confirmPasswordInput = screen.getByPlaceholderText("Re-enter your password");
@@ -137,20 +145,17 @@ describe("Check password mismatches", () => {
         await user.type(confirmPasswordInput, "Password456!");
 
         expect(await screen.findByText("Passwords do not match.")).toBeVisible();
-
-        fireEvent.press(screen.getByRole("button", {name: "Create account"}));
 
         expect(emailInput.props.value).toBe("test-email@example.com");
         expect(passwordInput.props.value).toBe("Password123!");
         expect(confirmPasswordInput.props.value).toBe("Password456!");
 
-        expect(spyAlert).toHaveBeenCalledWith('Error', 'Passwords do not match.');
+        expect(screen.getByRole("button", {name: "Create account"})).toBeDisabled();
     })
 
     test("do not show the inline error if passwords are equal", async() => {
         await render (<Signup/>);
         const user = userEvent.setup();
-        const spyAlert = jest.spyOn(Alert,"alert");
         const emailInput = screen.getByPlaceholderText("you@example.com");
         const passwordInput = screen.getByPlaceholderText("Enter a password");
         const confirmPasswordInput = screen.getByPlaceholderText("Re-enter your password");
@@ -158,19 +163,16 @@ describe("Check password mismatches", () => {
         await user.type(passwordInput, "Password123!");
         await user.type(confirmPasswordInput, "Password123!");
 
-        expect(await screen.findByText("Passwords do not match.")).not.toBeVisible();
-
-        fireEvent.press(screen.getByRole("button", {name: "Create account"}));
-
         expect(emailInput.props.value).toBe("test-email@example.com");
         expect(passwordInput.props.value).toBe("Password123!");
         expect(confirmPasswordInput.props.value).toBe("Password123!");
-
-        expect(spyAlert).not.toHaveBeenCalled();   
+        
+        expect(await screen.queryByText("Passwords do not match.")).not.toBeVisible();
+        expect(screen.getByRole("button", {name: "Create account"})).toBeEnabled();
     })
 
     test("remove the inline mismatch error when the passwords are corrected", async() => {
-        render(<Signup/>);
+        await render(<Signup/>);
         const user = userEvent.setup();
         const emailInput = screen.getByPlaceholderText("you@example.com");
         const passwordInput = screen.getByPlaceholderText("Enter a password");
@@ -181,10 +183,10 @@ describe("Check password mismatches", () => {
 
         expect(await screen.findByText("Passwords do not match.")).toBeVisible();
 
+        await user.clear(confirmPasswordInput);
         await user.type(confirmPasswordInput, "Password123!");
 
-        expect(await screen.findByText("Passwords do not match.")).not.toBeVisible();
-
+        expect(await screen.queryByText("Passwords do not match.")).not.toBeVisible();
     })
 })
 
@@ -237,7 +239,7 @@ describe("Password visibility", () => {
         await render(<Signup/>);
         const user = userEvent.setup();
         const passwordInput = screen.getByPlaceholderText("Re-enter your password");
-        const visibilityIcon = screen.getByRole("button", {name: "Show Confirm Password"});
+        const visibilityIcon = screen.getByRole("button", {name: "Show Confirm password"});
 
         await user.type(passwordInput, "Password123!");
         expect(passwordInput.props.secureTextEntry).toBe(true);
@@ -250,7 +252,7 @@ describe("Password visibility", () => {
         await render(<Signup/>);
         const user = userEvent.setup();
         const passwordInput = screen.getByPlaceholderText("Re-enter your password");
-        const visibilityShow = screen.getByRole("button", {name: "Show Confirm Password"});
+        const visibilityShow = screen.getByRole("button", {name: "Show Confirm password"});
 
         await user.type(passwordInput, "Password123!");
         expect(passwordInput.props.secureTextEntry).toBe(true);
@@ -258,30 +260,43 @@ describe("Password visibility", () => {
         await fireEvent.press(visibilityShow);
         expect(passwordInput.props.secureTextEntry).toBe(false);
 
-        const visibilityHide = screen.getByRole("button", {name: "Hide Confirm Password"});
+        const visibilityHide = screen.getByRole("button", {name: "Hide Confirm password"});
         await fireEvent.press(visibilityHide);
         expect(passwordInput.props.secureTextEntry).toBe(true);
     })
 })
 
-
-//todo: navigation tests
 describe ("Navigation to the correct screen", () => {
 
     test('navigate to login page when login in to another account is pressed', async() => {
-        /*await renderRouter({
-            "/(auth)/login" : Login,
-            "/(auth)/signup" : Signup,
-        }, {
-            initialUrl : "/(auth)/signup",
-        })*/
+        await render(<Signup/>);
 
         await fireEvent.press(screen.getByText("Already have an account? Sign in"));
-        expect(await screen.findByText('LOGIN')).toBeOnTheScreen();
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/login');
     })
 
     //navigate to onboarding screen if successful input
+    test("navigate to onboarding screen after successful account creation", async() => {
+        await render(<Signup/>);
+        const user = userEvent.setup();
+        const emailInput = screen.getByPlaceholderText("you@example.com");
+        const passwordInput = screen.getByPlaceholderText("Enter a password");
+        const confirmPasswordInput = screen.getByPlaceholderText("Re-enter your password");
+        await user.type(emailInput, "test-email@example.com");
+        await user.type(passwordInput, "Password123!");
+        await user.type(confirmPasswordInput, "Password123!");
 
+        expect(screen.getByRole("button", {name: "Create account"})).toBeEnabled();
+        fireEvent.press(screen.getByRole("button", {name: "Create account"}));
+        await expect(mockSignUp).toHaveBeenCalledWith("test-email@example.com", "Password123!");
+        expect(mockReplace).toHaveBeenCalledWith('/(auth)/(onboarding)/onboarding');
+    })
+
+    test("pressing back should navigate to splash screen", async() => {
+        await render(<Signup/>);
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockReplace).toHaveBeenCalledWith('/(auth)/splashscreen');
+    })
 })
 
 //password and email validation will be manually tested
