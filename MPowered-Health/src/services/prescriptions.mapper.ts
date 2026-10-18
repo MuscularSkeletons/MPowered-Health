@@ -26,11 +26,6 @@ export interface PrescriptionRow {
   number_of_repeat: number;
 }
 
-// time_out is NOT NULL in db, but the form has no field for either.
-// They are filled with these defaults on insert only, and never overwritten when a prescription is
-// edited. Replace if the form gets the field.
-export const DEFAULT_TIME_OUT = "09:00:00";
-
 export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
   return {
     id: row.prescription_id,
@@ -43,8 +38,8 @@ export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
   };
 }
 
-/** Fields shared by insert and update. */
-function editableFields(draft: PrescriptionDraft) {
+/** Fields shared by insert. */
+export function editableFields(draft: PrescriptionDraft) {
   return {
     medicine_name: draft.name.trim(),
     strength: Number(draft.strength),
@@ -59,13 +54,7 @@ export function draftToInsert(draft: PrescriptionDraft, userId: string) {
   return {
     ...editableFields(draft),
     user_id: userId,
-    time_out: DEFAULT_TIME_OUT,
   };
-}
-
-/** Deliberately excludes time_out (bc of reasons above) so an edit keeps whatever is stored. */
-export function draftToUpdate(draft: PrescriptionDraft) {
-  return editableFields(draft);
 }
 
 /** True when another prescription has the same name (with case not mattering), strength and unit. */

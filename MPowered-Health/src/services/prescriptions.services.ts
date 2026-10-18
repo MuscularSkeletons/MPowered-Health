@@ -7,8 +7,8 @@
 import { supabase } from '@/lib/supabase/client';
 import {
   draftToInsert,
-  draftToUpdate,
   rowToPrescription,
+  editableFields,
   type PrescriptionDraft,
   type PrescriptionItem,
   type PrescriptionRow,
@@ -42,7 +42,7 @@ export async function createPrescription(userId: string, draft: PrescriptionDraf
 export async function updatePrescription(id: string, draft: PrescriptionDraft): Promise<PrescriptionItem> {
   const { data, error } = await supabase
     .from('prescription')
-    .update(draftToUpdate(draft))
+    .update(editableFields(draft))
     .eq('prescription_id', id)
     .select()
     .single();
