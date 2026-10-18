@@ -14,8 +14,8 @@ export default function PrescriptionEditorScreen() {
 
 /** Displays the prescription fields and save controls using the editor’s current values. */
 function Editor({ id }: { id?: string }) {
-  const { draft, change, validName, validStrength, duplicate, ready, save, missing, } = useMedicationEditor(id);
-  const { name, strength, unit, form, repeat } = draft;
+  const { draft, change, validName, validStrength, duplicate, ready, save, missing, validRepeat } = useMedicationEditor(id);
+  const { name, strength, unit, form, repeat, frequency } = draft;
   if (missing)
     return (
       <Shell title="My Prescriptions">
@@ -56,11 +56,18 @@ function Editor({ id }: { id?: string }) {
         value={form}
         onChange={(value) => change('form', value)}
       />
-      <SelectField
+      <Field
         label="Repeat every"
-        options={['hour', 'day', 'week', 'month']}
         value={repeat}
-        onChange={(value) => change('repeat', value)}
+        set={(value) => change('repeat', value)}
+        input="decimal"
+        error={!validRepeat ? 'Enter a value greater than zero.' : undefined}
+      />
+      <SelectField
+        label="Unit of time"
+        options={['hour', 'day', 'week', 'month']}
+        value={frequency}
+        onChange={(value) => change('frequency', value)}
       />
       <ActionButton
         label="Save prescription"

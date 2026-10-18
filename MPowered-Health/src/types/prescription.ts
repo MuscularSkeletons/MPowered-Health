@@ -4,11 +4,11 @@ export interface MedicationDraft {
   strength: string;
   unit: string;
   form: string;
+  frequency: string;
   repeat: string;
 }
 export interface Medication extends MedicationDraft {
   id: string;
-  scheduleLabel?: string;
 }
 
 /** Creates the starting values for a new prescription. */
@@ -17,24 +17,51 @@ export const emptyMedication = (): MedicationDraft => ({
   strength: '',
   unit: 'mg',
   form: 'Tablet',
-  repeat: 'day',
+  frequency: 'day',
+  repeat: '',
 });
 
-/** Checks that a medicine strength is a finite positive number. */
-export const validStrength = (value: string) =>
+/** Checks that a number is a finite positive number. */
+export const validNumber = (value: string) =>
   /^\d+(\.\d+)?$/.test(value.trim()) && Number(value) > 0 && Number.isFinite(Number(value));
 
 /** Checks whether the required prescription fields are complete. */
 export const medicationReady = (draft: MedicationDraft) =>
   !!draft.name.trim() &&
-  validStrength(draft.strength) &&
+  validNumber(draft.strength) &&
   !!draft.unit &&
   !!draft.form &&
-  !!draft.repeat;
+  !!draft.frequency &&
+  validNumber(draft.repeat);
+
+function mapSchedule(repeat: string, frequency: string): string {
+  let number = repeat + ' times';
+  let freq = 'daily';
+
+  // special cases for numbers
+  if (repeat === '1') {
+    number = 'Once';
+  } else if (repeat === '2') {
+    number = 'Twice';
+  }
+
+  // map frequency
+  if (frequency === 'hour') {
+    freq = 'hourly';
+  } else if (frequency === 'day') {
+    freq = 'daily';
+  } else if (frequency === 'week') {
+    freq = 'weekly';
+  } else if (frequency ==='month') {
+    freq = 'monthly';
+  }
+
+  return number + ' ' + freq;
+}
 
 /** Formats the medicine name, strength, and schedule for display. */
 export const medicationLabel = (medication: Medication) =>
-  `${medication.name} ${medication.strength} ${medication.unit} — ${medication.scheduleLabel ?? `Every ${medication.repeat}`}`;
+  `${medication.name} ${medication.strength} ${medication.unit} — ${mapSchedule(medication.repeat, medication.frequency)}`;
 
 /**
  * Adds a prescription or replaces the entry with the same ID.

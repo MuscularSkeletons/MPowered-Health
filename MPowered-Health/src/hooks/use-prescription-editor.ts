@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   emptyMedication,
   medicationReady,
-  validStrength,
+  validNumber,
   type MedicationDraft,
 } from '@/types/prescription';
 import { useMedications } from '@/context/prescriptions-context';
@@ -19,6 +19,7 @@ export function useMedicationEditor(id?: string) {
           strength: existing.strength,
           unit: existing.unit,
           form: existing.form,
+          frequency: existing.frequency,
           repeat: existing.repeat,
         }
       : emptyMedication(),
@@ -34,7 +35,8 @@ export function useMedicationEditor(id?: string) {
     draft,
     change,
     validName: !!draft.name.trim(),
-    validStrength: validStrength(draft.strength),
+    validStrength: validNumber(draft.strength),
+    validRepeat: validNumber(draft.repeat),
     duplicate,
     ready: medicationReady(draft) && !duplicate,
     save: () => store.save(draft, id),

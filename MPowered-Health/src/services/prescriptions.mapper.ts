@@ -9,6 +9,7 @@ export interface PrescriptionDraft {
   strength: string;
   unit: string;
   form: string;
+  frequency: string;
   repeat: string;
 }
 export interface PrescriptionItem extends PrescriptionDraft {
@@ -22,13 +23,12 @@ export interface PrescriptionRow {
   strength_unit: string;
   form: string;
   frequency: string;
+  number_of_repeat: number;
 }
 
-// number_of_repeat and time_out are NOT NULL in db, but the form has no field for either.
+// time_out is NOT NULL in db, but the form has no field for either.
 // They are filled with these defaults on insert only, and never overwritten when a prescription is
 // edited. Replace if the form gets the field.
-/** Read as "repeat every 1 <frequency>". */
-export const DEFAULT_REPEAT_COUNT = 1;
 export const DEFAULT_TIME_OUT = "09:00:00";
 
 export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
@@ -38,7 +38,8 @@ export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
     strength: String(row.strength),
     unit: row.strength_unit,
     form: row.form,
-    repeat: row.frequency,
+    frequency: row.frequency,
+    repeat: String(row.number_of_repeat),
   };
 }
 
@@ -49,7 +50,8 @@ function editableFields(draft: PrescriptionDraft) {
     strength: Number(draft.strength),
     strength_unit: draft.unit,
     form: draft.form,
-    frequency: draft.repeat,
+    frequency: draft.frequency,
+    number_of_repeat: Number(draft.repeat),
   };
 }
 
@@ -57,12 +59,11 @@ export function draftToInsert(draft: PrescriptionDraft, userId: string) {
   return {
     ...editableFields(draft),
     user_id: userId,
-    number_of_repeat: DEFAULT_REPEAT_COUNT,
     time_out: DEFAULT_TIME_OUT,
   };
 }
 
-/** Deliberately excludes number_of_repeat and time_out (bc of reasons above) so an edit keeps whatever is stored. */
+/** Deliberately excludes time_out (bc of reasons above) so an edit keeps whatever is stored. */
 export function draftToUpdate(draft: PrescriptionDraft) {
   return editableFields(draft);
 }
