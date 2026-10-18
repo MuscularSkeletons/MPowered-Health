@@ -62,7 +62,6 @@ export const movementQuestions: MovementQuestionsConfig = {
     const { totalScore, impactLevel } = calculateMovementScore(answers);
     return {
       extraFields: {
-        movement_score: totalScore,
         impact_level: impactLevel,
       },
       summaryMessage: impactLevel,

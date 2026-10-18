@@ -53,7 +53,6 @@ export const socialHealthQuestions: SocialHealthQuestionsConfig = {
     const { totalScore, impactLevel } = calculateSocialScore(answers);
     return {
       extraFields: {
-        social_score: totalScore,
         impact_level: impactLevel,
       },
       summaryMessage: impactLevel,

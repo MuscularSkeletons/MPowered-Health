@@ -153,7 +153,7 @@ export default function AssessmentScreen({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(initialCompleted);
-  const [summaryMessage, setSummaryMessage] = useState<string | null>(null);
+  const [summaryMessage, setSummaryMessage] = useState<string | null>(existingAnswers?.impact_level || null,);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [otherText, setOtherText] = useState('');
 
@@ -204,14 +204,19 @@ export default function AssessmentScreen({
     setSubmitError(null);
     try {
       const calculated = categoryData.calculateScore?.(finalAnswers);
-      setSummaryMessage(calculated?.summaryMessage || null);
+      const insightText = calculated?.summaryMessage || calculated?.extraFields?.impact_level || null;
+      setSummaryMessage(insightText);
       await submitAssessmentAnswers(
         categoryData.title,
         finalAnswers,
         calculated?.extraFields || {},
         assessmentId,
       );
-      onComplete?.(finalAnswers);
+      const persistedAnswers = {
+        ...finalAnswers,
+        ...(calculated?.extraFields || {}),
+      };
+      onComplete?.(persistedAnswers);
       setIsFinished(true);
     } catch (error: any) {
       const message = error?.message || 'Failed to save responses. Please try again.';
@@ -277,7 +282,12 @@ export default function AssessmentScreen({
 
   if (isFinished) {
     const calculated = categoryData.calculateScore?.(answers);
-    const insight = summaryMessage || calculated?.summaryMessage;
+    const insight =
+      summaryMessage ||
+      calculated?.summaryMessage ||
+      existingAnswers?.impact_level ||
+      answers?.impact_level ||
+      null;
     const grouped = questions.reduce<Record<string, Question[]>>((result, question) => {
       (result[question.title] ||= []).push(question);
       return result;
@@ -300,13 +310,6 @@ export default function AssessmentScreen({
                 <View style={styles.summaryStatement}>
                   <Text style={styles.summaryStatementText}>{insight}</Text>
                 </View>
-                {categoryData.tip ? (
-                  <View style={styles.guideButton}>
-                    <Text style={styles.guideIcon}>⌕</Text>
-                    <Text style={styles.guideText}>{categoryData.tip}</Text>
-                    <Text style={styles.guideArrow}>›</Text>
-                  </View>
-                ) : null}
               </View>
             ) : null}
             {Object.entries(grouped).map(([title, group], index) => (
