@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/context/authcontext";
 import { useState, useCallback } from "react";
+import { getCurrentWeekStartDate } from '@/hooks/useAssessments';
 
 export interface Question {
     id: string;
@@ -158,27 +159,8 @@ export const useQuestions = () => {
     const refreshQuestions = async () => {
         await loadQuestions();
     };
-
-    // Helper to get Monday of the current week (YYYY-MM-DD)
-    function getCurrentWeekStartDate(): string {
-        const d = new Date();
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // monday
-        d.setDate(diff);
-        // Get the local date
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0'); //two digits format for months
-        const date = String(d.getDate()).padStart(2, '0'); ////two digits format for date
-        
-        return year + '-' + month + '-' + date; 
-    };
     
-    // retrieve the current week's assessment id
-    // TODO: integrate with assessment feature code
-        /**
-     * Gets the active assessment_id for the current week,
-     * or returns null
-     */
+    // retrieve the current week's assessment id or return null
     const getCurrentWeeklyAssessmentID = useCallback(async (): Promise<string | null> => {
         if (!user) {
             throw new Error("User not authenticated");
@@ -209,7 +191,6 @@ export const useQuestions = () => {
     const [isPainAssessmentLoading, setIsPainAssessmentLoading] = useState(false);
     
     // retrieve pain assessment data or if incomplete return null 
-    // TODO: integrate with assessment feature code
     const retrievePainAssessment = useCallback(async () => {
         if (!user) {
             throw new Error("User not authenticated");

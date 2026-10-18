@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
+import { useAuth } from "@/context/authcontext";
+import { useState, useCallback } from "react";
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
@@ -14,7 +16,7 @@ export interface CurrentWeeklyAssessmentState {
 }
 
 // Helper to get Monday of the current week (YYYY-MM-DD)
-function getCurrentWeekStartDate(): string {
+export function getCurrentWeekStartDate(): string {
   const d = new Date();
   const day = d.getDay();
   const diff = d.getDate() - day + (day === 0 ? -6 : 1); // monday
