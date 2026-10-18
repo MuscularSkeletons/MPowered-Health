@@ -9,7 +9,7 @@ import {
     Pressable,
     Modal,
 } from 'react-native';
-import { AuthScreen } from '@/components/auth/auth-ui';
+import { Screen } from '@/components/ui/common';
 import { router } from 'expo-router';
 import { useState } from 'react';
 
@@ -24,13 +24,13 @@ export function Shell({
   onBack?: () => void;
 }) {
   return (
-    <AuthScreen>
+    <Screen>
         <Pressable onPress={onBack}>
             <Text style={styles.back}>‹ Back</Text>
         </Pressable>
         <Text style={styles.title}>{title}</Text>
         {children}
-    </AuthScreen>
+    </Screen>
   );
 }
 

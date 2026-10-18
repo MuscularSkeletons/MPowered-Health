@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { PrimaryButton, AuthScreen, authStyles, AuthIntro } from '@/components/auth/auth-ui';
+import { PrimaryButton, Screen, Intro, commonStyles, } from '@/components/ui/common';
 import { palette } from '@/constants/profile/ui';
 import { saveWeeklyReflection } from '@/hooks/useAssessments';
 
@@ -40,16 +40,16 @@ export default function WeeklyReflectionScreen({
   };
 
   return (
-    <AuthScreen>
+    <Screen>
       {/* Top Header */}
       <View style={styles.top}>
-        <Text onPress={onBack} style={authStyles.back}>‹ Back</Text>
+        <Text onPress={onBack} style={commonStyles.back}>‹ Back</Text>
         <View style={styles.optionalBadge}>
           <Text style={styles.optionalText}>Optional</Text>
         </View>
       </View>
 
-      <AuthIntro
+      <Intro
         sectionLabel="WEEKLY CHECK-IN"
         title="Weekly Reflection"
         description="Write any notes, highlights, triggers, or thoughts about how your body felt this week."
@@ -79,7 +79,7 @@ export default function WeeklyReflectionScreen({
       <Text style={styles.helper}>
         This reflection is completely optional and will be attached to your weekly health record.
       </Text>
-    </AuthScreen>
+    </Screen>
   );
 }
 

@@ -1,6 +1,6 @@
 import { s } from '@/components/auth/welcome/styles';
 import { SplashArtwork } from '@/components/auth/welcome/artwork';
-import { AuthHeader } from '@/components/auth/auth-ui';
+import { Header } from '@/components/ui/common';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, Text, View, ViewToken } from 'react-native';
@@ -44,7 +44,7 @@ export default function Splash() {
   }, []);
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <FlatList
         ref={ref}
         style={s.list}

@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { palette } from '@/constants/profile/ui';
 
 /** Displays the MPowered Health wordmark used throughout account setup. */
-export function AuthHeader() {
+export function Header() {
   return (
     <View style={styles.header}>
       <View style={styles.logoLockup}>
@@ -29,11 +29,11 @@ export function AuthHeader() {
   );
 }
 
-/** Provides the shared background, header, scrolling, and keyboard behavior for auth screens. */
-export function AuthScreen({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
+/** Provides the shared background, header, scrolling, and keyboard behavior for screens. */
+export function Screen({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -50,7 +50,7 @@ export function AuthScreen({ children, compact = false }: { children: ReactNode;
 }
 
 /** Displays a section label, title, description, and optional progress above the form. */
-export function AuthIntro({
+export function Intro({
   sectionLabel,
   title,
   description,
@@ -74,7 +74,7 @@ export function AuthIntro({
 }
 
 /** Displays a labelled text field and an optional password visibility control. */
-export function AuthInput({
+export function Input({
   label,
   secure,
   reveal,
@@ -174,7 +174,7 @@ export function ChoiceButton({
   );
 }
 
-export const authStyles = StyleSheet.create({
+export const commonStyles = StyleSheet.create({
   actions: { gap: 10, marginTop: 28 },
   secondaryAction: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   secondaryText: { color: palette.primary, fontSize: 13, fontWeight: '700' },

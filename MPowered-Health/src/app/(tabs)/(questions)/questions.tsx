@@ -17,13 +17,12 @@ import { useAuth } from "@/context/authcontext";
 import { formatTimeAgo } from "@/lib/date-helper";
 import { Ionicons } from "@expo/vector-icons";
 import { ModalActions, modalStyles } from '@/components/ui/modal-ui';
-// temporary UI - to be replaced by settings specific UI
 import {
-  AuthIntro,
-  AuthHeader,
+  Intro,
+  Header,
   PrimaryButton,
-  AuthInput,
-} from '@/components/auth/auth-ui';
+  Input,
+} from '@/components/ui/common';
 
 interface QuestionCardProps {
   question: Question;
@@ -129,7 +128,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
           <View style={modalStyles.centredView}>
             <View style={modalStyles.editInterface}>
               <Text style={modalStyles.modalTitle}>{question.question}</Text>
-              <AuthInput
+              <Input
                 testID="answer-input"
                 label="Answer"
                 placeholder={'Enter your answer'}
@@ -198,10 +197,10 @@ export default function Questions() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <View style={styles.body}>
         <View style={styles.content}>
-          <AuthIntro
+          <Intro
             sectionLabel="Q&A"
             title="Questions & Answers"
             description="Add questions you would like to discuss with your healthcare professional/s."

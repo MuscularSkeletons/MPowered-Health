@@ -2,7 +2,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { openBrowserAsync } from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { palette } from '@/constants/profile/ui';
-import { AuthIntro, AuthScreen, PrimaryButton, authStyles } from '@/components/auth/auth-ui';
+import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/ui/common';
 
 /** Introduces profile setup and links to the terms and privacy policy. */
 export default function Onboarding() {
@@ -18,8 +18,8 @@ export default function Onboarding() {
   };
 
   return (
-    <AuthScreen>
-      <AuthIntro
+    <Screen>
+      <Intro
         sectionLabel="GET STARTED"
         title="Hello 👋🏻"
         description={
@@ -38,10 +38,10 @@ export default function Onboarding() {
           Privacy Policy
         </Text>.
       </Text>
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton label="Continue" onPress={() => router.push('/(auth)/(onboarding)/name')} />
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }
 

@@ -3,7 +3,7 @@ import { TrackingChart } from '@/components/my-health/tracking-chart';
 import { healthRecordStyles as styles } from '@/components/my-health/health-record-styles';
 import { useHealthRecords } from '@/hooks/use-health-records';
 import { painRecordDate } from '@/services/health-records.store';
-import { AuthScreen } from '@/components/auth/auth-ui';
+import { Screen } from '@/components/ui/common';
 import { palette } from '@/constants/profile/ui';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -32,7 +32,7 @@ export default function HealthRecords() {
     newestFirst,
   } = useHealthRecords();
   return (
-    <AuthScreen>
+    <Screen>
       <Pressable accessibilityRole="button" onPress={() => router.back()}>
         <Text style={styles.back}>‹ Back</Text>
       </Pressable>
@@ -197,7 +197,7 @@ export default function HealthRecords() {
         </View>
       </View>
     </Modal>
-    </AuthScreen>
+    </Screen>
   );
 }
 // Group chart, filter, history, and modal styles in one section.

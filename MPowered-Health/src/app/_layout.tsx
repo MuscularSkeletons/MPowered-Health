@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/authcontext';
-import { AuthHeader } from '@/components/auth/auth-ui';
+import { Header } from '@/components/ui/common';
 import { palette } from '@/constants/profile/ui';
 import { requiredSessionRoute } from '@/navigation/route-guard';
 
@@ -11,7 +11,7 @@ import { requiredSessionRoute } from '@/navigation/route-guard';
 function AppLoadingScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <View style={styles.body}>
         <View pointerEvents="none" style={styles.glowTop} />
         <View pointerEvents="none" style={styles.glowBottom} />

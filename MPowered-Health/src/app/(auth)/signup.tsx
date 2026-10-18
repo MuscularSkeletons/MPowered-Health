@@ -4,12 +4,12 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
+  Input,
+  Intro,
+  Screen,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/ui/common';
 
 /** Displays the account registration form. */
 export default function Signup() {
@@ -49,16 +49,16 @@ export default function Signup() {
   };
 
   return (
-    <AuthScreen compact>
+    <Screen compact>
       <Pressable onPress={() => router.replace('/(auth)/splashscreen')}>
-        <Text style={authStyles.back}>‹ Back</Text>
+        <Text style={commonStyles.back}>‹ Back</Text>
       </Pressable>
-      <AuthIntro
+      <Intro
         sectionLabel="GET STARTED"
         title="Create your account"
         description="Create your account, then tell us what matters for your health."
       />
-      <AuthInput
+      <Input
         label="Email address"
         placeholder="you@example.com"
         keyboardType="email-address"
@@ -73,7 +73,7 @@ export default function Signup() {
           setAuthError(null);
         }}
       />
-      <AuthInput
+      <Input
         label="Password"
         placeholder="Enter a password"
         autoCapitalize="none"
@@ -89,7 +89,7 @@ export default function Signup() {
         reveal={showPassword}
         onToggleReveal={() => setShowPassword((visible) => !visible)}
       />
-      <AuthInput
+      <Input
         label="Confirm password"
         placeholder="Re-enter your password"
         autoCapitalize="none"
@@ -107,16 +107,16 @@ export default function Signup() {
         onSubmitEditing={() => void handleSignUp()}
       />
       {!passwordsMatch ? (
-        <Text accessibilityRole="alert" style={authStyles.error}>
+        <Text accessibilityRole="alert" style={commonStyles.error}>
           Passwords do not match.
         </Text>
       ) : null}
       {authError ? (
-        <Text accessibilityRole="alert" style={authStyles.error}>
+        <Text accessibilityRole="alert" style={commonStyles.error}>
           {authError.message}
         </Text>
       ) : null}
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton
           label="Create account"
           loading={isLoading}
@@ -127,11 +127,11 @@ export default function Signup() {
           accessibilityRole="button"
           disabled={isLoading}
           onPress={() => router.push('/(auth)/login')}
-          style={authStyles.secondaryAction}
+          style={commonStyles.secondaryAction}
         >
-          <Text style={authStyles.secondaryText}>Already have an account? Sign in</Text>
+          <Text style={commonStyles.secondaryText}>Already have an account? Sign in</Text>
         </Pressable>
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }

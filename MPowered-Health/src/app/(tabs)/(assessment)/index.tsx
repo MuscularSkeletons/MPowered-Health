@@ -12,7 +12,7 @@ import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessment
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import WeeklyReflectionScreen from '@/constants/assessmentQuestions/weeklyReflection';
 import { palette } from '@/constants/profile/ui';
-import { AuthHeader } from '@/components/auth/auth-ui';
+import { Header } from '@/components/ui/common';
 import { useAuth } from '@/context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,
@@ -143,7 +143,7 @@ export default function HomeScreen() {
   // Otherwise, render the Overview UI
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       
         <ScrollView
           style={styles.body}

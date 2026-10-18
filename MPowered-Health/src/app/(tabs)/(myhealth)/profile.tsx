@@ -1,4 +1,4 @@
-import { AuthScreen } from '@/components/auth/auth-ui';
+import { Screen } from '@/components/ui/common';
 import { ProfileExportActions } from '@/components/my-health/profile-export-actions';
 import type { PainProfileReport } from '@/components/my-health/profile-report';
 import { layout, palette, radius, spacing } from '@/constants/profile/ui';
@@ -120,7 +120,7 @@ export default function LatestAssessmentScreen() {
   };
 
   return (
-    <AuthScreen>
+    <Screen>
       <Pressable accessibilityRole="button" onPress={() => router.back()}>
         <Text style={styles.back}>‹ Back</Text>
       </Pressable>
@@ -153,7 +153,7 @@ export default function LatestAssessmentScreen() {
           </View>
         );
       })}
-    </AuthScreen>
+    </Screen>
   );
 }
 

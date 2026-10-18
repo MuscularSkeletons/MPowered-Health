@@ -1,20 +1,19 @@
 import { Text, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-// temporary UI reusing auth ui
 import {
-  AuthIntro,
-  AuthScreen,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  Intro,
+  Screen,
+  commonStyles,
+} from '@/components/ui/common';
 import { palette } from '@/constants/profile/ui';
 
 // TODO: implement notifications in separate sprint if have time to do
 export default function ManageNotifications() {
   const router = useRouter();
   return (
-    <AuthScreen>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="NOTIFICATIONS"
         title="Notification preferences"
         description="Choose how and when you receive reminders."
@@ -30,7 +29,7 @@ export default function ManageNotifications() {
           </Text>
         </View>
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }
 

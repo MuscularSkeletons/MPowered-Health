@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthHeader, PrimaryButton } from '@/components/auth/auth-ui';
+import { Header, PrimaryButton } from '@/components/ui/common';
 import { palette } from '@/constants/profile/ui';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { useMedications } from '@/context/prescriptions-context';
@@ -285,7 +285,7 @@ export default function AssessmentScreen({
   if (!questions.length) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
-        <AuthHeader />
+        <Header />
         <View style={styles.empty}>
           <Text style={styles.required}>No questions found for this assessment.</Text>
           <PrimaryButton label="Back to Overview" onPress={onBack} />
@@ -308,7 +308,7 @@ export default function AssessmentScreen({
     }, {});
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
-        <AuthHeader />
+        <Header />
         <ScrollView style={styles.body} contentContainerStyle={styles.summary}>
           <Text style={styles.summaryTitle}>{categoryData.title} Summary</Text>
           <Text style={styles.summaryCopy}>
@@ -368,7 +368,7 @@ export default function AssessmentScreen({
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <KeyboardAvoidingView style={styles.body} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           ref={scrollRef}

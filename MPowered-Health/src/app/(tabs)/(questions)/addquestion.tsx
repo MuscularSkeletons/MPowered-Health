@@ -20,15 +20,14 @@ import {
 import { useAuth } from "@/context/authcontext";
 import { useQuestions } from "@/hooks/useQuestions";
 import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
-// temporary UI - to be replaced by settings specific UI
 import {
-  AuthIntro,
-  AuthHeader,
+  Intro,
+  Header,
   ChoiceButton,
   PrimaryButton,
-  authStyles,
-  AuthInput,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+  Input,
+} from '@/components/ui/common';
 
 export default function AddQuestion() {
   const router = useRouter();
@@ -134,18 +133,18 @@ export default function AddQuestion() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <View style={styles.body}>
         <View style={styles.content}>
-          <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-          <AuthIntro
+          <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+          <Intro
               sectionLabel="Questions"
               title="Add Questions"
               description="Questions are generated based on your assessment answers. Please complete your assessments for accurate suggestions."
             />
           <ScrollView>
             <Text>Click the checkbox next to any questions you wish to add to your appointment plan.</Text>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <Text style={styles.sectionTitle}>Pain Location</Text>
               {painLocationQuestions.map((question) => (
                 <ChoiceButton
@@ -157,7 +156,7 @@ export default function AddQuestion() {
                 />
               ))}
             </View>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <Text style={styles.sectionTitle}>Pain Intensity</Text>
               {painIntensityQuestions.map((question) => (
                 <ChoiceButton
@@ -169,7 +168,7 @@ export default function AddQuestion() {
                 />
               ))}
             </View>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <Text style={styles.sectionTitle}>Pain Impact</Text>
               {painImpactQuestions.map((question) => (
                 <ChoiceButton
@@ -181,7 +180,7 @@ export default function AddQuestion() {
                 />
               ))}
             </View>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <Text style={styles.sectionTitle}>Management</Text>
               {painManagementQuestions.map((question) => (
                 <ChoiceButton
@@ -193,7 +192,7 @@ export default function AddQuestion() {
                 />
               ))}
             </View>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <Text style={styles.sectionTitle}>Other</Text>
               {customQuestions.map((question) => (
                 <ChoiceButton
@@ -219,7 +218,7 @@ export default function AddQuestion() {
             <View style={modalStyles.centredView}>
               <View style={modalStyles.editInterface}>
                 <Text style={modalStyles.modalTitle}>Add Question</Text>
-                <AuthInput
+                <Input
                   testID="custom-question-input"
                   label="Question"
                   placeholder={'Enter your question'}

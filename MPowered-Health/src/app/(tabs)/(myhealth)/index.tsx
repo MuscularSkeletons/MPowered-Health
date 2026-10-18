@@ -1,4 +1,4 @@
-import { AuthScreen } from '@/components/auth/auth-ui';
+import { Screen } from '@/components/ui/common';
 import { overviewStyles as styles } from '@/components/my-health/overview-styles';
 import { palette } from '@/constants/profile/ui';
 import {
@@ -103,7 +103,7 @@ export default function MyHealthScreen() {
   const recentRecords = records.slice(-5);
 
   return (
-    <AuthScreen>
+    <Screen>
       <Text style={styles.eyebrow}>MY HEALTH</Text>
       <Text style={styles.pageTitle}>Understand your health over time</Text>
       <Text style={styles.pageCopy}>
@@ -156,6 +156,6 @@ export default function MyHealthScreen() {
         </Pressable>
       </View>
       <Text style={styles.sponsor}>Supported by ABBVIE</Text>
-    </AuthScreen>
+    </Screen>
   );
 }

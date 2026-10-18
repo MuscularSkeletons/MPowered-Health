@@ -3,12 +3,12 @@ import { Alert, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
+  Input,
+  Intro,
+  Screen,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/ui/common';
 
 /** Stores the name used to personalise the profile. */
 export default function StoreName() {
@@ -28,15 +28,15 @@ export default function StoreName() {
   };
 
   return (
-    <AuthScreen>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="YOUR PROFILE"
         progress="1 of 6"
         title="Your name"
         description="Your health and wellbeing are uniquely you. Your name helps us address you personally."
       />
-      <AuthInput
+      <Input
         label="Name"
         placeholder="Type your name"
         inputMode="text"
@@ -46,9 +46,9 @@ export default function StoreName() {
         onChangeText={setName}
         onSubmitEditing={handleComplete}
       />
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton label="Continue" disabled={!name.trim()} onPress={handleComplete} />
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }

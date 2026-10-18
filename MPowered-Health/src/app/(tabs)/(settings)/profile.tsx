@@ -17,14 +17,13 @@ import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
 import { sexOptions, diagnosisOptions, painConditionsOptions } from '@/constants/profile/profile-options';
 import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
 
-// temporary UI reusing auth ui
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
-  authStyles,
+  Input,
+  Intro,
+  Screen,
+  commonStyles,
   ChoiceButton,
-} from '@/components/auth/auth-ui';
+} from '@/components/ui/common';
 
 function ProfileRow({
   label,
@@ -295,9 +294,9 @@ export default function ManageProfile() {
   };
 
   return (
-    <AuthScreen>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="PROFILE"
         title="Profile Details"
         description="Keep your personal and health information up to date."
@@ -387,7 +386,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit name</Text>
-            <AuthInput
+            <Input
               testID="name-input"
               label="Name"
               placeholder={user?.name}
@@ -416,7 +415,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit sex</Text>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               {sexOptions.map((option) => (
                 <ChoiceButton
                   key={option}
@@ -443,7 +442,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit year of birth</Text>
-            <AuthInput
+            <Input
               testID="birth-year-input"
               label="Year of birth"
               placeholder={String(user?.birthyear || "XXXX")}
@@ -472,7 +471,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit diagnosis</Text>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               <ChoiceButton
                 label={diagnosisOptions[0]}
                 selected={hasDiagnosis === true}
@@ -502,7 +501,7 @@ export default function ManageProfile() {
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit pain conditions</Text>
             <ScrollView>
-            <View style={authStyles.choices}>
+            <View style={commonStyles.choices}>
               {painConditionsOptions.map((condition) => (
                 <ChoiceButton
                   key={condition}
@@ -531,7 +530,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Edit other condition</Text>
-            <AuthInput
+            <Input
               testID="other-conditions-input"
               label="Other condition"
               placeholder={user?.otherCondition || 'Type conditions or symptoms'}
@@ -559,7 +558,7 @@ export default function ManageProfile() {
         <View style={modalStyles.centredView}>
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Change email address</Text>
-            <AuthInput
+            <Input
               label="Email address"
               placeholder="you@example.com"
               keyboardType="email-address"
@@ -575,7 +574,7 @@ export default function ManageProfile() {
               }}
             />
             {authError ? (
-              <Text accessibilityRole="alert" style={authStyles.error}>
+              <Text accessibilityRole="alert" style={commonStyles.error}>
                 {authError.message}
               </Text>
             ) : null}
@@ -587,7 +586,7 @@ export default function ManageProfile() {
           </View>
         </View>
       </Modal>
-    </AuthScreen>
+    </Screen>
   
   );
 }

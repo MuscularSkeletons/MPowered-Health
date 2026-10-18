@@ -6,12 +6,12 @@ import { useAuth } from '@/context/authcontext';
 import { palette } from '@/constants/profile/ui';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
+  Input,
+  Intro,
+  Screen,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/ui/common';
 
 const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 
@@ -61,16 +61,16 @@ export default function Login() {
   };
 
   return (
-    <AuthScreen compact>
+    <Screen compact>
       <Pressable onPress={() => router.replace('/(auth)/splashscreen')}>
-        <Text style={authStyles.back}>‹ Back</Text>
+        <Text style={commonStyles.back}>‹ Back</Text>
       </Pressable>
-      <AuthIntro
+      <Intro
         sectionLabel="SIGN IN"
         title="Welcome back!"
         description="Sign in to continue your MPowered Health journey."
       />
-      <AuthInput
+      <Input
         label="Email address"
         placeholder="you@example.com"
         keyboardType="email-address"
@@ -85,7 +85,7 @@ export default function Login() {
           setAuthError(null);
         }}
       />
-      <AuthInput
+      <Input
         label="Password"
         placeholder="Enter your password"
         autoCapitalize="none"
@@ -114,11 +114,11 @@ export default function Login() {
         <Text style={styles.rememberText}>Remember my email address</Text>
       </Pressable>
       {authError ? (
-        <Text accessibilityRole="alert" style={authStyles.error}>
+        <Text accessibilityRole="alert" style={commonStyles.error}>
           {authError.message}
         </Text>
       ) : null}
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton
           label="Sign in"
           loading={isLoading}
@@ -129,12 +129,12 @@ export default function Login() {
           accessibilityRole="button"
           disabled={isLoading}
           onPress={() => router.push('/(auth)/signup')}
-          style={authStyles.secondaryAction}
+          style={commonStyles.secondaryAction}
         >
-          <Text style={authStyles.secondaryText}>New to MPowered Health? Get started</Text>
+          <Text style={commonStyles.secondaryText}>New to MPowered Health? Get started</Text>
         </Pressable>
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }
 

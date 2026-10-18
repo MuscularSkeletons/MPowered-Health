@@ -14,13 +14,12 @@ import { palette } from '@/constants/profile/ui';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { useState } from "react";
 import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
-// temporary UI reusing auth ui
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  Input,
+  Intro,
+  Screen,
+  commonStyles,
+} from '@/components/ui/common';
 
 function SettingRow({
   icon,
@@ -161,8 +160,8 @@ export default function Settings() {
     };
 
   return (
-    <AuthScreen>
-      <AuthIntro
+    <Screen>
+      <Intro
         title="Settings"
         description="Personalise your experience and control your account."
       />
@@ -255,7 +254,7 @@ export default function Settings() {
           <View style={modalStyles.editInterface}>
             <Text style={modalStyles.modalTitle}>Change password</Text>
             <Text style={modalStyles.modalDescription}>Confirm your current password, then choose a new one.</Text>
-            <AuthInput
+            <Input
               label="Current password"
               placeholder="Enter your current password"
               autoCapitalize="none"
@@ -270,7 +269,7 @@ export default function Settings() {
               reveal={showCurrPassword}
               onToggleReveal={() => setShowCurrPassword((visible) => !visible)}
             />
-            <AuthInput
+            <Input
               label="New password"
               placeholder="Enter a new password"
               autoCapitalize="none"
@@ -288,7 +287,7 @@ export default function Settings() {
               onSubmitEditing={() => void handleUpdatePassword()}
             />
             {authError ? (
-              <Text accessibilityRole="alert" style={authStyles.error}>
+              <Text accessibilityRole="alert" style={commonStyles.error}>
                 {authError.message}
               </Text>
             ) : null}
@@ -300,7 +299,7 @@ export default function Settings() {
           </View>
         </View>
       </Modal>
-    </AuthScreen>
+    </Screen>
   );
 }
 
