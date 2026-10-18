@@ -57,8 +57,8 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
   await fireEvent.changeText(screen.getByLabelText('Strength'), '10');
   await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
 
-  await waitFor(() => expect(screen.getByText('Test medicine 10 mg — Every day')).toBeTruthy());
-  expect(screen.queryByText('Test medicine 5 mg — Every day')).toBeNull();
+  await waitFor(() => expect(screen.getByText('Test medicine 10 mg — Once daily')).toBeTruthy());
+  expect(screen.queryByText('Test medicine 5 mg — Once daily')).toBeNull();
   await fireEvent.press(screen.getByRole('button', { name: 'Delete Test medicine 10 mg — Once daily' }));
   await waitFor(() => expect(screen.getByText('No prescriptions added yet.')).toBeTruthy());
 });
