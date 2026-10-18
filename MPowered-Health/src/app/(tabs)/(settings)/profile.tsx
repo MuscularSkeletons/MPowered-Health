@@ -299,7 +299,7 @@ export default function ManageProfile() {
       <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
       <AuthIntro
         sectionLabel="PROFILE"
-        title="Profile details"
+        title="Profile Details"
         description="Keep your personal and health information up to date."
       />
 
