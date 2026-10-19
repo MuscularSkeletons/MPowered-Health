@@ -4,7 +4,7 @@ import {
   commonStyles,
 } from '@/components/ui/common';
 import { ProfileExportActions } from '@/components/my-health/profileExportActions';
-import type { PainProfileReport } from '@/components/my-health/healthProfileReportPDF';
+import { type HealthProfileReport } from '@/components/my-health/healthProfileReportPDF';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { getLatestAssessments } from '@/services/healthRecords.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
@@ -113,7 +113,7 @@ export default function LatestAssessmentScreen() {
     .filter((value): value is string => Boolean(value));
   const updatedAt = dates.sort().at(-1);
   const updatedLabel = updatedAt ? formatDate(updatedAt) : '';
-  const report: PainProfileReport = {
+  const report: HealthProfileReport = {
     updatedAt: updatedLabel,
     sections: categories.map((category) => ({
       title: category.title,

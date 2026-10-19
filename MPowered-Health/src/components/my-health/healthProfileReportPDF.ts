@@ -6,7 +6,7 @@ export type ProfileSection = {
   items: [string, string][];
 };
 
-export type PainProfileReport = {
+export type HealthProfileReport = {
   updatedAt: string;
   sections: ProfileSection[];
 };
@@ -24,7 +24,7 @@ const escapeHtml = (value: string) =>
   });
 
 /** Creates the plain-text profile used by native sharing and the browser copy fallback. */
-export function profileReportText(report: PainProfileReport) {
+export function healthProfileReportText(report: HealthProfileReport) {
   return [
     'My health profile',
     report.updatedAt ? `Updated ${report.updatedAt}` : 'No completed assessments yet',
@@ -39,7 +39,7 @@ export function profileReportText(report: PainProfileReport) {
 }
 
 /** Creates an isolated A4 document so app navigation and controls never appear in the PDF. */
-export function profileReportHtml(report: PainProfileReport) {
+export function healthProfileReportHtml(report: HealthProfileReport) {
   return `
     <!doctype html>
     <html lang="en">

@@ -1,8 +1,8 @@
 import { copyText, printHtml, shareDocument } from '@/lib/documentExport';
 import {
-  type PainProfileReport,
-  profileReportHtml,
-  profileReportText,
+  type HealthProfileReport,
+  healthProfileReportHtml,
+  healthProfileReportText,
 } from '@/components/my-health/healthProfileReportPDF';
 import { palette, radius, spacing } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
@@ -14,7 +14,7 @@ export function ProfileExportActions({
   report,
   disabled,
 }: {
-  report: PainProfileReport;
+  report: HealthProfileReport;
   disabled: boolean;
 }) {
   const [busy, setBusy] = useState<'print' | 'share' | null>(null);
@@ -27,7 +27,7 @@ export function ProfileExportActions({
     if (disabled || pending.current) return;
     if (action === 'share' && Platform.OS === 'web') {
       setCopyStatus('');
-      setShareText(profileReportText(report));
+      setShareText(healthProfileReportText(report));
       return;
     }
 
@@ -36,14 +36,14 @@ export function ProfileExportActions({
     setError('');
     try {
       if (action === 'print') {
-        await printHtml(profileReportHtml(report));
+        await printHtml(healthProfileReportHtml(report));
       } else {
         const result = await shareDocument({
           title: 'My health profile',
-          html: profileReportHtml(report),
-          text: profileReportText(report),
+          html: healthProfileReportHtml(report),
+          text: healthProfileReportText(report),
         });
-        if (result === 'copy') setShareText(profileReportText(report));
+        if (result === 'copy') setShareText(healthProfileReportText(report));
       }
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : '';

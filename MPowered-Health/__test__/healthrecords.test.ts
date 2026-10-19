@@ -5,8 +5,8 @@ import {
 import { groupPainHistory } from '@/services/healthRecords.store';
 import { buildPainRecordsHtml } from '@/components/my-health/painRecordReportPDF';
 import {
-  profileReportHtml,
-  profileReportText,
+  healthProfileReportHtml,
+  healthProfileReportText,
 } from '@/components/my-health/healthProfileReportPDF';
 
 jest.mock('@/services/healthRecords.services', () => ({ fetchHealthSnapshot: jest.fn() }));
@@ -66,7 +66,7 @@ it('builds safe printable and shareable health profile reports', () => {
     ],
   };
 
-  expect(profileReportHtml(profile)).toContain('&lt;Back &amp; Knee&gt;');
-  expect(profileReportHtml(profile)).not.toContain('<Back & Knee>');
-  expect(profileReportText(profile)).toContain('Pain location: <Back & Knee>');
+  expect(healthProfileReportHtml(profile)).toContain('&lt;Back &amp; Knee&gt;');
+  expect(healthProfileReportHtml(profile)).not.toContain('<Back & Knee>');
+  expect(healthProfileReportText(profile)).toContain('Pain location: <Back & Knee>');
 });
