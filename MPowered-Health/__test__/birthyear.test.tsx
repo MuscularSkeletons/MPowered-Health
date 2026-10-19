@@ -1,7 +1,7 @@
 import StoreBirthYear from '../src/app/(auth)/(onboarding)/birthyear';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
+import { BIRTH_YEAR_RANGE } from "@/constants/profile/profileConstants";
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();

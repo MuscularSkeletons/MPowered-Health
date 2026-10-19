@@ -19,7 +19,7 @@ import {
 } from "@/constants/questions/questions";
 import { useAuth } from "@/context/authcontext";
 import { useQuestions } from "@/hooks/useQuestions";
-import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
+import { ModalActions, modalStyles } from "@/components/ui/modal";
 import {
   Intro,
   Header,

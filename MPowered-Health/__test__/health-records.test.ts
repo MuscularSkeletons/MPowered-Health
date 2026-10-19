@@ -1,13 +1,13 @@
 import {
   buildSnapshot,
   type AssessmentRow,
-} from '@/services/health-records.mapper';
-import { groupPainHistory } from '@/services/health-records.store';
-import { buildHealthRecordsHtml } from '@/lib/health-records-report';
+} from '@/services/healthRecords.mapper';
+import { groupPainHistory } from '@/services/healthRecords.store';
+import { buildHealthRecordsHtml } from '@/lib/healthRecordsReport';
 import {
   profileReportHtml,
   profileReportText,
-} from '@/components/my-health/profile-report';
+} from '@/components/my-health/profileReport';
 
 jest.mock('@/services/health-records.services', () => ({ fetchHealthSnapshot: jest.fn() }));
 

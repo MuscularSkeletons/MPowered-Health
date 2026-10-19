@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/ui/styling";
-import { HealthDataBoundary } from '@/components/my-health/health-data-boundary';
+import { HealthDataBoundary } from '@/components/my-health/healthDataBoundary';
 import { useAuth } from '@/context/authcontext';
-import { MedicationProvider } from '@/context/prescriptions-context';
+import { MedicationProvider } from '@/context/prescriptionsContext';
 
 // Specifies layout for tabs 
 export default function TabsLayout() {

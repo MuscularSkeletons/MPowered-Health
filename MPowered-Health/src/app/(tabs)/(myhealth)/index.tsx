@@ -2,14 +2,14 @@ import {
   Screen,
   Intro, 
 } from '@/components/ui/common';
-import { overviewStyles as styles } from '@/components/my-health/overview-styles';
+import { overviewStyles as styles } from '@/components/my-health/overviewStyles';
 import { palette } from '@/constants/ui/styling';
 import {
   getPainHistory,
   loadHealthRecords,
   painRecordDate,
   type PainAssessmentRecord,
-} from '@/services/health-records.store';
+} from '@/services/healthRecords.store';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';

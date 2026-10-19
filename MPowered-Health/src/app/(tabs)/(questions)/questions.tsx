@@ -14,9 +14,9 @@ import { useState, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
-import { formatTimeAgo } from "@/lib/date-helper";
+import { formatTimeAgo } from "@/lib/dateHelper";
 import { Ionicons } from "@expo/vector-icons";
-import { ModalActions, modalStyles } from '@/components/ui/modal-ui';
+import { ModalActions, modalStyles } from '@/components/ui/modal';
 import {
   Intro,
   Header,

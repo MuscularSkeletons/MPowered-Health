@@ -1,7 +1,7 @@
 import { Field, Shell, SelectField, ActionButton } from '@/components/prescription/form';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
-import { useMedicationEditor } from '@/hooks/use-prescription-editor';
+import { useMedicationEditor } from '@/hooks/usePrescriptionEditor';
 
 /** Displays the fields for adding or editing a prescription. */
 export default function PrescriptionEditorScreen() {

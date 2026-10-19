@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/authcontext';
 import { Header } from '@/components/ui/common';
 import { palette } from '@/constants/ui/styling';
-import { requiredSessionRoute } from '@/navigation/route-guard';
+import { requiredSessionRoute } from '@/navigation/routeGuard';
 
 /** Shows the green brand initial while restoring the session. */
 function AppLoadingScreen() {

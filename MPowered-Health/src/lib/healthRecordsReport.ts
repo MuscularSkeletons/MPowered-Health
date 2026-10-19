@@ -4,8 +4,8 @@ import {
   PainMetric,
   painMetricValue,
   painRecordDate,
-} from '@/services/health-records.store';
-import { HEALTH_RECORD_REPORT_STYLES } from './health-records-report-template';
+} from '@/services/healthRecords.store';
+import { HEALTH_RECORD_REPORT_STYLES } from './healthRecordsReportTemplate';
 
 /**
  * Escapes special characters so user text is safe to place in an HTML report.

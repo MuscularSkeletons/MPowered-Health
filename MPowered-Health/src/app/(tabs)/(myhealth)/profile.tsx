@@ -3,10 +3,10 @@ import {
   Intro,
   commonStyles,
 } from '@/components/ui/common';
-import { ProfileExportActions } from '@/components/my-health/profile-export-actions';
-import type { PainProfileReport } from '@/components/my-health/profile-report';
+import { ProfileExportActions } from '@/components/my-health/profileExportActions';
+import type { PainProfileReport } from '@/components/my-health/profileReport';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
-import { getLatestAssessments } from '@/services/health-records.store';
+import { getLatestAssessments } from '@/services/healthRecords.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';

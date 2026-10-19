@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, PrimaryButton } from '@/components/ui/common';
 import { palette } from '@/constants/ui/styling';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
-import { useMedications } from '@/context/prescriptions-context';
+import { useMedications } from '@/context/prescriptionsContext';
 import { medicationLabel } from '@/types/prescription';
 
 interface Question {

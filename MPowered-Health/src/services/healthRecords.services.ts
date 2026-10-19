@@ -5,7 +5,7 @@
  * planner. If every list is empty, check RLS policies!
  */
 import { supabase } from '@/lib/supabase/client'; // adjust if the client lives elsewhere
-import { buildSnapshot, retentionCutoff, type AssessmentRow, type HealthSnapshot } from './health-records.mapper';
+import { buildSnapshot, retentionCutoff, type AssessmentRow, type HealthSnapshot } from './healthRecords.mapper';
 
 // Each assessment has its child rows (pain, movement, personal care, social health, management).
 const ASSESSMENTS_WITH_CHILDREN = `

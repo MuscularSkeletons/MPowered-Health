@@ -1,8 +1,8 @@
-import { PrintPdfButton } from '@/components/my-health/print-pdf-button';
-import { TrackingChart } from '@/components/my-health/tracking-chart';
-import { healthRecordStyles as styles } from '@/components/my-health/health-record-styles';
-import { useHealthRecords } from '@/hooks/use-health-records';
-import { painRecordDate } from '@/services/health-records.store';
+import { PrintPdfButton } from '@/components/my-health/printPDFButton';
+import { TrackingChart } from '@/components/my-health/trackingChart';
+import { healthRecordStyles as styles } from '@/components/my-health/healthRecordStyles';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
+import { painRecordDate } from '@/services/healthRecords.store';
 import { 
   Screen,
   Intro,

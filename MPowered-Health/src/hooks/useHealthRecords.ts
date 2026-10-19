@@ -2,7 +2,7 @@ import {
   getPainHistory,
   groupPainHistory,
   type PainMetric,
-} from '@/services/health-records.store';
+} from '@/services/healthRecords.store';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 

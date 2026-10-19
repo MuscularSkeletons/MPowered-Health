@@ -13,7 +13,7 @@ import { openBrowserAsync } from 'expo-web-browser';
 import { palette } from '@/constants/ui/styling';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
 import { useState } from "react";
-import { ModalActions, modalStyles } from "@/components/ui/modal-ui";
+import { ModalActions, modalStyles } from "@/components/ui/modal";
 import {
   Input,
   Intro,

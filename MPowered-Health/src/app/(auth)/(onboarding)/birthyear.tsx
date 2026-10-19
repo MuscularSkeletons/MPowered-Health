@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { BIRTH_YEAR_RANGE } from '@/constants/profile/profile-constants';
+import { BIRTH_YEAR_RANGE } from '@/constants/profile/profileConstants';
 import {
   Input,
   Intro,

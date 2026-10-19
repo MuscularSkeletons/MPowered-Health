@@ -3,7 +3,7 @@
  * No network or React imports here, so every function can be unit tested!
  */
 import type { AssessmentAnswers, AssessmentId } from "@/types/assessment";
-import type { PainAssessmentRecord } from "@/services/health-records.store";
+import type { PainAssessmentRecord } from "@/services/healthRecords.store";
 
 /** Assessments older than this are removed by the cleanup job and must never be shown. */
 export const RETENTION_MONTHS = 18;

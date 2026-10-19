@@ -1,14 +1,14 @@
 /** Connects the health-record report to the print button and error feedback. */
 // This hook prepares the history groups and selections used by the records screen.
-import { buildHealthRecordsHtml } from '@/lib/health-records-report';
-import type { PainAssessmentRecord, PainMetric } from '@/services/health-records.store';
-import { printHtml } from '@/lib/document-export';
+import { buildHealthRecordsHtml } from '@/lib/healthRecordsReport';
+import type { PainAssessmentRecord, PainMetric } from '@/services/healthRecords.store';
+import { printHtml } from '@/lib/documentExport';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { healthRecordStyles as s } from './health-record-styles';
+import { healthRecordStyles as s } from './healthRecordStyles';
 
 /** Displays the button that prints the health-record report. */
 export function PrintPdfButton({

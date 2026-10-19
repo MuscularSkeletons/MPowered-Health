@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { medicationLabel } from '@/types/prescription';
-import { useMedications } from '@/context/prescriptions-context';
+import { useMedications } from '@/context/prescriptionsContext';
 
 /** Lists prescriptions and provides controls for adding or editing them. */
 export default function PrescriptionsScreen() {

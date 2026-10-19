@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { sexOptions } from '@/constants/profile/profile-options';
+import { sexOptions } from '@/constants/profile/profileOptions';
 import {
   Intro,
   Screen,

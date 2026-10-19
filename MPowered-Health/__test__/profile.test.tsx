@@ -1,6 +1,6 @@
 import ManageProfile from "@/app/(tabs)/(settings)/profile";
-import { BIRTH_YEAR_RANGE } from "@/constants/profile/profile-constants";
-import { diagnosisOptions, painConditionsOptions } from "@/constants/profile/profile-options";
+import { BIRTH_YEAR_RANGE } from "@/constants/profile/profileConstants";
+import { diagnosisOptions, painConditionsOptions } from "@/constants/profile/profileOptions";
 import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
 import { Alert } from "react-native";
 

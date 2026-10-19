@@ -1,6 +1,6 @@
 import StoreBirthSex from '../src/app/(auth)/(onboarding)/birthsex';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { sexOptions } from "@/constants/profile/profile-options";
+import { sexOptions } from "@/constants/profile/profileOptions";
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();

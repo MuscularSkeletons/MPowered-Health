@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { painConditionsOptions } from '@/constants/profile/profile-options';
+import { painConditionsOptions } from '@/constants/profile/profileOptions';
 import {
   Intro,
   Screen,

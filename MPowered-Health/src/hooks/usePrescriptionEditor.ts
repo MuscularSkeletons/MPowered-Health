@@ -5,7 +5,7 @@ import {
   validNumber,
   type MedicationDraft,
 } from '@/types/prescription';
-import { useMedications } from '@/context/prescriptions-context';
+import { useMedications } from '@/context/prescriptionsContext';
 
 /** Keeps the prescription form values and save actions together. */
 export function useMedicationEditor(id?: string) {

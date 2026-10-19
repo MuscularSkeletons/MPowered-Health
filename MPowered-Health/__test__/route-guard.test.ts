@@ -1,4 +1,4 @@
-import { requiredSessionRoute } from '@/navigation/route-guard';
+import { requiredSessionRoute } from '@/navigation/routeGuard';
 
 describe('session routing', () => {
   it('keeps signed-out users in authentication and redirects protected routes', () => {

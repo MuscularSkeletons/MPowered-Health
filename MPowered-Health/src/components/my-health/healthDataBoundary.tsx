@@ -5,8 +5,8 @@ import {
   clearHealthRecords,
   loadHealthRecords,
   setHealthRecordsAccount,
-} from '@/services/health-records.store';
-import { clearPrescriptions, loadPrescriptions } from '@/context/prescriptions-context';
+} from '@/services/healthRecords.store';
+import { clearPrescriptions, loadPrescriptions } from '@/context/prescriptionsContext';
 
 /** The id the layout passes when nobody is signed in; there is nothing to load for it. */
 const SIGNED_OUT = 'signed-out';

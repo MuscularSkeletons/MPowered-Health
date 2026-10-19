@@ -1,6 +1,6 @@
 import StorePainConditions from '../src/app/(auth)/(onboarding)/conditions';
 import { fireEvent, render, screen, waitFor} from '@testing-library/react-native';
-import { painConditionsOptions } from "@/constants/profile/profile-options";
+import { painConditionsOptions } from "@/constants/profile/profileOptions";
 
 const mockUser = jest.fn();
 const mockUpdateUserDraft = jest.fn();

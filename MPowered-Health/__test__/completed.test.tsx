@@ -1,6 +1,6 @@
 import CompleteOnboarding from "@/app/(auth)/(onboarding)/completed";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { painConditionsOptions } from "@/constants/profile/profile-options";
+import { painConditionsOptions } from "@/constants/profile/profileOptions";
 import { Alert } from "react-native";
 
 const mockUser = {

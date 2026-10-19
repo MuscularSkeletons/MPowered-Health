@@ -4,12 +4,12 @@ import {
   PainMetric,
   painMetricValue,
   painRecordDate,
-} from '@/services/health-records.store';
+} from '@/services/healthRecords.store';
 import { palette } from '@/constants/ui/styling';
 import { View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from 'react-native-svg';
 
-import { healthRecordStyles as s } from './health-record-styles';
+import { healthRecordStyles as s } from './healthRecordStyles';
 
 /** Draws a chart of the selected pain-history records. */
 export function TrackingChart({
