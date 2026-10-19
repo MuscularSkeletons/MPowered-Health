@@ -1,6 +1,5 @@
 import { PrintPdfButton } from '@/components/my-health/printPDFButton';
 import { TrackingChart } from '@/components/my-health/trackingChart';
-import { healthRecordStyles as styles } from '@/components/my-health/healthRecordStyles';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { painRecordDate } from '@/services/healthRecords.store';
 import { 
@@ -11,7 +10,14 @@ import {
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { 
+  Modal, 
+  Pressable, 
+  ScrollView, 
+  Text, 
+  View, 
+  StyleSheet 
+} from 'react-native';
 
 /**
  * Displays recorded pain history and the controls for filtering and exporting it.
@@ -205,3 +211,190 @@ export default function HealthRecords() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  
+  empty: { marginTop: 24, paddingVertical: 24 },
+  emptyCopy: { fontSize: 13, lineHeight: 20, color: palette.muted },
+  tableHeading: { fontWeight: '700', backgroundColor: palette.selectionBackground },
+  overlay: {
+    flex: 1,
+    backgroundColor: '#00000066',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  dropdown: {
+    width: '100%',
+    maxWidth: 520,
+    maxHeight: '80%',
+    backgroundColor: palette.surface,
+    borderRadius: 18,
+    padding: 20,
+  },
+  dropdownList: { flexShrink: 1, marginTop: 12 },
+  dropdownOption: {
+    minHeight: 58,
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: palette.line,
+  },
+  dropdownSelected: { backgroundColor: palette.selectionBackground, borderColor: palette.primary },
+  optionLabel: { color: palette.text, fontSize: 14, fontWeight: '700', lineHeight: 21 },
+  chartFrame: {
+    marginTop: 14,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  
+  
+  tabs: {
+    height: 48,
+    backgroundColor: palette.selectionBackground,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.line,
+    overflow: 'hidden',
+    flexDirection: 'row',
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabOn: { borderBottomColor: palette.primary },
+  tabText: { fontSize: 12, color: palette.text },
+  tabTextOn: { fontWeight: '800', color: palette.primary },
+  chartHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  metricTitle: { fontSize: 18, fontWeight: '700', color: palette.text },
+  filter: {
+    minHeight: 44,
+    maxWidth: '100%',
+    flexShrink: 1,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 17,
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+  },
+  filterContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  filterText: { flexShrink: 1, fontSize: 11, color: palette.text },
+  chart: {
+    height: 190,
+    backgroundColor: palette.surface,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    borderLeftWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: palette.line,
+    marginTop: 14,
+    overflow: 'hidden',
+  },
+  chartColumn: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'flex-end',
+    position: 'relative',
+  },
+  area: {
+    backgroundColor: palette.selectionBackground,
+    borderTopWidth: 2,
+    borderTopColor: palette.chart,
+  },
+  point: {
+    position: 'absolute',
+    alignSelf: 'center',
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: palette.chart,
+  },
+  axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
+  axisText: { fontSize: 7, color: palette.muted },
+  segment: {
+    height: 34,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 17,
+    overflow: 'hidden',
+    marginTop: 12,
+  },
+  segmentItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  segmentOn: { backgroundColor: palette.selectionBackground },
+  segmentText: { fontSize: 11, color: palette.text },
+  segmentTextOn: { fontWeight: '800', color: palette.primary },
+  table: {
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: palette.surface,
+  },
+  tableRow: {
+    minHeight: 34,
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: palette.line,
+  },
+  tableFirst: { borderTopWidth: 0 },
+  cell: {
+    flex: 1,
+    fontSize: 10,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: palette.text,
+    padding: 7,
+  },
+  dateCell: { flex: 1.35, textAlign: 'left' },
+  more: {
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: palette.selectionBackground,
+    borderWidth: 1,
+    borderColor: palette.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  moreText: { fontSize: 11, fontWeight: '800', color: palette.text },
+  history: { marginTop: 14 },
+  historyGroup: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.line,
+  },
+  historyDate: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: palette.text,
+    marginBottom: 8,
+  },
+  historyItem: { fontSize: 13, lineHeight: 27, color: palette.text },
+  historyArrow: { color: palette.success },
+});
+

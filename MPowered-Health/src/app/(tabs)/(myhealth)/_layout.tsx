@@ -6,7 +6,7 @@ export default function MyHealthLayout() {
         <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="(prescriptions)" />
-          <Stack.Screen name="healthrecords" />
+          <Stack.Screen name="painrecords" />
           <Stack.Screen name="profile" />
         </Stack>
   );
