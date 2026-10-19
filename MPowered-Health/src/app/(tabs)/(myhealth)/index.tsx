@@ -2,8 +2,7 @@ import {
   Screen,
   Intro, 
 } from '@/components/ui/common';
-import { overviewStyles as styles } from '@/components/my-health/overviewStyles';
-import { palette } from '@/constants/ui/styling';
+import { palette, radius, spacing, layout } from '@/constants/ui/styling';
 import {
   getPainHistory,
   loadHealthRecords,
@@ -12,7 +11,7 @@ import {
 } from '@/services/healthRecords.store';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, StyleSheet } from 'react-native';
 
 const CHART_SIDE_GUTTER = 24;
 const CHART_BASELINE = 82;
@@ -162,3 +161,127 @@ export default function MyHealthScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  quickRow: { flexDirection: 'row', gap: spacing.md },
+  quick: {
+    flex: 1,
+    borderRadius: radius.lg,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.light,
+    paddingHorizontal: layout.cardPadding,
+    paddingVertical: spacing.lg,
+    gap: spacing.md,
+    shadowColor: palette.text,
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
+  },
+  quickPink: { backgroundColor: palette.chartSoft, borderColor: palette.pinkBorder },
+  quickGreen: { backgroundColor: palette.success, borderColor: palette.greenBorder },
+  quickPressed: { opacity: 0.84, transform: [{ scale: 0.985 }] },
+  quickText: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '800',
+    color: palette.text,
+  },
+  quickTextOnDark: { color: palette.surface },
+  quickArrow: { fontSize: 13, lineHeight: 18, fontWeight: '700', color: palette.success },
+  quickArrowOnDark: { color: palette.surface },
+  insights: {
+    marginTop: spacing.xl,
+    backgroundColor: palette.softBlue,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: palette.blueBorder,
+    padding: layout.cardPadding,
+  },
+  insightMeta: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  insightTitleGroup: { flex: 1 },
+  insightHeading: { fontSize: 20, lineHeight: 26, fontWeight: '800', color: palette.text },
+  insightLabel: { marginTop: 2, fontSize: 13, lineHeight: 19, color: palette.muted },
+  recordCount: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: '700',
+    color: palette.primary,
+    backgroundColor: palette.surface,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  trend: { width: '100%' },
+  chart: {
+    height: 96,
+    position: 'relative',
+    marginTop: spacing.md,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.light,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  point: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: palette.chartSoft,
+  },
+  pointLast: { backgroundColor: palette.chart, width: 14, height: 14, borderRadius: 7 },
+  number: {
+    position: 'absolute',
+    fontSize: 10,
+    fontWeight: '700',
+    color: palette.text,
+    left: -1,
+    top: -25,
+  },
+  dateCanvas: { height: 28, position: 'relative' },
+  date: {
+    position: 'absolute',
+    width: 40,
+    textAlign: 'center',
+    fontSize: 10,
+    color: palette.muted,
+    top: spacing.sm,
+  },
+  emptyState: {
+    marginTop: spacing.md,
+    padding: spacing.xl,
+    borderRadius: radius.md,
+    backgroundColor: palette.surface,
+    alignItems: 'center',
+  },
+  emptyTitle: { fontSize: 16, fontWeight: '800', color: palette.text },
+  emptyCopy: { marginTop: spacing.xs, textAlign: 'center', fontSize: 13, color: palette.muted },
+  historyButton: {
+    minHeight: 48,
+    marginTop: spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: palette.chartSoft,
+    borderWidth: 1,
+    borderColor: palette.pinkBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  historyButtonText: { fontSize: 14, fontWeight: '800', color: palette.success },
+  sponsor: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: '600',
+    color: palette.muted,
+    textAlign: 'center',
+    marginTop: spacing.xl,
+  },
+});
