@@ -3,11 +3,11 @@ import {
   type AssessmentRow,
 } from '@/services/healthRecords.mapper';
 import { groupPainHistory } from '@/services/healthRecords.store';
-import { buildHealthRecordsHtml } from '@/lib/healthRecordsReport';
+import { buildPainRecordsHtml } from '@/components/my-health/painRecordPDF';
 import {
   profileReportHtml,
   profileReportText,
-} from '@/components/my-health/profileReport';
+} from '@/components/my-health/profileReportPDF';
 
 jest.mock('@/services/healthRecords.services', () => ({ fetchHealthSnapshot: jest.fn() }));
 
@@ -49,7 +49,7 @@ it('escapes user-provided labels in the printable report', () => {
     assessment('record', '2026-06-08T10:00:00.000Z', 7, ['Back']),
   ]).painRecords;
 
-  const report = buildHealthRecordsHtml(records, '<Back & Knee>', 'Average');
+  const report = buildPainRecordsHtml(records, '<Back & Knee>', 'Average');
 
   expect(report).toContain('&lt;Back &amp; Knee&gt;');
   expect(report).not.toContain('<Back & Knee>');

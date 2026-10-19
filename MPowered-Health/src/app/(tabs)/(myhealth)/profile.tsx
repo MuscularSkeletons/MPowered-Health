@@ -4,7 +4,7 @@ import {
   commonStyles,
 } from '@/components/ui/common';
 import { ProfileExportActions } from '@/components/my-health/profileExportActions';
-import type { PainProfileReport } from '@/components/my-health/profileReport';
+import type { PainProfileReport } from '@/components/my-health/profileReportPDF';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { getLatestAssessments } from '@/services/healthRecords.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
