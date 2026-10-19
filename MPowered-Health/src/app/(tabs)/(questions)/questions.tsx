@@ -7,7 +7,7 @@ import {
   Alert,
   Modal,
   RefreshControl,
-  TextInput,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/ui/styling";
@@ -20,7 +20,6 @@ import { ModalActions, modalStyles } from '@/components/ui/modal';
 import {
   Intro,
   Header,
-  PrimaryButton,
   Input,
 } from '@/components/ui/common';
 import { Feather } from '@expo/vector-icons';
@@ -105,22 +104,24 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
             <Feather name="trash-2" size={21} color={palette.error} />
           </TouchableOpacity>
         </View>
-        <View style={styles.questionContent}>
-          <View style={styles.question}>
-              <Text style={styles.questionText}>{question.question}</Text>
-          </View>  
-          <View style={styles.answer}>
-            {question.answer ? (
-              <Text style={styles.answerText}>{`"${question.answer}"`}</Text>
-            ) : <Text style={styles.noAnswerText}>No answer submitted yet</Text> }
+        <Pressable onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoading}>
+          <View style={styles.questionContent}>
+            <View style={styles.question}>
+                <Text style={styles.questionText}>{question.question}</Text>
+            </View>  
+            <View style={styles.answer}>
+              {question.answer ? (
+                <Text style={styles.answerText}>{`"${question.answer}"`}</Text>
+              ) : <Text style={styles.noAnswerText}>No answer submitted yet</Text> }
+            </View>
           </View>
-        </View>
-        <View style={styles.answerButton}>
-          <Text style={styles.answerButtonText} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoading}>
-            {question.answer ? 'EDIT ANSWER' : 'ADD ANSWER'}
-          </Text>
-          <Text style={styles.answerButtonArrow}>›</Text>
-        </View>
+          <View style={styles.answerButton}>
+            <Text style={styles.answerButtonText}>
+              {question.answer ? 'EDIT ANSWER' : 'ADD ANSWER'}
+            </Text>
+            <Text style={styles.answerButtonArrow}>›</Text>
+          </View>
+        </Pressable>
       </View>
 
       <Modal

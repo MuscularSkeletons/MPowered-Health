@@ -1,6 +1,4 @@
 import { supabase } from '@/lib/supabase/client';
-import { useAuth } from "@/context/authcontext";
-import { useState, useCallback } from "react";
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
