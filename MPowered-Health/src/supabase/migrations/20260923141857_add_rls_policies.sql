@@ -53,8 +53,6 @@ using ((select auth.uid()) = user_id);
 
 
 -- 3. PAIN ASSESSMENT
--- Ownership is inherited from public.assessment.
--- ------------------------------------------------------------
 
 alter table public.pain_assessment enable row level security;
 
