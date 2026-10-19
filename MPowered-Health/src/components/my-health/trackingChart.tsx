@@ -6,10 +6,15 @@ import {
   painRecordDate,
 } from '@/services/healthRecords.store';
 import { palette } from '@/constants/ui/styling';
-import { View } from 'react-native';
-import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from 'react-native-svg';
-
-import { healthRecordStyles as s } from './healthRecordStyles';
+import { View, StyleSheet } from 'react-native';
+import { 
+  Svg, 
+  Circle, 
+  Line, 
+  Polygon, 
+  Polyline, 
+  Text as SvgText 
+} from 'react-native-svg';
 
 /** Draws a chart of the selected pain-history records. */
 export function TrackingChart({
@@ -39,7 +44,7 @@ export function TrackingChart({
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
   const area = `${x(0)},${bottom} ${points} ${x(values.length - 1)},${bottom}`;
   return (
-    <View style={s.chartFrame}>
+    <View style={styles.chartFrame}>
       <Svg
         width="100%"
         height={270}
@@ -118,3 +123,14 @@ export function TrackingChart({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  chartFrame: {
+    marginTop: 14,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.line,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+});

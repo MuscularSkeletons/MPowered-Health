@@ -24,7 +24,7 @@ import {
  *
  * Coordinate filters, chart/history tabs, record groups, and printing.
  */
-export default function HealthRecords() {
+export default function PainRecords() {
   const {
     tab,
     setTab,
@@ -213,7 +213,6 @@ export default function HealthRecords() {
 }
 
 const styles = StyleSheet.create({
-  
   empty: { marginTop: 24, paddingVertical: 24 },
   emptyCopy: { fontSize: 13, lineHeight: 20, color: palette.muted },
   tableHeading: { fontWeight: '700', backgroundColor: palette.selectionBackground },
@@ -243,22 +242,12 @@ const styles = StyleSheet.create({
   },
   dropdownSelected: { backgroundColor: palette.selectionBackground, borderColor: palette.primary },
   optionLabel: { color: palette.text, fontSize: 14, fontWeight: '700', lineHeight: 21 },
-  chartFrame: {
-    marginTop: 14,
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.line,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
   },
-  
-  
   tabs: {
     height: 48,
     backgroundColor: palette.selectionBackground,
@@ -300,40 +289,6 @@ const styles = StyleSheet.create({
   },
   filterContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   filterText: { flexShrink: 1, fontSize: 11, color: palette.text },
-  chart: {
-    height: 190,
-    backgroundColor: palette.surface,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    borderLeftWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: palette.line,
-    marginTop: 14,
-    overflow: 'hidden',
-  },
-  chartColumn: {
-    flex: 1,
-    height: '100%',
-    justifyContent: 'flex-end',
-    position: 'relative',
-  },
-  area: {
-    backgroundColor: palette.selectionBackground,
-    borderTopWidth: 2,
-    borderTopColor: palette.chart,
-  },
-  point: {
-    position: 'absolute',
-    alignSelf: 'center',
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: palette.chart,
-  },
-  axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  axisText: { fontSize: 7, color: palette.muted },
   segment: {
     height: 34,
     flexDirection: 'row',
@@ -395,6 +350,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   historyItem: { fontSize: 13, lineHeight: 27, color: palette.text },
-  historyArrow: { color: palette.success },
 });
 
