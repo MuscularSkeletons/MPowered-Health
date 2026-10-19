@@ -257,12 +257,12 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: "absolute",
-    bottom: 104,
+    bottom: 90,
     right: 24,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: palette.secondary,
+    backgroundColor: palette.primary,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "black",
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   addButtonText: {
-    color: palette.text,
+    color: palette.surface,
     fontSize: 32,
     fontWeight: "300",
     lineHeight: 32,
