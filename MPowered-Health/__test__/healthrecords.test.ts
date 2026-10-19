@@ -40,8 +40,9 @@ it('maps Supabase assessments into ordered, grouped pain records', () => {
   ]);
 
   expect(snapshot.painRecords.map((record) => record.id)).toEqual(['older', 'newer']);
-  expect(groupPainHistory(snapshot.painRecords)).toHaveLength(1);
-  expect(groupPainHistory(snapshot.painRecords)[0].label).toBe('Back, Knee');
+  expect(groupPainHistory(snapshot.painRecords)).toHaveLength(2);
+  expect(groupPainHistory(snapshot.painRecords)[0].label).toBe('Back');
+  expect(groupPainHistory(snapshot.painRecords)[1].label).toBe('Knee');
 });
 
 it('escapes user-provided labels in the printable report', () => {
