@@ -164,7 +164,7 @@ describe("sign out tests", () => {
 
         //do not call sign out
         expect(mockSignOut).not.toHaveBeenCalled();
-        console.log("sign out was not called");
+        //console.log("sign out was not called");
         expect(screen.getByText("Settings")).toBeTruthy();
     })
 
@@ -179,9 +179,9 @@ describe("sign out tests", () => {
         await buttons?.[1]?.onPress?.();
 
         //call sign out
-        console.log("calling sign out");
+        //console.log("calling sign out");
         expect(mockSignOut).toHaveBeenCalledTimes(1);
-        console.log("sign out was called");
+        //console.log("sign out was called");
 
         //todo: navigate to login
     })
@@ -229,7 +229,7 @@ describe("delete account tests", () => {
 
         //do not call delete account
         expect(mockDeleteUser).not.toHaveBeenCalled();
-        console.log("delete account was not called");
+        //console.log("delete account was not called");
         expect(screen.getByText("Settings")).toBeTruthy();
     })
 
@@ -244,9 +244,9 @@ describe("delete account tests", () => {
         await buttons?.[1]?.onPress?.();
 
         //call delete
-        console.log("calling delete");
+        //console.log("calling delete");
         expect(mockDeleteUser).toHaveBeenCalledTimes(1);
-        console.log("delete was called");
+       //console.log("delete was called");
 
         //todo: navigate to splash screen
     })

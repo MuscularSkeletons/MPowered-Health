@@ -69,13 +69,13 @@ describe("editing name tests", () => {
         await user.press(screen.getByText("Jane"));
 
         //modal should open
-        console.log("open up name editor modal");
+        //console.log("open up name editor modal");
         expect(screen.getByText("Edit name")).toBeTruthy();
         expect(screen.getByText("Name")).toBeTruthy();
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("name editor pop up was opened");
+        //console.log("name editor pop up was opened");
         
     })
 
@@ -90,13 +90,13 @@ describe("editing name tests", () => {
         //get the input field and make the edit
         const nameInput = screen.getByTestId("name-input");
         fireEvent.changeText(nameInput, "John");
-        console.log("name edited");
+        //console.log("name edited");
 
         //save the edit
         await user.press(screen.getByText("Save"));
 
         expect(mockUpdateUser).toHaveBeenCalledWith({name: "John"});
-        console.log("user name updated");        
+        //console.log("user name updated");        
     })
 
     test("pressing cancel does not edit the name", async() => {
@@ -153,12 +153,12 @@ describe("editing birthsex tests", () => {
         await user.press(screen.getByText("Female"));
 
         //modal should open
-        console.log("open up birthsex editor modal");
+        //console.log("open up birthsex editor modal");
         expect(screen.getByText("Edit sex")).toBeTruthy();
         expect(screen.getByText("Male")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("birthsex editor pop up was opened");
+        //console.log("birthsex editor pop up was opened");
     })
     
     test("birthsex is edited successfully", async() => {
@@ -209,13 +209,13 @@ describe("editing birth year tests", () => {
         await user.press(screen.getByText("1997"));
 
         //modal should open
-        console.log("open up birth year modal");
+        //console.log("open up birth year modal");
         expect(screen.getByText("Edit year of birth")).toBeTruthy();
         expect(screen.getByText("Year of birth")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("birth year editor pop up was opened");
+        //console.log("birth year editor pop up was opened");
     })
 
     test("birthyear is changed successfully", async() => {
@@ -228,13 +228,13 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, "2000");
-        console.log("birth year changed");
+        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
 
         expect(mockUpdateUser).toHaveBeenCalledWith({birthyear: 2000});
-        console.log("birth year updated");        
+        //console.log("birth year updated");        
     })
 
     test("pressing cancel does not make edits", async() => {
@@ -247,7 +247,7 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, "2000");
-        console.log("birth year changed");
+        //console.log("birth year changed");
 
         //cancel the edit
         await user.press(screen.getByText("Cancel"));
@@ -267,7 +267,7 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, String(BIRTH_YEAR_RANGE.LOWER_BOUND - 1));
-        console.log("birth year changed");
+        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
@@ -286,7 +286,7 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, String(BIRTH_YEAR_RANGE.UPPER_BOUND + 1));
-        console.log("birth year changed");
+        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
@@ -327,8 +327,8 @@ describe("editing conditions tests (scrollable list)", () => {
 
         await user.press(screen.getByText(painConditionsOptions[5]));
         await user.press(screen.getByText(painConditionsOptions[10]));
-        console.log("adding", painConditionsOptions[5], "to conditions list");
-        console.log("adding", painConditionsOptions[10], "to conditions list");
+        //console.log("adding", painConditionsOptions[5], "to conditions list");
+        //console.log("adding", painConditionsOptions[10], "to conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -345,7 +345,7 @@ describe("editing conditions tests (scrollable list)", () => {
         expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[0]));
-        console.log("removing", painConditionsOptions[0], "from conditions list");
+        //console.log("removing", painConditionsOptions[0], "from conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -363,8 +363,8 @@ describe("editing conditions tests (scrollable list)", () => {
 
         await user.press(screen.getByText(painConditionsOptions[0]));
         await user.press(screen.getByText(painConditionsOptions[2]));
-        console.log("removing", painConditionsOptions[0], "from conditions list");
-        console.log("removing", painConditionsOptions[2], "from conditions list");
+        //console.log("removing", painConditionsOptions[0], "from conditions list");
+        //console.log("removing", painConditionsOptions[2], "from conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -403,13 +403,13 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Formal diagnosis recorded"));
 
         //modal should open
-        console.log("open up diagnosis modal");
+        //console.log("open up diagnosis modal");
         expect(screen.getByText("Edit diagnosis")).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[0])).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[1])).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("diagnosis pop up was opened");
+        //console.log("diagnosis pop up was opened");
 
     })
 
@@ -464,13 +464,13 @@ describe("editing other conditions tests (text input)", () => {
         await user.press(screen.getByText("Frequent headaches"));
 
         //modal should open
-        console.log("open up other conditions modal");
+        //console.log("open up other conditions modal");
         expect(screen.getByText("Edit other condition")).toBeTruthy();
         expect(screen.getByText("Other condition")).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        console.log("conditions pop up was opened");
+        //console.log("conditions pop up was opened");
     })
 
     test("other conditions is changed successfully", async() => {
@@ -537,7 +537,7 @@ describe("editing email tests (rendering)", () => {
         await user.press(screen.getByText("jane12@example.com"));
 
         //modal should open
-        console.log("open up email editor modal");
+        //console.log("open up email editor modal");
         expect(screen.getByText("Change email address")).toBeTruthy();
         expect(screen.getByText("Email address")).toBeTruthy();
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
