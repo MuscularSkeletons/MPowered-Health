@@ -163,10 +163,10 @@ export default function HealthRecords() {
       <View style={styles.overlay}>
         <View style={styles.dropdown} accessibilityViewIsModal>
           <Text style={styles.historyDate} accessibilityRole="header">
-            Choose pain areas
+            Filter by pain area
           </Text>
           <Text style={styles.emptyCopy}>
-            Each option shows assessments with exactly that combination of areas.
+            Display assessment results for the given pain area.
           </Text>
           <ScrollView style={styles.dropdownList}>
             {groups.map((group) => (

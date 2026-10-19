@@ -58,14 +58,6 @@ const clone = (record: PainAssessmentRecord): PainAssessmentRecord => ({
   answers: cloneAnswers(record.answers),
 });
 
-/** Builds a consistent key for a set of pain areas. */
-export function painAreaKey(areas: string[]) {
-  // Trim, un-duplicate, and sort so "Back, Knee" items always have one stable key.
-  return JSON.stringify(
-    [...new Set(areas.map((area) => area.trim()).filter(Boolean))].sort(),
-  );
-}
-
 /**
  * Loads the account's history (18 months) from db into memory.
  *
@@ -126,10 +118,12 @@ export function groupPainHistory(
   for (const record of [...history].sort((a, b) =>
     a.completedAt.localeCompare(b.completedAt),
   )) {
-    const key = painAreaKey(record.areas);
-    if (!groups.has(key))
-      groups.set(key, { key, label: JSON.parse(key).join(", "), records: [] });
-    groups.get(key)!.records.push(clone(record));
+    for (const area of record.areas) {
+      const key = area.trim();
+      if (!groups.has(key))
+        groups.set(key, { key, label: key, records: [] });
+      groups.get(key)!.records.push(clone(record));
+    }
   }
   return [...groups.values()];
 }
