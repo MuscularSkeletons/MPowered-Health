@@ -21,6 +21,7 @@ import {
   Intro,
   Header,
   Input,
+  commonStyles,
 } from '@/components/ui/common';
 import { Feather } from '@expo/vector-icons';
 
@@ -202,9 +203,9 @@ export default function Questions() {
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={commonStyles.safe} edges={['top']}>
       <Header />
-      <View style={styles.body}>
+      <View style={commonStyles.body}>
         <View style={styles.content}>
           <Intro
             sectionLabel="YOUR QUESTIONS"
@@ -234,28 +235,6 @@ export default function Questions() {
 }
 
 const styles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
-    backgroundColor: palette.surface 
-  },
-  body: { 
-    flex: 1, 
-    backgroundColor: palette.background 
-  },
-  title: {
-    marginTop: 8, 
-    fontSize: 29, 
-    lineHeight: 36, 
-    fontWeight: '800', 
-    letterSpacing: -0.6, 
-    color: palette.text
-  },
-  description: {
-    marginTop: 10, 
-    fontSize: 15, 
-    lineHeight: 23, 
-    color: palette.muted
-  },
   addButton: {
     position: "absolute",
     bottom: 90,

@@ -32,10 +32,10 @@ export function Header() {
 /** Provides the shared background, header, scrolling, and keyboard behavior for screens. */
 export function Screen({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={commonStyles.safe} edges={['top']}>
       <Header />
       <KeyboardAvoidingView
-        style={styles.keyboard}
+        style={commonStyles.body}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
@@ -197,6 +197,8 @@ export function ChoiceButton({
 }
 
 export const commonStyles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: palette.surface },
+  body: { flex: 1, backgroundColor: palette.background },
   actions: { gap: 10, marginTop: 28 },
   secondaryAction: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   secondaryText: { color: palette.primary, fontSize: 13, fontWeight: '700' },
@@ -207,8 +209,6 @@ export const commonStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.surface },
-  keyboard: { flex: 1, backgroundColor: palette.background },
   header: {
     height: 64,
     borderBottomWidth: 1,
@@ -236,9 +236,9 @@ const styles = StyleSheet.create({
   intro: { marginBottom: 26 },
   introMeta: { minHeight: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sectionLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 1.1, color: palette.primary },
-  progress: { fontSize: 11, fontWeight: '700', color: palette.muted },
   title: { marginTop: 8, fontSize: 29, lineHeight: 36, fontWeight: '800', letterSpacing: -0.6, color: palette.text },
   description: { marginTop: 10, fontSize: 15, lineHeight: 23, color: palette.muted },
+  progress: { fontSize: 11, fontWeight: '700', color: palette.muted },
   field: { marginTop: 14 },
   label: { marginBottom: 7, fontSize: 12, fontWeight: '700', color: palette.text },
   inputRow: { position: 'relative', justifyContent: 'center' },

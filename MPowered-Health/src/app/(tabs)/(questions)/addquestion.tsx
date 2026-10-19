@@ -133,9 +133,9 @@ export default function AddQuestion() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={commonStyles.safe} edges={['top']}>
       <Header />
-      <View style={styles.body}>
+      <View style={commonStyles.body}>
         <View style={styles.content}>
           <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
           <Intro
@@ -256,14 +256,6 @@ export default function AddQuestion() {
 }
 
 const styles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
-    backgroundColor: palette.surface 
-  },
-  body: { 
-    flex: 1, 
-    backgroundColor: palette.background 
-  },
   content: {
     width: '100%',
     maxWidth: 680,
