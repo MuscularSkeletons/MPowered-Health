@@ -15,6 +15,7 @@ const mockUser = {
 }
 
 const mockUpdateUser = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -29,6 +30,13 @@ jest.mock("@/context/authcontext", () => ({
         updateAuthUserEmail: jest.fn(),
         updateAuthUserPassword: jest.fn()
     }),
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        back: mockBack,
+    })
 }))
 
 describe("objects rendered on screen", () => {
@@ -553,5 +561,13 @@ describe("password placement", () => {
         await render(<ManageProfile/>);
 
         expect(screen.queryByText("Change password")).toBeNull();
+    })
+})
+
+describe("navigation tests", () => {
+    test("pressing back should navigate back to settings main page", async() => {
+        await render(<ManageProfile/>);
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
     })
 })

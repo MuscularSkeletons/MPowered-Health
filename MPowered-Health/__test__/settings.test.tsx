@@ -1,14 +1,12 @@
 import Settings from '../src/app/(tabs)/(settings)/settings';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { openBrowserAsync } from 'expo-web-browser';
-import { renderRouter } from 'expo-router/testing-library';
-import SettingsLayout from '@/app/(tabs)/(settings)/_layout';
-import ManageProfile from '@/app/(tabs)/(settings)/profile';
-import ManageNotifications from '@/app/(tabs)/(settings)/notifications';
 import { Alert } from 'react-native';
 
 const mockSignOut = jest.fn();
 const mockDeleteUser = jest.fn();
+const mockPush = jest.fn();
+const mockReplace = jest.fn(); 
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -25,6 +23,14 @@ jest.mock("@/context/authcontext", () => ({
 //mocking the web browser
 jest.mock('expo-web-browser', () => ({
     openBrowserAsync: jest.fn()
+}))
+
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        push: mockPush,
+        replace: mockReplace
+    })
 }))
 
 describe("objects rendering on screen", () => {
@@ -83,8 +89,7 @@ describe("url link tests", () => {
     })
 })
 
-/*
-//todo: fix expo router linking issue
+
 describe("navigation tests", () => {
 
     beforeEach(() => {
@@ -92,34 +97,18 @@ describe("navigation tests", () => {
     });
 
     test("clicking on edit profile directs to edit profile screen", async() => {
-        await renderRouter(
-            {
-                "_layout": () => <SettingsLayout/>,
-                "Edit Profile": () => <ManageProfile/>,
-            }, {
-                initialUrl: '../src/app/(tabs)/(settings)/settings',
-            }
-        )
-
+        await render(<Settings/>);
         fireEvent.press(screen.getByRole('button', {name : "Edit Profile"}));
-        expect(screen.getByText("PROFILE")).toBeTruthy();
+        expect(mockPush).toHaveBeenCalledWith('/(tabs)/(settings)/profile');
     
     })
 
     test("clicking on notifications directs to notifications screen", async() => {
-        await renderRouter(
-            {
-                "_layout": () => <SettingsLayout/>,
-                "notifications": () => <ManageNotifications/>,
-            }, {
-                initialUrl: '../src/app/(tabs)/(settings)/settings',
-            }
-        )
-
+        await render(<Settings/>);
         fireEvent.press(screen.getByRole('button', {name : "Notifications"}));
-        expect(screen.getByText("NOTIFICATIONS")).toBeTruthy();
+        expect(mockPush).toHaveBeenCalledWith('/(tabs)/(settings)/notifications');
     })
-})*/
+})
 
 describe("sign out tests", () => {
 
@@ -183,7 +172,7 @@ describe("sign out tests", () => {
         expect(mockSignOut).toHaveBeenCalledTimes(1);
         //console.log("sign out was called");
 
-        //todo: navigate to login
+        expect(mockReplace).toHaveBeenCalledWith("/(auth)/login");
     })
 })
 
@@ -248,6 +237,6 @@ describe("delete account tests", () => {
         expect(mockDeleteUser).toHaveBeenCalledTimes(1);
        //console.log("delete was called");
 
-        //todo: navigate to splash screen
+        expect(mockReplace).toHaveBeenCalledWith("/(auth)/splashscreen");
     })
 })
