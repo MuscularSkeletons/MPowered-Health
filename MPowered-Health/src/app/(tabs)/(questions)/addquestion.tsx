@@ -25,6 +25,7 @@ import {
   Header,
   ChoiceButton,
   PrimaryButton,
+  SecondaryButton,
   commonStyles,
   Input,
 } from '@/components/ui/common';
@@ -203,11 +204,20 @@ export default function AddQuestion() {
                   onPress={() => toggleQuestions(question)}
                 />
               ))}
-              <PrimaryButton label='Add your own question' onPress={() => {setShowQuestionPreview(!showQuestionPreview)}}/>
+              <SecondaryButton 
+                label='Add your own question' 
+                onPress={() => {setShowQuestionPreview(!showQuestionPreview)}}
+              />
+              
             </View>
           </ScrollView>
           <View style={styles.save}>
-            <PrimaryButton label="Save" disabled={!questions.length} loading={isLoading} onPress={handleSave} />
+            <PrimaryButton 
+              label="Save" 
+              disabled={!questions.length} 
+              loading={isLoading} 
+              onPress={handleSave} 
+            />
           </View>
 
           <Modal
@@ -223,11 +233,13 @@ export default function AddQuestion() {
                   label="Question"
                   placeholder={'Enter your question'}
                   inputMode="text"
+                  multiline
                   autoCorrect={false}
                   value={customQuestion}
                   onChangeText={setCustomQuestion}
                   onSubmitEditing={handleAddQuestion}
                   editable={!isLoading}
+                  style={styles.questionInput}
                 />
                 <ModalActions
                   isSaving={isLoading}
@@ -275,5 +287,18 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center", 
     backgroundColor: palette.background,
+  },
+  questionInput: {
+    backgroundColor: palette.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: palette.line,
+    color: palette.text,
+    fontSize: 15,
+    lineHeight: 22,
+    minHeight: 160,
+    textAlignVertical: 'top',
+    marginBottom: 24,
   },
 });

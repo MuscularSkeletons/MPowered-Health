@@ -1,4 +1,5 @@
-import { Field, Shell, SelectField, ActionButton } from '@/components/prescription/form';
+import { Field, Shell, SelectField } from '@/components/prescription/form';
+import { SecondaryButton } from '@/components/ui/common';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
 import { useMedicationEditor } from '@/hooks/usePrescriptionEditor';
@@ -17,7 +18,7 @@ function Editor({ id }: { id?: string }) {
     return (
       <Shell title="Prescriptions List">
         <Text>This prescription is no longer available.</Text>
-        <ActionButton
+        <SecondaryButton
           label="Back to prescriptions"
           onPress={() => router.replace('/(tabs)/(myhealth)/(prescriptions)')}
         />
@@ -66,7 +67,7 @@ function Editor({ id }: { id?: string }) {
         value={frequency}
         onChange={(value) => change('frequency', value)}
       />
-      <ActionButton
+      <SecondaryButton
         label="Save prescription"
         disabled={!ready}
         onPress={async () => {

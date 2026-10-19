@@ -147,29 +147,6 @@ export function SelectField({
   );
 }
 
-/* button to add and save prescriptions */
-export function ActionButton({
-  label,
-  onPress,
-  disabled = false,
-}: {
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [styles.action, disabled && styles.disabled, pressed && styles.buttonPressed]}
-    >
-      <Text style={[styles.actionText, disabled && styles.disabledText]}>{label}</Text>
-    </Pressable>
-  );
-}
-
 export const styles = StyleSheet.create({
   fieldError: { color: palette.error, fontSize: 12, marginTop: 6 },
   input: {
@@ -223,37 +200,4 @@ export const styles = StyleSheet.create({
   optionText: { fontSize: 15, color: palette.text },
   selectedText: { fontWeight: '700', color: palette.success },
   check: { fontSize: 16, fontWeight: '800', color: palette.success },
-  action: {
-    minHeight: 52,
-    borderRadius: radius.pill,
-    backgroundColor: palette.success,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 22,
-    shadowColor: palette.success,
-    shadowOpacity: 0.16,
-    shadowRadius: 12,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    elevation: 2,
-  },
-  buttonPressed: {
-    backgroundColor: palette.success,
-    opacity: 0.84,
-    transform: [
-      {
-        scale: 0.985,
-      },
-    ],
-  },
-  disabled: { backgroundColor: palette.surfaceSoft, shadowOpacity: 0, elevation: 0 },
-  disabledText: { color: palette.muted },
-  actionText: {
-    color: palette.surface,
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.1,
-  },
 });

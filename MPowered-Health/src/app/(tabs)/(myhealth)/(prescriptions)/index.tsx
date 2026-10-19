@@ -1,4 +1,5 @@
-import { Shell, ActionButton } from '@/components/prescription/form';
+import { Shell } from '@/components/prescription/form';
+import { SecondaryButton } from '@/components/ui/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,7 +15,7 @@ export default function PrescriptionsScreen() {
       {loadFailed ? (
         <>
           <Text style={styles.copy}>Your prescriptions could not be loaded.</Text>
-          <ActionButton label="Retry" onPress={reload} />
+          <SecondaryButton label="Retry" onPress={reload} />
         </>
       ) : !list.length ? (
         <Text style={styles.copy}>No prescriptions added yet.</Text>
@@ -49,7 +50,7 @@ export default function PrescriptionsScreen() {
           );
         })}
       </View>
-      <ActionButton
+      <SecondaryButton
         label="Add prescription"
         disabled={loadFailed}
         onPress={() => {

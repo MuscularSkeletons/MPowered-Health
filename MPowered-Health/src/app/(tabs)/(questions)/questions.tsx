@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/ui/styling";
@@ -15,7 +16,6 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
 import { formatTimeAgo } from "@/lib/dateHelper";
-import { Ionicons } from "@expo/vector-icons";
 import { ModalActions, modalStyles } from '@/components/ui/modal';
 import {
   Intro,
@@ -23,6 +23,7 @@ import {
   PrimaryButton,
   Input,
 } from '@/components/ui/common';
+import { Feather } from '@expo/vector-icons';
 
 interface QuestionCardProps {
   question: Question;
@@ -101,10 +102,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
             </Text>
           </View>
           <TouchableOpacity onPress={handleDelete} disabled={isLoading}>
-            <Ionicons 
-              name={"trash-outline"}
-              style={styles.delete}
-            />
+            <Feather name="trash-2" size={21} color={palette.error} />
           </TouchableOpacity>
         </View>
         <View style={styles.questionContent}>
@@ -112,11 +110,16 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
               <Text style={styles.questionText}>{question.question}</Text>
           </View>  
           <View style={styles.answer}>
-            <Text style={styles.answerText}>{ question.answer || "No answer submitted yet"}</Text>
-        </View>
+            {question.answer ? (
+              <Text style={styles.answerText}>{`"${question.answer}"`}</Text>
+            ) : <Text style={styles.noAnswerText}>No answer submitted yet</Text> }
+          </View>
         </View>
         <View style={styles.answerButton}>
-          <PrimaryButton label={question.answer ? 'Edit answer' : 'Add Answer'} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoading}/>
+          <Text style={styles.answerButtonText} onPress={() => {setShowAnswerPreview(!showAnswerPreview)}} disabled={isLoading}>
+            {question.answer ? 'EDIT ANSWER' : 'ADD ANSWER'}
+          </Text>
+          <Text style={styles.answerButtonArrow}>›</Text>
         </View>
       </View>
 
@@ -133,11 +136,13 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
                 label="Answer"
                 placeholder={'Enter your answer'}
                 inputMode="text"
+                multiline
                 autoCorrect={false}
                 value={answer}
                 onChangeText={setAnswer}
                 onSubmitEditing={handleAnswer}
                 editable={!isLoading}
+                style={styles.answerInput}
               />
               <ModalActions
                 isSaving={isLoading}
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   questionContainer: {
-    backgroundColor: palette.light,
+    backgroundColor: palette.surface,
     borderRadius: 16,
     overflow: "hidden",
     marginBottom: 16,
@@ -314,12 +319,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+    borderColor: palette.light,
+    borderWidth: 1,
   },
   questionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
+    paddingHorizontal: 20,
   },
   questionContent: {
     paddingHorizontal: 16,
@@ -331,21 +339,67 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  answer: {},
-  answerText: {},
+  answer: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: palette.line,
+  },
+  answerText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.text,
+    fontStyle: 'italic',
+  },
+  noAnswerText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.muted,
+    fontStyle: 'italic',
+  },
   timeInfo: {
-    padding: 16,
+    backgroundColor: palette.secondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
   timeAgo: {
+    fontSize: 11,
+    fontWeight: '700',
     color: palette.muted,
-    fontSize: 12,
-
+    textTransform: 'uppercase',
   },
   answerButton: {
     padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
   },
-  delete: {
-    fontSize: 20,
-    paddingRight: 5,
+  answerButtonText: {
+    fontSize: 12, 
+    fontWeight: '700', 
+    color: palette.text,
+  },
+  answerButtonArrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
+  answerInput: {
+    backgroundColor: palette.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: palette.line,
+    color: palette.text,
+    fontSize: 15,
+    lineHeight: 22,
+    minHeight: 160,
+    textAlignVertical: 'top',
+    marginBottom: 24,
   },
 });

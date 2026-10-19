@@ -12,7 +12,7 @@ import {
   type TextInputProps,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { palette } from '@/constants/ui/styling';
+import { palette, radius } from '@/constants/ui/styling';
 
 /** Displays the MPowered Health wordmark used throughout account setup. */
 export function Header() {
@@ -94,7 +94,7 @@ export function Input({
           {...props}
           secureTextEntry={secure && !reveal}
           placeholderTextColor={palette.muted}
-          style={styles.input}
+          style={[styles.input, props.style]}
         />
         {secure && onToggleReveal ? (
           <Pressable
@@ -139,6 +139,28 @@ export function PrimaryButton({
       <Text style={[styles.primaryText, (disabled || loading) && styles.primaryDisabledText]}>
         {loading ? 'Please wait…' : label}
       </Text>
+    </Pressable>
+  );
+}
+
+export function SecondaryButton({
+  label,
+  onPress,
+  disabled = false,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.action, disabled && styles.disabled, pressed && styles.buttonPressed]}
+    >
+      <Text style={[styles.actionText, disabled && styles.disabledText]}>{label}</Text>
     </Pressable>
   );
 }
@@ -268,4 +290,37 @@ const styles = StyleSheet.create({
   checkbox: { width: 23, height: 23, borderRadius: 7, borderWidth: 1.5, borderColor: palette.line, alignItems: 'center', justifyContent: 'center' },
   choiceMark: { backgroundColor: palette.success, borderColor: palette.success },
   tick: { color: palette.surface, fontSize: 12, fontWeight: '800' },
+  action: {
+    minHeight: 52,
+    borderRadius: radius.pill,
+    backgroundColor: palette.success,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 22,
+    shadowColor: palette.success,
+    shadowOpacity: 0.16,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    elevation: 2,
+  },
+  buttonPressed: {
+    backgroundColor: palette.success,
+    opacity: 0.84,
+    transform: [
+      {
+        scale: 0.985,
+      },
+    ],
+  },
+  disabled: { backgroundColor: palette.surfaceSoft, shadowOpacity: 0, elevation: 0 },
+  disabledText: { color: palette.muted },
+  actionText: {
+    color: palette.surface,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.1,
+  },
 });
