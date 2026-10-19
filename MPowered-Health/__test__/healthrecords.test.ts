@@ -9,7 +9,7 @@ import {
   profileReportText,
 } from '@/components/my-health/profileReport';
 
-jest.mock('@/services/health-records.services', () => ({ fetchHealthSnapshot: jest.fn() }));
+jest.mock('@/services/healthRecords.services', () => ({ fetchHealthSnapshot: jest.fn() }));
 
 const assessment = (
   id: string,

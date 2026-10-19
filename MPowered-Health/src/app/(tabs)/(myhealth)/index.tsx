@@ -153,7 +153,7 @@ export default function MyHealthScreen() {
         <Pressable
           accessibilityRole="button"
           style={({ pressed }) => [styles.historyButton, pressed && styles.quickPressed]}
-          onPress={() => router.push('/(tabs)/(myhealth)/health-records')}
+          onPress={() => router.push('/(tabs)/(myhealth)/healthrecords')}
         >
           <Text style={styles.historyButtonText}>View all pain records</Text>
         </Pressable>
