@@ -3,11 +3,11 @@ import {
   type AssessmentRow,
 } from '@/services/healthRecords.mapper';
 import { groupPainHistory } from '@/services/healthRecords.store';
-import { buildPainRecordsHtml } from '@/components/my-health/painRecordPDF';
+import { buildPainRecordsHtml } from '@/components/my-health/painRecordReportPDF';
 import {
   profileReportHtml,
   profileReportText,
-} from '@/components/my-health/profileReportPDF';
+} from '@/components/my-health/healthProfileReportPDF';
 
 jest.mock('@/services/healthRecords.services', () => ({ fetchHealthSnapshot: jest.fn() }));
 

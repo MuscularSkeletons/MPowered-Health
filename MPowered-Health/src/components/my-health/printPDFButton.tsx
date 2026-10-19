@@ -1,6 +1,6 @@
 /** Connects the health-record report to the print button and error feedback. */
 // This hook prepares the history groups and selections used by the records screen.
-import { buildPainRecordsHtml } from '@/components/my-health/painRecordPDF';
+import { buildPainRecordsHtml } from '@/components/my-health/painRecordReportPDF';
 import type { PainAssessmentRecord, PainMetric } from '@/services/healthRecords.store';
 import { printHtml } from '@/lib/documentExport';
 import { palette } from '@/constants/ui/styling';
