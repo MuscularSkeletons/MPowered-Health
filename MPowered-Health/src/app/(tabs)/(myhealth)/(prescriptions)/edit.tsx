@@ -1,4 +1,4 @@
-import { Field, Shell, SelectField } from '@/components/forms/form';
+import { Field, Shell, SelectField } from '@/components/prescription/form';
 import { ActionButton } from '@/components/my-health/app-ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
