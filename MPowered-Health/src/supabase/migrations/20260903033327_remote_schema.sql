@@ -56,7 +56,6 @@ CREATE TABLE public.pain_assessment (
   pain_location ARRAY NOT NULL,
   pain_characteristics ARRAY NOT NULL,
   assessment_id uuid UNIQUE,
-  pain_refelction text,
   CONSTRAINT pain_assessment_pkey PRIMARY KEY (pain_assessment_id),
   CONSTRAINT pain_assessment_assessment_id_fkey
     FOREIGN KEY (assessment_id)
