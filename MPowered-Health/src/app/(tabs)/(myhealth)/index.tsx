@@ -1,6 +1,7 @@
 import { 
   Screen,
   Intro, 
+  commonStyles,
 } from '@/components/ui/common';
 import { palette, radius, spacing, layout } from '@/constants/ui/styling';
 import {
@@ -157,7 +158,7 @@ export default function MyHealthScreen() {
           <Text style={styles.historyButtonText}>View all pain records</Text>
         </Pressable>
       </View>
-      <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+      <Text style={commonStyles.sponsor}>Supported by ABBVIE</Text>
     </Screen>
   );
 }
@@ -276,12 +277,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   historyButtonText: { fontSize: 14, fontWeight: '800', color: palette.success },
-  sponsor: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontWeight: '600',
-    color: palette.muted,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-  },
 });

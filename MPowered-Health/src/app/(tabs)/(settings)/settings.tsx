@@ -244,7 +244,7 @@ export default function Settings() {
           onPress={handleDelete}
         />
       </View>
-      <Text style={styles.sponsor}>Supported by ABBVIE</Text>
+      <Text style={commonStyles.sponsor}>Supported by ABBVIE</Text>
 
       <Modal 
         visible={showCurrPasswordEdit} 
@@ -388,11 +388,4 @@ const styles = StyleSheet.create({
   rowDescription: { fontSize: 12, lineHeight: 17, color: palette.muted, marginTop: 3 },
   dangerText: { color: palette.chart },
   divider: { height: 1, backgroundColor: palette.line, marginLeft: 55 },
-  sponsor: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: palette.muted,
-    textAlign: 'center',
-    marginTop: 34,
-  },
 });

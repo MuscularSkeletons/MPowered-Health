@@ -12,7 +12,7 @@ import {
   type TextInputProps,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { palette, radius } from '@/constants/ui/styling';
+import { palette, radius, spacing } from '@/constants/ui/styling';
 
 /** Displays the MPowered Health wordmark used throughout account setup. */
 export function Header() {
@@ -206,6 +206,14 @@ export const commonStyles = StyleSheet.create({
   error: { color: palette.error, fontSize: 13, lineHeight: 20, marginTop: 12 },
   choices: { gap: 12, marginTop: 12 },
   back: { alignSelf: 'flex-start', paddingVertical: 12, color: palette.primary, fontWeight: '700' },
+  sponsor: {
+      fontSize: 11,
+      lineHeight: 16,
+      fontWeight: '600',
+      color: palette.muted,
+      textAlign: 'center',
+      marginTop: spacing.xl,
+    },
 });
 
 const styles = StyleSheet.create({
