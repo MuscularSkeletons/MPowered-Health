@@ -7,7 +7,7 @@ import {
 } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 
-// TODO: implement notifications in separate sprint if have time to do
+// NOTE: notifications placeholder - functionality unimplemented
 export default function ManageNotifications() {
   const router = useRouter();
   return (

@@ -1,4 +1,4 @@
-import SplashScreen from '../src/app/(auth)/splashscreen';
+import SplashScreen from '@/app/(auth)/splashscreen';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 

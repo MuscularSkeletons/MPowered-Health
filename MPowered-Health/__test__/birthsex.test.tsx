@@ -1,4 +1,4 @@
-import StoreBirthSex from '../src/app/(auth)/(onboarding)/birthsex';
+import StoreBirthSex from '@/app/(auth)/(onboarding)/birthsex';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { sexOptions } from "@/constants/profile/profileOptions";
 

@@ -1,4 +1,4 @@
-import Onboarding from '../src/app/(auth)/(onboarding)/onboarding';
+import Onboarding from '@/app/(auth)/(onboarding)/onboarding';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Alert } from 'react-native';

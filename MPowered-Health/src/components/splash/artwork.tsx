@@ -6,7 +6,7 @@ import { palette } from '@/constants/ui/styling';
 const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
   [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
   [require('@/assets/splash/health-home.png'), require('@/assets/splash/health-records.png')],
-  [require('@/assets/splash/questions-home.png'), require('@/assets/splash/questions-add.png')], // TODO replace with questions
+  [require('@/assets/splash/questions-home.png'), require('@/assets/splash/questions-add.png')],
 ];
 
 /**

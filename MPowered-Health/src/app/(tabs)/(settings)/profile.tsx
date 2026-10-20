@@ -261,7 +261,7 @@ export default function ManageProfile() {
   // update email
   /* NOTE: when testing email update, a confirmation email is sent to the new email. please enter a valid email address
     to reduce the number of bounced emails sent.
-    Confirmation link currently redirects to a site (TODO: implement deep linking when do email verification)
+    Confirmation link currently redirects to a site (deep linking via email verification unimplemented)
     if you don't click confirm, you can check if the email has been updated in the email_change field in
     supabase. once confirmed it will update in the email field. updating to the UI may be delayed.
   */

@@ -1,4 +1,4 @@
-import StoreBirthYear from '../src/app/(auth)/(onboarding)/birthyear';
+import StoreBirthYear from '@/app/(auth)/(onboarding)/birthyear';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import { BIRTH_YEAR_RANGE } from "@/constants/profile/profileConstants";

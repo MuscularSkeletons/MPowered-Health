@@ -1,4 +1,4 @@
-import StoreName from '../src/app/(auth)/(onboarding)/name';
+import StoreName from '@/app/(auth)/(onboarding)/name';
 import {render, screen, fireEvent, userEvent} from '@testing-library/react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Login from '../src/app/(auth)/login';
+import Login from '@/app/(auth)/login';
 import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 

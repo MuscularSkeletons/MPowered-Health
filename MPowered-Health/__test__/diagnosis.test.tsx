@@ -1,4 +1,4 @@
-import StoreDiagnosis from '../src/app/(auth)/(onboarding)/diagnosis';
+import StoreDiagnosis from '@/app/(auth)/(onboarding)/diagnosis';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));

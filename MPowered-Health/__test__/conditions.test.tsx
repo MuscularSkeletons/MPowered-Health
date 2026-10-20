@@ -1,4 +1,4 @@
-import StorePainConditions from '../src/app/(auth)/(onboarding)/conditions';
+import StorePainConditions from '@/app/(auth)/(onboarding)/conditions';
 import { fireEvent, render, screen, waitFor} from '@testing-library/react-native';
 import { painConditionsOptions } from "@/constants/profile/profileOptions";
 
