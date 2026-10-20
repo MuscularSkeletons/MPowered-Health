@@ -16,7 +16,7 @@ jest.mock('@/context/authcontext', () => ({
   useAuth: () => ({ user: { id: 'user-1', name: 'Test Person', birthsex: 'Female', birthyear: 1980,
     formalDiagnosis: false, painConditions: ['Arthritis'], otherCondition: 'Test condition' } }),
 }));
-jest.mock('@/services/prescriptions.services', () => ({
+jest.mock('@/hooks/usePrescriptions', () => ({
   listPrescriptions: jest.fn(async () => []),
   createPrescription: jest.fn(async (_userId: string, draft: Omit<PrescriptionItem, 'id'>) => ({
     ...draft,

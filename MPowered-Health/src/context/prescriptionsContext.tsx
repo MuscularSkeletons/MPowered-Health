@@ -4,6 +4,7 @@ import {
   deletePrescription,
   listPrescriptions,
   updatePrescription,
+  isDuplicate,
 } from '@/hooks/usePrescriptions';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import { 
@@ -11,7 +12,6 @@ import {
   emptyPrescription,
   validNumber, 
 } from '@/services/prescriptionHelper';
-import { isDuplicate } from '@/hooks/usePrescriptions';
 import { type PrescriptionDraft, type PrescriptionItem } from '@/types/prescriptions';
 
 
