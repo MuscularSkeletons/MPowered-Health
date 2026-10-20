@@ -39,7 +39,7 @@ export function Screen({ children, compact = false }: { children: ReactNode; com
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="never"
           contentContainerStyle={[styles.content, compact && styles.compactContent]}
         >
           {children}

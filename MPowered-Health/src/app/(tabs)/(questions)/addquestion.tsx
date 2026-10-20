@@ -209,7 +209,37 @@ export default function AddQuestion() {
                 onPress={() => {setShowQuestionPreview(!showQuestionPreview)}}
               />
               
-            </View>
+            </View>        
+
+            <Modal
+              visible={showQuestionPreview}
+              transparent={true}
+              animationType="fade"
+              >
+              <View style={modalStyles.centredView}>
+                <View style={modalStyles.editInterface}>
+                  <Text style={modalStyles.modalTitle}>Add Question</Text>
+                  <Input
+                    testID="custom-question-input"
+                    label="Question"
+                    placeholder={'Enter your question'}
+                    inputMode="text"
+                    multiline
+                    autoCorrect={false}
+                    value={customQuestion}
+                    onChangeText={setCustomQuestion}
+                    onSubmitEditing={handleAddQuestion}
+                    editable={!isLoading}
+                    style={styles.questionInput}
+                  />
+                  <ModalActions
+                    isSaving={isLoading}
+                    onCancel={() => setShowQuestionPreview(false)}
+                    onSave={() => void handleAddQuestion()}
+                  />
+                </View>
+              </View>
+            </Modal>
           </ScrollView>
           <View style={styles.save}>
             <PrimaryButton 
@@ -219,36 +249,6 @@ export default function AddQuestion() {
               onPress={handleSave} 
             />
           </View>
-
-          <Modal
-            visible={showQuestionPreview}
-            transparent={true}
-            animationType="fade"
-            >
-            <View style={modalStyles.centredView}>
-              <View style={modalStyles.editInterface}>
-                <Text style={modalStyles.modalTitle}>Add Question</Text>
-                <Input
-                  testID="custom-question-input"
-                  label="Question"
-                  placeholder={'Enter your question'}
-                  inputMode="text"
-                  multiline
-                  autoCorrect={false}
-                  value={customQuestion}
-                  onChangeText={setCustomQuestion}
-                  onSubmitEditing={handleAddQuestion}
-                  editable={!isLoading}
-                  style={styles.questionInput}
-                />
-                <ModalActions
-                  isSaving={isLoading}
-                  onCancel={() => setShowQuestionPreview(false)}
-                  onSave={() => void handleAddQuestion()}
-                />
-              </View>
-            </View>
-          </Modal>
         </View>
       </View>
     </SafeAreaView>
