@@ -27,6 +27,7 @@ jest.mock('@/hooks/usePrescriptions', () => ({
     id,
   })),
   deletePrescription: jest.fn(async () => undefined),
+  isDuplicate: jest.fn(() => false),
 }));
 
 beforeEach(() => { mockParams = {}; jest.clearAllMocks(); });
