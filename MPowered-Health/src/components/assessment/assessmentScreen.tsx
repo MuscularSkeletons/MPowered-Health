@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, PrimaryButton } from '@/components/ui/common';
+import { Header, PrimaryButton } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { useMedications } from '@/context/prescriptionsContext';

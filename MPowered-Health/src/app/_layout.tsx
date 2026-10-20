@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/authcontext';
-import { Header } from '@/components/ui/common';
+import { Header } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { requiredSessionRoute } from '@/navigation/routeGuard';
 

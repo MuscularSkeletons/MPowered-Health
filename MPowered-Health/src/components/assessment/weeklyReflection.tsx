@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { PrimaryButton, Screen, Intro, commonStyles, } from '@/components/ui/common';
+import { PrimaryButton, Screen, Intro, commonStyles, } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { saveWeeklyReflection } from '@/hooks/useAssessments';
 

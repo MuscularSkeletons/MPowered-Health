@@ -1,9 +1,9 @@
-import { copyText, printHtml, shareDocument } from '@/lib/documentExport';
+import { copyText, printHtml, shareDocument } from '@/components/myhealth/documentExport';
 import {
   type HealthProfileReport,
   healthProfileReportHtml,
   healthProfileReportText,
-} from '@/components/my-health/healthProfileReportPDF';
+} from '@/components/myhealth/healthprofile/healthProfileReportPDF';
 import { palette, radius, spacing } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';

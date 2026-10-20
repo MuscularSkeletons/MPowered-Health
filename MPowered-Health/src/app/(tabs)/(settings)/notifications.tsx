@@ -4,7 +4,7 @@ import {
   Intro,
   Screen,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 
 // TODO: implement notifications in separate sprint if have time to do

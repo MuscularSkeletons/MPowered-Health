@@ -1,5 +1,5 @@
 import { SplashArtwork } from '@/components/splash/artwork';
-import { commonStyles, Header } from '@/components/ui/common';
+import { commonStyles, Header } from '@/components/shared/common';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, Text, View, ViewToken, StyleSheet } from 'react-native';

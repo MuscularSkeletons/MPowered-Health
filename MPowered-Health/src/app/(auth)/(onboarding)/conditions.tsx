@@ -9,7 +9,7 @@ import {
   ChoiceButton,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 /** Stores the selected pain conditions locally. */
 export default function StorePainConditions() {

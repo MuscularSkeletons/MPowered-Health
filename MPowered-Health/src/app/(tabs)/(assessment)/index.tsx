@@ -10,7 +10,7 @@ import { ASSESSMENT_QUESTIONS } from '@/constants/assessmentQuestions/assessment
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import WeeklyReflectionScreen from '@/components/assessment/weeklyReflection';
 import { palette } from '@/constants/ui/styling';
-import { Screen, commonStyles } from '@/components/ui/common';
+import { Screen, commonStyles } from '@/components/shared/common';
 import { useAuth } from '@/context/authcontext';
 import {
   getCurrentWeeklyAssessmentState,

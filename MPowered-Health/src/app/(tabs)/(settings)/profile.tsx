@@ -15,7 +15,7 @@ import { palette } from "@/constants/ui/styling";
 import { useState } from "react";
 import { BIRTH_YEAR_RANGE } from '@/constants/profile/profileConstants';
 import { sexOptions, diagnosisOptions, painConditionsOptions } from '@/constants/profile/profileOptions';
-import { ModalActions, modalStyles } from "@/components/ui/modal";
+import { ModalActions, modalStyles } from "@/components/shared/modal";
 
 import {
   Input,
@@ -23,7 +23,7 @@ import {
   Screen,
   commonStyles,
   ChoiceButton,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 function ProfileRow({
   label,

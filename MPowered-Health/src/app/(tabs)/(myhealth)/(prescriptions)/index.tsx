@@ -1,5 +1,5 @@
 import { Shell } from '@/components/prescription/form';
-import { SecondaryButton } from '@/components/ui/common';
+import { SecondaryButton } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';

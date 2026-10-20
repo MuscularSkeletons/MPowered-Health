@@ -15,14 +15,14 @@ import { useState, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Question, useQuestions } from "@/hooks/useQuestions";
 import { useAuth } from "@/context/authcontext";
-import { formatTimeAgo } from "@/lib/dateHelper";
-import { ModalActions, modalStyles } from '@/components/ui/modal';
+import { formatTimeAgo } from "@/components/questions/dateHelper";
+import { ModalActions, modalStyles } from '@/components/shared/modal';
 import {
   Intro,
   Header,
   Input,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 import { Feather } from '@expo/vector-icons';
 
 interface QuestionCardProps {

@@ -1,12 +1,12 @@
-import { PrintPdfButton } from '@/components/my-health/printPDFButton';
-import { TrackingChart } from '@/components/my-health/trackingChart';
+import { PrintPDFButton } from '@/components/myhealth/painrecords/printPainRecordPDFButton';
+import { TrackingChart } from '@/components/myhealth/painrecords/trackingChart';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { painRecordDate } from '@/services/healthRecords.store';
 import { 
   Screen,
   Intro,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -49,7 +49,7 @@ export default function PainRecords() {
           sectionLabel="TRACKING RECORDS"
           title="Pain Records"
         />
-        <PrintPdfButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
+        <PrintPDFButton records={records} areaLabel={selected?.label ?? ''} metric={metric} />
       </View>
       <View style={styles.tabs}>
         {(['Chart', 'History'] as const).map((label) => (

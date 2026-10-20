@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { useAuth } from '@/context/authcontext';
-import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/ui/common';
+import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
 
 /** Saves the profile answers and marks onboarding complete. */
 export default function CompleteOnboarding() {

@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/ui/styling";
-import { HealthDataBoundary } from '@/components/my-health/healthDataBoundary';
+import { HealthDataBoundary } from '@/components/myhealth/healthDataBoundary';
 import { useAuth } from '@/context/authcontext';
 import { MedicationProvider } from '@/context/prescriptionsContext';
 

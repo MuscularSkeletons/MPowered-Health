@@ -5,7 +5,7 @@ import {
   painMetricValue,
   painRecordDate,
 } from '@/services/healthRecords.store';
-import { PAIN_RECORD_REPORT_STYLES } from '@/constants/myhealth/painRecordStyles';
+import { PAIN_RECORD_REPORT_STYLES } from '@/constants/myhealth/painRecordPDFStyles';
 
 /**
  * Escapes special characters so user text is safe to place in an HTML report.

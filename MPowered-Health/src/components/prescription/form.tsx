@@ -12,7 +12,7 @@ import {
     Screen, 
     Intro,
     commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 import { router } from 'expo-router';
 import { useState } from 'react';
 

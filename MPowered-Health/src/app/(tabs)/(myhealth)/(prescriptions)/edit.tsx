@@ -1,5 +1,5 @@
 import { Field, Shell, SelectField } from '@/components/prescription/form';
-import { SecondaryButton } from '@/components/ui/common';
+import { SecondaryButton } from '@/components/shared/common';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
 import { useMedicationEditor } from '@/hooks/usePrescriptionEditor';

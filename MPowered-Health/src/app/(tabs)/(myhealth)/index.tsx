@@ -2,7 +2,7 @@ import {
   Screen,
   Intro, 
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 import { palette, radius, spacing, layout } from '@/constants/ui/styling';
 import {
   getPainHistory,
@@ -117,7 +117,7 @@ export default function MyHealthScreen() {
         <Pressable
           accessibilityRole="button"
           style={({ pressed }) => [styles.quick, styles.quickPink, pressed && styles.quickPressed]}
-          onPress={() => router.push('/(tabs)/(myhealth)/profile')}
+          onPress={() => router.push('/(tabs)/(myhealth)/healthprofile')}
         >
           <Text style={styles.quickText}>My health profile</Text>
           <Text style={styles.quickArrow}>View ›</Text>

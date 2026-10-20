@@ -19,7 +19,7 @@ import {
 } from "@/constants/questions/questions";
 import { useAuth } from "@/context/authcontext";
 import { useQuestions } from "@/hooks/useQuestions";
-import { ModalActions, modalStyles } from "@/components/ui/modal";
+import { ModalActions, modalStyles } from "@/components/shared/modal";
 import {
   Intro,
   Header,
@@ -28,7 +28,7 @@ import {
   SecondaryButton,
   commonStyles,
   Input,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 export default function AddQuestion() {
   const router = useRouter();

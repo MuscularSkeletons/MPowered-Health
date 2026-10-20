@@ -7,7 +7,7 @@ export default function MyHealthLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(prescriptions)" />
           <Stack.Screen name="painrecords" />
-          <Stack.Screen name="profile" />
+          <Stack.Screen name="healthprofile" />
         </Stack>
   );
 }

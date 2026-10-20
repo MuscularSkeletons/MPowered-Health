@@ -8,7 +8,7 @@ import {
   Screen,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 /** Stores the name used to personalise the profile. */
 export default function StoreName() {

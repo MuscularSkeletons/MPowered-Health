@@ -9,7 +9,7 @@ import {
   Screen,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 /** Stores an optional birth year after checking the allowed range. */
 export default function StoreBirthYear() {

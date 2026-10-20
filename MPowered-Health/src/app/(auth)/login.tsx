@@ -11,7 +11,7 @@ import {
   Screen,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 

@@ -9,7 +9,7 @@ import {
   ChoiceButton,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 /** Stores whether the user has a formal diagnosis. */
 export default function StoreDiagnosis() {

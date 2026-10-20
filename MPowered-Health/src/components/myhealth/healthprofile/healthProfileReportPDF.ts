@@ -1,4 +1,4 @@
-import { HEALTH_PROFILE_REPORT_STYLES } from '@/constants/myhealth/healthProfileStyles';
+import { HEALTH_PROFILE_REPORT_STYLES } from '@/constants/myhealth/healthProfilePDFStyles';
 
 /** Builds safe printable and shareable versions of My health profile. */
 export type ProfileSection = {

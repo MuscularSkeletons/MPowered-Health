@@ -8,7 +8,7 @@ import {
   Screen,
   PrimaryButton,
   commonStyles,
-} from '@/components/ui/common';
+} from '@/components/shared/common';
 
 /** Stores other miscellaneous conditions if the question is not skipped. */
 export default function StoreOtherConditions() {

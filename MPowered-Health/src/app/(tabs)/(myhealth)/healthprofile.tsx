@@ -2,9 +2,9 @@ import {
   Screen,
   Intro,
   commonStyles,
-} from '@/components/ui/common';
-import { ProfileExportActions } from '@/components/my-health/profileExportActions';
-import { type HealthProfileReport } from '@/components/my-health/healthProfileReportPDF';
+} from '@/components/shared/common';
+import { ProfileExportActions } from '@/components/myhealth/healthprofile/healthProfileExportActions';
+import { type HealthProfileReport } from '@/components/myhealth/healthprofile/healthProfileReportPDF';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
 import { getLatestAssessments } from '@/services/healthRecords.store';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
