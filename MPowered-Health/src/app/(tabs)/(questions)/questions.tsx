@@ -218,11 +218,14 @@ export default function Questions() {
             data={questions} 
             renderItem={renderQuestion} 
             keyExtractor={(item) => item.id}
-            contentContainerStyle={
-              questions.length === 0 ? styles.emptyContent : styles.qaContent
+            contentContainerStyle={questions.length === 0 ? styles.emptyContent : styles.qaContent}
+            ListEmptyComponent={
+              <View style={styles.emptyInstructions}>
+              <Text style={styles.emptyContentText}>No questions created yet. Press the + button to start adding questions!</Text>
+              </View>
             }
-            ListEmptyComponent={<Text style={styles.emptyContentText}>No questions created yet. Press the + button to start adding questions!</Text>}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+            ListFooterComponent={<Text style={commonStyles.sponsor}>Supported by ABBVIE</Text>}
           />     
 
           <TouchableOpacity style={styles.addButton} onPress={() => handleAddQuestion()} disabled={isLoading}>
@@ -273,15 +276,16 @@ const styles = StyleSheet.create({
     paddingBottom: 112,
   },
   emptyContent: {
-    alignItems: "center",
-    borderRadius: 28,
-    backgroundColor: palette.light,
-    overflow: "hidden",
-    padding: 16,
-    width: '100%',
     maxWidth: 680,
     alignSelf: 'center',
 
+  },
+  emptyInstructions: {
+    alignItems: "center",
+    overflow: "hidden",
+    borderRadius: 28,
+    backgroundColor: palette.light,
+    padding: 16,
   },
   emptyContentText: {
     fontSize: 16,
