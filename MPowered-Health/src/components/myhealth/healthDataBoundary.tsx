@@ -5,7 +5,7 @@ import {
   clearHealthRecords,
   loadHealthRecords,
   setHealthRecordsAccount,
-} from '@/services/healthRecords.store';
+} from '@/services/healthDataHelper';
 import { clearPrescriptions, loadPrescriptions } from '@/context/prescriptionsContext';
 
 /** The id the layout passes when nobody is signed in; there is nothing to load for it. */

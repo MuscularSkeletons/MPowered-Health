@@ -9,7 +9,7 @@ import {
   loadHealthRecords,
   painRecordDate,
   type PainAssessmentRecord,
-} from '@/services/healthRecords.store';
+} from '@/services/healthDataHelper';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, Text, View, StyleSheet } from 'react-native';

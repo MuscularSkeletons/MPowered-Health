@@ -4,7 +4,7 @@ import {
   PainMetric,
   painMetricValue,
   painRecordDate,
-} from '@/services/healthRecords.store';
+} from '@/services/healthDataHelper';
 import { PAIN_RECORD_REPORT_STYLES } from '@/constants/myhealth/painRecordPDFStyles';
 
 /**

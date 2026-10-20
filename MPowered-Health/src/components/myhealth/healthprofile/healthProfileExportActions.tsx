@@ -3,7 +3,7 @@ import {
   type HealthProfileReport,
   healthProfileReportHtml,
   healthProfileReportText,
-} from '@/components/myhealth/healthprofile/healthProfileReportPDF';
+} from '@/services/healthProfileReportPDF';
 import { palette, radius, spacing } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';

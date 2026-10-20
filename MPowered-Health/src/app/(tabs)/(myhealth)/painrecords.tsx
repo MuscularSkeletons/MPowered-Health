@@ -1,7 +1,11 @@
 import { PrintPDFButton } from '@/components/myhealth/painrecords/printPainRecordPDFButton';
 import { TrackingChart } from '@/components/myhealth/painrecords/trackingChart';
-import { useHealthRecords } from '@/hooks/useHealthRecords';
-import { painRecordDate } from '@/services/healthRecords.store';
+import { 
+  painRecordDate, 
+  getPainHistory,
+  groupPainHistory,
+  type PainMetric, 
+} from '@/services/healthDataHelper';
 import { 
   Screen,
   Intro,
@@ -9,7 +13,7 @@ import {
 } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { 
   Modal, 
   Pressable, 
@@ -18,6 +22,7 @@ import {
   View, 
   StyleSheet 
 } from 'react-native';
+import { useCallback, useState } from 'react';
 
 /**
  * Displays recorded pain history and the controls for filtering and exporting it.
@@ -25,22 +30,25 @@ import {
  * Coordinate filters, chart/history tabs, record groups, and printing.
  */
 export default function PainRecords() {
-  const {
-    tab,
-    setTab,
-    metric,
-    setMetric,
-    expanded,
-    setExpanded,
-    setSelectedKey,
-    dropdownOpen,
-    setDropdownOpen,
-    groups,
-    selected,
-    records,
-    rows,
-    newestFirst,
-  } = useHealthRecords();
+  const [tab, setTab] = useState<'chart' | 'history'>('chart');
+  const [metric, setMetric] = useState<PainMetric>('Average');
+  const [expanded, setExpanded] = useState(false);
+  const [history, setHistory] = useState(getPainHistory);
+  const [selectedKey, setSelectedKey] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      setHistory(getPainHistory());
+    }, []),
+  );
+  // Keep the selected group when it exists, or use the first group.
+  const groups = groupPainHistory(history);
+  const selected = groups.find((group) => group.key === selectedKey) ?? groups[0];
+  const records = selected?.records ?? [];
+  const newestFirst = [...records].reverse();
+  // Show recent records first and reveal older ones only on request.
+  const rows = expanded ? newestFirst : newestFirst.slice(0, 4);
+
   return (
     <Screen>
       <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>

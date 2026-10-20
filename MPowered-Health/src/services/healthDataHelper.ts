@@ -5,8 +5,8 @@
  * the screens can keep reading it, with nothing written to device.
  */
 import type { AssessmentAnswers } from "@/types/assessment";
-import { fetchHealthSnapshot } from "@/services/healthRecords.services";
-import type { HealthSnapshot } from "@/services/healthRecords.mapper";
+import { fetchHealthSnapshot } from "@/hooks/useAssessments";
+import type { HealthSnapshot } from "@/services/assessmentDataMapper";
 
 export type PainAssessmentRecord = {
   id: string;

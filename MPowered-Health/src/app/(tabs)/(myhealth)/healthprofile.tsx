@@ -4,9 +4,9 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 import { ProfileExportActions } from '@/components/myhealth/healthprofile/healthProfileExportActions';
-import { type HealthProfileReport } from '@/components/myhealth/healthprofile/healthProfileReportPDF';
+import { type HealthProfileReport } from '@/services/healthProfileReportPDF';
 import { layout, palette, radius, spacing } from '@/constants/ui/styling';
-import { getLatestAssessments } from '@/services/healthRecords.store';
+import { getLatestAssessments } from '@/services/healthDataHelper';
 import type { AssessmentAnswers, AssessmentId } from '@/types/assessment';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';

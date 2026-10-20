@@ -1,15 +1,15 @@
 import {
   buildSnapshot,
   type AssessmentRow,
-} from '@/services/healthRecords.mapper';
-import { groupPainHistory } from '@/services/healthRecords.store';
-import { buildPainRecordsHtml } from '@/components/myhealth/painrecords/painRecordReportPDF';
+} from '@/services/assessmentDataMapper';
+import { groupPainHistory } from '@/services/healthDataHelper';
+import { buildPainRecordsHtml } from '@/services/painRecordReportPDF';
 import {
   healthProfileReportHtml,
   healthProfileReportText,
-} from '@/components/myhealth/healthprofile/healthProfileReportPDF';
+} from '@/services/healthProfileReportPDF';
 
-jest.mock('@/services/healthRecords.services', () => ({ fetchHealthSnapshot: jest.fn() }));
+jest.mock('@/hooks/useAssessments', () => ({ fetchHealthSnapshot: jest.fn() }));
 
 const assessment = (
   id: string,

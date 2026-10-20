@@ -4,7 +4,7 @@ import {
   PainMetric,
   painMetricValue,
   painRecordDate,
-} from '@/services/healthRecords.store';
+} from '@/services/healthDataHelper';
 import { palette } from '@/constants/ui/styling';
 import { View, StyleSheet } from 'react-native';
 import { 
