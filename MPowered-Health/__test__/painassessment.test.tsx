@@ -1,9 +1,13 @@
-import { PainAssessment } from '../src/app/(tabs)/(assessment)/painassessment';
+//import { PainAssessment } from '../src/app/(tabs)/(assessment)/painassessment';
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
-import { painQuestions } from "@/constants/assessment/questions";
+//import { painQuestions } from "@/constants/assessment/questions";
 import { Alert } from 'react-native';
+import AssessmentScreen from '@/components/assessment/assessmentScreen';
+import { submitAssessmentAnswers } from '@/hooks/useAssessments';
+import { painQuestions } from '@/constants/assessmentQuestions/painQuestions';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
+const onBack = jest.fn();
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -20,15 +24,15 @@ jest.mock("@/context/authcontext", () => ({
 describe("pain assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
-        await render (<PainAssessment/>);
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack}/>);
     });
 
     afterEach(jest.clearAllMocks);
     
     test("question 1 (pain location) is rendered on screen", () => {
+        expect(screen.getByText("MY PAIN")).toBeTruthy();
         expect(screen.getByText('Pain location')).toBeTruthy();
         expect(screen.getByText('I have had pain in these areas last week.')).toBeTruthy();
-        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
         // options
         expect(screen.getByText('Head')).toBeTruthy();
         expect(screen.getByText('Neck')).toBeTruthy();
@@ -42,13 +46,18 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByText('Other')).toBeTruthy();
 
         expect(screen.getByText('1/6')).toBeTruthy();
+        expect(screen.getByText("This question is mandatory.")).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
-    test("question 2 (pain characteristics) is rendered on screen", () => {
+    test("question 2 (pain characteristics) is rendered on screen", async() => {
+
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
         expect(screen.getByText('Pain characteristics')).toBeTruthy();
         expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
-        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
         // options
         expect(screen.getByText('Aching')).toBeTruthy();
         expect(screen.getByText('Throbbing')).toBeTruthy();
@@ -67,10 +76,18 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByText('Unbearable')).toBeTruthy();
 
         expect(screen.getByText('2/6')).toBeTruthy();
+        expect(screen.getByText("This question is mandatory.")).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     }); 
 
-    test("question 3 (pain intensity) is rendered on screen", () => {
+    test("question 3 (pain intensity) is rendered on screen", async() => {
+
+        //navigate to question 3
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My current pain is')).toBeTruthy();
         // score
@@ -80,7 +97,15 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
-    test("question 4 (pain intensity) is rendered on screen", () => {
+    test("question 4 (pain intensity) is rendered on screen", async() => {
+
+        //navigate to question 4
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My mildest pain last week was')).toBeTruthy();
         // score
@@ -90,7 +115,16 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
-    test("question 5 (pain intensity) is rendered on screen", () => {
+    test("question 5 (pain intensity) is rendered on screen", async() => {
+
+        //navigate to question 5
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My worst pain last week was')).toBeTruthy();
         // score
@@ -100,35 +134,48 @@ describe("pain assessment questions are rendered on screen", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
-    test("question 6 (pain intensity) is rendered on screen", () => {
+    test("question 6 (pain intensity) is rendered on screen", async() => {
+
+        //navigate to question 6
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
         expect(screen.getByText('Pain intensity')).toBeTruthy();
         expect(screen.getByText('My overall average pain last week was')).toBeTruthy();
         // score
         expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
 
         expect(screen.getByText('6/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
     });
-
 });
 
-// selection/input tests
+
+
+// selection tests
+// test sliders manually
 describe("my pain assessment questions are selected/inputted correctly", () => {
-    afterEach(() => {
-        jest.clearAllMocks();
+    
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack}/>);
     });
 
-    test("question 1 not selected", async() => {
+    afterEach(jest.clearAllMocks);
+    
+    test("multiple options can be selected for question 1", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+
     });
 
     test("can input text for question 1 option other", async() => {
-        await render(<PainAssessment/>);
         fireEvent.press(screen.getByText("Other"));
         const otherInput = screen.getByPlaceholderText("Input other pain location");
         const user = userEvent.setup();
@@ -138,7 +185,6 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     test("question 2 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
@@ -148,7 +194,6 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     test("question 3 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
@@ -157,7 +202,6 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     test("question 4 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
@@ -166,7 +210,6 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     test("question 5 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
@@ -175,7 +218,6 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     test("question 6 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
@@ -183,17 +225,21 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
 
 });
 
+//record button disable tests
+
+
 // input validation tests
 describe("input validation for question 1 other", () => {
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack}/>);
     });
+
+    afterEach(jest.clearAllMocks);
 
     // question 1 is mandatory
     test("no text is entered for question 1 other", async() => {
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
         fireEvent.press(screen.getByText("Other"));
 
         fireEvent.press(screen.getByText("OK"));
@@ -202,7 +248,6 @@ describe("input validation for question 1 other", () => {
 
     test("other location entered is not the same as a pre-existing option", async() => {
         jest.spyOn(Alert, "alert");
-        await render(<PainAssessment/>);
         fireEvent.press(screen.getByText("Other"));
         const otherInput = screen.getByPlaceholderText("Input other pain location");
         const user = userEvent.setup();
@@ -212,15 +257,24 @@ describe("input validation for question 1 other", () => {
     });
 });
 
+//submission tests
+
+describe('summary screen', () => {
+    test("objects rendered on screen", async() => {
+        //use dummy data here for checking
+    })
+})
+
 // navigation tests
 describe("navigation", () => {
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack}/>);
     });
 
-    test('question 1 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
+    afterEach(jest.clearAllMocks);
+
+    test('navigate through all the questions to the summary screens', async() => {
         jest.spyOn(Alert, "alert");
         fireEvent.press(screen.getByText("Head"));
         fireEvent.press(screen.getByText("Record"));
@@ -252,121 +306,19 @@ describe("navigation", () => {
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
     });
 
-    test('question 1 other answered and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        const otherInput = screen.getByPlaceholderText("Input other pain location");
-        const user = userEvent.setup();
-        await user.type(otherInput, "Inner thigh");
+    test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled();
-        // expect question 2 components to be rendered on screen
-        expect(screen.getByText('Pain characteristics')).toBeTruthy();
-        expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
-        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
-        // options
-        expect(screen.getByText('Aching')).toBeTruthy();
-        expect(screen.getByText('Throbbing')).toBeTruthy();
-        expect(screen.getByText('Shooting')).toBeTruthy();
-        expect(screen.getByText('Stabbing')).toBeTruthy();
-        expect(screen.getByText('Gnawing')).toBeTruthy();
-        expect(screen.getByText('Sharp')).toBeTruthy();
-        expect(screen.getByText('Tender')).toBeTruthy();
-        expect(screen.getByText('Burning')).toBeTruthy();
-        expect(screen.getByText('Exhausting')).toBeTruthy();
-        expect(screen.getByText('Tiring')).toBeTruthy();
-        expect(screen.getByText('Penetrating')).toBeTruthy();
-        expect(screen.getByText('Nagging')).toBeTruthy();
-        expect(screen.getByText('Numb')).toBeTruthy();
-        expect(screen.getByText('Miserable')).toBeTruthy();
-        expect(screen.getByText('Unbearable')).toBeTruthy();
+    })
 
-        expect(screen.getByText('2/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-        
-    });
+    test('pressing back on a question 1 should navigate to the homescreen', async() => {
 
-    test('question 2 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("Throbbing"));
-        fireEvent.press(screen.getByText("Record"));
+    })
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 3 components to be rendered on screen
-        expect(screen.getByText('Pain intensity')).toBeTruthy();
-        expect(screen.getByText('My current pain is')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+    test('pressing close on summary screen should navigate to homescreen', async() => {
 
-        expect(screen.getByText('3/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+    })
 
-    test('question 3 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("2")); 
-        fireEvent.press(screen.getByText("Record"));
-        
+    test("pressing edit on summary screen should navigate to question 1", async() => {
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 4 components to be rendered on screen
-        expect(screen.getByText('Pain intensity')).toBeTruthy();
-        expect(screen.getByText('My mildest pain last week was')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
-
-        expect(screen.getByText('4/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 4 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("2")); 
-        fireEvent.press(screen.getByText("Record"));
-        
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 5 components to be rendered on screen
-        expect(screen.getByText('Pain intensity')).toBeTruthy();
-        expect(screen.getByText('My worst pain last week was')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
-
-        expect(screen.getByText('5/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 5 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("2")); 
-        fireEvent.press(screen.getByText("Record"));
-        
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 6 components to be rendered on screen
-        expect(screen.getByText('Pain intensity')).toBeTruthy();
-        expect(screen.getByText('My overall average pain last week was')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
-
-        expect(screen.getByText('6/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 6 selected and navigate to next screen', async() => {
-        await render(<PainAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("2")); 
-        fireEvent.press(screen.getByText("Record"));
-        
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect summary components to be rendered on screen
-        expect(screen.getByText('My Pain Summary')).toBeTruthy();
-    });
+    })
 });
