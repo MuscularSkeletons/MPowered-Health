@@ -423,7 +423,8 @@ describe("input validation for question 1 other", () => {
         fireEvent.press(screen.getByText("OK"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please input a location that is not already listed as an option");
     });
-})*/;
+});
+*/
 
 //submission tests
 
@@ -433,62 +434,116 @@ describe('summary screen', () => {
         //use dummy data here for checking
     })
 })
-
+*/
 // navigation tests
 describe("navigation", () => {
 
     beforeEach(async() => {
-        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack}/>);
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6,
+            average_pain: 8
+        }}/>);
     });
 
     afterEach(jest.clearAllMocks);
 
-    test('navigate through all the questions to the summary screens', async() => {
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("Head"));
-        fireEvent.press(screen.getByText("Record"));
+    test('navigate through all the questions to the summary screen', async() => {
+        //question 1
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        
-        // expect question 2 components to be rendered on screen
-        expect(screen.getByText('Pain characteristics')).toBeTruthy();
-        expect(screen.getByText('For each of the following words, select the adjectives that apply to your pain.')).toBeTruthy();
-        expect(screen.getByText('(scroll down for more options)')).toBeTruthy();
-        // options
-        expect(screen.getByText('Aching')).toBeTruthy();
-        expect(screen.getByText('Throbbing')).toBeTruthy();
-        expect(screen.getByText('Shooting')).toBeTruthy();
-        expect(screen.getByText('Stabbing')).toBeTruthy();
-        expect(screen.getByText('Gnawing')).toBeTruthy();
-        expect(screen.getByText('Sharp')).toBeTruthy();
-        expect(screen.getByText('Tender')).toBeTruthy();
-        expect(screen.getByText('Burning')).toBeTruthy();
-        expect(screen.getByText('Exhausting')).toBeTruthy();
-        expect(screen.getByText('Tiring')).toBeTruthy();
-        expect(screen.getByText('Penetrating')).toBeTruthy();
-        expect(screen.getByText('Nagging')).toBeTruthy();
-        expect(screen.getByText('Numb')).toBeTruthy();
-        expect(screen.getByText('Miserable')).toBeTruthy();
-        expect(screen.getByText('Unbearable')).toBeTruthy();
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
-        expect(screen.getByText('2/6')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
+
+        //summary screen
+        expect(screen.getByText('My Pain Summary')).toBeTruthy();
     });
 
     test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(screen.getByText('1/6')).toBeTruthy();
     })
 
     test('pressing back on a question 1 should navigate to the homescreen', async() => {
-
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(onBack).toHaveBeenCalled();
+        //homescreen
     })
 
     test('pressing close on summary screen should navigate to homescreen', async() => {
+        //question 1
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
+
+        //summary screen
+        expect(screen.getByText('My Pain Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Close'));
+        expect(onBack).toHaveBeenCalled();
+        
     })
 
     test("pressing edit on summary screen should navigate to question 1", async() => {
+        //question 1
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
+
+        //summary screen
+        expect(screen.getByText('My Pain Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Edit'));
+        expect(screen.getByText('1/6')).toBeTruthy();
+        
     })
 });
-*/

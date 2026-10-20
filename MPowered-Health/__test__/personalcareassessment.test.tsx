@@ -175,90 +175,99 @@ describe("input validation for question 4", () => {
         fireEvent.press(screen.getByText("Record"));
         expect("").toBeTruthy(); // optional question
     });
-});
+});*/
 
 // navigation tests
 describe("navigation", () => {
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack}/>);
     });
 
-    test('question 1 selected and navigate to next screen', async() => {
-        await render(<PersonalCareAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("I sleep less well because of my pain"));
-        fireEvent.press(screen.getByText("Record"));
+    afterEach(jest.clearAllMocks);
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 2 components to be rendered on screen
-        expect(screen.getByText('Personal care (washing, dressing, etc.)')).toBeTruthy();
-        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
-        // options
-        expect(screen.getByText('I can look after myself normally without causing extra pain')).toBeTruthy();
-        expect(screen.getByText('I can look after myself normally, but it causes extra pain')).toBeTruthy();
-        expect(screen.getByText('It is painful to look after myself and I am slow and careful')).toBeTruthy();
-        expect(screen.getByText('I need some help but manage most of my personal care')).toBeTruthy();
-        expect(screen.getByText('I need help every day with most aspects of self-care')).toBeTruthy();
-        expect(screen.getByText('I do not get dressed, wash with difficulty and stay in bed')).toBeTruthy();
+    test('navigate through all the questions to the summary screen', async() => {
 
-        expect(screen.getByText('2/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        //question 1 
+        await fireEvent.press(screen.getByText('I am not doing any jobs that I usually do around the house'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
-    test('question 2 selected and navigate to next screen', async() => {
-        await render(<PersonalCareAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("I can look after myself normally without causing extra pain"));
-        fireEvent.press(screen.getByText("Record"));
+        //question 2
+        await fireEvent.press(screen.getByText('I can look after myself normally without causing extra pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 3 components to be rendered on screen
-        expect(screen.getByText('Sleeping')).toBeTruthy();
-        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
-        // options
-        expect(screen.getByText('My sleep is never disturbed by pain')).toBeTruthy();
-        expect(screen.getByText('My sleep is occasionally disturbed by pain')).toBeTruthy();
-        expect(screen.getByText('Because of pain I have less than 6 hours of sleep')).toBeTruthy();
-        expect(screen.getByText('Because of pain I have less than 4 hours of sleep')).toBeTruthy();
-        expect(screen.getByText('Because of pain I have less than 2 hours of sleep')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me from sleeping at all')).toBeTruthy();
+        //question 3
+        await fireEvent.press(screen.getByText('My sleep is never disturbed by pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
-        expect(screen.getByText('3/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        //question 4 (reflection)
+        await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
 
-    test('question 3 selected and navigate to next screen', async() => {
-        await render(<PersonalCareAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("Because of pain I have less than 4 hours of sleep"));
-        fireEvent.press(screen.getByText("Record"));
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 4 components to be rendered on screen
-        expect(screen.getByText('Reflection on your personal care')).toBeTruthy();
-        expect(screen.getByText('Write any reflections of pain impacts on your daily life.')).toBeTruthy();
-        // text
-        expect(screen.getByPlaceholderText('For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.')).toBeTruthy();
-
-        expect(screen.getByText('4/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 4 answered and navigate to next screen', async() => {
-        await render(<PersonalCareAssessment/>);
-        jest.spyOn(Alert, "alert");
-        const reflection = screen.getByPlaceholderText("For instance, this week, I felt that I could not everything at all, I felt hopeless, even doing the laundry felt miserable.");
-        const user = userEvent.setup();
-        await user.type(reflection, "I felt hopeless and unmotivated to do anything this week.");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled();
         // expect summary components to be rendered on screen
         expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
     });
 
-    test('user presses the back button', () => {
-        expect("").toBeTruthy();
-    });
-});*/
+    test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
+        // navigate to question 2 
+        await fireEvent.press(screen.getByText('I am not doing any jobs that I usually do around the house'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'})); 
+
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(screen.getByText('1/4')).toBeTruthy();
+    })
+
+    test('pressing back on a question 1 should navigate to the homescreen', async() => {
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(onBack).toHaveBeenCalled();
+        //homescreen
+    })
+
+    test('pressing close on summary screen should navigate to homescreen', async() => {
+
+        //question 1 
+        await fireEvent.press(screen.getByText('I am not doing any jobs that I usually do around the house'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can look after myself normally without causing extra pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 3
+        await fireEvent.press(screen.getByText('My sleep is never disturbed by pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 4 (reflection)
+        await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Close'));
+        expect(onBack).toHaveBeenCalled();
+    })
+
+    test("pressing edit on summary screen should navigate to question 1", async() => {
+
+        //question 1 
+        await fireEvent.press(screen.getByText('I am not doing any jobs that I usually do around the house'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can look after myself normally without causing extra pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 3
+        await fireEvent.press(screen.getByText('My sleep is never disturbed by pain'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
+
+        //question 4 (reflection)
+        await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Edit'));
+
+        expect(screen.getByText('1/4')).toBeTruthy();
+    })
+});

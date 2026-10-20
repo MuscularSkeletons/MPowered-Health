@@ -113,21 +113,33 @@ describe("my management assessment questions are rendered on screen", () => {
 /*
 // selection/input tests
 describe("my management assessment questions are selected/inputted correctly", () => {
-    afterEach(() => {
-        jest.clearAllMocks();
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
     });
 
-    test("question 1 not selected", async() => {
+    afterEach(jest.clearAllMocks);
+
+    test("can select multiple options for question 1", async() => {
+
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByText('Candesartan 16 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //check props values
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<ManagementAssessment/>);
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
     });
 
-    test("question 2 answer can be entered", async() => {
-        await render(<ManagementAssessment/>);
+    test("user can enter a text response for question 2", async() => {
+
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
         const otcMedication = screen.getByPlaceholderText("Input name of over the counter medication");
         const user = userEvent.setup();
         await user.type(otcMedication, "Ibuprofen");
@@ -138,14 +150,14 @@ describe("my management assessment questions are selected/inputted correctly", (
     test("question 3 not selected", async() => {
         //show an alert if continue is pressed without selecting an option
         jest.spyOn(Alert, "alert");
-        await render(<ManagementAssessment/>);
+
 
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
     });
 
     test("question 4 answer can be entered", async() => {
-        await render(<ManagementAssessment/>);
+
         const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
         const user = userEvent.setup();
         await user.type(emotionStrategies, "Meditation");
@@ -169,89 +181,133 @@ describe("input validation for question 2 & 4", () => {
         fireEvent.press(screen.getByText("Record"));
         expect("").toBeTruthy(); // optional question
     });
-});
+});*/
+
+/*
+describe("summary screen tests", () => {
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
+    });
+
+    afterEach(jest.clearAllMocks);
+
+    test("objects are rendered on screen correctly", async() => {
+        //test dummy data here
+        expect(screen.getByText("My Management Summary")).toBeTruthy();
+        expect(screen.getByText("This helps guide your treatment and support your recovery.")).toBeTruthy();
+        expect(screen.getByText("My Management")).toBeTruthy();
+        expect(screen.getByText("Medication")).toBeTruthy();
+        expect(screen.getByText("Exercise")).toBeTruthy();
+        expect(screen.getByText("Emotion")).toBeTruthy();
+        expect(screen.getByText("Your answers have been saved")).toBeTruthy();
+        expect(screen.getByText("Edit")).toBeTruthy();
+        expect(screen.getByText("Close")).toBeTruthy();
+    })
+
+})*/
 
 // navigation tests
 describe("navigation", () => {
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
     });
 
-    test('question 1 selected and navigate to next screen', async() => {
-        await render(<ManagementAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("Perindopril")); // TODO: when assessment is implemented
-        fireEvent.press(screen.getByText("Record"));
+    afterEach(jest.clearAllMocks);
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 1 components to be rendered on screen
-        expect(screen.getByText('Medication')).toBeTruthy();
-        expect(screen.getByText('Over the past week, did you consume any over the counter (OTC) medication.')).toBeTruthy();
-        expect(screen.getByText('Not taking OTC medications? Just click the record button')).toBeTruthy();
-        // text
-        expect(screen.getByPlaceholderText('Input name of over the counter medication')).toBeTruthy();
+    test("navigate through all the questions to the summary screen", async() => {
+        //navigate through questions 1 - 4
 
-        expect(screen.getByText('2/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        //question 1
+        expect(screen.getByText("1/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-    test('question 2 answered and navigate to next screen', async() => {
-        await render(<ManagementAssessment/>);
-        jest.spyOn(Alert, "alert");
-        const otcMedication = screen.getByPlaceholderText("Input name of over the counter medication");
-        const user = userEvent.setup();
-        await user.type(otcMedication, "Ibuprofen");
+        //question 2
+        expect(screen.getByText("2/4")).toBeTruthy();
+        await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled();
-        // expect question 3 components to be rendered on screen
-        expect(screen.getByText('Exercise')).toBeTruthy();
-        expect(screen.getByText('In the past 7 days, did you perform any exercises to manage your musculoskeletal pain or improve your movement?')).toBeTruthy();
-        expect(screen.getByText('Examples: walking, stretching, strengthening, yoga, resistance band work, or balance exercises.')).toBeTruthy();
-        // options
-        expect(screen.getByText('0 days')).toBeTruthy();
-        expect(screen.getByText('1-2 days')).toBeTruthy();
-        expect(screen.getByText('3-4 days')).toBeTruthy();
-        expect(screen.getByText('5-6 days')).toBeTruthy();
-        expect(screen.getByText('7 days')).toBeTruthy();
+        //question 3
+        expect(screen.getByText("3/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText("0 days"));
+        await fireEvent.press(screen.getByRole("button", {name : "Record"}));
 
-        expect(screen.getByText('3/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        //question 4
+        expect(screen.getByText("4/4")).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
-    test('question 3 selected and navigate to next screen', async() => {
-        await render(<ManagementAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("0 days"));
-        fireEvent.press(screen.getByText("Record"));
+        //summary screen
+        expect(screen.getByText("My Management Summary")).toBeTruthy();
+    })
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 4 components to be rendered on screen
-        expect(screen.getByText('Emotion')).toBeTruthy();
-        expect(screen.getByText('Over the past week, did you perform any strategies to manage your stress level or emotion?')).toBeTruthy();
-        expect(screen.getByText('Examples: meditation, journaling, meeting people')).toBeTruthy();
-        // text
-        expect(screen.getByPlaceholderText('Examples: meditation, journaling, meeting people')).toBeTruthy();
+    test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
+        // navigate to question 2 
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', {name: 'Record'})); 
 
-        expect(screen.getByText('4/4')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(screen.getByText('1/4')).toBeTruthy();
+    })
 
-    test('question 4 answered and navigate to next screen', async() => {
-        await render(<ManagementAssessment/>);
-        jest.spyOn(Alert, "alert");
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
-        const user = userEvent.setup();
-        await user.type(emotionStrategies, "Meditation");
+    test('pressing back on a question 1 should navigate to the homescreen', async() => {
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(onBack).toHaveBeenCalled();
+        //homescreen
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled();
-        // expect summary components to be rendered on screen
-        expect(screen.getByText('My Management Summary')).toBeTruthy();
-    });
+    test('pressing close on summary screen should navigate to homescreen', async() => {
+        //question 1
+        expect(screen.getByText("1/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-    test('user presses the back button', () => {
-        expect("").toBeTruthy();
-    });
-});*/
+        //question 2
+        expect(screen.getByText("2/4")).toBeTruthy();
+        await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
+
+        //question 3
+        expect(screen.getByText("3/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText("0 days"));
+        await fireEvent.press(screen.getByRole("button", {name : "Record"}));
+
+        //question 4
+        expect(screen.getByText("4/4")).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        //summary screen
+        expect(screen.getByText("My Management Summary")).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Close'));
+        expect(onBack).toHaveBeenCalled();        
+    })
+
+    test("pressing edit on summary screen should navigate to question 1", async() => {
+        //question 1
+        expect(screen.getByText("1/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText('Perindopril arginine 5 mg — Once daily'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 2
+        expect(screen.getByText("2/4")).toBeTruthy();
+        await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
+
+        //question 3
+        expect(screen.getByText("3/4")).toBeTruthy();
+        await fireEvent.press(screen.getByText("0 days"));
+        await fireEvent.press(screen.getByRole("button", {name : "Record"}));
+
+        //question 4
+        expect(screen.getByText("4/4")).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        //summary screen
+        expect(screen.getByText("My Management Summary")).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Edit'));
+        expect(screen.getByText('1/4')).toBeTruthy();
+    })
+});

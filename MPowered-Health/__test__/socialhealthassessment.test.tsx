@@ -168,7 +168,7 @@ describe("social health assessment questions are rendered on screen", () => {
         expect(screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.')).toBeTruthy();
 
         expect(screen.getByText('7/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
     });
 
 });
@@ -261,146 +261,125 @@ describe("input validation for question 7", () => {
         fireEvent.press(screen.getByText("Record"));
         expect(Alert.alert).not.toHaveBeenCalled(); // optional question
     });
-});
+});*/
 
 // navigation tests
 describe("navigation", () => {
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+    });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    test('question 1 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("My social life is normal and gives me no extra pain"));
-        fireEvent.press(screen.getByText("Record"));
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 2 components to be rendered on screen
-        expect(screen.getByText('Travelling')).toBeTruthy();
-        expect(screen.getByText('Select the MOST relevant statement:')).toBeTruthy();
-        // options
-        expect(screen.getByText('I can travel anywhere without pain')).toBeTruthy();
-        expect(screen.getByText('I can travel anywhere, but it gives me extra pain')).toBeTruthy();
-        expect(screen.getByText('Pain is bad, but I manage journeys over two hours')).toBeTruthy();
-        expect(screen.getByText('Pain restricts me to journeys of less than one hour')).toBeTruthy();
-        expect(screen.getByText('Pain restricts me to short necessary journeys under 30 minutes')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me from travelling except to receive treatment')).toBeTruthy();
-
-        expect(screen.getByText('2/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 2 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("I can travel anywhere without pain"));
-        fireEvent.press(screen.getByText("Record"));
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 3 components to be rendered on screen
-        expect(screen.getByText('Mood')).toBeTruthy();
-        expect(screen.getByText('Over the past week, how much has pain impacted your mood?')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
-
-        expect(screen.getByText('3/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 3 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("3")); 
-        fireEvent.press(screen.getByText("Record"));
+    test('navigate through all the questions to the summary screen', async() => {
         
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 4 components to be rendered on screen
-        expect(screen.getByText('Relation with others')).toBeTruthy();
-        expect(screen.getByText('Over the past week, how much has pain interfered with your relationships with other people?')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
 
-        expect(screen.getByText('4/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-    test('question 4 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("3"));
-        fireEvent.press(screen.getByText("Record"));
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 5 components to be rendered on screen
-        expect(screen.getByText('Enjoyment of life')).toBeTruthy();
-        expect(screen.getByText('Over the past week, how much has pain impacted your ability to enjoy life?')).toBeTruthy();
-        // score
-        expect(screen.getByPlaceholderText('0 to 10')).toBeTruthy();
-
-        expect(screen.getByText('5/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 5 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("3"));
-        fireEvent.press(screen.getByText("Record"));
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 6 components to be rendered on screen
-        expect(screen.getByText('Mood')).toBeTruthy();
-        expect(screen.getByText('Over the past week, how was your mood generally?')).toBeTruthy();
-        expect(screen.getByText('Tap below the emoji that best describes your mood.')).toBeTruthy();
-        // options - to adjust to how it's actually implemented
-        expect(screen.getByText('I was feeling frustrated')).toBeTruthy();
-        expect(screen.getByText('I was feeling sad')).toBeTruthy();
-        expect(screen.getByText('I was feeling okay')).toBeTruthy();
-        expect(screen.getByText('I was feeling calm')).toBeTruthy();
-        expect(screen.getByText('I was feeling delighted')).toBeTruthy();
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
-        expect(screen.getByText('6/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 6 selected and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("I was feeling sad")); 
-        fireEvent.press(screen.getByText("Record"));
-        
-
-        expect(Alert.alert).not.toHaveBeenCalled(); 
-        // expect question 7 components to be rendered on screen
-        expect(screen.getByText('Mood')).toBeTruthy();
-        expect(screen.getByText('What triggered that mood?')).toBeTruthy();
-        // text
-        expect(screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.')).toBeTruthy();
-
-        expect(screen.getByText('7/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
-    });
-
-    test('question 7 answered and navigate to next screen', async() => {
-        await render(<SocialHealthAssessment/>);
-        jest.spyOn(Alert, "alert");
-        const moodReason = screen.getByPlaceholderText("i.e: delays in work due to pain or inability to meet with friends, etc.");
-        const user = userEvent.setup();
-        await user.type(moodReason, "No friends.");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled();
-        // expect summary components to be rendered on screen
+        //summary screen
         expect(screen.getByText('My Social Health Summary')).toBeTruthy();
     });
 
-    test('user presses the back button', () => {
-        expect("").toBeTruthy();
-    });
+    test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));     
+
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(screen.getByText('1/7')).toBeTruthy();
+    })
+
+    test('pressing back on a question 1 should navigate to the homescreen', async() => {
+        await fireEvent.press(screen.getByText('‹ Back'));
+        expect(onBack).toHaveBeenCalled();
+        //homescreen
+    })
+
+    test('pressing close on summary screen should navigate to homescreen', async() => {
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        //summary screen
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Close'));
+        expect(onBack).toHaveBeenCalled();
+    })
+
+    test("pressing edit on summary screen should navigate to question 1", async() => {
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        //summary screen
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
+
+        await fireEvent.press(screen.getByText('Edit'));
+        expect(screen.getByText('1/7')).toBeTruthy();
+    })
 });
-*/
