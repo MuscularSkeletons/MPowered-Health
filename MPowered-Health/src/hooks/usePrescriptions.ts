@@ -5,14 +5,8 @@
  * like "Prescription list is empty", which is unsafe for a medication list.
  */
 import { supabase } from '@/lib/supabase/client';
-import {
-  draftToInsert,
-  rowToPrescription,
-  editableFields,
-  type PrescriptionDraft,
-  type PrescriptionItem,
-  type PrescriptionRow,
-} from './prescriptions.mapper';
+import { type PrescriptionDraft, type PrescriptionItem, type PrescriptionRow } from '@/types/prescriptions';
+
 
 /** Error messages carry only the error code, never prescription details. */
 const failure = (action: string, code?: string) => new Error(`Could not ${action} (${code ?? 'unknown'}).`);
@@ -53,4 +47,51 @@ export async function updatePrescription(id: string, draft: PrescriptionDraft): 
 export async function deletePrescription(id: string): Promise<void> {
   const { error } = await supabase.from('prescription').delete().eq('prescription_id', id);
   if (error) throw failure('remove the prescription', error.code);
+}
+
+export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
+  return {
+    id: row.prescription_id,
+    name: row.medicine_name,
+    strength: String(row.strength),
+    unit: row.strength_unit,
+    form: row.form,
+    frequency: row.frequency,
+    repeat: String(row.number_of_repeat),
+  };
+}
+
+/** Fields shared by insert. */
+export function editableFields(draft: PrescriptionDraft) {
+  return {
+    medicine_name: draft.name.trim(),
+    strength: Number(draft.strength),
+    strength_unit: draft.unit,
+    form: draft.form,
+    frequency: draft.frequency,
+    number_of_repeat: Number(draft.repeat),
+  };
+}
+
+export function draftToInsert(draft: PrescriptionDraft, userId: string) {
+  return {
+    ...editableFields(draft),
+    user_id: userId,
+  };
+}
+
+/** True when another prescription has the same name (with case not mattering), strength and unit. */
+export function isDuplicate(
+  draft: PrescriptionDraft,
+  list: PrescriptionItem[],
+  excludeId?: string,
+): boolean {
+  const name = draft.name.trim().toLowerCase();
+  return list.some(
+    (item) =>
+      item.id !== excludeId &&
+      item.name.trim().toLowerCase() === name &&
+      Number(item.strength) === Number(draft.strength) &&
+      item.unit === draft.unit,
+  );
 }

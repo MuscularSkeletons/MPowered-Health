@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { MedicationProvider } from '@/context/prescriptionsContext';
+import { PrescriptionProvider } from '@/context/prescriptionsContext';
 import PrescriptionEditor from '@/app/(tabs)/(myhealth)/(prescriptions)/edit';
 import Prescriptions from '@/app/(tabs)/(myhealth)/(prescriptions)';
-import type { Medication } from '@/types/prescription';
+import { type PrescriptionItem } from '@/types/prescriptions';
 
 let mockParams: { id?: string } = {};
 jest.mock('expo-router', () => ({
@@ -18,11 +18,11 @@ jest.mock('@/context/authcontext', () => ({
 }));
 jest.mock('@/services/prescriptions.services', () => ({
   listPrescriptions: jest.fn(async () => []),
-  createPrescription: jest.fn(async (_userId: string, draft: Omit<Medication, 'id'>) => ({
+  createPrescription: jest.fn(async (_userId: string, draft: Omit<PrescriptionItem, 'id'>) => ({
     ...draft,
     id: 'prescription-1',
   })),
-  updatePrescription: jest.fn(async (id: string, draft: Omit<Medication, 'id'>) => ({
+  updatePrescription: jest.fn(async (id: string, draft: Omit<PrescriptionItem, 'id'>) => ({
     ...draft,
     id,
   })),
@@ -32,7 +32,7 @@ jest.mock('@/services/prescriptions.services', () => ({
 beforeEach(() => { mockParams = {}; jest.clearAllMocks(); });
 
 it('validates, adds, edits and deletes prescriptions within the same tab session', async () => {
-  await render(<MedicationProvider><PrescriptionEditor /><Prescriptions /></MedicationProvider>);
+  await render(<PrescriptionProvider><PrescriptionEditor /><Prescriptions /></PrescriptionProvider>);
   expect(screen.getByText('No prescriptions added yet.')).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
 
@@ -53,7 +53,7 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
     throw new Error('Edit navigation must include the prescription ID');
   }
   mockParams = { id: destination.params.id };
-  await screen.rerender(<MedicationProvider><PrescriptionEditor /><Prescriptions /></MedicationProvider>);
+  await screen.rerender(<PrescriptionProvider><PrescriptionEditor /><Prescriptions /></PrescriptionProvider>);
   await fireEvent.changeText(screen.getByLabelText('Strength'), '10');
   await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
 
@@ -65,6 +65,6 @@ it('validates, adds, edits and deletes prescriptions within the same tab session
 
 it('reports stale prescription links instead of creating another entry', async () => {
   mockParams = { id: 'missing' };
-  await render(<MedicationProvider><PrescriptionEditor /></MedicationProvider>);
+  await render(<PrescriptionProvider><PrescriptionEditor /></PrescriptionProvider>);
   expect(screen.getByText('This prescription is no longer available.')).toBeTruthy();
 });

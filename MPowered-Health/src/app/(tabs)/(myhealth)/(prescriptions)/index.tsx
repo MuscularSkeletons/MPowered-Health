@@ -4,12 +4,12 @@ import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
-import { medicationLabel } from '@/types/prescription';
-import { useMedications } from '@/context/prescriptionsContext';
+import { prescriptionLabel } from '@/services/prescriptionHelper';
+import { usePrescriptions } from '@/context/prescriptionsContext';
 
 /** Lists prescriptions and provides controls for adding or editing them. */
 export default function PrescriptionsScreen() {
-  const { list, remove, loadFailed, reload } = useMedications();
+  const { list, remove, loadFailed, reload } = usePrescriptions();
   return (
     <Shell title="Prescriptions List" onBack={() => router.back()}>
       {loadFailed ? (
@@ -22,7 +22,7 @@ export default function PrescriptionsScreen() {
       ) : null}
       <View style={styles.list}>
         {list.map((item) => {
-          const m = medicationLabel(item);
+          const m = prescriptionLabel(item);
           return (
             <View key={item.id} style={styles.med}>
               <Text style={styles.medText}>{m}</Text>

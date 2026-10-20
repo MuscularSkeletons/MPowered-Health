@@ -2,7 +2,7 @@ import { Field, Shell, SelectField } from '@/components/prescription/form';
 import { SecondaryButton } from '@/components/shared/common';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
-import { useMedicationEditor } from '@/hooks/usePrescriptionEditor';
+import { usePrescriptionEditor } from '@/context/prescriptionsContext';
 
 /** Displays the fields for adding or editing a prescription. */
 export default function PrescriptionEditorScreen() {
@@ -12,7 +12,7 @@ export default function PrescriptionEditorScreen() {
 
 /** Displays the prescription fields and save controls using the editor’s current values. */
 function Editor({ id }: { id?: string }) {
-  const { draft, change, validName, validStrength, duplicate, ready, save, missing, validRepeat } = useMedicationEditor(id);
+  const { draft, change, validName, validStrength, duplicate, ready, save, missing, validRepeat } = usePrescriptionEditor(id);
   const { name, strength, unit, form, repeat, frequency } = draft;
   if (missing)
     return (

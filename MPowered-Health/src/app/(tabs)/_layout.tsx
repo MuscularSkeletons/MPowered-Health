@@ -3,14 +3,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { palette } from "@/constants/ui/styling";
 import { HealthDataBoundary } from '@/components/myhealth/healthDataBoundary';
 import { useAuth } from '@/context/authcontext';
-import { MedicationProvider } from '@/context/prescriptionsContext';
+import { PrescriptionProvider } from '@/context/prescriptionsContext';
 
 // Specifies layout for tabs 
 export default function TabsLayout() {
     const { user } = useAuth();
     return (
         <HealthDataBoundary key={user?.id ?? 'signed-out'} userId={user?.id ?? 'signed-out'}>
-            <MedicationProvider>
+            <PrescriptionProvider>
                 <Tabs screenOptions={{ 
                         headerShown: false,
                         sceneStyle: { backgroundColor: palette.background },
@@ -85,7 +85,7 @@ export default function TabsLayout() {
                         }}
                     />
                 </Tabs>
-            </MedicationProvider>
+            </PrescriptionProvider>
         </HealthDataBoundary>
     );
 }

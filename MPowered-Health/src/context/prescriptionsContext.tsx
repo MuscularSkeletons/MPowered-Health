@@ -4,15 +4,21 @@ import {
   deletePrescription,
   listPrescriptions,
   updatePrescription,
-} from '@/services/prescriptions.services';
-import { isDuplicate } from '@/services/prescriptions.mapper';
+} from '@/hooks/usePrescriptions';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
-import { medicationReady, type Medication, type MedicationDraft } from '@/types/prescription';
+import { 
+  prescriptionReady,
+  emptyPrescription,
+  validNumber, 
+} from '@/services/prescriptionHelper';
+import { isDuplicate } from '@/hooks/usePrescriptions';
+import { type PrescriptionDraft, type PrescriptionItem } from '@/types/prescriptions';
+
 
 // The session boundary loads the list before any screen mounts, so the list is correct on the first
 // render and a failed load is recorded here instead of thrown so only the prescriptions screen reports it
 // (with a retry), and the rest of My Health stays available.
-let preloaded: { userId: string; list: Medication[]; failed: boolean } | null = null;
+let preloaded: { userId: string; list: PrescriptionItem[]; failed: boolean } | null = null;
 // Bumped on every clear, so a request that started for a previous account cannot land late and
 // overwrite the list loaded for the current one.
 let generation = 0;
@@ -20,7 +26,7 @@ let generation = 0;
 /** Loads this account's prescriptions. Never throws - a failure is recorded for the prescriptions screen. */
 export async function loadPrescriptions(userId: string) {
   const requestGeneration = generation;
-  let list: Medication[] = [];
+  let list: PrescriptionItem[] = [];
   let failed = false;
   try {
     list = await listPrescriptions(userId);
@@ -38,10 +44,10 @@ export function clearPrescriptions() {
 }
 
 /** Keeps the prescription list and its update actions, saving every change to supabase. */
-function useMedicationStore() {
+function usePrescriptionStore() {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const [list, setList] = useState<Medication[]>(() =>
+  const [list, setList] = useState<PrescriptionItem[]>(() =>
     preloaded && preloaded.userId === userId ? preloaded.list : [],
   );
 
@@ -69,8 +75,8 @@ function useMedicationStore() {
    * Adds or updates a prescription. True only after Supabase accepts the change.
    * The list changes only on success, so a failed save never looks saved!
    */
-  const save = async (draft: MedicationDraft, id?: string) => {
-    if (!medicationReady(draft) || isDuplicate(draft, list, id) || !userId || saving.current) return false;
+  const save = async (draft: PrescriptionDraft, id?: string) => {
+    if (!prescriptionReady(draft) || isDuplicate(draft, list, id) || !userId || saving.current) return false;
     saving.current = true;
     setError('');
     try {
@@ -99,22 +105,60 @@ function useMedicationStore() {
   };
 
   /** True when another prescription already has this name, strength and unit */
-  const duplicateOf = (draft: MedicationDraft, id?: string) => isDuplicate(draft, list, id);
+  const duplicateOf = (draft: PrescriptionDraft, id?: string) => isDuplicate(draft, list, id);
 
   return { list, save, remove, error, duplicateOf, loadFailed, reload };
 }
 
-const Context = createContext<ReturnType<typeof useMedicationStore> | null>(null);
+const Context = createContext<ReturnType<typeof usePrescriptionStore> | null>(null);
 
 /** Shares the prescription list across its list and editor screens. */
-export function MedicationProvider({ children }: { children: ReactNode }) {
-  const value = useMedicationStore();
+export function PrescriptionProvider({ children }: { children: ReactNode }) {
+  const value = usePrescriptionStore();
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 
 /** Reads the prescription list and available update actions. */
-export function useMedications() {
+export function usePrescriptions() {
   const value = useContext(Context);
-  if (!value) throw new Error('MedicationProvider is required');
+  if (!value) throw new Error('PrescriptionProvider is required');
   return value;
+}
+
+/** Keeps the prescription form values and save actions together. */
+export function usePrescriptionEditor(id?: string) {
+  const store = usePrescriptions();
+  const existing = store.list.find((item) => item.id === id);
+  // Edit a copy so typing does not change the visible prescription list before Save.
+  const [draft, setDraft] = useState<PrescriptionDraft>(() =>
+    existing
+      ? {
+          name: existing.name,
+          strength: existing.strength,
+          unit: existing.unit,
+          form: existing.form,
+          frequency: existing.frequency,
+          repeat: existing.repeat,
+        }
+      : emptyPrescription(),
+  );
+
+  /** Updates one prescription field without changing the others. */
+  const change = (field: keyof PrescriptionDraft, value: string) =>
+    setDraft((current) => ({ ...current, [field]: value }));
+
+  const duplicate = store.duplicateOf(draft, id);
+
+  return {
+    draft,
+    change,
+    validName: !!draft.name.trim(),
+    validStrength: validNumber(draft.strength),
+    validRepeat: validNumber(draft.repeat),
+    duplicate,
+    ready: prescriptionReady(draft) && !duplicate,
+    save: () => store.save(draft, id),
+    // A stale edit link must be reported instead of silently creating a replacement.
+    missing: !!id && !existing,
+  };
 }

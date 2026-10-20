@@ -6,33 +6,9 @@ import {
     ReactNode,
     useContext,
 } from "react";
+import { type User, type AuthContextType } from "@/types/user";
 
 // information related to user authentication + its related functions
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  birthsex?: string;
-  birthyear?: number;
-  formalDiagnosis?: boolean;
-  painConditions?: string[];
-  otherCondition?: string | null;
-  onboardingComplete?: boolean;
-}
-
-interface AuthContextType {
-  user: User | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  deleteUser: () => Promise<void>;
-  updateUserDraft: (userData: Partial<User>) => void;
-  updateUser: (userData: Partial<User>) => Promise<void>;
-  isLoading: boolean;
-  updateAuthUserEmail: (email: string) => Promise<void>;
-  updateAuthUserPassword: (currPassword: string, newPassword: string) => Promise<void>;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

@@ -22,3 +22,17 @@ export interface SummarySection {
   title: string;
   text: string;
 }
+
+export interface CurrentWeeklyAssessmentState {
+  completedCategories: string[];
+  answersByCategory: Record<string, Record<string, any>>;
+}
+
+// extract the relevant pain assessment data to pass to question mapper
+export interface PainAssessment {
+    pain_location: string[];
+    worst_pain: number;
+    mildest_pain: number;
+    average_pain: number;
+    current_pain: number;
+}

@@ -2,24 +2,9 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/context/authcontext";
 import { useState, useCallback } from "react";
 import { getCurrentWeekStartDate } from '@/hooks/useAssessments';
+import { type Question } from "@/types/questions";
+import { type PainAssessment } from "@/types/assessment";
 
-export interface Question {
-    id: string;
-    user_id: string;
-    question: string;
-    answer: string | null;
-    created_at: string;
-    updated_at: string;
-}
-
-// extract the relevant pain assessment data to pass to question mapper
-export interface PainAssessment {
-    pain_location: string[];
-    worst_pain: number;
-    mildest_pain: number;
-    average_pain: number;
-    current_pain: number;
-}
 
 export const useQuestions = () => {
     const [questions, setQuestions] = useState<Question[]>([]);

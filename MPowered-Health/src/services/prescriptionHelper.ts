@@ -1,18 +1,7 @@
-/** Defines prescription data, required-field checks, and list update rules. */
-export interface MedicationDraft {
-  name: string;
-  strength: string;
-  unit: string;
-  form: string;
-  frequency: string;
-  repeat: string;
-}
-export interface Medication extends MedicationDraft {
-  id: string;
-}
+import { type PrescriptionDraft, type PrescriptionItem } from '@/types/prescriptions';
 
 /** Creates the starting values for a new prescription. */
-export const emptyMedication = (): MedicationDraft => ({
+export const emptyPrescription = (): PrescriptionDraft => ({
   name: '',
   strength: '',
   unit: 'mg',
@@ -26,7 +15,7 @@ export const validNumber = (value: string) =>
   /^\d+(\.\d+)?$/.test(value.trim()) && Number(value) > 0 && Number.isFinite(Number(value));
 
 /** Checks whether the required prescription fields are complete. */
-export const medicationReady = (draft: MedicationDraft) =>
+export const prescriptionReady = (draft: PrescriptionDraft) =>
   !!draft.name.trim() &&
   validNumber(draft.strength) &&
   !!draft.unit &&
@@ -59,9 +48,9 @@ function mapSchedule(repeat: string, frequency: string): string {
   return number + ' ' + freq;
 }
 
-/** Formats the medicine name, strength, and schedule for display. */
-export const medicationLabel = (medication: Medication) =>
-  `${medication.name} ${medication.strength} ${medication.unit} — ${mapSchedule(medication.repeat, medication.frequency)}`;
+/** Formats the prescription name, strength, and schedule for display. */
+export const prescriptionLabel = (prescription: PrescriptionItem) =>
+  `${prescription.name} ${prescription.strength} ${prescription.unit} — ${mapSchedule(prescription.repeat, prescription.frequency)}`;
 
 /**
  * Adds a prescription or replaces the entry with the same ID.
@@ -71,14 +60,14 @@ export const medicationLabel = (medication: Medication) =>
  * @param id - Identity to add or replace.
  * @returns The updated list, or the original list if the draft is invalid.
  */
-export function saveMedication(
-  list: Medication[],
-  draft: MedicationDraft,
+export function savePresciption(
+  list: PrescriptionItem[],
+  draft: PrescriptionDraft,
   id: string,
-): Medication[] {
-  if (!medicationReady(draft)) return list;
-  const medication: Medication = { ...draft, name: draft.name.trim(), id };
+): PrescriptionItem[] {
+  if (!prescriptionReady(draft)) return list;
+  const prescription: PrescriptionItem = { ...draft, name: draft.name.trim(), id };
   return list.some((item) => item.id === id)
-    ? list.map((item) => (item.id === id ? medication : item))
-    : [...list, medication];
+    ? list.map((item) => (item.id === id ? prescription : item))
+    : [...list, prescription];
 }

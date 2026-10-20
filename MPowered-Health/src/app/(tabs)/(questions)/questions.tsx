@@ -13,9 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { palette } from "@/constants/ui/styling";
 import { useState, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
-import { Question, useQuestions } from "@/hooks/useQuestions";
+import { useQuestions } from "@/hooks/useQuestions";
+import { type Question } from "@/types/questions";
 import { useAuth } from "@/context/authcontext";
-import { formatTimeAgo } from "@/components/questions/dateHelper";
+import { formatTimeAgo } from "@/utils/dateHelper";
 import { ModalActions, modalStyles } from '@/components/shared/modal';
 import {
   Intro,

@@ -33,10 +33,13 @@ MPowered-Health/
 │   ├── components/          // shared UI components
 │   ├── constants/           // shared variables
 │   ├── context/             // shared state
-│   ├── hooks/               // shared logic
+│   ├── hooks/               // custom react hooks
 │   ├── lib/
-│   │   └── supabase/        // code to store supabase migration
+│   │   └── supabase/        // database connection
 │   ├── navigation/
+│   ├── services/            // shared logic
+│   ├── types/
+│   ├── utils/               // generic helper functions
 ```
 
 ## Contributors

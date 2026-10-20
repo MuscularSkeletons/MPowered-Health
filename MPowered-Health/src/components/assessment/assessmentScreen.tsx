@@ -15,8 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, PrimaryButton } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
-import { useMedications } from '@/context/prescriptionsContext';
-import { medicationLabel } from '@/types/prescription';
+import { usePrescriptions } from '@/context/prescriptionsContext';
+import { prescriptionLabel } from '@/services/prescriptionHelper';
 
 interface Question {
   id: string;
@@ -158,7 +158,7 @@ export default function AssessmentScreen({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [otherText, setOtherText] = useState('');
 
-  const { list, loadFailed } = useMedications();
+  const { list, loadFailed } = usePrescriptions();
 
   const scrollRef = useRef<ScrollView>(null);
 
@@ -166,7 +166,7 @@ export default function AssessmentScreen({
     if (question.id === 'medication') {
       return {
         ...question,
-        options: list.map((medication) => medicationLabel(medication))
+        options: list.map((medication) => prescriptionLabel(medication))
       };
     } else {
       return question;

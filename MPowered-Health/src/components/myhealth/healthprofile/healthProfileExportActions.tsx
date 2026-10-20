@@ -1,4 +1,4 @@
-import { copyText, printHtml, shareDocument } from '@/components/myhealth/documentExport';
+import { copyText, printHtml, shareDocument } from '@/utils/documentExport';
 import {
   type HealthProfileReport,
   healthProfileReportHtml,

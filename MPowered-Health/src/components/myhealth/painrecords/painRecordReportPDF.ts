@@ -18,7 +18,7 @@ const escapeHtml = (text: string) =>
     (value) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[value]!,
   );
 
-/** Builds a printable HTML report from the health records. */
+/** Builds a printable HTML report from pain records. */
 export function buildPainRecordsHtml(
   records: PainAssessmentRecord[],
   areaLabel: string,

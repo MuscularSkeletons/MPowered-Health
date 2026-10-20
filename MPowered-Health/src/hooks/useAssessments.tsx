@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
+import { type CurrentWeeklyAssessmentState } from '@/types/assessment';
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
@@ -8,10 +9,7 @@ const TABLE_MAP: Record<string, string> = {
   'My Management': 'management_assessment',
 };
 
-export interface CurrentWeeklyAssessmentState {
-  completedCategories: string[];
-  answersByCategory: Record<string, Record<string, any>>;
-}
+
 
 // Helper to get Monday of the current week (YYYY-MM-DD)
 export function getCurrentWeekStartDate(): string {

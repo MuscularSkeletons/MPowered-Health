@@ -2,7 +2,7 @@
 // This hook prepares the history groups and selections used by the records screen.
 import { buildPainRecordsHtml } from '@/components/myhealth/painrecords/painRecordReportPDF';
 import type { PainAssessmentRecord, PainMetric } from '@/services/healthRecords.store';
-import { printHtml } from '@/components/myhealth/documentExport';
+import { printHtml } from '@/utils/documentExport';
 import { palette, radius, spacing } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
@@ -13,7 +13,7 @@ import {
   StyleSheet, 
 } from 'react-native';
 
-/** Displays the button that prints the health-record report. */
+/** Displays the button that prints the pain record report. */
 export function PrintPDFButton({
   records,
   areaLabel,
