@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { type CurrentWeeklyAssessmentState } from '@/types/assessment';
 import { buildSnapshot, retentionCutoff, type AssessmentRow, type HealthSnapshot } from '@/services/assessmentDataMapper';
+import { useAuth } from '@/context/authcontext';
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
@@ -37,21 +38,11 @@ function localIsoDate(value: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-async function getAuthenticatedUserId(): Promise<string> {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    throw new Error(`Unable to verify your account: ${error.message}`);
-  }
-
+async function getAuthenticatedUserId() {
+  const { user } = useAuth();
   if (!user) {
-    throw new Error('Please sign in again before saving your assessment.');
+    throw new Error("User not authenticated");
   }
-
-  return user.id;
 }
 
 /** Returns the number of consecutive weeks in which the signed-in user checked in. */
