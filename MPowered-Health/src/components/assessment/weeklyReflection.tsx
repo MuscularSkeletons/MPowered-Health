@@ -29,9 +29,7 @@ export default function WeeklyReflectionScreen({
     try {
       await saveWeeklyReflection(reflection.trim());
       onSaved(reflection.trim());
-      Alert.alert('Saved', 'Your reflection has been recorded for this week.', [
-        { text: 'Done', onPress: onBack },
-      ]);
+      onBack();
     } catch (err: any) {
       Alert.alert('Error', err?.message || 'Failed to save your reflection.');
     } finally {
