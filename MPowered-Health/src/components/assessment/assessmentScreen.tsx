@@ -333,7 +333,7 @@ export default function AssessmentScreen({
                   const answer = answers[question.id];
                   const text = Array.isArray(answer)
                     ? answer.map(asSentence).join('\n')
-                    : answer === undefined || answer === ''
+                    : answer === undefined || answer === '' || answer === null
                       ? 'No response'
                       : asSentence(String(answer));
                   return (
