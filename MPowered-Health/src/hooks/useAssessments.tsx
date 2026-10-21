@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
 import { type CurrentWeeklyAssessmentState } from '@/types/assessment';
 import { buildSnapshot, retentionCutoff, type AssessmentRow, type HealthSnapshot } from '@/services/assessmentDataMapper';
-import { useAuth } from '@/context/authcontext';
 
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
@@ -38,20 +37,12 @@ function localIsoDate(value: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-async function getAuthenticatedUserId() {
-  const { user } = useAuth();
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-}
-
 /** Returns the number of consecutive weeks in which the signed-in user checked in. */
-export async function getWeeklyAssessmentStreak(): Promise<number> {
-  const activeUserId = await getAuthenticatedUserId();
+export async function getWeeklyAssessmentStreak(userId: string): Promise<number> {
   const { data, error } = await supabase
     .from('assessment')
     .select('week_start')
-    .eq('user_id', activeUserId)
+    .eq('user_id', userId)
     .order('week_start', { ascending: false });
 
   if (error) {
@@ -86,14 +77,13 @@ export async function getWeeklyAssessmentStreak(): Promise<number> {
  * Loads this week's saved answers without creating an empty assessment.
  * This keeps the home-screen progress accurate after the app is reopened.
  */
-export async function getCurrentWeeklyAssessmentState(): Promise<CurrentWeeklyAssessmentState> {
-  const activeUserId = await getAuthenticatedUserId();
+export async function getCurrentWeeklyAssessmentState(userId: string): Promise<CurrentWeeklyAssessmentState> {
   const weekStart = getCurrentWeekStartDate();
   const { data: assessment, error: assessmentError } = await supabase
     .from('assessment')
     .select('assessment_id')
     .eq('week_start', weekStart)
-    .eq('user_id', activeUserId)
+    .eq('user_id', userId)
     .maybeSingle();
 
   if (assessmentError) {
@@ -140,7 +130,6 @@ export async function getOrCreateCurrentWeeklyAssessment(
   userId: string | null = null
 ): Promise<string | number> {
   const weekStart = getCurrentWeekStartDate();
-  const activeUserId = userId || (await getAuthenticatedUserId());
 
   // A weekly assessment belongs to one user. Filtering only by week can select
   // another person's record or make maybeSingle fail when several people have
@@ -149,7 +138,7 @@ export async function getOrCreateCurrentWeeklyAssessment(
     .from('assessment')
     .select('assessment_id')
     .eq('week_start', weekStart)
-    .eq('user_id', activeUserId);
+    .eq('user_id', userId);
 
   const { data: existing, error: fetchError } = await query.maybeSingle();
 
@@ -165,7 +154,7 @@ export async function getOrCreateCurrentWeeklyAssessment(
   // If assessment for that week doesn't exist, create it
   const newRecord = {
     week_start: weekStart,
-    user_id: activeUserId,
+    user_id: userId,
   };
 
   const { data: created, error: insertError } = await supabase
@@ -248,15 +237,14 @@ export async function saveWeeklyReflection(
 /**
  * Retrieves the current week's reflection text.
  */
-export async function getWeeklyReflection(): Promise<string> {
-  const activeUserId = await getAuthenticatedUserId();
+export async function getWeeklyReflection(userId: string): Promise<string> {
   const weekStart = getCurrentWeekStartDate();
 
   const { data, error } = await supabase
     .from('assessment')
     .select('weekly_reflection')
     .eq('week_start', weekStart)
-    .eq('user_id', activeUserId)
+    .eq('user_id', userId)
     .maybeSingle();
 
   if (error) {

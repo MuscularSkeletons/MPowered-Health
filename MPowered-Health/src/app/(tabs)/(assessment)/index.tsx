@@ -53,9 +53,12 @@ export default function HomeScreen() {
     Partial<Record<AssessmentId, Record<string, any>>>
   >({});
 
-  const refreshStreak = useCallback(async () => {
+  const refreshStreak = useCallback(async () => {  
     try {
-      setStreak(await getWeeklyAssessmentStreak());
+      if (!user) {
+        throw new Error('User not authenticated')
+      };
+      setStreak(await getWeeklyAssessmentStreak(user.id));
     } catch {
       setStreak(0);
     }
@@ -63,9 +66,12 @@ export default function HomeScreen() {
 
   const refreshWeeklyProgress = useCallback(async () => {
     try {
+      if (!user) {
+        throw new Error('User not authenticated')
+      };
       const [weeklyState, reflectionText] = await Promise.all([
-      getCurrentWeeklyAssessmentState(),
-      getWeeklyReflection(),
+      getCurrentWeeklyAssessmentState(user.id),
+      getWeeklyReflection(user.id),
       ]);
 
       setCompletedList(
