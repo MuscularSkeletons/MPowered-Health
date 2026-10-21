@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 
+/** Specifies stack for questions tab */
 export default function QuestionsLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>

@@ -25,9 +25,11 @@ import {
 import { useCallback, useState } from 'react';
 
 /**
- * Displays recorded pain history and the controls for filtering and exporting it.
- *
- * Coordinate filters, chart/history tabs, record groups, and printing.
+ * Displays graphical or table representation of user pain history
+ * Data points derived from average, worst or midlest pain
+ * Data filtered by pain location
+ * Chart and tables can be printed
+ * History tab displays text version
  */
 export default function PainRecords() {
   const [tab, setTab] = useState<'chart' | 'history'>('chart');

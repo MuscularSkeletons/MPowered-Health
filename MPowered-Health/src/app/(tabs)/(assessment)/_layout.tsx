@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-/** Keep prescription edits while navigating this tab; discard them when the account changes. */
+/** Specifies stack for assessment tab */
 export default function AsssessmentLayout() {
   return (
         <Stack screenOptions={{ headerShown: false, animation: 'none' }}>

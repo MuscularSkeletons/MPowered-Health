@@ -11,7 +11,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores an optional birth year after checking the allowed range. */
+/** Stores an optional birth year after checking the allowed range */
 export default function StoreBirthYear() {
   const [birthYear, setBirthYear] = useState('');
   const router = useRouter();

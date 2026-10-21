@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-/** Groups public authentication, onboarding, and the post-registration activation screen. */
+/** Groups public authentication, onboarding, and the post-registration activation screen */
 export default function AuthLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>

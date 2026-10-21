@@ -30,6 +30,9 @@ import {
   Input,
 } from '@/components/shared/common';
 
+/** Displays list of questions derived from pain assessment data if completed to add
+ * Supports custom questions
+ */
 export default function AddQuestion() {
   const router = useRouter();
   const { user } = useAuth();

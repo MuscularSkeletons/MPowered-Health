@@ -7,7 +7,7 @@ import { Header } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { requiredSessionRoute } from '@/navigation/routeGuard';
 
-/** Shows the green brand initial while restoring the session. */
+/** Shows a loading screen while restoring the session */
 function AppLoadingScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

@@ -6,7 +6,7 @@ import { Dimensions, FlatList, Pressable, Text, View, ViewToken, StyleSheet } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { palette } from '@/constants/ui/styling';
 
-// The user can swipe through these messages before choosing registration or sign-in.
+/** Specifies the rotating messages displayed on the splashscreen advertising app features */
 const pages = [
   { title: 'Track your pain and its impacts weekly' },
   { title: 'Easily share your pain logs to your healthcare professionals' },
@@ -14,16 +14,15 @@ const pages = [
 ];
 
 /**
- * Shows the welcome page and the choices to sign in or get started.
- *
- * Track the visible introduction page and offer registration or sign-in.
+ * Shows the welcome page and the choices to sign in or get started
+ * Displays main app features on a rotating basis
  */
 export default function Splash() {
   const [index, setIndex] = useState(0);
   const currentIndex = useRef(0);
   const ref = useRef<FlatList<(typeof pages)[number]>>(null);
   const width = Dimensions.get('window').width;
-  // Update the active dot when a new page becomes mostly visible.
+  // Update the active dot when a new page becomes mostly visible
   const [changed] = useState(
     () =>
       ({ viewableItems }: { viewableItems: ViewToken<(typeof pages)[number]>[] }) => {
@@ -33,7 +32,7 @@ export default function Splash() {
         }
       },
   );
-  // Advance messages automatically while still allowing manual swipes.
+  // Advance messages automatically while still allowing manual swipes
   useEffect(() => {
     const timer = setInterval(() => {
       const next = (currentIndex.current + 1) % pages.length;

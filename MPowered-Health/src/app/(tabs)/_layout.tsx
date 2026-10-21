@@ -5,7 +5,7 @@ import { HealthDataBoundary } from '@/components/myhealth/healthDataBoundary';
 import { useAuth } from '@/context/authcontext';
 import { PrescriptionProvider } from '@/context/prescriptionsContext';
 
-// Specifies layout for tabs 
+/** Specifies layout for the main app tabs */
 export default function TabsLayout() {
     const { user } = useAuth();
     return (

@@ -11,7 +11,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Displays the account registration form. */
+/** Displays the account sign up screen */
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +24,7 @@ export default function Signup() {
   const { signUp } = useAuth();
   const passwordsMatch = !confirmPassword || confirmPassword === password;
 
-  /** Validates matching passwords and creates the account through the authentication context. */
+  /** Validates passwords matching and creates the account using authentication context */
   const handleSignUp = async () => {
     if (!email.trim() || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');

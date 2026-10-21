@@ -10,7 +10,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores other miscellaneous conditions if the question is not skipped. */
+/** Stores other miscellaneous conditions if the question is not skipped */
 export default function StoreOtherConditions() {
   const [otherCondition, setOtherCondition] = useState('');
   const router = useRouter();

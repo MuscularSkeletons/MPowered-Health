@@ -11,7 +11,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores the selected pain conditions locally. */
+/** Stores the selected pain conditions locally */
 export default function StorePainConditions() {
   const [painConditions, setPainConditions] = useState<string[]>([]);
   const router = useRouter();

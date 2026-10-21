@@ -4,13 +4,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
 import { usePrescriptionEditor } from '@/context/prescriptionsContext';
 
-/** Displays the fields for adding or editing a prescription. */
+/** Displays the fields for adding or editing a prescription */
 export default function PrescriptionEditorScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   return <Editor key={id ?? 'new'} id={id} />;
 }
 
-/** Displays the prescription fields and save controls using the editor’s current values. */
+/** Displays the prescription fields and save button */
 function Editor({ id }: { id?: string }) {
   const { draft, change, validName, validStrength, duplicate, ready, save, missing, validRepeat } = usePrescriptionEditor(id);
   const { name, strength, unit, form, repeat, frequency } = draft;

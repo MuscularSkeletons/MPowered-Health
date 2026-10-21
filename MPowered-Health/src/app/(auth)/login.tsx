@@ -15,7 +15,7 @@ import {
 
 const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 
-/** Displays the sign-in form and restores the remembered email address. */
+/** Displays the sign-in form and restores the remembered email address */
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +35,7 @@ export default function Login() {
     });
   }, []);
 
-  /** Validates the form and signs in through the authentication context. */
+  /** Validates the form and signs in using authentication context */
   const handleLogin = async () => {
     if (!email.trim() || !password) {
       Alert.alert('Error', 'Please fill in all fields');

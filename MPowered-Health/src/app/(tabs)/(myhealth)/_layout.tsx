@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-/** Keep prescription edits while navigating this tab; discard them when the account changes. */
+/** Specifies stack for my health tab */
 export default function MyHealthLayout() {
   return (
         <Stack screenOptions={{ headerShown: false, animation: 'none' }}>

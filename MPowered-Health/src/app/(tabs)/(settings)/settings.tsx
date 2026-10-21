@@ -63,6 +63,13 @@ function SettingRow({
   );
 }
 
+/** 
+ * Contains: 
+  * Navigation to editing profile, notifications (NOTE: functionality unimplemented), privacy policy, T&C 
+  * Update password
+  * Signing out
+  * Deleting account (NOTE: automated deletion unimplemented)
+*/
 export default function Settings() {
   const { user, signOut, deleteUser, updateAuthUserPassword } = useAuth();
   const router = useRouter();

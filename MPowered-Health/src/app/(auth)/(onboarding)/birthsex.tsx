@@ -11,7 +11,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores the selected birth sex locally. */
+/** Stores the selected birth sex locally */
 export default function StoreBirthSex() {
   const [birthsex, setBirthSex] = useState('');
   const router = useRouter();

@@ -7,7 +7,7 @@ import {
 } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 
-// NOTE: notifications placeholder - functionality unimplemented
+/** NOTE: notifications placeholder - functionality unimplemented */
 export default function ManageNotifications() {
   const router = useRouter();
   return (

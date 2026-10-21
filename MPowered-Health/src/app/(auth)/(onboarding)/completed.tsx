@@ -3,7 +3,7 @@ import { Alert, Text, View } from 'react-native';
 import { useAuth } from '@/context/authcontext';
 import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
 
-/** Saves the profile answers and marks onboarding complete. */
+/** Saves the profile answers and marks onboarding complete */
 export default function CompleteOnboarding() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateUser } = useAuth();

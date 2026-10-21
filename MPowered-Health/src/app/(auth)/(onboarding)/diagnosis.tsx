@@ -11,7 +11,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores whether the user has a formal diagnosis. */
+/** Stores whether the user has a formal diagnosis */
 export default function StoreDiagnosis() {
   const [hasDiagnosis, setHasDiagnosis] = useState<boolean | null>(null);
   const router = useRouter();

@@ -31,6 +31,8 @@ interface QuestionCardProps {
   onDelete: (questionId: string) => Promise<void>;
   onUpdate: (questionId: string, answer: string) => Promise<void>;
 }
+
+/** Styling and functionality of individual question and answers in the list */
 const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => { 
 
   const { user } = useAuth();
@@ -159,6 +161,7 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
   )
 }
 
+/** Styling and functions for the overall screen and questions list */
 export default function Questions() {
   const router = useRouter();
   const { user } = useAuth();

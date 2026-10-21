@@ -98,7 +98,7 @@ function AnswerRows({ answers, labels }: { answers: AssessmentAnswers; labels: s
   ));
 }
 
-/** Shows the newest recorded answers across all five assessment categories. */
+/** Shows the most recent recorded answers for each of the five assessment categories */
 export default function LatestAssessmentScreen() {
   const [latest, setLatest] = useState(getLatestAssessments());
 

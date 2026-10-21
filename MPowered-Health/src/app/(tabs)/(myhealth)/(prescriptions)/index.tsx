@@ -7,7 +7,7 @@ import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { prescriptionLabel } from '@/services/prescriptionHelper';
 import { usePrescriptions } from '@/context/prescriptionsContext';
 
-/** Lists prescriptions and provides controls for adding or editing them. */
+/** Lists prescriptions and provides buttons for adding or editing them */
 export default function PrescriptionsScreen() {
   const { list, remove, loadFailed, reload } = usePrescriptions();
   return (

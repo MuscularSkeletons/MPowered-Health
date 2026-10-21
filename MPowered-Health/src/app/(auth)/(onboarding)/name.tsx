@@ -10,7 +10,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 
-/** Stores the name used to personalise the profile. */
+/** Stores the name used to personalise the profile */
 export default function StoreName() {
   const [name, setName] = useState('');
   const router = useRouter();

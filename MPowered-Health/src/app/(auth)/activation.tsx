@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { palette } from '@/constants/ui/styling';
 import { useAuth } from '@/context/authcontext';
 
-/** Celebrates completed onboarding before opening the home page. */
+/** Transition screen from onboarding to main app to indicate onboarding completed */
 export default function ActivationScreen() {
   const router = useRouter();
   const { user } = useAuth();

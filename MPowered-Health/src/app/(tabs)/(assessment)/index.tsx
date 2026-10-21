@@ -28,15 +28,12 @@ const ASSESSMENTS = [
 
 type AssessmentId = (typeof ASSESSMENTS)[number]['id'];
 
-function BrandWord() {
-  return (
-    <View style={styles.brandWord}>
-      <Text style={styles.brandM}>M</Text>
-      <Text style={styles.brandPowered}>Powered</Text>
-    </View>
-  );
-}
-
+/**
+ * App homescreen contains: 
+  * navigation to each of the 5 assessments
+  * weekly reflection
+  * current streak and progress
+ */
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
@@ -103,27 +100,27 @@ export default function HomeScreen() {
     const categoryData = ASSESSMENT_QUESTIONS[activeCategoryId];
     const isAlreadyDone = completedList.includes(activeCategoryId);
 
-  return (
-    <AssessmentScreen
-      categoryData={categoryData}
-      initialCompleted={isAlreadyDone}
-      existingAnswers={savedAnswersByCat[activeCategoryId] || {}}
-      onComplete={(newAnswers) => {
-        // 1. Mark as completed
-        setCompletedList((prev) =>
-          prev.includes(activeCategoryId) ? prev : [...prev, activeCategoryId],
-        );
-        // 2. Persist the answers for the summary review
-        setSavedAnswersByCat((prev) => ({
-          ...prev,
-          [activeCategoryId]: newAnswers,
-        }));
-        void refreshStreak();
-      }}
-      onBack={() => setActiveCategoryId(null)}
-    />
-  );
-}
+    return (
+      <AssessmentScreen
+        categoryData={categoryData}
+        initialCompleted={isAlreadyDone}
+        existingAnswers={savedAnswersByCat[activeCategoryId] || {}}
+        onComplete={(newAnswers) => {
+          // 1. Mark as completed
+          setCompletedList((prev) =>
+            prev.includes(activeCategoryId) ? prev : [...prev, activeCategoryId],
+          );
+          // 2. Persist the answers for the summary review
+          setSavedAnswersByCat((prev) => ({
+            ...prev,
+            [activeCategoryId]: newAnswers,
+          }));
+          void refreshStreak();
+        }}
+        onBack={() => setActiveCategoryId(null)}
+      />
+    );
+  }
   // Weekly reflection
   if (isEditingReflection) {
       return (
@@ -137,8 +134,7 @@ export default function HomeScreen() {
       );
     }
 
-
-  // Otherwise, render the Overview UI
+  // Otherwise, render the home page screen
   return (
     <Screen>
       {/* Banner */}
@@ -146,7 +142,7 @@ export default function HomeScreen() {
         <Text style={styles.greeting}>Good morning, {name} ☀️</Text>
         <View style={styles.bannerTitleRow}>
           <Text style={styles.bannerTitle}>Let&apos;s build your</Text>
-          <BrandWord />
+          
           <Text style={styles.bannerTitle}>plan.</Text>
         </View>
         <Text style={styles.bannerCopy}>
@@ -287,25 +283,6 @@ const styles = StyleSheet.create({
     gap: 5,
     marginTop: 10,
     flexWrap: 'wrap',
-  },
-  brandWord: { width: 69, height: 27, position: 'relative' },
-  brandM: {
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    fontSize: 24,
-    lineHeight: 27,
-    fontWeight: '800',
-    color: palette.text,
-  },
-  brandPowered: {
-    position: 'absolute',
-    left: 20,
-    top: 0,
-    fontSize: 11,
-    lineHeight: 13,
-    fontWeight: '800',
-    color: palette.text,
   },
   bannerCopy: {
     fontSize: 14,

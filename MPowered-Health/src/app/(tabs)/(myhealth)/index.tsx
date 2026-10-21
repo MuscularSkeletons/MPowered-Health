@@ -19,7 +19,7 @@ const CHART_BASELINE = 82;
 const PIXELS_PER_SCORE = 6;
 const LINE_THICKNESS = 4;
 
-/** Draws a compact overview of the most recent average pain scores. */
+/** Graphical display tracking the user's average pain scores */
 function PainTrend({ records }: { records: PainAssessmentRecord[] }) {
   const [width, setWidth] = useState(0);
   const values = records.map((record) => ({
@@ -83,7 +83,13 @@ function PainTrend({ records }: { records: PainAssessmentRecord[] }) {
   );
 }
 
-/** Shows the user's health trend and the two My Health destinations. */
+/** 
+ * Contains:
+  * shows the user's average pain trend as a piecewise function
+  * navigation to health profile (display summaries of the 5 assessments)
+  * navigation to pain records (more in-depth details about user pain trend) 
+  * navigation to prescription feature
+*/
 export default function MyHealthScreen() {
   const [records, setRecords] = useState(getPainHistory());
 

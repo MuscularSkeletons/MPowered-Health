@@ -4,11 +4,11 @@ import { useRouter } from 'expo-router';
 import { palette } from '@/constants/ui/styling';
 import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
 
-/** Introduces profile setup and links to the terms and privacy policy. */
+/** Introduces profile setup and links to the terms and privacy policy */
 export default function Onboarding() {
   const router = useRouter();
 
-  /** Opens a policy without losing the current onboarding screen. */
+  /** Opens a policy without losing the current onboarding screen */
   const openPolicy = async (url: string) => {
     try {
       await openBrowserAsync(url);
