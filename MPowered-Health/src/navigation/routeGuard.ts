@@ -1,6 +1,6 @@
 export type SessionUser = { onboardingComplete?: boolean } | null;
 
-/** Returns the required route for the current backend session, or null when the route is allowed. */
+/** Returns the required route for the current backend session, or null when the route is allowed */
 export function requiredSessionRoute({
   user,
   rootSegment,
@@ -15,12 +15,33 @@ export function requiredSessionRoute({
   const inOnboardingSection = inAuthSection && nestedSegment === '(onboarding)';
   const inActivationScreen = inAuthSection && nestedSegment === 'activation';
 
-  if (!user) return inAuthSection ? null : '/(auth)/splashscreen';
+  /**  
+   * no user -> splashscreen
+   * unless currently in auth section, in which case stay there
+  */
+  if (!user) {
+    return inAuthSection ? null : '/(auth)/splashscreen';
+  } 
+
+  /** 
+   * user created but onboarding incomplete -> first onboarding screen
+   * unless user currently completing onboarding, in which case stay there
+  */
   if (!user.onboardingComplete) {
     return inOnboardingSection ? null : '/(auth)/(onboarding)/onboarding';
   }
-  // Saving the profile changes the session before the onboarding screen unmounts.
-  // Send that transition to activation instead of skipping straight to the tabs.
-  if (inOnboardingSection) return '/(auth)/activation';
+
+  /** 
+   * user created, onboarding completed but still in the onboarding section 
+   * -> transition to activation screen first instead of skipping straight to the homepage
+  */
+  if (inOnboardingSection) {
+    return '/(auth)/activation';
+  } 
+
+  /** 
+   * user created, onboarding completed, and no longer in onboarding section 
+   * -> stay where you are, or go to the homepage if reopening the app but session is still persisting
+  */
   return inTabsSection || inActivationScreen ? null : '/(tabs)/(assessment)';
 }

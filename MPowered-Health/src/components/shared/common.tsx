@@ -73,7 +73,7 @@ export function Intro({
   );
 }
 
-/** Displays a labelled text field and an optional password visibility control. */
+/** Displays a labelled input text field and an optional password visibility control */
 export function Input({
   label,
   secure,
