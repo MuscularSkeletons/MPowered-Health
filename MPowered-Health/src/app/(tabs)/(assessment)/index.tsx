@@ -62,7 +62,7 @@ export default function HomeScreen() {
     } catch {
       setStreak(0);
     }
-  }, []);
+  }, [user]);
 
   const refreshWeeklyProgress = useCallback(async () => {
     try {
@@ -84,7 +84,7 @@ export default function HomeScreen() {
     } catch {
       // Keep any in-session progress visible if the network is temporarily unavailable.
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!user?.id) return;
