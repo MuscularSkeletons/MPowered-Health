@@ -53,25 +53,19 @@ export default function HomeScreen() {
     Partial<Record<AssessmentId, Record<string, any>>>
   >({});
 
-  const refreshStreak = useCallback(async () => {  
+  const refreshStreak = useCallback(async () => {
     try {
-      if (!user) {
-        throw new Error('User not authenticated')
-      };
-      setStreak(await getWeeklyAssessmentStreak(user.id));
+      setStreak(await getWeeklyAssessmentStreak());
     } catch {
       setStreak(0);
     }
-  }, [user]);
+  }, []);
 
   const refreshWeeklyProgress = useCallback(async () => {
     try {
-      if (!user) {
-        throw new Error('User not authenticated')
-      };
       const [weeklyState, reflectionText] = await Promise.all([
-      getCurrentWeeklyAssessmentState(user.id),
-      getWeeklyReflection(user.id),
+      getCurrentWeeklyAssessmentState(),
+      getWeeklyReflection(),
       ]);
 
       setCompletedList(
@@ -84,7 +78,7 @@ export default function HomeScreen() {
     } catch {
       // Keep any in-session progress visible if the network is temporarily unavailable.
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
