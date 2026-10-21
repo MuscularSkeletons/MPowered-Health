@@ -79,6 +79,7 @@ export function Field({
             : null,
         ]}
         multiline={multiline}
+        maxLength={input === 'decimal' ? 3 : 100}
       />
       {error ? (
         <Text accessibilityLiveRegion="polite" style={styles.fieldError}>

@@ -95,6 +95,7 @@ export function Input({
           secureTextEntry={secure && !reveal}
           placeholderTextColor={palette.muted}
           style={[styles.input, props.style]}
+          maxLength={500}
         />
         {secure && onToggleReveal ? (
           <Pressable

@@ -422,7 +422,7 @@ export default function AssessmentScreen({
               value={currentText}
               onChangeText={(text) => select(currentQ.kind === 'number' ? text.replace(/\D/g, '') : text)}
               keyboardType={currentQ.kind === 'number' ? 'numeric' : 'default'}
-              maxLength={currentQ.kind === 'number' ? 2 : undefined}
+              maxLength={currentQ.kind === 'number' ? 2 : 500}
               multiline={currentQ.kind === 'text'}
               placeholder={currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
               placeholderTextColor={palette.muted}
@@ -462,6 +462,7 @@ export default function AssessmentScreen({
                           placeholderTextColor="#81798A"
                           style={styles.otherTextInput}
                           autoFocus
+                          maxLength={50}
                         />
                       </View>
                     ) : null}

@@ -65,6 +65,7 @@ export default function WeeklyReflectionScreen({
         placeholderTextColor="#81798A"
         style={styles.textArea}
         autoFocus
+        maxLength={500}
       />
 
       <View style={styles.action}>
