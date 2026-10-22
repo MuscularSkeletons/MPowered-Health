@@ -19,7 +19,7 @@ export type PainAssessmentRecord = {
   answers: AssessmentAnswers;
 };
 export type PainMetric = "Average" | "Worst" | "Mildest";
-export type PainAreaGroup = {
+type PainAreaGroup = {
   key: string;
   label: string;
   records: PainAssessmentRecord[];

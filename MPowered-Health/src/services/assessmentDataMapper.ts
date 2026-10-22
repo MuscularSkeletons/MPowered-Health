@@ -7,12 +7,7 @@ import type { PainAssessmentRecord } from "@/services/healthDataHelper";
 
 /** Assessments older than this are removed by the cleanup job and must never be shown. */
 export const RETENTION_MONTHS = 18;
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DAYS_PER_WEEK = 7;
-/** The overview insight needs at least a month of use (form acceptance criteria). */
-const MIN_INSIGHT_SPAN_DAYS = 28;
-/** The overview design plots three weekly points. */
-const INSIGHT_POINTS = 3;
 const MONTHS = [
   "Jan",
   "Feb",
@@ -38,7 +33,7 @@ const TYPE_ORDER: AssessmentId[] = [
 
 // Row shapes
 
-export interface PainRow {
+interface PainRow {
   current_pain: number;
   mildest_pain: number;
   worst_pain: number;
@@ -46,7 +41,7 @@ export interface PainRow {
   pain_location: string[];
   pain_characteristics: string[];
 }
-export interface MovementRow {
+interface MovementRow {
   active_hour: string;
   general_impacts: string[] | null;
   walking_impact: string;
@@ -55,13 +50,13 @@ export interface MovementRow {
   standing_impact: string;
   movement_reflection: string | null;
 }
-export interface PersonalCareRow {
+interface PersonalCareRow {
   activities_impact: string[] | null;
   personal_care_impact: string;
   sleeping_impact: string;
   care_reflection: string | null;
 }
-export interface SocialRow {
+interface SocialRow {
   social_life: string;
   travelling: string;
   mood_impact: number;
@@ -70,7 +65,7 @@ export interface SocialRow {
   general_mood: string;
   mood_trigger: string | null;
 }
-export interface ManagementRow {
+interface ManagementRow {
   medicine_name: string[] | null;
   exercise_frequency: string;
   emotion_strategies: string | null;
@@ -89,13 +84,13 @@ export interface AssessmentRow {
   management_assessment: OneOrMany<ManagementRow>;
 }
 
-export type LatestAssessment = {
+type LatestAssessment = {
   answers: AssessmentAnswers;
   completedAt: string;
 };
 
 /** One completed assessment inside a week. Pass 'answers' to the summary builder for 'type'. */
-export interface WeekEntry {
+interface WeekEntry {
   type: AssessmentId;
   assessmentId: string;
   completedAt: string;
@@ -103,7 +98,7 @@ export interface WeekEntry {
 }
 
 /** A Monday-to-Sunday week and the latest assessment of each type completed in it. */
-export interface WeekGroup {
+interface WeekGroup {
   weekStart: string;
   label: string;
   entries: WeekEntry[]; // in TYPE_ORDER - types with no assessment that week are absent
@@ -128,7 +123,7 @@ const score = (value: number): string[] => [String(value)];
 
 // Convert database rows to the question-index format used by assessment summaries.
 
-export function painAnswers(row: PainRow): AssessmentAnswers {
+function painAnswers(row: PainRow): AssessmentAnswers {
   return {
     0: [...(row.pain_location ?? [])], // areas
     1: [...(row.pain_characteristics ?? [])],
@@ -139,7 +134,7 @@ export function painAnswers(row: PainRow): AssessmentAnswers {
   };
 }
 
-export function movementAnswers(row: MovementRow): AssessmentAnswers {
+function movementAnswers(row: MovementRow): AssessmentAnswers {
   return {
     0: one(row.active_hour),
     1: [...(row.general_impacts ?? [])],
@@ -151,7 +146,7 @@ export function movementAnswers(row: MovementRow): AssessmentAnswers {
   };
 }
 
-export function personalCareAnswers(row: PersonalCareRow): AssessmentAnswers {
+function personalCareAnswers(row: PersonalCareRow): AssessmentAnswers {
   return {
     0: [...(row.activities_impact ?? [])],
     1: one(row.personal_care_impact),
@@ -160,7 +155,7 @@ export function personalCareAnswers(row: PersonalCareRow): AssessmentAnswers {
   };
 }
 
-export function socialAnswers(row: SocialRow): AssessmentAnswers {
+function socialAnswers(row: SocialRow): AssessmentAnswers {
   return {
     0: one(row.social_life),
     1: one(row.travelling),
@@ -172,7 +167,7 @@ export function socialAnswers(row: SocialRow): AssessmentAnswers {
   };
 }
 
-export function managementAnswers(row: ManagementRow): AssessmentAnswers {
+function managementAnswers(row: ManagementRow): AssessmentAnswers {
   return {
     0: [...(row.medicine_name ?? [])],
     1: one(row.exercise_frequency),
@@ -189,7 +184,7 @@ const normalizeAreas = (pain: PainRow): string[] =>
   ].sort();
 
 /** Builds the record the charts, history and PDFs read, from an assessment and its pain row. */
-export function toPainRecord(
+function toPainRecord(
   assessment: AssessmentRow,
   pain: PainRow,
 ): PainAssessmentRecord {
@@ -316,87 +311,4 @@ export function weekLabel(start: Date): string {
   return start.getMonth() === end.getMonth()
     ? `${from}-${to} ${MONTHS[start.getMonth()]}`
     : `${from} ${MONTHS[start.getMonth()]}-${to} ${MONTHS[end.getMonth()]}`;
-}
-
-export interface WeeklyPainRow {
-  weekStart: string; // local YYYY-MM-DD of the Monday
-  label: string;
-  record: PainAssessmentRecord;
-}
-
-/** One row per week, newest first. If a week has several assessments latest one is used. */
-export function weeklyPainRows(
-  records: PainAssessmentRecord[],
-): WeeklyPainRow[] {
-  const byWeek = new Map<
-    string,
-    { start: Date; record: PainAssessmentRecord }
-  >();
-  for (const record of records) {
-    const start = weekStartOf(new Date(record.completedAt));
-    const key = isoDay(start);
-    const existing = byWeek.get(key);
-    if (!existing || record.completedAt > existing.record.completedAt)
-      byWeek.set(key, { start, record });
-  }
-  return [...byWeek.entries()]
-    .sort(([a], [b]) => b.localeCompare(a))
-    .map(([key, { start, record }]) => ({
-      weekStart: key,
-      label: weekLabel(start),
-      record,
-    }));
-}
-
-// Numbers shown on the overview and profile
-
-/** Mean of the assessment average pain over the last N days, or null when there is none. */
-export function averagePainOverDays(
-  records: PainAssessmentRecord[],
-  days = 2 * DAYS_PER_WEEK,
-  now = new Date(),
-): number | null {
-  const since = now.getTime() - days * MS_PER_DAY;
-  const recent = records.filter(
-    (record) => Date.parse(record.completedAt) >= since,
-  );
-  if (!recent.length) return null;
-  return Math.round(
-    recent.reduce((sum, record) => sum + record.average, 0) / recent.length,
-  );
-}
-
-export type PainDirection = "increased" | "decreased" | "unchanged";
-export interface PainInsight {
-  direction: PainDirection;
-  points: { date: string; value: number }[]; // oldest first
-}
-
-/** The overview card: null until a month of data exists, then up to three weekly average points. */
-export function painInsight(
-  records: PainAssessmentRecord[],
-): PainInsight | null {
-  if (!records.length) return null;
-  const times = records.map((record) => Date.parse(record.completedAt));
-  if (
-    Math.max(...times) - Math.min(...times) <
-    MIN_INSIGHT_SPAN_DAYS * MS_PER_DAY
-  )
-    return null;
-
-  const points = weeklyPainRows(records)
-    .slice(0, INSIGHT_POINTS)
-    .reverse()
-    .map((row) => ({
-      date: row.record.completedAt,
-      value: row.record.average,
-    }));
-  if (points.length < 2) return null;
-
-  const change = points[points.length - 1].value - points[0].value;
-  return {
-    direction:
-      change > 0 ? "increased" : change < 0 ? "decreased" : "unchanged",
-    points,
-  };
 }
