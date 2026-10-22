@@ -41,3 +41,9 @@ export const layout = {
 };
 
 export const radius = { sm: 12, md: 16, lg: 20, xl: 24, pill: 999 };
+
+export const textInputLength = {
+  long: 500,
+  medium: 100,
+  short: 50,
+};

@@ -12,7 +12,7 @@ import {
   type TextInputProps,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { palette, radius, spacing } from '@/constants/ui/styling';
+import { palette, radius, spacing, textInputLength } from '@/constants/ui/styling';
 
 /** Displays the MPowered Health logo as the app header */
 export function Header() {
@@ -95,7 +95,7 @@ export function Input({
           secureTextEntry={secure && !reveal}
           placeholderTextColor={palette.muted}
           style={[styles.input, props.style]}
-          maxLength={500}
+          maxLength={textInputLength.long}
         />
         {secure && onToggleReveal ? (
           <Pressable

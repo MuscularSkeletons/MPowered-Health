@@ -14,7 +14,7 @@ import { ScoreSlider } from "@/components/assessment/slider";
 import { QuestionItem } from "@/types/assessment";
 import { RefObject, Dispatch, SetStateAction } from "react";
 import { PrescriptionItem } from "@/types/prescriptions";
-import { palette } from "@/constants/ui/styling";
+import { palette, textInputLength } from "@/constants/ui/styling";
 import { router } from "expo-router";
 import { asSentence } from "@/utils/convertSentence";
 
@@ -142,7 +142,7 @@ export function AssessmentQuestion({
                         value={currentText}
                         onChangeText={(text) => select(currentQ.kind === 'number' ? text.replace(/\D/g, '') : text)}
                         keyboardType={currentQ.kind === 'number' ? 'numeric' : 'default'}
-                        maxLength={currentQ.kind === 'number' ? 2 : 500}
+                        maxLength={currentQ.kind === 'number' ? 2 : textInputLength.long}
                         multiline={currentQ.kind === 'text'}
                         placeholder={currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
                         placeholderTextColor={palette.muted}
@@ -182,7 +182,7 @@ export function AssessmentQuestion({
                                     placeholderTextColor="#81798A"
                                     style={styles.otherTextInput}
                                     autoFocus
-                                    maxLength={50}
+                                    maxLength={textInputLength.short}
                                 />
                                 </View>
                             ) : null}

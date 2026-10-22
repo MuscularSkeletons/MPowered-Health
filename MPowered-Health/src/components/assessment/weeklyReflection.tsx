@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { PrimaryButton, Screen, Intro, commonStyles, } from '@/components/shared/common';
-import { palette } from '@/constants/ui/styling';
+import { palette, textInputLength } from '@/constants/ui/styling';
 import { saveWeeklyReflection } from '@/hooks/useAssessments';
 
 interface WeeklyReflectionScreenProps {
@@ -64,7 +64,7 @@ export default function WeeklyReflectionScreen({
         placeholderTextColor="#81798A"
         style={styles.textArea}
         autoFocus
-        maxLength={500}
+        maxLength={textInputLength.long}
       />
 
       <View style={styles.action}>

@@ -1,4 +1,4 @@
-import { palette, radius, spacing } from '@/constants/ui/styling';
+import { palette, radius, spacing, textInputLength } from '@/constants/ui/styling';
 import { 
     StyleSheet,
     Text, 
@@ -83,7 +83,7 @@ export function Field({
             : null,
         ]}
         multiline={multiline}
-        maxLength={input === 'decimal' ? 3 : 100}
+        maxLength={input === 'decimal' ? 3 : textInputLength.medium}
       />
       {error ? (
         <Text accessibilityLiveRegion="polite" style={styles.fieldError}>
