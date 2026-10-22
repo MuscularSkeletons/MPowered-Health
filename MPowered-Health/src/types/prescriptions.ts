@@ -1,6 +1,4 @@
-/**
- * Maps between the prescription form and the Prescription table.
- */
+/** Maps between the prescription form and the Prescription table */
 
 export interface PrescriptionDraft {
   name: string;

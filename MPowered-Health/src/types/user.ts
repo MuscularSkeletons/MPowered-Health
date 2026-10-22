@@ -1,3 +1,4 @@
+/** Defines user data structure from backend user table */
 export interface User {
   id: string;
   name: string;
@@ -10,6 +11,7 @@ export interface User {
   onboardingComplete?: boolean;
 }
 
+/** Information related to user authentication and related functions */
 export interface AuthContextType {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;

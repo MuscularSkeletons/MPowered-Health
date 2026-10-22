@@ -1,3 +1,4 @@
+/** Defines question data structure from backend questions table */
 export interface Question {
     id: string;
     user_id: string;
