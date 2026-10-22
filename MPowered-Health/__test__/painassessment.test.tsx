@@ -339,8 +339,8 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     
     test("multiple options can be selected for question 1", async() => {
 
-        fireEvent.press(screen.getByText("Hip"));
-        fireEvent.press(screen.getByText("Shoulder"));
+        await fireEvent.press(screen.getByText("Hip"));
+        await fireEvent.press(screen.getByText("Shoulder"));
 
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();
     });
@@ -351,8 +351,8 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
         await fireEvent.press(screen.getByText('Head'));
         await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
 
-        fireEvent.press(screen.getByText("Throbbing"));
-        fireEvent.press(screen.getByText("Sharp"));
+        await fireEvent.press(screen.getByText("Throbbing"));
+        await fireEvent.press(screen.getByText("Sharp"));
 
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();
     });
@@ -632,12 +632,13 @@ describe("submitting users answers to database", () => {
                 "My Pain",
                 {
                     pain_location: ['Head', 'Shoulder'],
-                    pain_charactersitics: ['Aching', 'Throbbing'],
+                    pain_characteristics: ['Aching', 'Throbbing'],
                     current_pain: 5,
                     mildest_pain: 7,
                     worst_pain: 6,
                     average_pain: 8,
                 }, 
+                {},
                 undefined,
             )
         })
