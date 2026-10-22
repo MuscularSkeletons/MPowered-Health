@@ -7,7 +7,7 @@ const TIME = {
     WEEKS_IN_YEAR: 52,
 } as const;
 
-
+/** Calculates difference between given and current date time as readable string */
 export const formatTimeAgo = (createdAt: string): string => {
     const now = new Date();
     const created = new Date(createdAt);
