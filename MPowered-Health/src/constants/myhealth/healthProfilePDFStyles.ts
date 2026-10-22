@@ -1,4 +1,4 @@
-/** Styles for health profile report PDF. */
+/** Styles for health profile report PDF */
 export const HEALTH_PROFILE_REPORT_STYLES = `
     @page {
         size: A4;

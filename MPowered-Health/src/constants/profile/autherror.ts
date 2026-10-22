@@ -1,4 +1,4 @@
-// contains supabase authentication errors
+/** Maps supabase authentication errors to corresponding message the UI should show */ 
 // source: https://www.iloveblogs.blog/post/supabase-auth-error-codes-typescript
 import type { AuthError } from '@supabase/supabase-js';
  
@@ -106,8 +106,8 @@ const FALLBACK: AuthUserError = {
 };
  
 /**
- * Translate any Supabase AuthError (or unknown error) into a user-facing
- * AuthUserError. Logs the raw error for observability.
+ * Translate any Supabase AuthError (or unknown error) into a user-facing AuthUserError
+ * Logs the raw error for observability
  */
 export function toUserError(error: unknown): AuthUserError {
   if (!error) return FALLBACK;

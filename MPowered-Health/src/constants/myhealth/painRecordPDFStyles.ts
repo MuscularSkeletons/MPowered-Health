@@ -1,4 +1,4 @@
-/** Styles for pain record report PDF. */
+/** Styles for pain record report PDF */
 export const PAIN_RECORD_REPORT_STYLES = `
   @page {
     size: A4 portrait;

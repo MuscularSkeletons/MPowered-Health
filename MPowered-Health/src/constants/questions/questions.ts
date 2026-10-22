@@ -1,3 +1,8 @@
+/** 
+ * Returns an array of questions based on the user's pain assessment 
+ * Returns a list of default questions of pain assessment not completed
+*/
+
 export function getPainLocationQuestions(latestPainLocations: string[] | null): string[] {
     // if no pain assessment completed, return default answers
     if (latestPainLocations === null || latestPainLocations.length === 0) {

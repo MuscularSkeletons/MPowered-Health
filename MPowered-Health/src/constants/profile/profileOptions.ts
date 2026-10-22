@@ -1,6 +1,20 @@
-// specifies array values for profile options - to use during onboarding and updating profile in settings
-export const sexOptions = ['Female', 'Male', 'Intersex', 'Prefer not to say'];
-export const diagnosisOptions = ['Yes, I have', 'No, I haven’t'];
+/** 
+ * Specifies array values for profile options
+ * Used during onboarding and updating profile in settings 
+*/
+
+export const sexOptions = [
+  'Female', 
+  'Male', 
+  'Intersex', 
+  'Prefer not to say'
+];
+
+export const diagnosisOptions = [
+  'Yes, I have', 
+  'No, I haven’t'
+];
+
 export const painConditionsOptions = [
   'Arthritis',
   'Ankylosing spondylitis',
