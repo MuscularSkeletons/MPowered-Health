@@ -281,11 +281,7 @@ describe("record button tests", () => {
     })
 
     test("record button is disabled when no option is selected for question 6", async() => {
-        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
-            current_pain: 5, 
-            mildest_pain: 7,
-            worst_pain: 6
-        }}/>);
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 6
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
@@ -295,16 +291,11 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
     
-        expect(screen.getByRole("button", {name: "Review"})).toBeDisabled();      
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
     })
 
     test("record button is enabled when a value is selected for question 6", async() => {
-        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
-            current_pain: 5, 
-            mildest_pain: 7,
-            worst_pain: 6,
-            average_pain: 8
-        }}/>);
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 6
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
@@ -315,15 +306,11 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         await fireEvent.press(screen.getByText('I was feeling frustrated'));
-        expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();     
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();     
     })
 
     test("review button is enabled when no text is entered for question 7", async() => {
-        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
-            current_pain: 5, 
-            mildest_pain: 7,
-            worst_pain: 6
-        }}/>);
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 7
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
@@ -339,12 +326,7 @@ describe("record button tests", () => {
     })
 
     test("review button is enabled when text is entered for question 7", async() => {
-        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
-            current_pain: 5, 
-            mildest_pain: 7,
-            worst_pain: 6,
-            average_pain: 8
-        }}/>);
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 7
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
@@ -439,7 +421,7 @@ describe("summary screen tests", () => {
         expect(screen.getAllByText('Select the MOST relevant statement:')).toBeTruthy();
         expect(screen.getByText('Over the past week, how was your mood generally?')).toBeTruthy();
         expect(screen.getByText('What triggered that mood?')).toBeTruthy();
-        expect(screen.getByText('Over the past week, how much has pain interfered with your relationship with other people?')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain interfered with your relationships with other people?')).toBeTruthy();
         expect(screen.getByText('Over the past week, how much has pain impacted your ability to enjoy life?')).toBeTruthy();
        
         //user's answers
@@ -486,7 +468,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         // expect summary components to be rendered on screen
-        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();       
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();       
         expect(screen.getByText('Your answers indicate that pain does not really impact your social health.')).toBeTruthy();
     })
 
@@ -518,7 +500,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         // expect summary components to be rendered on screen
-        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
         expect(screen.getByText('Your answers indicate that pain mildly impacts your social health.')).toBeTruthy();
     })
 
@@ -550,7 +532,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         // expect summary components to be rendered on screen
-        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
         expect(screen.getByText('Your answers indicate that pain moderately impacts your social health.')).toBeTruthy();
     })
 
@@ -582,7 +564,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         // expect summary components to be rendered on screen
-        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
         expect(screen.getByText('Your answers indicate that pain significantly impacts your social health.')).toBeTruthy(); 
     })
 })
