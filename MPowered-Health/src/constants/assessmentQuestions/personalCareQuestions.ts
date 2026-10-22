@@ -1,4 +1,6 @@
-export const personalCareScales: Record<string, string[]> = {
+import { QuestionsConfig, getSectionScore } from "@/services/assessmentScoreCalculator";
+
+const personalCareScales: Record<string, string[]> = {
   washing: [
     'I can look after myself normally without causing extra pain',
     'I can look after myself normally, but it causes extra pain',
@@ -18,27 +20,8 @@ export const personalCareScales: Record<string, string[]> = {
   ],
 };
 
-export interface QuestionItem {
-  id: string;
-  title: string;
-  prompt: string;
-  kind: 'single' | 'multi' | 'score' | 'number' | 'text';
-  options?: string[];
-  helper?: string;
-  optional?: boolean;
-}
 
-export interface PersonalCareQuestionsConfig {
-  title: string;
-  tip: string;
-  calculateScore: (answers: Record<string, any>) => {
-    extraFields: Record<string, any>;
-    summaryMessage: string;
-  };
-  questions: QuestionItem[];
-}
-
-export const personalCareQuestions: PersonalCareQuestionsConfig = {
+export const personalCareQuestions: QuestionsConfig = {
   title: 'My Personal Care',
   tip: 'Explore tips on daily living',
 
@@ -95,19 +78,7 @@ export const personalCareQuestions: PersonalCareQuestionsConfig = {
   ],
 };
 
-/**
- * Calculates scores for Personal care and Sleeping sections (0 to 5 each).
- * First option = 0, Last option = 5.
- */
-function getSectionScore(selectedValue: any, scaleList: string[]): number {
-  if (!selectedValue || !Array.isArray(scaleList) || scaleList.length <= 1) {
-    return 0;
-  }
-  const index = scaleList.indexOf(selectedValue);
-  return index === -1 ? 0 : index;
-}
-
-export function calculatePersonalCareScore(answers: Record<string, any>): {
+function calculatePersonalCareScore(answers: Record<string, any>): {
   totalScore: number;
   impactLevel: string;
 } {

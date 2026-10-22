@@ -1,4 +1,5 @@
-// Shared color tokens keep every screen aligned with the calm pastel brand palette.
+/** Defines UI related constants for colour scheme, spacing, layout and radius */
+
 export const palette = {
   primary: '#9B91D3',
   primaryDark: '#756AB2',

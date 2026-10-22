@@ -1,5 +1,7 @@
+import { QuestionsConfig, getSectionScore } from "@/services/assessmentScoreCalculator";
+
 // Scale options used across multiple questions
-export const movementScales: Record<string, string[]> = {
+const movementScales: Record<string, string[]> = {
   walk: [
     'Pain does not prevent me walking any distance',
     'Pain prevents me from walking more than 1 kilometre',
@@ -34,27 +36,7 @@ export const movementScales: Record<string, string[]> = {
   ],
 };
 
-export interface QuestionItem {
-  id: string;
-  title: string;
-  prompt: string;
-  kind: 'single' | 'multi' | 'score' | 'number' | 'text';
-  options?: string[];
-  helper?: string;
-  optional?: boolean;
-}
-
-export interface MovementQuestionsConfig {
-  title: string;
-  tip: string;
-  calculateScore: (answers: Record<string, any>) => {
-    extraFields: Record<string, any>;
-    summaryMessage: string;
-  };
-  questions: QuestionItem[];
-}
-
-export const movementQuestions: MovementQuestionsConfig = {
+export const movementQuestions: QuestionsConfig = {
   title: 'My Movement',
   tip: 'Explore tips on managing movement',
 
@@ -138,19 +120,7 @@ export const movementQuestions: MovementQuestionsConfig = {
   ],
 };
 
-/**
- * Calculates scores for Walking, Lifting, Sitting, and Standing sections (0 to 5 each).
- * First option = 0, Last option = 5.
- */
-function getSectionScore(selectedValue: any, scaleList: string[]): number {
-  if (!selectedValue || !Array.isArray(scaleList) || scaleList.length <= 1) {
-    return 0;
-  }
-  const index = scaleList.indexOf(selectedValue);
-  return index === -1 ? 0 : index;
-}
-
-export function calculateMovementScore(answers: Record<string, any>): {
+function calculateMovementScore(answers: Record<string, any>): {
   totalScore: number;
   impactLevel: string;
 } {
