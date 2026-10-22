@@ -1,5 +1,4 @@
-//import { SocialHealthAssessment } from '../src/app/(tabs)/(assessment)/socialhealthassessment';
-import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
@@ -173,78 +172,197 @@ describe("social health assessment questions are rendered on screen", () => {
 
 });
 
-/*
-// selection/input tests
-describe("my social health assessment questions are selected/inputted correctly", () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+// selection + record button tests (combined as similar tests and to avoid duplicates)
+// manual tests for sliders
+describe("record button tests", () => {
 
-    test("question 1 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+    afterEach(jest.clearAllMocks);
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
+    test("record button is disabled when no option is selected for question 1", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();
+    })
 
-    test("question 2 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+    test("record button is enabled when an option is selected for question 1", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();        
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
+    test("record button is disabled when no option is selected for question 2", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
 
-    // TODO: see how Q3-5 implemented
-    test("question 3 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();        
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
+    test("record button is enabled when an option is selected for question 2", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();          
+    })
+
+    test("record button is disabled when no option is selected for question 3", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        //navigate to question 3
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
+
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();  
+    })
+
+    test("record button is enabled when a value is selected for question 3", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        //navigate to question 3
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
+
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();  
+    })
+
+    test("record button is disabled when no option is selected for question 4", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        //navigate to question 4
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
+    })
+
+    test("record button is enabled when a value is selected for question 4", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        //navigate to question 4
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));        
     
-    test("question 4 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();      
+    })
+    
+    test("record button is disabled when no option is selected for question 5", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+        //navigate to question 5
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));        
+    
+        expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
+    test("record button is enabled when a value is selected for question 5", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        //navigate to question 5
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+    
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();      
+    })
 
-    test("question 5 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+    test("record button is disabled when no option is selected for question 6", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6
+        }}/>);
+        //navigate to question 6
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+    
+        expect(screen.getByRole("button", {name: "Review"})).toBeDisabled();      
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
+    test("record button is enabled when a value is selected for question 6", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6,
+            average_pain: 8
+        }}/>);
+        //navigate to question 6
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();     
+    })
 
-    test("question 6 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+    test("review button is enabled when no text is entered for question 7", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6
+        }}/>);
+        //navigate to question 7
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));     
+    
+        expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();      
+    })
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-
-    test("question 7 answer can be entered", async() => {
-        await render(<SocialHealthAssessment/>);
-        const moodReason = screen.getByPlaceholderText("i.e: delays in work due to pain or inability to meet with friends, etc.");
+    test("review button is enabled when text is entered for question 7", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6,
+            average_pain: 8
+        }}/>);
+        //navigate to question 7
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
         const user = userEvent.setup();
-        await user.type(moodReason, "No friends.");
+        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        await user.type(moodInput, "No friends :( ");
 
-        expect(moodReason.props.value).toBe("No friends.");
-    });
-
-});
+        expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();
+    })
+})
 
 // input validation tests
 describe("input validation for question 7", () => {
@@ -253,15 +371,221 @@ describe("input validation for question 7", () => {
         jest.clearAllMocks();
     });
 
-    // question 7 is optional
-    test("no text is entered for question 7", async() => {
-        jest.spyOn(Alert, "alert");
-        await render(<SocialHealthAssessment/>);
+    test("text entered is within the character limit", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        //navigate to question 7
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).not.toHaveBeenCalled(); // optional question
+        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        await fireEvent.changeText(moodInput, "Didnt like the movie I watched. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu")
+        const updatedInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        expect(updatedInput.props.value).toHaveLength(500);
     });
-});*/
+});
+
+describe("summary screen tests", () => {
+    
+    afterEach(jest.clearAllMocks);
+    
+    test("objects are rendered on screen correctly", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        //summary screen components
+        expect(screen.getByText('My Social Health Summary')).toBeTruthy();
+        expect(screen.getByText("This helps guide your treatment and support your recovery.")).toBeTruthy();
+        expect(screen.getByText("My Social Health")).toBeTruthy();
+
+        //headings
+        expect(screen.getByText("Social life")).toBeTruthy();
+        expect(screen.getByText("Travelling")).toBeTruthy();
+        expect(screen.getByText("Mood")).toBeTruthy();
+        expect(screen.getByText("Relationships with others")).toBeTruthy();
+        expect(screen.getByText("Enjoyment of life")).toBeTruthy();
+
+        //questions
+        expect(screen.getByText('Over the past week, how much has pain impacted your mood?')).toBeTruthy();
+        expect(screen.getAllByText('Select the MOST relevant statement:')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how was your mood generally?')).toBeTruthy();
+        expect(screen.getByText('What triggered that mood?')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain interfered with your relationship with other people?')).toBeTruthy();
+        expect(screen.getByText('Over the past week, how much has pain impacted your ability to enjoy life?')).toBeTruthy();
+       
+        //user's answers
+        expect(screen.getByText('My social life is normal and gives me no extra pain')).toBeTruthy();
+        expect(screen.getByText('I can travel anywhere without pain')).toBeTruthy();
+        expect(screen.getByText('3')).toBeTruthy();
+        expect(screen.getByText('3')).toBeTruthy();
+        expect(screen.getByText('9')).toBeTruthy();
+        expect(screen.getByText("I was feeling frustrated")).toBeTruthy();        
+        //message
+        expect(screen.getByText("Your answers have been saved.")).toBeTruthy();
+
+        //buttons
+        expect(screen.getByText("Edit")).toBeTruthy();
+        expect(screen.getByText("Close")).toBeTruthy();
+    })
+
+    //tests for displaying the appropriate message according to the score
+    test("score less than 10", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 2, relation_impact: 2, enjoyment_impact: 2 }}/>);
+        
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();       
+        expect(screen.getByText('Your answers indicate that pain does not really impact your social health.')).toBeTruthy();
+    })
+
+    test("score less than 19 and more than 10", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 4 }}/>);
+        
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal but increases the degree of pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere, but it gives me extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('Your answers indicate that pain mildly impacts your social health.')).toBeTruthy();
+    })
+
+    test("score less than 30 and more than 20", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+        
+        //question 1
+        await fireEvent.press(screen.getByText('Pain has no significant effect on my social life apart from limiting my more energetic interests, such as gym or sports'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('Pain is bad, but I manage journeys over two hours'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('Your answers indicate that pain moderately impacts your social health.')).toBeTruthy();
+    })
+
+    test("score more than 30", async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 8, enjoyment_impact: 9 }}/>);
+        
+        //question 1
+        await fireEvent.press(screen.getByText('Pain has restricted my social life and I do not go out as often'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('Pain restricts me to journeys of less than one hour'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        // expect summary components to be rendered on screen
+        expect(screen.getByText('My Personal Care Summary')).toBeTruthy();
+        expect(screen.getByText('Your answers indicate that pain significantly impacts your social health.')).toBeTruthy(); 
+    })
+})
 
 // navigation tests
 describe("navigation", () => {
@@ -383,3 +707,100 @@ describe("navigation", () => {
         expect(screen.getByText('1/7')).toBeTruthy();
     })
 });
+
+//submission tests
+describe("submitting users answers to database", () => {
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
+    });
+
+    afterEach(jest.clearAllMocks);
+
+    test("successful submission of the user's answers", async() => {
+    
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        const user = userEvent.setup();
+        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        await user.type(moodInput, "No friends :( ");
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        await waitFor(() => {
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith({
+                categoryTitle: "My Social Health",
+                answers: {
+                    social_life: "My social life is normal and gives me no extra pain",
+                    travelling: "I can travel anywhere without pain",
+                    mood_impact: 5,
+                    relation_impact: 3,
+                    enjoyment_impact: 9,
+                    general_mood: "I was feeling frustrated",
+                    mood_trigger: "No friends :( ", 
+                }
+            })
+        })
+
+        expect(screen.getByText("My Social Health Summary")).toBeTruthy();
+    })
+
+    test("throw an error if submission to the database fails", async() => {
+        (submitAssessmentAnswers as jest.Mock).mockRejectedValue(
+            new Error('Network error')
+        );
+        const spyAlert = jest.spyOn(Alert, 'alert');
+
+        //question 1
+        await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 2
+        await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+
+        //question 3
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 4
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 5
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 6
+        await fireEvent.press(screen.getByText('I was feeling frustrated'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+
+        //question 7
+        const user = userEvent.setup();
+        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        await user.type(moodInput, "No friends :( ");
+        await fireEvent.press(screen.getByRole("button", {name: "Review"}));
+
+        await waitFor(() => {
+            expect(spyAlert).toHaveBeenCalledWith('Could not save answers','Network error');
+        });
+
+        expect(screen.queryByText('My Social Health Summary')).toBeNull();
+    }) 
+})
