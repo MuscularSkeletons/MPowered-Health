@@ -189,7 +189,6 @@ export const useQuestions = () => {
         setIsPainAssessmentLoading(true);
         try {
             const assessmentID = await getCurrentWeeklyAssessmentID();
-            console.log(assessmentID);
             if (assessmentID === null) {
                 console.log("No pain assessment completed this week");
                 setPainAssessment(null);
