@@ -1,5 +1,5 @@
 //import { PainAssessment } from '../src/app/(tabs)/(assessment)/painassessment';
-import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 //import { painQuestions } from "@/constants/assessment/questions";
 import { Alert } from 'react-native';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
@@ -327,7 +327,6 @@ describe("record button tests", () => {
     })
 })
 
-/*
 // selection tests
 // test sliders manually
 describe("my pain assessment questions are selected/inputted correctly", () => {
@@ -339,61 +338,24 @@ describe("my pain assessment questions are selected/inputted correctly", () => {
     afterEach(jest.clearAllMocks);
     
     test("multiple options can be selected for question 1", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
 
-        fireEvent.press(screen.getByText("Record"));
+        fireEvent.press(screen.getByText("Hip"));
+        fireEvent.press(screen.getByText("Shoulder"));
 
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();
     });
 
-    test("can input text for question 1 option other", async() => {
-        fireEvent.press(screen.getByText("Other"));
-        const otherInput = screen.getByPlaceholderText("Input other pain location");
-        const user = userEvent.setup();
-        await user.type(otherInput, "Inner thigh");
+    test("multiple options can be selected for question 2", async() => {
+
+        //navigate to question 2
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        fireEvent.press(screen.getByText("Throbbing"));
+        fireEvent.press(screen.getByText("Sharp"));
+
+        expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();
     });
-
-    test("question 2 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-
-    // TODO: check how Q3-6 implemented in assessment
-    test("question 3 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-    
-    test("question 4 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-
-    test("question 5 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-
-    test("question 6 not selected", async() => {
-        //show an alert if continue is pressed without selecting an option
-        jest.spyOn(Alert, "alert");
-
-        fireEvent.press(screen.getByText("Record"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
-    });
-
 });
 
 // input validation tests
@@ -405,36 +367,115 @@ describe("input validation for question 1 other", () => {
 
     afterEach(jest.clearAllMocks);
 
-    // question 1 is mandatory
-    test("no text is entered for question 1 other", async() => {
-        jest.spyOn(Alert, "alert");
+    test("can input text for question 1 option other", async() => {
         fireEvent.press(screen.getByText("Other"));
+        const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
+        const user = userEvent.setup();
+        await user.type(otherInput, "Inner thigh");
 
-        fireEvent.press(screen.getByText("OK"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please select an option");
+        expect(otherInput.props.value).toBe("Inner thigh");
     });
 
     test("other location entered is not the same as a pre-existing option", async() => {
         jest.spyOn(Alert, "alert");
         fireEvent.press(screen.getByText("Other"));
-        const otherInput = screen.getByPlaceholderText("Input other pain location");
+        const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
         const user = userEvent.setup();
-        await user.type(otherInput, "Shoulder");
-        fireEvent.press(screen.getByText("OK"));
-        expect(Alert.alert).toHaveBeenCalledWith("Error", "please input a location that is not already listed as an option");
+        const location = "Shoulder";
+        await user.type(otherInput, location);
+        fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+        expect(Alert.alert).toHaveBeenCalledWith('Location Already Listed', '"' + {location} + 'is already a an option in the list. Please select it from the options above.');
     });
+
+    test("500 character limit for option other in question 1", async() => {
+        fireEvent.press(screen.getByText("Other"));
+        const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
+        const location = "Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt.";
+        await fireEvent.changeText(otherInput, location);
+        const updatedInput = screen.getByPlaceholderText("Input name of over the counter medication");
+        expect(updatedInput.props.value).toHaveLength(500);
+    })
 });
-*/
 
-//submission tests
-
-/*
 describe('summary screen', () => {
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6,
+            average_pain: 8
+        }}/>);
+    });
+
+    afterEach(jest.clearAllMocks);
+
     test("objects rendered on screen", async() => {
-        //use dummy data here for checking
+        //question 1
+        const user = userEvent.setup();
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press(screen.getByText('Upper Back'));
+        await fireEvent.press(screen.getByText('Other'));
+        const locationInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
+        await userEvent.type(locationInput, "Elbow");
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press(screen.getByText('Gnawing'));
+        await fireEvent.press(screen.getByText('Sharp'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));
+
+        expect(screen.getByText("My Pain Summary")).toBeTruthy();
+        expect(screen.getByText("This helps guide your treatment and support your recovery.")).toBeTruthy();
+        expect(screen.getByText("My Pain")).toBeTruthy();
+
+        //questions
+        expect(screen.getByText("I have had pain in these areas last week.")).toBeTruthy();
+        expect(screen.getByText("For each of the following words, select the adjectives that apply to your pain.")).toBeTruthy();
+        expect(screen.getByText("My current pain is")).toBeTruthy();
+        expect(screen.getByText("My mildest pain last week was")).toBeTruthy();
+        expect(screen.getByText("My worst pain last week was")).toBeTruthy();
+        expect(screen.getByText("My overall average pain last week was")).toBeTruthy();
+
+        //user's answers
+        expect(screen.getByText('Head')).toBeTruthy();
+        expect(screen.getByText('Upper Back')).toBeTruthy();
+        expect(screen.getByText('Elbow')).toBeTruthy();
+        expect(screen.getByText('Aching')).toBeTruthy();
+        expect(screen.getByText('Gnawing')).toBeTruthy();
+        expect(screen.getByText('Sharp')).toBeTruthy();
+        expect(screen.getByText('5')).toBeTruthy();
+        expect(screen.getByText('7')).toBeTruthy();
+        expect(screen.getByText('6')).toBeTruthy();
+        expect(screen.getByText('8')).toBeTruthy();
+
+        //headings
+        expect(screen.getByText("Pain location")).toBeTruthy();
+        expect(screen.getByText("Pain characteristics")).toBeTruthy();
+        expect(screen.getByText("Pain intensity")).toBeTruthy();
+
+        //message
+        expect(screen.getByText("Your answers have been saved.")).toBeTruthy();
+
+        //buttons
+        expect(screen.getByText("Edit")).toBeTruthy();
+        expect(screen.getByText("Close")).toBeTruthy();
     })
 })
-*/
+
 // navigation tests
 describe("navigation", () => {
 
@@ -547,3 +588,95 @@ describe("navigation", () => {
         
     })
 });
+
+//submission tests
+describe("submitting users answers to database", () => {
+
+    beforeEach(async() => {
+        await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
+            current_pain: 5, 
+            mildest_pain: 7,
+            worst_pain: 6,
+            average_pain: 8
+        }}/>);
+    });
+
+    afterEach(jest.clearAllMocks);
+
+    test("successful submission of the user's answers", async() => {
+    
+        //question 1
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press(screen.getByText('Shoulder'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press(screen.getByText('Throbbing'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
+
+        await waitFor(() => {
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith(
+                "My Pain",
+                {
+                    pain_location: ['Head', 'Shoulder'],
+                    pain_charactersitics: ['Aching', 'Throbbing'],
+                    current_pain: 5,
+                    mildest_pain: 7,
+                    worst_pain: 6,
+                    average_pain: 8,
+                }, 
+                undefined,
+            )
+        })
+
+        expect(screen.getByText("My Pain Summary")).toBeTruthy();
+    })
+
+    test("throw an error if submission to the database fails", async() => {
+        (submitAssessmentAnswers as jest.Mock).mockRejectedValue(
+            new Error('Network error')
+        );
+        const spyAlert = jest.spyOn(Alert, 'alert');
+
+        //question 1
+        await fireEvent.press(screen.getByText('Head'));
+        await fireEvent.press(screen.getByText('Shoulder'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 2
+        await fireEvent.press(screen.getByText('Aching'));
+        await fireEvent.press(screen.getByText('Throbbing'));
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 3
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 4
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 5
+        await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
+
+        //question 6
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
+
+        await waitFor(() => {
+            expect(spyAlert).toHaveBeenCalledWith('Could not save answers','Network error');
+        });
+
+        expect(screen.queryByText('My Pain Summary')).toBeNull();
+    }) 
+})
