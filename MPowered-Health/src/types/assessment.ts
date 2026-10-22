@@ -24,3 +24,24 @@ export interface PainAssessment {
     average_pain: number;
     current_pain: number;
 }
+
+// Definitions related to assessment questions
+export interface QuestionItem {
+  id: string;
+  title: string;
+  prompt: string;
+  kind: 'single' | 'multi' | 'score' | 'number' | 'text' | string;
+  options?: string[];
+  helper?: string;
+  optional?: boolean;
+}
+
+export interface QuestionsConfig {
+  title: string;
+  tip: string;
+  calculateScore: (answers: Record<string, any>) => {
+    extraFields: Record<string, any>;
+    summaryMessage: string;
+  };
+  questions: QuestionItem[];
+}

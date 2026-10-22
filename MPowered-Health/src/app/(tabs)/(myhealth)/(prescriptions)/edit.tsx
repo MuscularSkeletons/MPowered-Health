@@ -1,4 +1,4 @@
-import { Field, Shell, SelectField } from '@/components/prescription/form';
+import { Field, PrescriptionScreen, SelectField } from '@/components/prescription/form';
 import { SecondaryButton } from '@/components/shared/common';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from 'react-native';
@@ -16,16 +16,16 @@ function Editor({ id }: { id?: string }) {
   const { name, strength, unit, form, repeat, frequency } = draft;
   if (missing)
     return (
-      <Shell title="Prescriptions List">
+      <PrescriptionScreen title="Prescriptions List">
         <Text>This prescription is no longer available.</Text>
         <SecondaryButton
           label="Back to prescriptions"
           onPress={() => router.replace('/(tabs)/(myhealth)/(prescriptions)')}
         />
-      </Shell>
+      </PrescriptionScreen>
     );
   return (
-    <Shell
+    <PrescriptionScreen
       title={!id ? 'Add Prescription' : 'Edit Prescription'}
       onBack={() => router.back()}
     >
@@ -76,6 +76,6 @@ function Editor({ id }: { id?: string }) {
           else router.replace('/(tabs)/(myhealth)/(prescriptions)');
         }}
       />
-    </Shell>
+    </PrescriptionScreen>
   );
 }

@@ -1,4 +1,3 @@
-/** Displays pain-history scores as a chart with selectable metrics. */
 import {
   PainAssessmentRecord,
   PainMetric,
@@ -16,7 +15,7 @@ import {
   Text as SvgText 
 } from 'react-native-svg';
 
-/** Draws a chart of the selected pain-history records. */
+/** Draws a chart of the selected pain history records */
 export function TrackingChart({
   metric,
   records,
@@ -24,7 +23,7 @@ export function TrackingChart({
   metric: PainMetric;
   records: PainAssessmentRecord[];
 }) {
-  // Convert values to coordinates on the fixed zero-to-ten chart.
+  // Convert values to coordinates on the fixed zero-to-ten chart
   const values = records.map((record) => painMetricValue(record, metric));
   const chartDates = records.map((record) => painRecordDate(record, true));
   const left = 34,
@@ -32,13 +31,13 @@ export function TrackingChart({
     top = 28,
     bottom = 224;
 
-  /** Converts a record position into a horizontal chart coordinate. */
+  // Converts a record position into a horizontal chart coordinate
   const x = (index: number) =>
     values.length === 1
       ? (left + right) / 2
       : left + (index * (right - left)) / (values.length - 1);
 
-  /** Converts a score into a vertical chart coordinate. */
+  // Converts a score into a vertical chart coordinate
   const y = (value: number) => bottom - (value / 10) * (bottom - top);
 
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
@@ -122,7 +121,7 @@ export function TrackingChart({
       </Svg>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   chartFrame: {

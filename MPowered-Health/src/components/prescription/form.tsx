@@ -1,4 +1,3 @@
-// contains UI components for form including input and drop down menus. Currently used by prescriptions feature
 import { palette, radius, spacing } from '@/constants/ui/styling';
 import { 
     StyleSheet,
@@ -16,8 +15,13 @@ import {
 import { router } from 'expo-router';
 import { useState } from 'react';
 
-/** Wraps a form in the shared page layout and back navigation. */
-export function Shell({
+/**
+ * Contains UI components for form including input and drop down menus
+ * Currently only used by prescriptions feature
+*/
+
+/** Shared screen for prescriptions */
+export function PrescriptionScreen({
   title,
   children,
   onBack = () => router.back(),
@@ -28,7 +32,7 @@ export function Shell({
 }) {
   return (
     <Screen>
-        <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+        <Text onPress={() => onBack} style={commonStyles.back}>‹ Back</Text>
         <Intro
             sectionLabel="PRESCRIPTIONS"
             title={title}
@@ -38,7 +42,7 @@ export function Shell({
   );
 }
 
-/** Displays a labeled form input for either numeric and text values. */
+/** Displays a labeled form input for either numeric or text values */
 export function Field({
   label,
   value,
@@ -90,7 +94,7 @@ export function Field({
   );
 }
 
-/** Displays one compact form value and opens its available options in a modal sheet. */
+/** Displays a drop down menu field */
 export function SelectField({
   label,
   options,

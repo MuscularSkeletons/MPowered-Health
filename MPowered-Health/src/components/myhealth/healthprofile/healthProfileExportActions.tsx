@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/** Prints and shares a My health profile report without allowing duplicate requests. */
+/** Prints and shares a my health profile report without allowing duplicate requests */
 export function ProfileExportActions({
   report,
   disabled,

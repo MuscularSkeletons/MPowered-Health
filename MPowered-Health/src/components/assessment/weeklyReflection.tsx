@@ -16,6 +16,7 @@ interface WeeklyReflectionScreenProps {
   onSaved: (savedText: string) => void;
 }
 
+/** Screen for weekly reflection */
 export default function WeeklyReflectionScreen({
   initialText = '',
   onBack,

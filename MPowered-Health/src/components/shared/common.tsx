@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { palette, radius, spacing } from '@/constants/ui/styling';
 
-/** Displays the MPowered Health wordmark used throughout account setup. */
+/** Displays the MPowered Health logo as the app header */
 export function Header() {
   return (
     <View style={styles.header}>
@@ -29,7 +29,7 @@ export function Header() {
   );
 }
 
-/** Provides the shared background, header, scrolling, and keyboard behavior for screens. */
+/** Provides the shared background, header, scrolling, and keyboard behavior for screens */
 export function Screen({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
     <SafeAreaView style={commonStyles.safe} edges={['top']}>
@@ -49,7 +49,7 @@ export function Screen({ children, compact = false }: { children: ReactNode; com
   );
 }
 
-/** Displays a section label, title, description, and optional progress above the form. */
+/** Displays an introductory section label, title, optional description, and optional progress */
 export function Intro({
   sectionLabel,
   title,
@@ -113,7 +113,7 @@ export function Input({
   );
 }
 
-/** Displays the main action with a clear loading and disabled state. */
+/** A button with loading and disabled state */
 export function PrimaryButton({
   label,
   onPress,
@@ -144,6 +144,7 @@ export function PrimaryButton({
   );
 }
 
+/** Another button with different styling */
 export function SecondaryButton({
   label,
   onPress,
@@ -166,7 +167,7 @@ export function SecondaryButton({
   );
 }
 
-/** Displays one selectable answer with visible selected state. */
+/** Displays multichoice buttons */
 export function ChoiceButton({
   label,
   selected,

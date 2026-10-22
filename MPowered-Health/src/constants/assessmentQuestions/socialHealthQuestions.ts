@@ -1,4 +1,5 @@
-import { QuestionsConfig, getSectionScore } from "@/services/assessmentScoreCalculator";
+import { getSectionScore } from "@/utils/assessmentScoreCalculator";
+import { QuestionsConfig } from "@/types/assessment";
 
 const socialScales: Record<string, string[]> = {
   life: [

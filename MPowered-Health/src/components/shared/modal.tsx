@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { palette } from "@/constants/ui/styling";
 
+/** Specifies the buttons for modals */
 export function ModalActions({
   isSaving,
   onCancel,
@@ -55,7 +56,6 @@ export function ModalActions({
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
     buttonOptions: {
@@ -124,4 +124,4 @@ export const modalStyles = StyleSheet.create({
     },
     modalTitle: { fontSize: 24, lineHeight: 30, fontWeight: '800', color: palette.text, marginBottom: 8 },
     modalDescription: { fontSize: 13, lineHeight: 20, color: palette.muted, marginBottom: 8 },
-})
+});

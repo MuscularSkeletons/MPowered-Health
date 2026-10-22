@@ -1,5 +1,4 @@
-/** Connects the health-record report to the print button and error feedback. */
-// This hook prepares the history groups and selections used by the records screen.
+
 import { buildPainRecordsHtml } from '@/services/painRecordReportPDF';
 import type { PainAssessmentRecord, PainMetric } from '@/services/healthDataHelper';
 import { printHtml } from '@/utils/documentExport';
@@ -13,7 +12,7 @@ import {
   StyleSheet, 
 } from 'react-native';
 
-/** Displays the button that prints the pain record report. */
+/** Displays the button that prints the pain record report */
 export function PrintPDFButton({
   records,
   areaLabel,
@@ -27,11 +26,7 @@ export function PrintPDFButton({
   const pending = useRef(false);
   const [error, setError] = useState('');
 
-  /**
-   * Builds the health-record report and opens the print dialog.
-   *
-   * Build the filtered report before opening the platform print dialog.
-   */
+  // Builds the pain record report and opens the print dialog
   const printPdf = async () => {
     if (pending.current || !records.length) return;
     pending.current = true;

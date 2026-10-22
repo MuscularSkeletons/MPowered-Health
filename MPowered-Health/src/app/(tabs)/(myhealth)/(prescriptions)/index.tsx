@@ -1,4 +1,4 @@
-import { Shell } from '@/components/prescription/form';
+import { PrescriptionScreen } from '@/components/prescription/form';
 import { SecondaryButton } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
 import { Feather } from '@expo/vector-icons';
@@ -11,7 +11,7 @@ import { usePrescriptions } from '@/context/prescriptionsContext';
 export default function PrescriptionsScreen() {
   const { list, remove, loadFailed, reload } = usePrescriptions();
   return (
-    <Shell title="Prescriptions List" onBack={() => router.back()}>
+    <PrescriptionScreen title="Prescriptions List" onBack={() => router.back()}>
       {loadFailed ? (
         <>
           <Text style={styles.copy}>Your prescriptions could not be loaded.</Text>
@@ -57,7 +57,7 @@ export default function PrescriptionsScreen() {
           router.push('./edit');
         }}
       />
-    </Shell>
+    </PrescriptionScreen>
   );
 }
 

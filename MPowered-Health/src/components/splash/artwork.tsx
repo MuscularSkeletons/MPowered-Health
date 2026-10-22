@@ -2,7 +2,11 @@ import { StyleSheet, View } from 'react-native';
 import { Image, type ImageSource } from 'expo-image';
 import { palette } from '@/constants/ui/styling';
 
-// Each welcome page previews a different pair of app screens.
+/** Creates the preview screens advertising the app core features shown in the welcome screen */
+
+/**
+ * Three pairs of screenshots previews of the app for the three key features
+ */
 const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
   [require('@/assets/splash/pain-home.png'), require('@/assets/splash/pain-summary.png')],
   [require('@/assets/splash/health-home.png'), require('@/assets/splash/health-records.png')],
@@ -10,9 +14,7 @@ const previewPairs: readonly [ImageSource | number, ImageSource | number][] = [
 ];
 
 /**
- * Draws one small example screen in the welcome artwork.
- *
- * Position the front preview above the back preview.
+ * Draws one small example screen in the welcome artwork
  */
 function ScreenPreview({ source, front }: { source: ImageSource | number; front?: boolean }) {
   return (
@@ -25,9 +27,8 @@ function ScreenPreview({ source, front }: { source: ImageSource | number; front?
 }
 
 /**
- * Displays the group of preview screens on the welcome page.
- *
- * Pick the artwork pair that belongs to the current splash page.
+ * Displays the group of preview screens on the welcome page
+ * Show the artwork pair that belongs to the current splash page
  */
 export function SplashArtwork({ page }: { page: number }) {
   const [back, front] = previewPairs[page] ?? previewPairs[0];
@@ -40,7 +41,6 @@ export function SplashArtwork({ page }: { page: number }) {
   );
 }
 
-// Keep preview positions and frames together.
 const styles = StyleSheet.create({
   canvas: {
     width: '100%',

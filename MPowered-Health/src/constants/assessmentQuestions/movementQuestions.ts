@@ -1,4 +1,5 @@
-import { QuestionsConfig, getSectionScore } from "@/services/assessmentScoreCalculator";
+import { getSectionScore } from "@/utils/assessmentScoreCalculator";
+import { QuestionsConfig } from "@/types/assessment";
 
 // Scale options used across multiple questions
 const movementScales: Record<string, string[]> = {
