@@ -220,7 +220,7 @@ describe("input validation for question 4", () => {
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         const reflectionInput = screen.getByPlaceholderText("Write your reflection");
-        fireEvent.changeText(reflectionInput, "I felt hopeless and unmotivated to do anything this week. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu")
+        await fireEvent.changeText(reflectionInput, "I felt hopeless and unmotivated to do anything this week. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu")
         const updatedInput = screen.getByPlaceholderText('Write your reflection');
         expect(updatedInput.props.value).toHaveLength(500);
     });
