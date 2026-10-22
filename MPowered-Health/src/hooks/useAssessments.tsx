@@ -1,7 +1,14 @@
 import { supabase } from '@/lib/supabase/client';
 import { type CurrentWeeklyAssessmentState } from '@/types/assessment';
 import { buildSnapshot, retentionCutoff, type AssessmentRow, type HealthSnapshot } from '@/services/assessmentDataMapper';
+import { MAX_ASSESSMENTS } from '@/constants/myhealth/assessments';
 
+/**
+ * Assessment CRUD (create, read, update, delete) with Supabase
+ * RLS ensure every call is by the user
+*/
+
+/** Map database assessment name to UI displayable name */
 const TABLE_MAP: Record<string, string> = {
   'My Pain': 'pain_assessment',
   'My Movement': 'movement_assessment',
@@ -10,7 +17,7 @@ const TABLE_MAP: Record<string, string> = {
   'My Management': 'management_assessment',
 };
 
-// Helper to get Monday of the current week (YYYY-MM-DD)
+/** Helper to get Monday of the current week (YYYY-MM-DD) */
 export function getCurrentWeekStartDate(): string {
   const d = new Date();
   const day = d.getDay();
@@ -19,8 +26,8 @@ export function getCurrentWeekStartDate(): string {
 
   // Get the local date
   const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0'); //two digits format for months
-  const date = String(d.getDate()).padStart(2, '0'); ////two digits format for date
+  const month = String(d.getMonth() + 1).padStart(2, '0'); // two digits format for months
+  const date = String(d.getDate()).padStart(2, '0'); // two digits format for date
   
   return year + '-' + month + '-' + date; 
 }
@@ -54,7 +61,7 @@ async function getAuthenticatedUserId(): Promise<string> {
   return user.id;
 }
 
-/** Returns the number of consecutive weeks in which the signed-in user checked in. */
+/** Returns the number of consecutive weeks (streak) in which the signed-in user checked in */
 export async function getWeeklyAssessmentStreak(): Promise<number> {
   const activeUserId = await getAuthenticatedUserId();
   const { data, error } = await supabase
@@ -78,8 +85,7 @@ export async function getWeeklyAssessmentStreak(): Promise<number> {
   const currentWeek = getCurrentWeekStartDate();
   const cursor = localDateFromIso(currentWeek);
 
-  // A streak remains active during the current week before the person checks in.
-  // In that case, begin counting from the previous completed week.
+  // Begin counting streak from previous week if the current week hasn't been completed yet
   if (!completedWeeks.has(currentWeek)) cursor.setDate(cursor.getDate() - 7);
 
   let streak = 0;
@@ -92,8 +98,8 @@ export async function getWeeklyAssessmentStreak(): Promise<number> {
 }
 
 /**
- * Loads this week's saved answers without creating an empty assessment.
- * This keeps the home-screen progress accurate after the app is reopened.
+ * Loads this week's saved answers without creating an empty assessment
+ * This keeps the home-screen progress accurate after the app is reopened
  */
 export async function getCurrentWeeklyAssessmentState(): Promise<CurrentWeeklyAssessmentState> {
   const activeUserId = await getAuthenticatedUserId();
@@ -142,18 +148,19 @@ export async function getCurrentWeeklyAssessmentState(): Promise<CurrentWeeklyAs
 }
 
 /**
- * Gets the active assessment_id for the current week,
- * or creates one if it doesn't exist yet.
- */
+ * Gets the active assessment_id for the current week or creates one if it doesn't exist yet
+*/
 export async function getOrCreateCurrentWeeklyAssessment(
   userId: string | null = null
 ): Promise<string | number> {
   const weekStart = getCurrentWeekStartDate();
   const activeUserId = userId || (await getAuthenticatedUserId());
 
-  // A weekly assessment belongs to one user. Filtering only by week can select
-  // another person's record or make maybeSingle fail when several people have
-  // completed an assessment in the same week.
+  /** 
+   * A weekly assessment belongs to one user
+   * Filtering only by week can select another person's record or make maybeSingle 
+   * fail when several people have completed an assessment in the same week 
+  */
   const query = supabase
     .from('assessment')
     .select('assessment_id')
@@ -218,7 +225,7 @@ export async function submitAssessmentAnswers(
   const { data, error } = await supabase
     .from(tableName)
 
-    // Updating the same assessment in the same week replaces its previous answers.
+    // Updating the same assessment in the same week replaces its previous answers
     .upsert(payload, { onConflict: 'assessment_id' })
     .select();
 
@@ -231,7 +238,7 @@ export async function submitAssessmentAnswers(
 }
 
 /**
- * Saves the weekly reflection text directly to the parent 'assessment' taBLE.
+ * Saves the weekly reflection text directly to the parent 'assessment' table
  */
 export async function saveWeeklyReflection(
   reflectionText: string,
@@ -255,7 +262,7 @@ export async function saveWeeklyReflection(
 }
 
 /**
- * Retrieves the current week's reflection text.
+ * Retrieves the current week's reflection text
  */
 export async function getWeeklyReflection(): Promise<string> {
   const activeUserId = await getAuthenticatedUserId();
@@ -276,43 +283,29 @@ export async function getWeeklyReflection(): Promise<string> {
   return data?.weekly_reflection || '';
 }
 
-// for health profile
 /**
- * Reads user's assessments from Supabase in one trip.
- *
- * Row Level Security decides which rows come back - the user_id filter only helps the query
- * planner. If every list is empty, check RLS policies!
- */
-// Each assessment has its child rows (pain, movement, personal care, social health, management).
-const ASSESSMENTS_WITH_CHILDREN = `
-  assessment_id,
-  date,
-  pain_assessment(*),
-  movement_assessment(*),
-  personal_care_assessment(*),
-  social_health_assessment(*),
-  management_assessment(*)
-`;
-
-/** 18 months of weekly check-ins is about 80 rows - this cap only guards. */
-const MAX_ASSESSMENTS = 500;
-
-/**
- * Loads the pain history and the latest answers for every assessment type.
- *
- * @throws If the request fails, so the session boundary can show its retry screen. The message
- *         carries only the error code and never any health data!
+ * Reads all user's assessments from Supabase in one go from within the data retention period
+ * Used by my health feature
  */
 export async function fetchHealthSnapshot(userId: string): Promise<HealthSnapshot> {
   const { data, error } = await supabase
     .from('assessment')
-    .select(ASSESSMENTS_WITH_CHILDREN)
+    .select(`
+      assessment_id,
+      date,
+      pain_assessment(*),
+      movement_assessment(*),
+      personal_care_assessment(*),
+      social_health_assessment(*),
+      management_assessment(*)
+    `)
     .eq('user_id', userId)
     .gte('date', retentionCutoff().toISOString())
     .order('date', { ascending: false })
     .limit(MAX_ASSESSMENTS);
 
-  // PGRST200 means a foreign key from a child table to assessment is missing.
+  // PGRST200 means a foreign key from a child table to assessment is missing
   if (error) throw new Error(`Could not load health records (${error.code ?? 'unknown'}).`);
+
   return buildSnapshot((data ?? []) as unknown as AssessmentRow[]);
 }

@@ -5,7 +5,11 @@ import { getCurrentWeekStartDate } from '@/hooks/useAssessments';
 import { type Question } from "@/types/questions";
 import { type PainAssessment } from "@/types/assessment";
 
-
+/**
+ * Question CRUD (create, read, update, delete) with Supabase
+ * RLS ensure every call is by the user
+ * Also retrieves pain assessment data related to generate personalised questions
+*/
 export const useQuestions = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -57,12 +61,14 @@ export const useQuestions = () => {
         }
 
         try {
-            const {error} = await supabase.from("question").insert({
-                user_id: user.id,
-                question: question,
-            })
-            .select()
-            .single();
+            const {error} = await supabase
+                .from("question")
+                .insert({
+                    user_id: user.id,
+                    question: question,
+                })
+                .select()
+                .single();
 
             if (error) {
                 console.error("Error creating question:", error);

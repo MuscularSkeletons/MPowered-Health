@@ -1,38 +1,52 @@
-/**
- * Prescription CRUD with Supabase, where RLS makes sure every call is by the user.
- *
- * Every function throws on failure. Returning an empty list instead would make a failed load look
- * like "Prescription list is empty", which is unsafe for a medication list.
- */
 import { supabase } from '@/lib/supabase/client';
 import { type PrescriptionDraft, type PrescriptionItem, type PrescriptionRow } from '@/types/prescriptions';
 
+/**
+ * Prescription CRUD (create, read, update, delete) with Supabase
+ * RLS ensure every call is by the user
+ * Also contains function to check for duplicate prescriptions
+*/
 
-/** Error messages carry only the error code, never prescription details. */
+/** Structure of an error message  */
 const failure = (action: string, code?: string) => new Error(`Could not ${action} (${code ?? 'unknown'}).`);
 
-/** Oldest first, matching how the list screen appends new prescriptions. */
 export async function listPrescriptions(userId: string): Promise<PrescriptionItem[]> {
   const { data, error } = await supabase
     .from('prescription')
     .select('*')
     .eq('user_id', userId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true }); // display oldest prescriptions first
+
   if (error) throw failure('load prescriptions', error.code);
   return ((data ?? []) as PrescriptionRow[]).map(rowToPrescription);
+}
+
+/** Prescription values that can be updated once created */
+function editableFields(draft: PrescriptionDraft) {
+  return {
+    medicine_name: draft.name.trim(),
+    strength: Number(draft.strength),
+    strength_unit: draft.unit,
+    form: draft.form,
+    frequency: draft.frequency,
+    number_of_repeat: Number(draft.repeat),
+  };
 }
 
 export async function createPrescription(userId: string, draft: PrescriptionDraft): Promise<PrescriptionItem> {
   const { data, error } = await supabase
     .from('prescription')
-    .insert(draftToInsert(draft, userId))
+    .insert({
+      ...editableFields(draft),
+      user_id: userId,
+    })
     .select()
     .single();
+
   if (error) throw failure('save the prescription', error.code);
   return rowToPrescription(data as PrescriptionRow);
 }
 
-/** Fails (rather than silently doing nothing) if the row no longer exists or isn't the users. */
 export async function updatePrescription(id: string, draft: PrescriptionDraft): Promise<PrescriptionItem> {
   const { data, error } = await supabase
     .from('prescription')
@@ -40,6 +54,8 @@ export async function updatePrescription(id: string, draft: PrescriptionDraft): 
     .eq('prescription_id', id)
     .select()
     .single();
+
+  // Fails (rather than silently doing nothing) if the row no longer exists or isn't the users
   if (error) throw failure('save the prescription', error.code);
   return rowToPrescription(data as PrescriptionRow);
 }
@@ -61,26 +77,10 @@ export function rowToPrescription(row: PrescriptionRow): PrescriptionItem {
   };
 }
 
-/** Fields shared by insert. */
-export function editableFields(draft: PrescriptionDraft) {
-  return {
-    medicine_name: draft.name.trim(),
-    strength: Number(draft.strength),
-    strength_unit: draft.unit,
-    form: draft.form,
-    frequency: draft.frequency,
-    number_of_repeat: Number(draft.repeat),
-  };
-}
-
-export function draftToInsert(draft: PrescriptionDraft, userId: string) {
-  return {
-    ...editableFields(draft),
-    user_id: userId,
-  };
-}
-
-/** True when another prescription has the same name (with case not mattering), strength and unit. */
+/** 
+ * Prevent exact same prescription from being added
+ * True when another prescription has the same name (with case not mattering), strength and unit 
+*/
 export function isDuplicate(
   draft: PrescriptionDraft,
   list: PrescriptionItem[],
