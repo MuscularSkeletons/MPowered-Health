@@ -206,8 +206,7 @@ describe("input validation for question 2 & 4", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         const otcMedication = screen.getByPlaceholderText("Input name of over the counter medication");
         await fireEvent.changeText(otcMedication, "medication medication medication medication medication medication medication medication medication medication Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu");
-        const updatedInput = screen.getByPlaceholderText("Input name of over the counter medication");
-        expect(updatedInput.props.value).toHaveLength(500);
+        expect(otcMedication.props.value).toHaveLength(500);
     });
 
     test("500 character limit test for question 4 ", async() => {
@@ -219,9 +218,8 @@ describe("input validation for question 2 & 4", () => {
         await fireEvent.press(screen.getByText("0 days"));
         await fireEvent.press(screen.getByRole("button", {name : "Record"}));
         const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
-        await fireEvent.changeText(emotionStrategies, "Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu");
-        const updatedInput = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");        
-        expect(updatedInput.props.value).toHaveLength(500);
+        await fireEvent.changeText(emotionStrategies, "Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu");  
+        expect(emotionStrategies.props.value).toHaveLength(500);
     });
 });
 
