@@ -32,7 +32,7 @@ export function PrescriptionScreen({
 }) {
   return (
     <Screen>
-        <Text onPress={() => onBack} style={commonStyles.back}>‹ Back</Text>
+        <Text onPress={onBack} style={commonStyles.back}>‹ Back</Text>
         <Intro
             sectionLabel="PRESCRIPTIONS"
             title={title}

@@ -16,7 +16,7 @@ import { RefObject, Dispatch, SetStateAction } from "react";
 import { PrescriptionItem } from "@/types/prescriptions";
 import { palette, textInputLength } from "@/constants/ui/styling";
 import { router } from "expo-router";
-import { asSentence } from "@/utils/convertSentence";
+import { asSentence } from "@/utils/convertToSentence";
 
 interface AssessmentQuestionProps {
     categoryData: {

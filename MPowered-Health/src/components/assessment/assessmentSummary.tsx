@@ -9,7 +9,7 @@ import {
 import { Header, commonStyles } from "@/components/shared/common";
 import { QuestionItem } from "@/types/assessment";
 import { palette } from "@/constants/ui/styling";
-import { asSentence } from "@/utils/convertSentence";
+import { asSentence } from "@/utils/convertToSentence";
 
 interface AssessmentSummaryProps {
   categoryData: {

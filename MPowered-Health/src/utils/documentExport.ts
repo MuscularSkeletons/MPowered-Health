@@ -1,7 +1,8 @@
-/** Provides native printing, document sharing, and clipboard helpers */
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Share } from 'react-native';
+
+/** Provides native printing, document sharing, and clipboard helpers */
 
 /** Opens a printable document from HTML using this platform’s printing support */
 export async function printHtml(html: string): Promise<void> {
@@ -41,3 +42,19 @@ export async function copyText(_text: string): Promise<boolean> {
   // Native profile actions do not show a copy option; the web module implements it
   return false;
 }
+
+/**
+ * Escapes special characters so user text is safe to place in an HTML report
+ * User-entered labels must be escaped before they are inserted into the print document
+*/
+export const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return entities[character];
+  });

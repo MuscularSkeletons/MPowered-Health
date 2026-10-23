@@ -9,7 +9,7 @@ import { prescriptionLabel } from '@/services/prescriptionHelper';
 import { QuestionItem } from '@/types/assessment';
 import { AssessmentSummary } from '@/components/assessment/assessmentSummary';
 import { AssessmentQuestion, EmptyAssessment } from '@/components/assessment/assessementQuestion';
-import { asSentence } from "@/utils/convertSentence";
+import { asSentence } from "@/utils/convertToSentence";
 
 interface AssessmentScreenProps {
   categoryData: {

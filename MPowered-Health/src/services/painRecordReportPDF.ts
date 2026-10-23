@@ -1,4 +1,3 @@
-/** Builds the printable health-record report, including its chart. */
 import {
   PainAssessmentRecord,
   PainMetric,
@@ -6,31 +5,28 @@ import {
   painRecordDate,
 } from '@/services/healthDataHelper';
 import { PAIN_RECORD_REPORT_STYLES } from '@/constants/myhealth/painRecordPDFStyles';
+import { escapeHtml } from '@/utils/documentExport';
 
-/**
- * Escapes special characters so user text is safe to place in an HTML report.
- *
- * User-entered labels must be escaped before they are inserted into the print document.
- */
-const escapeHtml = (text: string) =>
-  text.replace(
-    /[&<>"']/g,
-    (value) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[value]!,
-  );
+/** 
+ * Builds the printable health record report, including its chart and table
+*/
 
-/** Builds a printable HTML report from pain records. */
+/** Builds a printable HTML report from pain records */
 export function buildPainRecordsHtml(
   records: PainAssessmentRecord[],
   areaLabel: string,
   metric: PainMetric,
 ) {
-  // Build chart values and short date labels from the selected area group only.
+  // Build chart values and short date labels from the selected area group only
   const chart = records.map((record) => painMetricValue(record, metric));
   const chartDates = records.map((record) => painRecordDate(record, true));
-  // Expo Print renders HTML through WebKit. Keep the report self-contained and use
-  // print-safe SVG/CSS so charts and table rows paginate without being clipped.
+
+  /** 
+   * Expo Print renders HTML through WebKit. Keep the report self-contained and use
+   * print-safe SVG/CSS so charts and table rows paginate without being clipped 
+  */
   const rows = [...records]
-    // Show the latest assessment first in the detail table.
+    // Show the latest assessment first in the detail table
     .reverse()
     .map((record) => [
       painRecordDate(record),
@@ -49,23 +45,22 @@ export function buildPainRecordsHtml(
     chartBottom = 178;
 
   /**
-   * Places a record along the report chart’s horizontal axis.
-   *
-   * Spread points across the available width, centring a chart with one result.
+   * Places a record along the report chart’s horizontal axis
+   * Spread points across the available width, centring a chart with one result
    */
   const chartX = (index: number) =>
     chart.length === 1
       ? (chartLeft + chartRight) / 2
       : chartLeft + (index * (chartRight - chartLeft)) / (chart.length - 1);
 
-  /** Places a score along the report chart’s vertical axis. */
+  // Places a score along the report chart’s vertical axis
   const chartY = (score: number) => chartBottom - (score / 10) * (chartBottom - chartTop);
 
-  // These strings become the line and shaded area coordinates in the SVG.
+  // These strings become the line and shaded area coordinates in the SVG
   const chartPoints = chart.map((score, index) => `${chartX(index)},${chartY(score)}`).join(' ');
   const chartArea = `${chartX(0)},${chartBottom} ${chartPoints} ${chartX(chart.length - 1)},${chartBottom}`;
   const horizontalGrid = Array.from(
-    // Draw one horizontal guide for every possible score from zero to ten.
+    // Draw one horizontal guide for every possible score from zero to ten
     { length: 11 },
     (_, score) =>
       `<line x1="${chartLeft}" x2="${chartRight}" y1="${chartY(score)}" y2="${chartY(score)}" stroke="#CBD6D9" stroke-width="1" stroke-dasharray="3 4"/><text x="30" y="${chartY(score) + 4}" text-anchor="end" font-size="10" fill="#68787E">${score}</text>`,
@@ -79,7 +74,7 @@ export function buildPainRecordsHtml(
     .join('');
 
   const chartLabels = chartDates
-    // Limit date labels on long histories so they remain readable when printed.
+    // Limit date labels on long histories so they remain readable when printed
     .map((date, index) =>
       date && (index % Math.max(1, Math.ceil(chart.length / 8)) === 0 || index === chart.length - 1)
         ? `<text x="${chartX(index)}" y="202" text-anchor="middle" font-size="9" fill="#68787E">${date}</text>`
@@ -103,7 +98,7 @@ export function buildPainRecordsHtml(
     </svg>
   `;
   
-    // Return one self-contained document so native and web printing need no extra assets.
+  // Return one self-contained document so native and web printing need no extra assets
   return `
     <!doctype html>
     <html lang="en">
