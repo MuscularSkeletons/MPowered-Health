@@ -543,7 +543,7 @@ describe("summary screen tests", () => {
     })
 
     test("score more than 30", async() => {
-        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 8, enjoyment_impact: 9 }}/>);
+        await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 8, relation_impact: 9, enjoyment_impact: 9 }}/>);
         
         //question 1
         await fireEvent.press(screen.getByText('Pain has restricted my social life and I do not go out as often'));
