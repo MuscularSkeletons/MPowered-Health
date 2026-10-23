@@ -20,6 +20,12 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+jest.mock('@/context/prescriptionsContext', () => ({
+    usePrescriptions: jest.fn (() => ({
+        list: [],
+    })),
+}))
+
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 })) 

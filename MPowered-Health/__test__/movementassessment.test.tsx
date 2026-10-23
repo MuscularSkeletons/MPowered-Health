@@ -7,6 +7,9 @@ import { Alert } from 'react-native';
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
+jest.mock('@react-native-async-storage/async-storage', () => 
+    require('@react-native-async-storage/async-storage/jest/async-storage-mock'))
+
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -17,6 +20,12 @@ jest.mock("@/context/authcontext", () => ({
         isLoading: false,
     }),
 }));
+
+jest.mock('@/context/prescriptionsContext', () => ({
+    usePrescriptions: jest.fn (() => ({
+        list: [],
+    })),
+}))
 
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
