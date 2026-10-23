@@ -320,7 +320,7 @@ describe("summary screen tests", () => {
             await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I get dressed more slowly than usual because of my pain',
             personal_care_impact: 'I can look after myself normally, but it causes extra pain',
-            sleeping_impact: 'My sleep is occasionally disturbed by pain',
+            sleeping_impact: 'Because of pain I have less than 6 hours of sleep',
             care_reflection: "I felt hopeless and unmotivated to do anything this week.",
         }}/>);
         
@@ -333,7 +333,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         //question 3
-        await fireEvent.press(screen.getByText('My sleep is occasionally disturbed by pain'));
+        await fireEvent.press(screen.getByText('Because of pain I have less than 6 hours of sleep'));
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         //question 4 (reflection)
@@ -346,14 +346,14 @@ describe("summary screen tests", () => {
 
     test("score less than 15 and more than 10", async() => {
             await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
-            activities_impact: 'I sleep less well because of my pain',
+            activities_impact: 'I am more irritable and bad tempered with people than usual',
             personal_care_impact: 'It is painful to look after myself and I am slow and careful',
-            sleeping_impact: 'My sleep than never disturbed by pain',
+            sleeping_impact: 'Because of pain I have less than 2 hours of sleep',
             care_reflection: "I felt hopeless and unmotivated to do anything this week.",
         }}/>);
         
         //question 1 
-        await fireEvent.press(screen.getByText('I sleep less well because of my pain'));
+        await fireEvent.press(screen.getByText('I am more irritable and bad tempered with people than usual'));
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         //question 2
@@ -361,7 +361,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         //question 3
-        await fireEvent.press(screen.getByText('My sleep is never disturbed by pain'));
+        await fireEvent.press(screen.getByText('Because of pain I have less than 2 hours of sleep'));
         await fireEvent.press(screen.getByRole('button', {name: 'Record'}));
 
         //question 4 (reflection)
@@ -531,7 +531,6 @@ describe("submitting users answers to database", () => {
                     sleeping_impact: 'My sleep is never disturbed by pain',
                 }, 
                 {
-                care_score: 1,
                 impact_level: "Your answers indicate that pain does not really impact your personal care.",
                 },
                 undefined,
