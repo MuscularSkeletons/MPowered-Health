@@ -734,9 +734,9 @@ describe("submitting users answers to database", () => {
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         await waitFor(() => {
-            expect(submitAssessmentAnswers).toHaveBeenCalledWith({
-                categoryTitle: "My Social Health",
-                answers: {
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith(
+                "My Social Health",
+                {
                     social_life: "My social life is normal and gives me no extra pain",
                     travelling: "I can travel anywhere without pain",
                     mood_impact: 5,
@@ -744,8 +744,12 @@ describe("submitting users answers to database", () => {
                     enjoyment_impact: 9,
                     general_mood: "I was feeling frustrated",
                     mood_trigger: "No friends :( ", 
-                }
-            })
+                },
+                {
+                    impact_level: "Your answers indicate that pain mildly impacts your social health.",
+                },
+                    undefined,
+            )
         })
 
         expect(screen.getByText("My Social Health Summary")).toBeTruthy();
