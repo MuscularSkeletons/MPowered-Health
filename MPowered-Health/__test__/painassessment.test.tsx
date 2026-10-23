@@ -374,7 +374,7 @@ describe("input validation for question 1 other", () => {
     afterEach(jest.clearAllMocks);
 
     test("can input text for question 1 option other", async() => {
-        fireEvent.press(screen.getByText("Other"));
+        await fireEvent.press(screen.getByText("Other"));
         const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
         const user = userEvent.setup();
         await user.type(otherInput, "Inner thigh");
@@ -384,22 +384,23 @@ describe("input validation for question 1 other", () => {
 
     test("other location entered is not the same as a pre-existing option", async() => {
         jest.spyOn(Alert, "alert");
-        fireEvent.press(screen.getByText("Other"));
+        await fireEvent.press(screen.getByText("Other"));
         const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
         const user = userEvent.setup();
-        const location = "Shoulder";
+        const location = 'Shoulder';
         await user.type(otherInput, location);
         fireEvent.press((screen.getByRole('button', { name: 'Record' })));
-        expect(Alert.alert).toHaveBeenCalledWith('Location Already Listed', '"' + {location} + 'is already a an option in the list. Please select it from the options above.');
+        expect(Alert.alert).toHaveBeenCalledWith("Location Already Listed", `"${location}" is already an option in the list. Please select it from the options above.`);
     });
 
-    test("500 character limit for option other in question 1", async() => {
-        fireEvent.press(screen.getByText("Other"));
+    test("50 character limit for option other in question 1", async() => {
+        await fireEvent.press(screen.getByText("Other"));
         const otherInput = screen.getByPlaceholderText("Please specify location (e.g., Wrist, Elbow)");
         const location = "Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Shoulder Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt.";
+        expect(otherInput.props.maxLength).toBe(50);
+        //await userEvent.type(otherInput, location )
         await fireEvent.changeText(otherInput, location);
-        const updatedInput = screen.getByPlaceholderText("Input name of over the counter medication");
-        expect(updatedInput.props.value).toHaveLength(500);
+        expect(otherInput.props.value).toHaveLength(50);
     })
 });
 
@@ -457,12 +458,8 @@ describe('summary screen', () => {
         expect(screen.getByText("My overall average pain last week was")).toBeTruthy();
 
         //user's answers
-        expect(screen.getByText('Head')).toBeTruthy();
-        expect(screen.getByText('Upper Back')).toBeTruthy();
-        expect(screen.getByText('Elbow')).toBeTruthy();
-        expect(screen.getByText('Aching')).toBeTruthy();
-        expect(screen.getByText('Gnawing')).toBeTruthy();
-        expect(screen.getByText('Sharp')).toBeTruthy();
+        expect(screen.getByText('Head Upper Back Elbow')).toBeTruthy();
+        expect(screen.getByText('Aching Gnawing Sharp')).toBeTruthy();
         expect(screen.getByText('5')).toBeTruthy();
         expect(screen.getByText('7')).toBeTruthy();
         expect(screen.getByText('6')).toBeTruthy();

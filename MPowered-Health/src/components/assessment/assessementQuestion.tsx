@@ -177,7 +177,7 @@ export function AssessmentQuestion({
                                 <View style={styles.otherInputContainer}>
                                 <TextInput
                                     value={otherText}
-                                    onChangeText={setOtherText}
+                                    onChangeText={(text) => setOtherText(text.slice(0,textInputLength.short))}
                                     placeholder="Please specify location (e.g., Wrist, Elbow)"
                                     placeholderTextColor="#81798A"
                                     style={styles.otherTextInput}
