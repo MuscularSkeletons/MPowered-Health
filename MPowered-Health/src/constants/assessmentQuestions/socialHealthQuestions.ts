@@ -24,6 +24,7 @@ const socialScales: Record<string, string[]> = {
     'I was feeling frustrated',
     'I was feeling sad',
     'I was feeling okay',
+    'I was feeling calm',
     'I was feeling delighted',
   ],
 };
