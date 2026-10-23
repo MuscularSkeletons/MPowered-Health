@@ -140,7 +140,7 @@ export function AssessmentQuestion({
                     ) : currentQ.kind === 'text' || currentQ.kind === 'number' ? (
                     <TextInput
                         value={currentText}
-                        onChangeText={(text) => select(currentQ.kind === 'number' ? text.replace(/\D/g, '') : text)}
+                        onChangeText={(text) => select(currentQ.kind === 'number' ? text.replace(/\D/g, '') : text.slice(0, textInputLength.long))}
                         keyboardType={currentQ.kind === 'number' ? 'numeric' : 'default'}
                         maxLength={currentQ.kind === 'number' ? 2 : textInputLength.long}
                         multiline={currentQ.kind === 'text'}
