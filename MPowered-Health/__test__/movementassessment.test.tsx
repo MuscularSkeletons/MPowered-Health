@@ -7,9 +7,6 @@ import { Alert } from 'react-native';
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
-jest.mock('@react-native-async-storage/async-storage', () => 
-    require('@react-native-async-storage/async-storage/jest/async-storage-mock'))
-
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -167,9 +164,9 @@ describe("movement assessment questions are rendered on screen", () => {
         // options
         expect(screen.getByText('I can stand as long as I want without increased pain')).toBeTruthy();
         expect(screen.getByText('I can stand as long as I want, but it increases my pain')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me standing more than one hour')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me standing more than 30 minutes')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me from standing more than 10 minutes')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from standing for more than one hour')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from standing for more than 30 minutes')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from standing for more than 10 minutes')).toBeTruthy();
         expect(screen.getByText('Pain prevents me from standing at all')).toBeTruthy();
 
         expect(screen.getByText('6/7')).toBeTruthy();
@@ -194,12 +191,12 @@ describe("movement assessment questions are rendered on screen", () => {
 
         expect(screen.getByText('Write any reflections of pain impacts on your mobility.')).toBeTruthy();
         expect(screen.getByText('Reflection on your movement')).toBeTruthy();
-        expect(screen.getByText('For instance, when pain occured, you lie down for the whole day.')).toBeTruthy();
+        expect(screen.getByText('For instance, when pain occurred, you may have needed to lie down for the whole day.')).toBeTruthy();
         // text
         expect(screen.getByPlaceholderText('Write your reflection')).toBeTruthy();
 
         expect(screen.getByText('7/7')).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
     });
 
 });
@@ -422,8 +419,7 @@ describe("input validation for question 7", () => {
         
         const reflectionInput = screen.getByPlaceholderText("Write your reflection");
         await fireEvent.changeText(reflectionInput, "Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Pain Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu ");
-        const updatedInput = screen.getByPlaceholderText('Write your reflection');
-        expect(updatedInput.props.value).toHaveLength(500);
+        expect(reflectionInput.props.value).toHaveLength(500);
     });
 });
 
@@ -438,12 +434,12 @@ describe("summary screen tests", () => {
             walking_impact: 'Pain prevents me from walking more than 100 metres',
             lifting_impact:'I can lift very light weights',
             sitting_impact: 'Pain prevents me sitting more than 1 hour',
-            standing_impact:'Pain prevents me from standing for more than 1 hour',
+            standing_impact:'Pain prevents me from standing for more than one hour',
         }}/>);
         
         //navigate to summary screen
         //question 1
-        await fireEvent.press(screen.getByText('Less than 1 hour'));
+        await fireEvent.press(screen.getByText('1 - 2 hours'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 2
@@ -451,20 +447,23 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 3
-        await fireEvent.press(screen.getByText('Pain does not prevent me walking any distance'));
+        await fireEvent.press(screen.getByText('Pain prevents me from walking more than 100 metres'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 4
-        await fireEvent.press(screen.getByText('I can lift heavy weights without extra pain'));
+        await fireEvent.press(screen.getByText('I can lift only very light weights'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 5
-        await fireEvent.press(screen.getByText('I can sit in any chair as long as I like'));
+        await fireEvent.press(screen.getByText('Pain prevents me sitting more than 1 hour'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 6
-        await fireEvent.press(screen.getByText('I can stand as long as I want without increased pain'));
-        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+        await fireEvent.press(screen.getByText('Pain prevents me from standing for more than one hour'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
+        
+        //question 7
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));      
 
         //summary screen
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
@@ -483,19 +482,19 @@ describe("summary screen tests", () => {
         expect(screen.getByText('On average, how many hours per day were you able to stay active or mobile last week?')).toBeTruthy();
         expect(screen.getByText('Select ALL relevant statements:')).toBeTruthy();
         expect(screen.getAllByText('Select the MOST relevant statement:')).toBeTruthy();
-        expect(screen.getByText('Write any reflections of pain impacts on your mobility')).toBeTruthy();
+        expect(screen.getByText('Write any reflections of pain impacts on your mobility.')).toBeTruthy();
        
         //user's answers
         expect(screen.getByText('1 - 2 hours')).toBeTruthy();
         expect(screen.getByText('I walk more slowly than usual because of my pain')).toBeTruthy();
         expect(screen.getByText('Pain prevents me from walking more than 100 metres')).toBeTruthy();
-        expect(screen.getByText('I can lift very light weights')).toBeTruthy();
+        expect(screen.getByText('I can lift only very light weights')).toBeTruthy();
         expect(screen.getByText('Pain prevents me sitting more than 1 hour')).toBeTruthy();
-        expect(screen.getByText('Pain prevents me standing more than one hour')).toBeTruthy();
+        expect(screen.getByText('Pain prevents me from standing for more than one hour')).toBeTruthy();
         expect(screen.getByText("No response")).toBeTruthy();
         
         //message
-        expect(screen.getByText("Your answers have been saved")).toBeTruthy();
+        expect(screen.getByText("Your answers have been saved.")).toBeTruthy();
 
         //buttons
         expect(screen.getByText("Edit")).toBeTruthy();
@@ -536,7 +535,10 @@ describe("summary screen tests", () => {
         
         //question 6
         await fireEvent.press(screen.getByText('I can stand as long as I want without increased pain'));
-        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
+        
+        //question 7
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));      
 
         //summary screen
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
@@ -563,7 +565,7 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 3
-        await fireEvent.press(screen.getByText('Pain prevents me from walking more than 1 kilometre'));
+        await fireEvent.press(screen.getByText('Pain prevents me from walking more than 500 metres'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 4
@@ -576,7 +578,10 @@ describe("summary screen tests", () => {
         
         //question 6
         await fireEvent.press(screen.getByText('I can stand as long as I want, but it increases my pain'));
-        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 7
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));
 
         //summary screen
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
@@ -590,7 +595,7 @@ describe("summary screen tests", () => {
             walking_impact: 'Pain prevents me from walking more than 500 metres',
             lifting_impact:'I struggle to lift heavy weights off the floor, but I can lift them from a table',
             sitting_impact: 'Pain prevents me sitting more than 1 hour',
-            standing_impact:'Pain prevents me standing more than one hour',
+            standing_impact:'Pain prevents me from standing for more than one hour',
         }}/>);
         
         //navigate to summary screen
@@ -603,20 +608,23 @@ describe("summary screen tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 3
-        await fireEvent.press(screen.getByText('Pain prevents me from walking more than 500 metres'));
+        await fireEvent.press(screen.getByText('Pain prevents me from walking more than 100 metres'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 4
-        await fireEvent.press(screen.getByText('I struggle to lift heavy weights off the floor, but I can lift them from a tabl'));
+        await fireEvent.press(screen.getByText('I struggle to lift heavy weights off the floor, but I can lift medium weights from a table'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 5
-        await fireEvent.press(screen.getByText('Pain prevents me sitting more than 1 hour'));
+        await fireEvent.press(screen.getByText('Pain prevents me sitting more than 30 minutes'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         //question 6
-        await fireEvent.press(screen.getByText('Pain prevents me standing more than one hour'));
-        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+        await fireEvent.press(screen.getByText('Pain prevents me from standing for more than 30 minutes'));
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
+        
+        //question 7
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));
 
         //summary screen
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
@@ -656,7 +664,10 @@ describe("summary screen tests", () => {
         
         //question 6
         await fireEvent.press(screen.getByText('Pain prevents me from standing at all'));
-        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
+        await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
+        
+        //question 7
+        await fireEvent.press(screen.getByRole('button', { name: 'Review' }));  
 
         //summary screen
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
@@ -701,7 +712,7 @@ describe("navigation", () => {
         
         //question 7
         const user = userEvent.setup();
-        const reflectionInput = screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.');
+        const reflectionInput = screen.getByPlaceholderText('Write your reflection');
         await user.type(reflectionInput, 'I had no trouble walking the stairs today!');
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
         
@@ -755,7 +766,7 @@ describe("navigation", () => {
     
         //question 7
         const user = userEvent.setup();
-        const reflectionInput = screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.');
+        const reflectionInput = screen.getByPlaceholderText('Write your reflection');
         await user.type(reflectionInput, 'I had no trouble walking the stairs today!');
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
     
@@ -794,7 +805,7 @@ describe("navigation", () => {
     
         //question 7
         const user = userEvent.setup();
-        const reflectionInput = screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.');
+        const reflectionInput = screen.getByPlaceholderText('Write your reflection');
         await user.type(reflectionInput, 'I had no trouble walking the stairs today!');
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
     
@@ -843,24 +854,36 @@ describe("submitting users answers to database", () => {
         
         //question 7
         const user = userEvent.setup();
-        const reflectionInput = screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.');
+        const reflectionInput = screen.getByPlaceholderText('Write your reflection');
         await user.type(reflectionInput, 'I had no trouble walking the stairs today!');
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
 
         await waitFor(() => {
-            expect(submitAssessmentAnswers).toHaveBeenCalledWith({
-                categoryTitle: "My Movement",
-                answers: {
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith(
+                "My Movement",
+                {
                     active_hour: 'Less than 1 hour',
-                    general_impacts: 'I walk more slowly than usual because of my pain',
+                    general_impacts: ['I walk more slowly than usual because of my pain'],
                     walking_impact: 'Pain does not prevent me walking any distance',
                     lifting_impact:'I can lift heavy weights without extra pain',
                     sitting_impact: 'I can sit in any chair as long as I like',
                     standing_impact:'I can stand as long as I want without increased pain',
                     movement_reflection: 'I had no trouble walking the stairs today!',
-                }
-            })
+                },
+                {
+                    impact_level: "Your answers indicate that pain does not really impact your movement."
+                },
+                undefined,
+            )
         })
+
+        /*"My Movement", {"active_hour": "Less than 1 hour", "general_impacts": 
+            ["I walk more slowly than usual because of my pain"], "lifting_impact": "I can lift heavy
+             weights without extra pain", "movement_reflection": "I had no trouble walking the stairs today!",
+              "sitting_impact": "I can sit in any chair as long as I like", "standing_impact": "I can stand as
+               long as I want without increased pain", "walking_impact": "Pain does not prevent me walking any 
+               distance"}, {"impact_level": "Your answers indicate that pain does not really impact your movement."}, undefined
+*/
 
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
     })
@@ -897,7 +920,7 @@ describe("submitting users answers to database", () => {
         
         //question 7
         const user = userEvent.setup();
-        const reflectionInput = screen.getByPlaceholderText('For instance, when pain occured, you lie down for the whole day.');
+        const reflectionInput = screen.getByPlaceholderText('Write your reflection');
         await user.type(reflectionInput, 'I had no trouble walking the stairs today!');
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
 

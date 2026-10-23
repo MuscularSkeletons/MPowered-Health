@@ -374,8 +374,7 @@ describe("input validation for question 7", () => {
 
         const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
         await fireEvent.changeText(moodInput, "Didnt like the movie I watched. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu")
-        const updatedInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
-        expect(updatedInput.props.value).toHaveLength(500);
+        expect(moodInput.props.value).toHaveLength(500);
     });
 });
 
