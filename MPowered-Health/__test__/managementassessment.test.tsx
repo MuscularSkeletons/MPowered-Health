@@ -109,7 +109,7 @@ describe("my management assessment questions are rendered on screen", () => {
         expect(screen.getByText('Over the past week, did you perform any strategies to manage your stress level or emotion?')).toBeTruthy();
         expect(screen.getByText('Examples include meditation, journaling, or meeting with people.')).toBeTruthy();
         // text
-        expect(screen.getByPlaceholderText('Examples: meditation, journaling, meeting people')).toBeTruthy();
+        expect(screen.getByPlaceholderText('Write your strategies')).toBeTruthy();
         
         expect(screen.getByText('4/4')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
@@ -186,7 +186,7 @@ describe("my management assessment questions are selected/inputted correctly", (
         await fireEvent.press(screen.getByText("0 days"));
         await fireEvent.press(screen.getByRole("button", {name : "Record"}));
     
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         const user = userEvent.setup();
         await user.type(emotionStrategies, "Meditation");
    
@@ -217,7 +217,7 @@ describe("input validation for question 2 & 4", () => {
         await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
         await fireEvent.press(screen.getByText("0 days"));
         await fireEvent.press(screen.getByRole("button", {name : "Record"}));
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         await fireEvent.changeText(emotionStrategies, "Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu");  
         expect(emotionStrategies.props.value).toHaveLength(500);
     });
@@ -310,7 +310,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('1-2 days'));
         await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
         
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         const user = userEvent.setup();
         await user.type(emotionStrategies, "Meditation");
     
@@ -566,7 +566,7 @@ describe("submitting users answers to database", () => {
 
         //question 4
         expect(screen.getByText("4/4")).toBeTruthy();
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         await user.type(emotionStrategies, "Meditation");
         expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
