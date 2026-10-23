@@ -51,8 +51,7 @@ function mapSchedule(repeat: string, frequency: string): string {
 
 /** Formats the prescription name, strength, and schedule for display */
 export const prescriptionLabel = (prescription: PrescriptionItem) =>
-  `${prescription.name} ${prescription.strength} ${prescription.unit} 
-  — ${mapSchedule(prescription.repeat, prescription.frequency)}`;
+  `${prescription.name} ${prescription.strength} ${prescription.unit} — ${mapSchedule(prescription.repeat, prescription.frequency)}`;
 
 /**
  * Adds a prescription or replaces the entry with the same ID
