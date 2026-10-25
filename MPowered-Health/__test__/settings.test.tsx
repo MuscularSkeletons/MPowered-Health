@@ -1,4 +1,4 @@
-import Settings from '@/app/(tabs)/(settings)/settings';
+import Settings from '@/app/(tabs)/(settings)';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Alert } from 'react-native';
