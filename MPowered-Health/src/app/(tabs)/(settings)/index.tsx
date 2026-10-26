@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useAuth } from "@/context/authcontext";
 import { useRouter } from "expo-router";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { openBrowserAsync } from 'expo-web-browser';
 import { palette } from '@/constants/ui/styling';
 import { toUserError, type AuthUserError } from '@/constants/profile/autherror';
@@ -29,7 +29,7 @@ function SettingRow({
   danger = false,
   link = false,
 }: {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: "person-outline" | "notifications-outline" | "shield-checkmark-outline" | "document-text-outline" | "lock-closed-outline" | "log-out-outline" | "trash-outline";
   title: string;
   description: string;
   onPress: () => void;

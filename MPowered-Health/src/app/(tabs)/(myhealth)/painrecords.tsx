@@ -12,7 +12,7 @@ import {
   commonStyles,
 } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@react-native-vector-icons/feather";
 import { router, useFocusEffect } from 'expo-router';
 import { 
   Modal, 

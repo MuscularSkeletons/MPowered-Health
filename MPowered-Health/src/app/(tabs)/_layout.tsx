@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { palette } from "@/constants/ui/styling";
 import { HealthDataBoundary } from '@/components/myhealth/healthDataBoundary';
 import { useAuth } from '@/context/authcontext';
