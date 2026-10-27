@@ -1,5 +1,6 @@
 import AddQuestion from "@/app/(tabs)/(questions)/addquestion";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen, userEvent } from "@testing-library/react-native";
+import { Alert } from "react-native";
 
 let mockAssessment: {
     pain_location: string[] | null,
@@ -18,6 +19,8 @@ let mockAssessment: {
 const mockCreateQuestion = jest.fn();
 const mockRetrievePainAssessment = jest.fn();
 const mockAssessmentLoading = false;
+const mockReplace = jest.fn();
+const mockBack = jest.fn();
 
 jest.mock('@/context/authcontext', () => ({
     useAuth: () => ({
@@ -35,7 +38,13 @@ jest.mock('@/hooks/useQuestions', () => ({
     }),
 }));
 
-
+//mocking expo router
+jest.mock('expo-router', () => ({
+    useRouter: () => ({
+        replace: mockReplace,
+        back: mockBack,
+    })
+}))
 
 //add question screen rendering
 describe("add question screen", () => {
@@ -141,11 +150,77 @@ describe("save button is enabled/disabled", () => {
     })
 })
 
-//default questions
-
-//questions from assessment
-
 //custom questions
+describe("custom question functionality", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("pressing on add question button should open a pop up", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
+        expect(screen.getByText("Add Question")).toBeTruthy();
+        expect(screen.getByText("Question")).toBeTruthy();
+        expect(screen.getByPlaceholderText("Enter your question")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+        expect(screen.getAllByText("Save")).toBeTruthy();
+    })
+
+    test("user can add custom questions", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
+
+        const user = userEvent.setup();
+        const questionInput = screen.getByPlaceholderText("Enter your question");
+        await user.type(questionInput, "Why am I restless at night?");
+
+        expect(questionInput.props.value).toBe("Why am I restless at night?");
+    })
+
+    test("question added shows up under the 'Other' section", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
+
+        const user = userEvent.setup();
+        const questionInput = screen.getByPlaceholderText("Enter your question");
+        await user.type(questionInput, "Why am I restless at night?");
+
+        await fireEvent.press(screen.getAllByRole("button", {name: "Save"})[0]);
+        expect(screen.getByText("Why am I restless at night?")).toBeTruthy();
+    })
+
+    test("pressing save without adding any text throws an error", async() => {
+        await render(<AddQuestion/>);
+
+        const spyAlert = jest.spyOn(Alert, 'alert');
+        await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
+
+        await fireEvent.press(screen.getAllByRole("button", {name: "Save"})[0]);
+        expect(spyAlert).toHaveBeenCalledWith("Error", "Please enter a question");        
+    })
+})
+
+//submission 
 
 //navigation
+describe("navigation tests", ()=> {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("pressing save after selecting a question should navigate to questions list", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
+        await fireEvent.press(screen.getByRole("button", {name: "Save"}));      
+        expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(questions)/questions');
+    })
+
+    test('user presses the back button', async() => {
+        await render(<AddQuestion/>);
+        fireEvent.press(screen.getByText("‹ Back"));
+        expect(mockBack).toHaveBeenCalled();
+    })
+})
 
