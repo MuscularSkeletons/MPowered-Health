@@ -80,21 +80,22 @@ export default function Splash() {
         )}
       />
       <View style={styles.actions}>
-        <Pressable
-          style={({ pressed }) => [styles.primary, pressed && styles.primaryPressed]}
-          onPress={() =>
-            router.replace('/(auth)/signup')
-          }
-        >
-          <Text style={styles.primaryText}>Get started →</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.secondary, pressed && styles.secondaryPressed]}
-          onPress={() => router.replace('/(auth)/login')}
-        >
-          <Text style={styles.secondaryText}>Sign in</Text>
-        </Pressable>
-        
+        <View style={styles.buttons}>
+          <Pressable
+            style={({ pressed }) => [styles.primary, pressed && styles.primaryPressed]}
+            onPress={() =>
+              router.replace('/(auth)/signup')
+            }
+          >
+            <Text style={styles.primaryText}>Get started →</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.secondary, pressed && styles.secondaryPressed]}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            <Text style={styles.secondaryText}>Sign in</Text>
+          </Pressable>
+        </View>
       </View>
       <Text style={styles.sponsor}>Supported by ABBVIE</Text>
     </SafeAreaView>
@@ -137,12 +138,14 @@ export default function Splash() {
   dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: palette.light },
   dotOn: { width: 34, height: 12, borderRadius: 6, backgroundColor: palette.success },
   actions: {
-    width: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
+    backgroundColor: palette.background,
+  },
+  buttons: {
+    width: '100%', 
     paddingHorizontal: 30,
     gap: 6,
-    backgroundColor: palette.background,
+    alignSelf: 'center',
+    maxWidth: 520,
   },
   primary: {
     height: 50,
