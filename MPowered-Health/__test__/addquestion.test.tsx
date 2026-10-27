@@ -1,5 +1,5 @@
 import AddQuestion from "@/app/(tabs)/(questions)/addquestion";
-import { fireEvent, render, screen, userEvent } from "@testing-library/react-native";
+import { fireEvent, render, screen, userEvent, waitFor } from "@testing-library/react-native";
 import { Alert } from "react-native";
 
 let mockAssessment: {
@@ -201,20 +201,57 @@ describe("custom question functionality", () => {
     })
 })
 
-//submission 
+//submission tests
+describe('submission tests', () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("successful submission to the database", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
+        await fireEvent.press(screen.getByRole("button", {name: "Save"}));  
+        
+        await waitFor(() => {
+            expect(mockCreateQuestion).toHaveBeenCalledWith(
+                'What can I do to better manage days when the pain is high?'
+            );
+        });     
+    })
+
+    test("throw an error if submission to database fails", async() => {
+        (mockCreateQuestion as jest.Mock).mockRejectedValue(new Error("Could not submit"));
+        await render(<AddQuestion/>);
+        const spyAlert = jest.spyOn(Alert, 'alert');
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
+        await fireEvent.press(screen.getByRole("button", {name: "Save"}));  
+        
+        await waitFor(() => {
+            expect(spyAlert).toHaveBeenCalledWith(
+                'Error',
+                'Failed to complete. Please try again.',
+            );
+        });     
+    })
+})
 
 //navigation
 describe("navigation tests", ()=> {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (mockCreateQuestion as jest.Mock).mockResolvedValue(undefined);
     })
 
     test("pressing save after selecting a question should navigate to questions list", async() => {
         await render(<AddQuestion/>);
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
         await fireEvent.press(screen.getByRole("button", {name: "Save"}));      
-        expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(questions)/questions');
+        await waitFor(() => {
+            expect(mockCreateQuestion).toHaveBeenCalledWith('What can I do to better manage days when the pain is high?');
+            expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(questions)/questions');
+        })
     })
 
     test('user presses the back button', async() => {
