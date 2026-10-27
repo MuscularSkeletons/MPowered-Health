@@ -104,7 +104,11 @@ const QuestionCard = ({question, onDelete, onUpdate}: QuestionCardProps) => {
               }
             </Text>
           </View>
-          <TouchableOpacity onPress={handleDelete} disabled={isLoading}>
+          <TouchableOpacity 
+            accessibilityRole="button"
+            accessibilityLabel={`Delete`}
+            onPress={handleDelete} 
+            disabled={isLoading}>
             <Feather name="trash-2" size={21} color={palette.error} />
           </TouchableOpacity>
         </View>
