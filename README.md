@@ -20,6 +20,37 @@ cp MPowered-Health/.env.example MPowered-Health/.env
 
 The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
 
+## Connect to Supabase
+
+The Supabase URL and publishable key can be found from the dashboard if you click 'Connect', then choose 'Server' and look under environmental variables.
+
+Create an `.env` inside the MPowered-Health folder on the same levels as `src` folder.
+
+```js
+MPowered-Health/
+├── __test__/
+├── assets/
+├── src/
+├── .env/                   // <-- .env should be directly under MPowered-Health
+```
+
+Paste the Supabase URL and publishable key into the `.env` folder. The file should look like: 
+
+```sh
+EXPO_PUBLIC_SUPABASE_URL='YOUR SUPABASE PROJECT URL'
+EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
+```
+
+Ensure the `.env` file is not committed.
+
+## Troubleshooting Tips
+
+To diagnose expo issues, run:
+
+```sh
+npx expo-doctor
+```
+
 ## Repository Structure
 
 ```js
