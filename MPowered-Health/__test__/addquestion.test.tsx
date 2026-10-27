@@ -107,7 +107,39 @@ describe("add question screen", () => {
     })
 })
 
-//selecting questions
+//selection + button tests
+describe("save button is enabled/disabled", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    })
+
+    test("save button is disabled if no question is selected", async() => {
+        await render(<AddQuestion/>);
+        expect(screen.getByRole("button", {name: "Save"})).toBeDisabled();
+    })
+
+    test("save button is enabled if a question is selected", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
+    })
+
+    test("save button is enabled if multiple questions are selected", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));
+        await fireEvent.press(screen.getByText('How can I prevent the pain from becoming severe again?'));
+        expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
+    })
+
+    test("deselecting a question should disable the save button", async() => {
+        await render(<AddQuestion/>);
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        expect(screen.getByRole("button", {name: "Save"})).toBeDisabled();      
+    })
+})
 
 //default questions
 
