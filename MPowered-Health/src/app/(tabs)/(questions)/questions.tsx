@@ -24,7 +24,7 @@ import {
   Input,
   commonStyles,
 } from '@/components/shared/common';
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@react-native-vector-icons/feather";
 
 interface QuestionCardProps {
   question: Question;

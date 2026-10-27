@@ -1,6 +1,4 @@
-//import { PainAssessment } from '../src/app/(tabs)/(assessment)/painassessment';
 import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
-//import { painQuestions } from "@/constants/assessment/questions";
 import { Alert } from 'react-native';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';

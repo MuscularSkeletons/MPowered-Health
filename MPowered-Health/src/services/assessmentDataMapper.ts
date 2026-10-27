@@ -1,11 +1,11 @@
-/**
- * Helpers that turn Supabase rows into the shapes the My Health screens read.
- * No network or React imports here, so every function can be unit tested!
- */
 import type { AssessmentAnswers, AssessmentId } from "@/types/assessment";
 import type { PainAssessmentRecord } from "@/services/healthDataHelper";
 
-/** Assessments older than this are removed by the cleanup job and must never be shown. */
+/**
+ * Helpers that turn Supabase assessment tables into usable form for my health feature
+*/
+
+/** Assessments older than this are removed by the postgres cleanup script */
 export const RETENTION_MONTHS = 18;
 const DAYS_PER_WEEK = 7;
 const MONTHS = [
@@ -22,7 +22,7 @@ const MONTHS = [
   "Nov",
   "Dec",
 ];
-/** The order assessment types are listed within a week, matching the design. */
+/** The order assessment types are listed on the homepage */
 const TYPE_ORDER: AssessmentId[] = [
   "pain",
   "movement",
@@ -31,8 +31,7 @@ const TYPE_ORDER: AssessmentId[] = [
   "management",
 ];
 
-// Row shapes
-
+// relevant data from assessment tables in Supabase
 interface PainRow {
   current_pain: number;
   mildest_pain: number;
@@ -71,7 +70,7 @@ interface ManagementRow {
   emotion_strategies: string | null;
 }
 
-/** PostgREST returns a child as an array, or as one object when foreign key is unique. */
+/** PostgREST returns a child as an array, or as one object when foreign key is unique */
 type OneOrMany<T> = T | T[] | null;
 
 export interface AssessmentRow {
@@ -89,7 +88,10 @@ type LatestAssessment = {
   completedAt: string;
 };
 
-/** One completed assessment inside a week. Pass 'answers' to the summary builder for 'type'. */
+/** 
+ * One completed assessment inside a week
+ * Pass 'answers' to the summary builder for 'type'
+*/
 interface WeekEntry {
   type: AssessmentId;
   assessmentId: string;
@@ -97,7 +99,7 @@ interface WeekEntry {
   answers: AssessmentAnswers;
 }
 
-/** A Monday-to-Sunday week and the latest assessment of each type completed in it. */
+/** A Monday-to-Sunday week and the latest assessment of each type completed in it */
 interface WeekGroup {
   weekStart: string;
   label: string;
@@ -105,11 +107,11 @@ interface WeekGroup {
 }
 
 export interface HealthSnapshot {
-  /** Oldest first, matching what groupPainHistory expects. */
+  /** Oldest first, matching what groupPainHistory expects */
   painRecords: PainAssessmentRecord[];
-  /** The newest answers for each assessment type that has any data. */
+  /** The newest answers for each assessment type that has any data */
   latest: Partial<Record<AssessmentId, LatestAssessment>>;
-  /** Newest week first, for the History tab with week, then assessment type, then summary. */
+  /** Newest week first, for the History tab with week, then assessment type, then summary */
   weeks: WeekGroup[];
 }
 
@@ -121,8 +123,7 @@ const one = (value: string | null | undefined): string[] =>
   value ? [value] : [];
 const score = (value: number): string[] => [String(value)];
 
-// Convert database rows to the question-index format used by assessment summaries.
-
+/** Convert database rows to the question-index format used by assessment summaries */
 function painAnswers(row: PainRow): AssessmentAnswers {
   return {
     0: [...(row.pain_location ?? [])], // areas
@@ -175,7 +176,7 @@ function managementAnswers(row: ManagementRow): AssessmentAnswers {
   };
 }
 
-/** Trim, un-duplicate and sort so "Back, Knee" always forms one group. */
+/** Trim, un-duplicate and sort so e.g. "Back, Knee"  and "Knee, Back" always forms one group */
 const normalizeAreas = (pain: PainRow): string[] =>
   [
     ...new Set(
@@ -183,7 +184,7 @@ const normalizeAreas = (pain: PainRow): string[] =>
     ),
   ].sort();
 
-/** Builds the record the charts, history and PDFs read, from an assessment and its pain row. */
+/** Builds the record the charts, history and PDFs read, from an assessment and its pain row */
 function toPainRecord(
   assessment: AssessmentRow,
   pain: PainRow,
@@ -201,7 +202,7 @@ function toPainRecord(
   };
 }
 
-/** The assessment types are on one row with their answers. */
+/** The assessment types are on one row with their answers */
 function answersByType(
   row: AssessmentRow,
 ): [AssessmentId, AssessmentAnswers][] {
@@ -220,7 +221,10 @@ function answersByType(
   return found;
 }
 
-/** Turns the assessments (with their children) into the pain history plus the latest answers per type and week groups. */
+/** 
+ * Turns the assessments (with their children) into the pain history 
+ * plus the latest answers per type and week groups
+*/
 export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
   const newestFirst = [...rows].sort(
     (a, b) => Date.parse(b.date) - Date.parse(a.date),
@@ -234,7 +238,7 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
     if (!found.length) continue; // an assessment with no child rows has nothing to show
 
     const completedAt = new Date(row.date).toISOString();
-    // Rows are newest first, so the first answers seen for a type are the latest.
+    // Rows are newest first, so the first answers seen for a type are the latest
     const pain = first(row.pain_assessment);
     if (pain) painRecords.push(toPainRecord(row, pain));
 
@@ -247,7 +251,7 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
     for (const [type, answers] of found) {
       // Rows are newest first, so the first answers seen for a type are the latest overall...
       if (!latest[type]) latest[type] = { answers, completedAt };
-      // ...and the first seen within a week are that week's latest.
+      // ...and the first seen within a week are that week's latest
       if (!week.entries.some((entry) => entry.type === type)) {
         week.entries.push({
           type,
@@ -270,9 +274,7 @@ export function buildSnapshot(rows: AssessmentRow[]): HealthSnapshot {
   return { painRecords: painRecords.reverse(), latest, weeks: weekList };
 }
 
-// Retention
-
-/** The earliest date an assessment may have and still be shown. */
+/** The earliest date an assessment was completed and is still within the data retention period */
 export function retentionCutoff(now = new Date()): Date {
   const cutoff = new Date(now);
   const day = cutoff.getDate();
@@ -287,14 +289,16 @@ export function retentionCutoff(now = new Date()): Date {
   return cutoff;
 }
 
-// Weeks (Monday to Sunday, device-local time)
-// Note: assessment.week_start ISNT used bs its default is the day the row was inserted, not a Monday.
+/** 
+ * Weeks (Monday to Sunday, device-local time)
+ * Note: assessment.week_start ISNT used bc its default is the day the row was inserted, not a Monday
+*/
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const isoDay = (date: Date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
-/** Monday 00:00 (local) of the week containing the date. */
+/** Monday 00:00 (local) of the week containing the date */
 export function weekStartOf(date: Date): Date {
   const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const daysSinceMonday = (day.getDay() + 6) % DAYS_PER_WEEK; // Sunday (0) counts as day 6
@@ -302,7 +306,7 @@ export function weekStartOf(date: Date): Date {
   return day;
 }
 
-/** "18-24 May", or "27 Apr-03 May" when the week spans two months. */
+/** "18-24 May", or "27 Apr-03 May" when the week spans two months */
 export function weekLabel(start: Date): string {
   const end = new Date(start);
   end.setDate(end.getDate() + DAYS_PER_WEEK - 1);

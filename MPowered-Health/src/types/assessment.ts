@@ -34,6 +34,7 @@ export interface QuestionItem {
   options?: string[];
   helper?: string;
   optional?: boolean;
+  placeholder?: string;
 }
 
 export interface QuestionsConfig {

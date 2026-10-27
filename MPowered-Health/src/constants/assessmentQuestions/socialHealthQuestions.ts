@@ -100,6 +100,7 @@ export const socialHealthQuestions: QuestionsConfig = {
       optional: true,
       helper:
         'For example: delays at work due to pain or being unable to meet with friends.',
+      placeholder: 'Write your mood trigger',
     },
   ],
 };

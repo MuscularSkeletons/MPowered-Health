@@ -1,7 +1,7 @@
 import { PrescriptionScreen } from '@/components/prescription/form';
 import { SecondaryButton } from '@/components/shared/common';
 import { palette } from '@/constants/ui/styling';
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@react-native-vector-icons/feather";
 import { router } from 'expo-router';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { prescriptionLabel } from '@/services/prescriptionHelper';

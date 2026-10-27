@@ -10,7 +10,7 @@ jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: () => true },
   useLocalSearchParams: () => mockParams,
 }));
-jest.mock('@expo/vector-icons', () => ({ Feather: () => null }));
+jest.mock('@react-native-vector-icons/feather', () => ({ Feather: () => null }));
 jest.mock('react-native-safe-area-context', () => jest.requireActual('react-native-safe-area-context/jest/mock').default);
 jest.mock('@/context/authcontext', () => ({
   useAuth: () => ({ user: { id: 'user-1', name: 'Test Person', birthsex: 'Female', birthyear: 1980,

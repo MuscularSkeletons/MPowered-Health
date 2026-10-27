@@ -5,7 +5,7 @@ import {
   healthProfileReportText,
 } from '@/services/healthProfileReportPDF';
 import { palette, radius, spacing } from '@/constants/ui/styling';
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@react-native-vector-icons/feather";
 import { useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 

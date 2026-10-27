@@ -16,7 +16,7 @@ import { RefObject, Dispatch, SetStateAction } from "react";
 import { PrescriptionItem } from "@/types/prescriptions";
 import { palette, textInputLength } from "@/constants/ui/styling";
 import { router } from "expo-router";
-import { asSentence } from "@/utils/convertSentence";
+import { asSentence } from "@/utils/convertToSentence";
 
 interface AssessmentQuestionProps {
     categoryData: {
@@ -144,7 +144,7 @@ export function AssessmentQuestion({
                         keyboardType={currentQ.kind === 'number' ? 'numeric' : 'default'}
                         maxLength={currentQ.kind === 'number' ? 2 : textInputLength.long}
                         multiline={currentQ.kind === 'text'}
-                        placeholder={currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
+                        placeholder={currentQ.placeholder ? currentQ.placeholder : currentQ.kind === 'number' ? 'Input number only' : 'Write your reflection'}
                         placeholderTextColor={palette.muted}
                         style={[styles.input, currentQ.kind === 'text' && styles.textArea]}
                     />

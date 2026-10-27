@@ -22,6 +22,7 @@ export const managementQuestions = {
             kind: 'text',
             optional: true,
             helper: 'Not taking OTC medication? You can continue without entering a medication.',
+            placeholder: 'Input name of over the counter medication',
         },
 
         {   
@@ -44,6 +45,7 @@ export const managementQuestions = {
             kind: 'text',
             optional: true,
             helper: 'Examples include meditation, journaling, or meeting with people.',
+            placeholder: 'Write your strategies',
         },
         
     ],

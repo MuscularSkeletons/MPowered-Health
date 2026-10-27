@@ -170,7 +170,7 @@ describe("social health assessment questions are rendered on screen", () => {
         expect(screen.getByText('Mood')).toBeTruthy();
         expect(screen.getByText('What triggered that mood?')).toBeTruthy();
         // text
-        expect(screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.')).toBeTruthy();
+        expect(screen.getByPlaceholderText('Write your mood trigger')).toBeTruthy();
 
         expect(screen.getByText('7/7')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
@@ -345,7 +345,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         const user = userEvent.setup();
-        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        const moodInput = screen.getByPlaceholderText('Write your mood trigger');
         await user.type(moodInput, "No friends :( ");
 
         expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();
@@ -372,7 +372,7 @@ describe("input validation for question 7", () => {
         await fireEvent.press(screen.getByText('I was feeling frustrated'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        const moodInput = screen.getByPlaceholderText('Write your mood trigger');
         await fireEvent.changeText(moodInput, "Didnt like the movie I watched. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu")
         expect(moodInput.props.value).toHaveLength(500);
     });
@@ -729,14 +729,14 @@ describe("submitting users answers to database", () => {
 
         //question 7
         const user = userEvent.setup();
-        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        const moodInput = screen.getByPlaceholderText('Write your mood trigger');
         await user.type(moodInput, "No friends :( ");
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         await waitFor(() => {
-            expect(submitAssessmentAnswers).toHaveBeenCalledWith({
-                categoryTitle: "My Social Health",
-                answers: {
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith(
+                "My Social Health",
+                {
                     social_life: "My social life is normal and gives me no extra pain",
                     travelling: "I can travel anywhere without pain",
                     mood_impact: 5,
@@ -744,8 +744,12 @@ describe("submitting users answers to database", () => {
                     enjoyment_impact: 9,
                     general_mood: "I was feeling frustrated",
                     mood_trigger: "No friends :( ", 
-                }
-            })
+                },
+                {
+                    impact_level: "Your answers indicate that pain mildly impacts your social health.",
+                },
+                    undefined,
+            )
         })
 
         expect(screen.getByText("My Social Health Summary")).toBeTruthy();
@@ -780,7 +784,7 @@ describe("submitting users answers to database", () => {
 
         //question 7
         const user = userEvent.setup();
-        const moodInput = screen.getByPlaceholderText('i.e: delays in work due to pain or inability to meet with friends, etc.');
+        const moodInput = screen.getByPlaceholderText('Write your mood trigger');
         await user.type(moodInput, "No friends :( ");
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 

@@ -10,7 +10,8 @@
         "./assets/*"
       ]
     },
-    "types": ["jest"]
+    "types": ["jest"],
+    "customConditions": ["react-native", "react-native-legacy-deep-imports"],
   },
   "include": [
     "**/*.ts",

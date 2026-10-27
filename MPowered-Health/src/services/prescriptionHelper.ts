@@ -1,6 +1,6 @@
 import { type PrescriptionDraft, type PrescriptionItem } from '@/types/prescriptions';
 
-/** Creates the starting values for a new prescription. */
+/** Initialises a new prescription with empty/default values */
 export const emptyPrescription = (): PrescriptionDraft => ({
   name: '',
   strength: '',
@@ -10,11 +10,11 @@ export const emptyPrescription = (): PrescriptionDraft => ({
   repeat: '',
 });
 
-/** Checks that a number is a finite positive number. */
+/** Checks that a number is a finite positive number */
 export const validNumber = (value: string) =>
   /^\d+(\.\d+)?$/.test(value.trim()) && Number(value) > 0 && Number.isFinite(Number(value));
 
-/** Checks whether the required prescription fields are complete. */
+/** Checks whether the required prescription fields are complete */
 export const prescriptionReady = (draft: PrescriptionDraft) =>
   !!draft.name.trim() &&
   validNumber(draft.strength) &&
@@ -23,18 +23,19 @@ export const prescriptionReady = (draft: PrescriptionDraft) =>
   !!draft.frequency &&
   validNumber(draft.repeat);
 
+/** Map dosage frequency data 2 day into sentence e.g. 2 day -> Twice daily */
 function mapSchedule(repeat: string, frequency: string): string {
   let number = repeat + ' times';
   let freq = 'daily';
 
-  // special cases for numbers
+  // Special cases for numbers
   if (repeat === '1') {
     number = 'Once';
   } else if (repeat === '2') {
     number = 'Twice';
   }
 
-  // map frequency
+  // Map frequency
   if (frequency === 'hour') {
     freq = 'hourly';
   } else if (frequency === 'day') {
@@ -48,17 +49,16 @@ function mapSchedule(repeat: string, frequency: string): string {
   return number + ' ' + freq;
 }
 
-/** Formats the prescription name, strength, and schedule for display. */
+/** Formats the prescription name, strength, and schedule for display */
 export const prescriptionLabel = (prescription: PrescriptionItem) =>
   `${prescription.name} ${prescription.strength} ${prescription.unit} — ${mapSchedule(prescription.repeat, prescription.frequency)}`;
 
 /**
- * Adds a prescription or replaces the entry with the same ID.
- *
- * @param list - Existing prescription entries.
- * @param draft - Entered prescription values.
- * @param id - Identity to add or replace.
- * @returns The updated list, or the original list if the draft is invalid.
+ * Adds a prescription or replaces the entry with the same ID
+ * @param list - Existing prescription entries
+ * @param draft - Entered prescription values
+ * @param id - Identity to add or replace
+ * @returns The updated list, or the original list if the draft is invalid
  */
 export function savePresciption(
   list: PrescriptionItem[],

@@ -1,6 +1,10 @@
 import { HEALTH_PROFILE_REPORT_STYLES } from '@/constants/myhealth/healthProfilePDFStyles';
+import { escapeHtml } from '@/utils/documentExport';
 
-/** Builds safe printable and shareable versions of My health profile. */
+/** 
+ * Builds safe printable and shareable versions of health profile
+*/
+
 type ProfileSection = {
   title: string;
   items: [string, string][];
@@ -11,19 +15,7 @@ export type HealthProfileReport = {
   sections: ProfileSection[];
 };
 
-const escapeHtml = (value: string) =>
-  value.replace(/[&<>"']/g, (character) => {
-    const entities: Record<string, string> = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
-    };
-    return entities[character];
-  });
-
-/** Creates the plain-text profile used by native sharing and the browser copy fallback. */
+/** Creates the plain-text profile used by native sharing and the browser copy fallback */
 export function healthProfileReportText(report: HealthProfileReport) {
   return [
     'My health profile',
@@ -38,7 +30,7 @@ export function healthProfileReportText(report: HealthProfileReport) {
   ].join('\n\n');
 }
 
-/** Creates an isolated A4 document so app navigation and controls never appear in the PDF. */
+/** Creates an isolated A4 document so app navigation and controls never appear in the PDF */
 export function healthProfileReportHtml(report: HealthProfileReport) {
   return `
     <!doctype html>

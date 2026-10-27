@@ -4,14 +4,18 @@ import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { usePrescriptions } from '@/context/prescriptionsContext';
 import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
+import { PrescriptionItem } from '@/types/prescriptions';
 
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
-const mockPrescriptions = [
-    {id: '1', name: 'Perindopril arginine 5 mg — Once daily'},
-    {id: '2', name: 'Paracetamol 500mg — 3 times daily'},
-    {id: '3', name: 'A very long prescription name 80mg — Once daily'},
+const mockPrescriptions : PrescriptionItem[] = [
+    {id: '1', name: 'Perindopril arginine', strength: "5", unit: "mg", form: "Tablet", frequency: 'day', repeat: "1"},
+    {id: '2', name: 'Paracetamol', strength: "500", unit: "mg", form: "Tablet", frequency: 'day', repeat: "3"},
+    {id: '3', name: 'A very long prescription name', strength: "80", unit: "mg", form: "Tablet", frequency: 'day', repeat: "1"},
 ];
+
+//3 items in the prescription list
+const medications = [mockPrescriptions[0], mockPrescriptions[1], mockPrescriptions[2]];
 
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
@@ -37,7 +41,7 @@ describe("my management assessment questions are rendered on screen", () => {
     
     beforeEach(async() => {
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
     });
@@ -51,9 +55,9 @@ describe("my management assessment questions are rendered on screen", () => {
         expect(screen.getByText('Not taking medications? You can continue without selecting an option. This list is generated from your medication records.')).toBeTruthy();
         
         // options
-        expect(screen.getByText(/Perindopril arginine 5 mg — Once daily/)).toBeTruthy();
-        expect(screen.getByText(/Paracetamol 500mg — 3 times daily/)).toBeTruthy();
-        expect(screen.getByText(/A very long prescription name 80mg — Once daily/)).toBeTruthy();
+        expect(screen.getByText("Perindopril arginine 5 mg — Once daily")).toBeTruthy();
+        expect(screen.getByText("Paracetamol 500 mg — 3 times daily")).toBeTruthy();
+        expect(screen.getByText("A very long prescription name 80 mg — Once daily")).toBeTruthy();
         
         expect(screen.getByText('1/4')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Record' })).toBeTruthy();
@@ -61,7 +65,7 @@ describe("my management assessment questions are rendered on screen", () => {
 
     test("question 2 (Medication) is rendered on screen", async() => {
         //navigate to question 2
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
         expect(screen.getByText('Medication')).toBeTruthy();
@@ -78,7 +82,7 @@ describe("my management assessment questions are rendered on screen", () => {
     test("question 3 (Exercise) is rendered on screen", async() => {
         
         //navigate to question 3
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
         
@@ -99,7 +103,7 @@ describe("my management assessment questions are rendered on screen", () => {
     test("question 4 (Emotion) is rendered on screen", async() => {
         
         //navigate to question 4
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
         await fireEvent.press(screen.getByText("0 days"));
@@ -109,7 +113,7 @@ describe("my management assessment questions are rendered on screen", () => {
         expect(screen.getByText('Over the past week, did you perform any strategies to manage your stress level or emotion?')).toBeTruthy();
         expect(screen.getByText('Examples include meditation, journaling, or meeting with people.')).toBeTruthy();
         // text
-        expect(screen.getByPlaceholderText('Examples: meditation, journaling, meeting people')).toBeTruthy();
+        expect(screen.getByPlaceholderText('Write your strategies')).toBeTruthy();
         
         expect(screen.getByText('4/4')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
@@ -146,7 +150,7 @@ describe("my management assessment questions are selected/inputted correctly", (
     
     beforeEach(async() => {
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
     
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
@@ -155,15 +159,15 @@ describe("my management assessment questions are selected/inputted correctly", (
     afterEach(jest.clearAllMocks);
     
     test("can select multiple options for question 1", async() => {
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
-        await fireEvent.press(screen.getByText(/A very long prescription name 80mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
+        await fireEvent.press(screen.getByText("A very long prescription name 80 mg — Once daily"));
         expect(screen.getByRole('button', { name: 'Record' })).toBeEnabled();
     });
     
     test("user can enter a text response for question 2", async() => {
     
         //navigate to question 2
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
     
         const otcMedication = screen.getByPlaceholderText("Input name of over the counter medication");
@@ -180,13 +184,13 @@ describe("my management assessment questions are selected/inputted correctly", (
 
     test("user can enter a text response for question 4", async() => {
         //navigate to question 4
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
         await fireEvent.press(screen.getByText("0 days"));
         await fireEvent.press(screen.getByRole("button", {name : "Record"}));
     
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         const user = userEvent.setup();
         await user.type(emotionStrategies, "Meditation");
    
@@ -212,12 +216,12 @@ describe("input validation for question 2 & 4", () => {
     test("500 character limit test for question 4 ", async() => {
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
         //navigate to question 4
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name : 'Record'}));
         await fireEvent.press(screen.getByText("0 days"));
         await fireEvent.press(screen.getByRole("button", {name : "Record"}));
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         await fireEvent.changeText(emotionStrategies, "Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Meditation Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu");  
         expect(emotionStrategies.props.value).toHaveLength(500);
     });
@@ -236,7 +240,7 @@ describe("record button tests", () => {
     test("prescription list addded and record button is enabled even when no option is selected for question 2", async() => {
         
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
         
@@ -246,11 +250,11 @@ describe("record button tests", () => {
     test("prescription list addded and record button is enabled when options are selected for question 2", async() => {
         
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
-        await fireEvent.press(screen.getByText(/A very long prescription name 80mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
+        await fireEvent.press(screen.getByText("A very long prescription name 80 mg — Once daily"));
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();      
     })
 
@@ -310,7 +314,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('1-2 days'));
         await fireEvent.press((screen.getByRole('button', { name: 'Record' })));
         
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         const user = userEvent.setup();
         await user.type(emotionStrategies, "Meditation");
     
@@ -357,7 +361,7 @@ describe("summary screen tests", () => {
         expect(screen.getByText("Over the past week, did you perform any strategies to manage your stress level or emotion?")).toBeTruthy();
 
         //user's answers
-        expect(screen.getByText(/Amlodipine 5 mg — Once daily/)).toBeTruthy();
+        expect(screen.getByText("Amlodipine 5 mg — Once daily")).toBeTruthy();
         expect(screen.getByText(/Panadol/)).toBeTruthy();
         expect(screen.getByText('1-2 days')).toBeTruthy();
         expect(screen.getByText('Meditation')).toBeTruthy();
@@ -428,7 +432,7 @@ describe("navigation", () => {
 
     beforeEach(async() => {
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
     });
@@ -441,7 +445,7 @@ describe("navigation", () => {
         //question 1
 
         expect(screen.getByText("1/4")).toBeTruthy();
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
         //question 2
@@ -464,7 +468,7 @@ describe("navigation", () => {
 
     test('pressing back on a question (except question 1) should navigate to the previous question', async() => {
         // navigate to question 2 
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', {name: 'Record'})); 
 
         await fireEvent.press(screen.getByText('‹ Back'));
@@ -480,7 +484,7 @@ describe("navigation", () => {
     test('pressing close on summary screen should navigate to homescreen', async() => {
         //question 1
         expect(screen.getByText("1/4")).toBeTruthy();
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
         //question 2
@@ -507,7 +511,7 @@ describe("navigation", () => {
     test("pressing edit on summary screen should navigate to question 1", async() => {
         //question 1
         expect(screen.getByText("1/4")).toBeTruthy();
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
         //question 2
@@ -537,7 +541,7 @@ describe("submitting users answers to database", () => {
 
     beforeEach(async() => {
         (usePrescriptions as jest.Mock).mockReturnValue({
-            list: mockPrescriptions,
+            list: medications,
         })
         await render (<AssessmentScreen categoryData={managementQuestions} onBack={onBack}/>);
     });
@@ -549,8 +553,8 @@ describe("submitting users answers to database", () => {
     
         //question 1
         expect(screen.getByText("1/4")).toBeTruthy();
-        await fireEvent.press(screen.getByText(/Perindopril arginine 5 mg — Once daily/));
-        await fireEvent.press(screen.getByText(/A very long prescription name 80mg — Once daily/));
+        await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
+        await fireEvent.press(screen.getByText("A very long prescription name 80 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
         //question 2
@@ -566,21 +570,23 @@ describe("submitting users answers to database", () => {
 
         //question 4
         expect(screen.getByText("4/4")).toBeTruthy();
-        const emotionStrategies = screen.getByPlaceholderText("Examples: meditation, journaling, meeting people");
+        const emotionStrategies = screen.getByPlaceholderText("Write your strategies");
         await user.type(emotionStrategies, "Meditation");
         expect(screen.getByRole('button', { name: 'Review' })).toBeTruthy();
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
         await waitFor(() => {
-            expect(submitAssessmentAnswers).toHaveBeenCalledWith({
-                categoryTitle: "My Management",
-                answers: {
-                    medication: ['Perindopril arginine 5 mg — Once daily', 'A very long prescription name 80mg — Once daily'],
+            expect(submitAssessmentAnswers).toHaveBeenCalledWith(
+                "My Management",
+                {
+                    medication: ["Perindopril arginine 5 mg — Once daily", "A very long prescription name 80 mg — Once daily"],
                     otc_medication: "Panadol",
                     exercise_frequency: "1-2 days",
                     emotion_strategies: "Meditation"
-                }
-            })
+                }, 
+                {},
+                undefined,
+            )
         })
 
         expect(screen.getByText("My Management Summary")).toBeTruthy();
