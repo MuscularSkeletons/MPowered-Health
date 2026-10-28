@@ -4,7 +4,7 @@
 ## About
 MPowered Health is an app designed for users with musculoskeletal conditions to empower them to take charge of their health. The app's core features allow users to record weekly assessments concerning their health and prepare questions to ask healthcare professional/s. 
 
-## Run the app in Expo
+## Run the App in Expo
 
 Install Git and the current [Node.js LTS](https://nodejs.org/en/download) release (which includes npm) if they are not already installed. On macOS, the setup script can install Node.js for you if [Homebrew](https://brew.sh/) is available.
 
@@ -72,6 +72,14 @@ MPowered-Health/
 │   ├── types/
 │   ├── utils/               // generic helper functions
 ```
+
+## Codebase Description
+
+Click [here]() to view the guide for this codebase.
+
+## User Manual
+
+Click [here]() to view the user manual for this app.
 
 ## Contributors
 - <a href="https://github.com/Sher-Wen">Sher-Wen Chan</a>: sherwenc@student.unimelb.edu.au
