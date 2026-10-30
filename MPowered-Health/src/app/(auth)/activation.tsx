@@ -3,16 +3,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { palette } from '@/constants/profile/ui';
+import { palette } from '@/constants/ui/styling';
 import { useAuth } from '@/context/authcontext';
 
-/** Celebrates completed onboarding before opening the home page. */
+/** Transition screen from onboarding to main app to indicate onboarding completed */
 export default function ActivationScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => router.replace('/(tabs)'), 5000);
+    const timer = setTimeout(() => router.replace('/(tabs)/(assessment)'), 5000);
     return () => clearTimeout(timer);
   }, [router]);
 

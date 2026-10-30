@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { sexOptions } from '@/constants/profile/profile-options';
+import { sexOptions } from '@/constants/profile/profileOptions';
 import {
-  AuthIntro,
-  AuthScreen,
+  Intro,
+  Screen,
   ChoiceButton,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/shared/common';
 
-/** Stores the selected birth sex locally. */
+/** Stores the selected birth sex locally */
 export default function StoreBirthSex() {
   const [birthsex, setBirthSex] = useState('');
   const router = useRouter();
@@ -28,15 +28,15 @@ export default function StoreBirthSex() {
   };
 
   return (
-    <AuthScreen>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="YOUR PROFILE"
         progress="2 of 6"
         title="Your sex"
         description="Research shows that people may experience pain differently depending on their sex."
       />
-      <View style={authStyles.choices}>
+      <View style={commonStyles.choices}>
         {sexOptions.map((option) => (
           <ChoiceButton
             key={option}
@@ -46,9 +46,9 @@ export default function StoreBirthSex() {
           />
         ))}
       </View>
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton label="Continue" disabled={!birthsex} onPress={handleComplete} />
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }

@@ -6,66 +6,58 @@ import {
     ReactNode,
     useContext,
 } from "react";
+import { type User, type AuthContextType } from "@/types/user";
 
-// information related to user authentication + its related functions
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  birthsex?: string;
-  birthyear?: number;
-  formalDiagnosis?: boolean;
-  painConditions?: string[];
-  otherCondition?: string;
-  onboardingComplete?: boolean;
-}
-
-interface AuthContextType {
-  user: User | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  updateUserDraft: (userData: Partial<User>) => void;
-  updateUser: (userData: Partial<User>) => Promise<void>;
-  isLoading: boolean;
-}
-
+/** Information related to user authentication and its related functions */
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// defines all functions related to authentication
+/** 
+ * Defines all functions related to authentication including
+ * User CRUD (create, read, update, delete) with Supabase (NOTE: automated deletion unimplemented)
+ * Authentication related: sign-in using email and password and sign-out
+*/
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
 
-  // get the user information from supabase for the user with that userId (check if user authenticated)
-  // checks if user information exists when they sign-in/sign-up
+  /** 
+   * Get the user information from supabase for the user with that userId (check if user authenticated)
+   * Checks if user information exists when they sign-in/sign-up 
+  */
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
-      // fetch all user info from db for the given user id
+      // Fetch all user info from database for the given user id
       const { data, error } = await supabase
-        .from("User")
+        .from("user")
         .select("*")
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
       
         if (error) {
-          console.error("Error fetching user profile:", error);
-          return null; // abort function early
-        }
-
-        if (!data) {
-          console.error("User profile data not found");
-          return null; // abort function early
+          if (__DEV__) console.debug('User profile request failed:', error.code);
+          throw error;
         }
 
         const authUser = await supabase.auth.getUser(); // gets info about a user currently logged in
         if (!authUser.data.user) {
-          console.error("No authenticated user found");
+          if (__DEV__) console.debug('No authenticated user was available for the profile.');
           return null; // abort function early
         }
 
-        // return the user
+        /** 
+         * A newly authenticated account may not have completed onboarding profile yet
+         * Remain signed in so the onboarding flow can create that row on completion 
+        */
+        if (!data) {
+          return {
+            id: userId,
+            name: '',
+            email: authUser.data.user.email || '',
+            onboardingComplete: false,
+          };
+        }
+
+        // Return the user
         return {
           id: data.user_id,
           name: data.name,
@@ -79,19 +71,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
     } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
+      throw error;
     }
   }
 
-  // TODO: implement sign in using email and password
+  // NOTE: email authentication unimplemented
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ // supabase has different options for this
+    const { data, error } = await supabase.auth.signInWithPassword({ // NOTE: supabase has different options for this
       email,
       password,
     });
 
-    if (error) throw error; // TO DO: try-catch block? maybe??
+    if (error) throw error;
 
     console.log("User signed in");
 
@@ -102,14 +93,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // handles user sign up using an email and pasword authentication method
+  // Handles user sign up using an email and password authentication method
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) throw error; // TO DO: try-catch block? maybe??
+    if (error) throw error;
 
     console.log("User signed up");
 
@@ -123,25 +114,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-  }
+  };
 
-  // Onboarding screens build one local profile before the completed screen saves it.
+
+  /** 
+   * Deletes user 
+   * NOTE: currently adds user id to delete requests table and signs user out
+    * User can then be manually deleted from supabase, but automated deletion is unimplemented
+  */
+  const deleteUser = async () => {
+    // Check user logged in
+    if (!user) return;
+
+    // add user id to delete requests table
+      const { error } = await supabase
+        .from("delete_request")
+        .insert({ user_id: user.id });
+
+    if (error) throw error;
+
+    console.log("Delete request added to delete_request table. Awaiting manual delete by admin.");
+
+    // Sign the user out
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  /**
+   * Throughout onboarding sequence, a locally stored profile is built
+   * Once get to completed screen, then the profile is saved to supabase
+   */
   const updateUserDraft = (userData: Partial<User>) => {
     if (!user) return;
     setUser((current) => current ? { ...current, ...userData } : current);
-    // Log field names only so health answers and personal details stay out of logs.
+    // Log field names only so health answers and personal details stay out of logs
     if (__DEV__) console.log('User draft updated locally:', Object.keys(userData));
   };
 
-  // update user info in supabase - pass in a partial value so can update any combination of fields
+  // Update user info in supabase - pass in a partial value so can update any combination of fields
   const updateUser = async (userData: Partial<User>) => {
-    // check user logged in
+    // Check user logged in
     if (!user) return;
 
     try {
-      // the values we want to update
+      // The values we want to update
       const updateData: any = {};
-      // only update data if the data to update is defined
+      // Only update data if the data to update is defined
       if (userData.name !== undefined) updateData.name = userData.name;
       if (userData.birthsex !== undefined) updateData.sex = userData.birthsex;
       if (userData.birthyear !== undefined) updateData.birth_year = userData.birthyear;
@@ -150,9 +168,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userData.otherCondition !== undefined) updateData.other_condition = userData.otherCondition;
       if (userData.onboardingComplete !== undefined) updateData.onboarding_complete = userData.onboardingComplete;
 
-      // update values in db
+      // Update values in database
       const { error, data } = await supabase
-        .from("User")
+        .from("user")
         .update(updateData)
         .eq("user_id", user.id)
         .select()
@@ -160,7 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
 
-      // update the change here
+      // Update the change locally as well if successfully updated to supabase
       if (data) {
         if (__DEV__) console.log('User profile saved:', Object.keys(updateData));
         const userProfile = await fetchUserProfile(data.user_id);
@@ -169,15 +187,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
     } catch (error) {
-      console.error("Error updating user:", error);
+      if (__DEV__) console.debug('User profile save failed.');
       throw error;
     }
   };
 
-  // check if there is an existing session - automatically runs when open the app
+  // Updated user email
+  const updateAuthUserEmail = async (email: string) => {
+    // Check user logged in
+    if (!user) return;
+
+    // Update values in database
+    const { data, error } = await supabase.auth.updateUser({
+      email: email.trim(),
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      if (!userProfile) {
+        console.error("Error fetching user profile.");
+        return; // abort early - do not set user profile to null
+      }
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
+  /**
+   * Updates current password with new password
+   * Requires current password in order to update
+   * NOTE: for maximum security, should turn on secure password change 
+    * (requires user to reverify email before can update password) in supabase settings
+    * This is currently left unimplemented as email verification is not yet implemented
+   */
+  const updateAuthUserPassword = async (currPassword: string, newPassword: string) => {
+    // Check user logged in
+    if (!user) return;
+
+    // Update values in database
+    const { data, error } = await supabase.auth.updateUser({
+      current_password: currPassword,
+      password: newPassword,
+    });
+
+    if (error) throw error;
+    
+    if (data.user) {
+      const userProfile = await fetchUserProfile(data.user.id);
+      setUser(userProfile);
+      console.log("User profile information fetched and set");
+    }
+  }
+
+  // Check if there is an existing session - automatically runs when open the app
   const checkSession = async () => {
     setIsLoading(true);
-    // tries to get a session from supabase to see if user logged in
+    // Tries to get a session from supabase to see if user logged in
     try {
       const { data: { session }} = await supabase.auth.getSession();
 
@@ -189,32 +256,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("User not logged in");
         setUser(null); // user is not logged in
       }
-    } catch (error) {
-      console.error("Error checking session", error);
+    } catch {
+      if (__DEV__) console.debug('Saved session could not load its profile.');
       setUser(null);
     } finally {
       setIsLoading(false); // finished checking session so can proceed
     }
   }; 
 
-  // Restore the saved login when this provider first appears.
+  // Restore the saved login when this provider first appears
   useEffect(() => {
     void Promise.resolve().then(checkSession);
-    // Check the saved login only once when the app opens.
-    // Checking again while the user answers questions could erase their unsaved answers.
+    /** 
+     * Check the saved login only once when the app opens
+     * Checking again while the user answers questions could erase their unsaved answers 
+    */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AuthContext.Provider 
-        value={{ user, signIn, signUp, signOut, updateUserDraft, updateUser, isLoading }}
+        value={{ 
+          user, 
+          signIn, 
+          signUp, 
+          signOut, 
+          deleteUser,
+          updateUserDraft, 
+          updateUser, 
+          isLoading,
+          updateAuthUserEmail,
+          updateAuthUserPassword, }}
     >
         {children}
     </AuthContext.Provider>
   );
 };
 
-// allows easy access to functions defined here
+// Can access all functions defined here from one import
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

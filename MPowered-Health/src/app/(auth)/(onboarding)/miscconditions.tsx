@@ -3,14 +3,14 @@ import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
 import {
-  AuthInput,
-  AuthIntro,
-  AuthScreen,
+  Input,
+  Intro,
+  Screen,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/shared/common';
 
-/** Stores other miscellaneous conditions if the question is not skipped. */
+/** Stores other miscellaneous conditions if the question is not skipped */
 export default function StoreOtherConditions() {
   const [otherCondition, setOtherCondition] = useState('');
   const router = useRouter();
@@ -24,15 +24,15 @@ export default function StoreOtherConditions() {
   };
 
   return (
-    <AuthScreen>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="YOUR PROFILE"
         progress="6 of 6"
         title="Do you have any other conditions?"
         description="Add any other conditions or symptoms you know about. This question is optional."
       />
-      <AuthInput
+      <Input
         label="Other conditions"
         placeholder="Type conditions or symptoms"
         inputMode="text"
@@ -41,12 +41,12 @@ export default function StoreOtherConditions() {
         onChangeText={setOtherCondition}
         onSubmitEditing={handleComplete}
       />
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton label="Continue" disabled={!otherCondition.trim()} onPress={handleComplete} />
-        <Pressable accessibilityRole="button" onPress={finish} style={authStyles.secondaryAction}>
-          <Text style={authStyles.secondaryText}>Skip</Text>
+        <Pressable accessibilityRole="button" onPress={finish} style={commonStyles.secondaryAction}>
+          <Text style={commonStyles.secondaryText}>Skip</Text>
         </Pressable>
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }

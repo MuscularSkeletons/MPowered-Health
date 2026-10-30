@@ -3,15 +3,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/authcontext';
-import { AuthHeader } from '@/components/auth/auth-ui';
-import { palette } from '@/constants/profile/ui';
-import { requiredSessionRoute } from '@/navigation/route-guard';
+import { Header } from '@/components/shared/common';
+import { palette } from '@/constants/ui/styling';
+import { requiredSessionRoute } from '@/navigation/routeGuard';
 
-/** Shows the green brand initial while restoring the session. */
+/** Shows a loading screen while restoring the session */
 function AppLoadingScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthHeader />
+      <Header />
       <View style={styles.body}>
         <View pointerEvents="none" style={styles.glowTop} />
         <View pointerEvents="none" style={styles.glowBottom} />
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingM: { fontSize: 42, fontWeight: '800', color: palette.success },
+  loadingM: { fontSize: 42, fontWeight: '800', color: palette.primary },
   loadingTitle: { marginTop: 24, fontSize: 22, fontWeight: '800', color: palette.text, textAlign: 'center' },
   loadingCopy: { marginTop: 9, fontSize: 14, lineHeight: 21, color: palette.muted, textAlign: 'center' },
   spinner: { marginTop: 24 },

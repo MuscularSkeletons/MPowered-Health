@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authcontext';
-import { painConditionsOptions } from '@/constants/profile/profile-options';
+import { painConditionsOptions } from '@/constants/profile/profileOptions';
 import {
-  AuthIntro,
-  AuthScreen,
+  Intro,
+  Screen,
   ChoiceButton,
   PrimaryButton,
-  authStyles,
-} from '@/components/auth/auth-ui';
+  commonStyles,
+} from '@/components/shared/common';
 
-/** Stores the selected pain conditions locally. */
+/** Stores the selected pain conditions locally */
 export default function StorePainConditions() {
   const [painConditions, setPainConditions] = useState<string[]>([]);
   const router = useRouter();
@@ -31,15 +31,15 @@ export default function StorePainConditions() {
   };
 
   return (
-    <AuthScreen compact>
-      <Text onPress={() => router.back()} style={authStyles.back}>‹ Back</Text>
-      <AuthIntro
+    <Screen compact>
+      <Text onPress={() => router.back()} style={commonStyles.back}>‹ Back</Text>
+      <Intro
         sectionLabel="YOUR PROFILE"
         progress="5 of 6"
         title="Tell us about the pain you’re experiencing"
         description="Select any musculoskeletal or chronic pain conditions that apply."
       />
-      <View style={authStyles.choices}>
+      <View style={commonStyles.choices}>
         {painConditionsOptions.map((condition) => (
           <ChoiceButton
             key={condition}
@@ -50,16 +50,16 @@ export default function StorePainConditions() {
           />
         ))}
       </View>
-      <View style={authStyles.actions}>
+      <View style={commonStyles.actions}>
         <PrimaryButton label="Continue" disabled={!painConditions.length} onPress={handleComplete} />
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push('/(auth)/(onboarding)/miscconditions')}
-          style={authStyles.secondaryAction}
+          style={commonStyles.secondaryAction}
         >
-          <Text style={authStyles.secondaryText}>Skip</Text>
+          <Text style={commonStyles.secondaryText}>Skip</Text>
         </Pressable>
       </View>
-    </AuthScreen>
+    </Screen>
   );
 }
