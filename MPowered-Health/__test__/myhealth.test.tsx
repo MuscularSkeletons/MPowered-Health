@@ -1,71 +1,110 @@
-import { router } from 'expo-router';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { PrescriptionProvider } from '@/context/prescriptionsContext';
-import PrescriptionEditor from '@/app/(tabs)/(myhealth)/(prescriptions)/edit';
-import Prescriptions from '@/app/(tabs)/(myhealth)/(prescriptions)';
-import { type PrescriptionItem } from '@/types/prescriptions';
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import MyHealthScreen from "@/app/(tabs)/(myhealth)";
+import { router } from "expo-router";
+import { getPainHistory, loadHealthRecords } from "@/services/healthDataHelper";
 
-let mockParams: { id?: string } = {};
-jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: () => true },
-  useLocalSearchParams: () => mockParams,
-}));
-jest.mock('@react-native-vector-icons/feather', () => ({ Feather: () => null }));
-jest.mock('react-native-safe-area-context', () => jest.requireActual('react-native-safe-area-context/jest/mock').default);
-jest.mock('@/context/authcontext', () => ({
-  useAuth: () => ({ user: { id: 'user-1', name: 'Test Person', birthsex: 'Female', birthyear: 1980,
-    formalDiagnosis: false, painConditions: ['Arthritis'], otherCondition: 'Test condition' } }),
-}));
-jest.mock('@/hooks/usePrescriptions', () => ({
-  listPrescriptions: jest.fn(async () => []),
-  createPrescription: jest.fn(async (_userId: string, draft: Omit<PrescriptionItem, 'id'>) => ({
-    ...draft,
-    id: 'prescription-1',
-  })),
-  updatePrescription: jest.fn(async (id: string, draft: Omit<PrescriptionItem, 'id'>) => ({
-    ...draft,
-    id,
-  })),
-  deletePrescription: jest.fn(async () => undefined),
-  isDuplicate: jest.fn(() => false),
+jest.mock("expo-router", () => ({
+    router: {
+        push: jest.fn(),
+    },
+    useFocusEffect: jest.fn(),
 }));
 
-beforeEach(() => { mockParams = {}; jest.clearAllMocks(); });
+jest.mock("@/services/healthDataHelper", () => ({
+    getPainHistory: jest.fn(() => []),
+    loadHealthRecords: jest.fn(() => Promise.resolve()),
+    painRecordDate: jest.fn(() => "01/10/2026"),
+}));
 
-it('validates, adds, edits and deletes prescriptions within the same tab session', async () => {
-  await render(<PrescriptionProvider><PrescriptionEditor /><Prescriptions /></PrescriptionProvider>);
-  expect(screen.getByText('No prescriptions added yet.')).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+const mockHealthRecords = [
+    {id: '1', completedAt: '01/10/2026', areas: ['Head', 'Leg'], current: 5, mildest: 3, worst: 9, average: 7},
+    {id: '2', completedAt: '06/10/2026', areas: ['Head'], current: 8, mildest: 5, worst: 10, average: 8},
+    {id: '3', completedAt: '06/10/2026', areas: ['Head'], current: 8, mildest: 5, worst: 10, average: 8},
+  ]
 
-  await fireEvent.changeText(screen.getByLabelText('Medication name'), 'Test medicine');
-  await fireEvent.changeText(screen.getByLabelText('Strength'), '0');
-  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
+describe("objects rendering", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (getPainHistory as jest.Mock).mockReturnValue([]);
+        (loadHealthRecords as jest.Mock).mockResolvedValue(undefined);
+    });
 
-  await fireEvent.changeText(screen.getByLabelText('Strength'), '5');
-  expect(screen.getByRole('button', { name: 'Save prescription' })).toBeDisabled();
-
-  await fireEvent.changeText(screen.getByLabelText('Repeat every'), '1');
-  await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
-
-  await waitFor(() => expect(screen.getByText('Test medicine 5 mg — Once daily')).toBeTruthy());
-  await fireEvent.press(screen.getByRole('button', { name: 'Edit Test medicine 5 mg — Once daily' }));
-  const destination = jest.mocked(router.push).mock.calls[0][0];
-  if (typeof destination === 'string' || typeof destination.params?.id !== 'string') {
-    throw new Error('Edit navigation must include the prescription ID');
-  }
-  mockParams = { id: destination.params.id };
-  await screen.rerender(<PrescriptionProvider><PrescriptionEditor /><Prescriptions /></PrescriptionProvider>);
-  await fireEvent.changeText(screen.getByLabelText('Strength'), '10');
-  await fireEvent.press(screen.getByRole('button', { name: 'Save prescription' }));
-
-  await waitFor(() => expect(screen.getByText('Test medicine 10 mg — Once daily')).toBeTruthy());
-  expect(screen.queryByText('Test medicine 5 mg — Once daily')).toBeNull();
-  await fireEvent.press(screen.getByRole('button', { name: 'Delete Test medicine 10 mg — Once daily' }));
-  await waitFor(() => expect(screen.getByText('No prescriptions added yet.')).toBeTruthy());
+    test("objects are rendered on screen correctly (no pain assessment done yet)", async() => {
+        await render(<MyHealthScreen />);
+        expect(screen.getByText("MY HEALTH")).toBeTruthy();
+        expect(screen.getByText("Understand your health over time")).toBeTruthy();
+        expect(screen.getByText("Review your pain trends and keep your prescriptions in one place.")).toBeTruthy();
+        expect(screen.getByText("My health profile")).toBeTruthy();
+        expect(screen.getAllByText("View ›")).toBeTruthy();
+        expect(screen.getByText("My prescriptions")).toBeTruthy();
+        expect(screen.getByText("Average pain trend")).toBeTruthy();
+        expect(screen.getByText("Your five most recent pain assessments")).toBeTruthy();
+        expect(screen.getByText("No pain records yet")).toBeTruthy();
+        expect(screen.getByText(/0 records/)).toBeTruthy();
+        expect(screen.getByText("Complete a pain assessment to see your progress here.")).toBeTruthy();
+        expect(screen.getByText("View all pain records")).toBeTruthy();
+        expect(screen.getByText("Supported by ABBVIE")).toBeTruthy();
+    });
 });
 
-it('reports stale prescription links instead of creating another entry', async () => {
-  mockParams = { id: 'missing' };
-  await render(<PrescriptionProvider><PrescriptionEditor /></PrescriptionProvider>);
-  expect(screen.getByText('This prescription is no longer available.')).toBeTruthy();
+
+// navigation tests
+describe("navigation tests", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (getPainHistory as jest.Mock).mockReturnValue([]);
+    });
+
+    test("pressing health profile navigates to health profile", async() => {
+        await render(<MyHealthScreen />);
+
+        fireEvent.press(screen.getByText("My health profile"));
+
+        expect(router.push).toHaveBeenCalledWith("/(tabs)/(myhealth)/healthprofile");
+    });
+
+    test("pressing prescriptions navigates to prescription screen", async() => {
+        await render(<MyHealthScreen />);
+
+        fireEvent.press(screen.getByText("My prescriptions"));
+
+        expect(router.push).toHaveBeenCalledWith("/(tabs)/(myhealth)/(prescriptions)");
+    });
+
+    test("pressing pain records navigates to records", async() => {
+        await render(<MyHealthScreen />);
+
+        fireEvent.press(screen.getByText("View all pain records"));
+
+        expect(router.push).toHaveBeenCalledWith("/(tabs)/(myhealth)/painrecords");
+    });
 });
+
+// empty graph tests
+describe("empty average pain graph", () => {
+    test("shows message when no pain records exist", async() => {
+        (getPainHistory as jest.Mock).mockReturnValue([]);
+
+        await render(<MyHealthScreen />);
+
+        expect(screen.getByText("No pain records yet")).toBeTruthy();
+        expect(screen.getByText("Complete a pain assessment to see your progress here.")).toBeTruthy();
+    });
+});
+
+//graph with dummy data
+describe("average pain graph with records", () => {
+    
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("graph shows a trend when records are available", async() => {
+        (getPainHistory as jest.Mock).mockReturnValue(mockHealthRecords);
+        await render(<MyHealthScreen/>);
+
+        expect(screen.queryByText("No pain records yet")).toBeNull();
+        expect(screen.getByText(/3 records/)).toBeTruthy();
+    })
+})
