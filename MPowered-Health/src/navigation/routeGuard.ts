@@ -1,14 +1,16 @@
-export type SessionUser = { onboardingComplete?: boolean } | null;
+export type SessionUser = { onboardingComplete?: boolean; } | null;
 
 /** Returns the required route for the current backend session, or null when the route is allowed */
 export function requiredSessionRoute({
   user,
   rootSegment,
   nestedSegment,
+  showActivation,
 }: {
   user: SessionUser;
   rootSegment?: string;
   nestedSegment?: string;
+  showActivation: boolean;
 }) {
   const inAuthSection = rootSegment === '(auth)';
   const inTabsSection = rootSegment === '(tabs)';
@@ -38,8 +40,8 @@ export function requiredSessionRoute({
    * user created, onboarding completed but still in the onboarding section 
    * -> transition to activation screen first instead of skipping straight to the homepage
   */
-  if (inOnboardingSection) {
-    return '/(auth)/activation';
+  if (showActivation) {
+    return inActivationScreen ? null : '/(auth)/activation';
   } 
 
   /** 

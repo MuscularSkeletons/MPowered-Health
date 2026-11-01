@@ -33,16 +33,16 @@ function AppLoadingScreen() {
 /** Directs users according to their session and onboarding status. */
 function RouteGuard() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, showActivation } = useAuth();
   const segments = useSegments();
   const rootSegment = segments[0];
   const nestedSegment = segments[1];
 
   useEffect(() => {
     if (isLoading) return;
-    const required = requiredSessionRoute({ user, rootSegment, nestedSegment });
+    const required = requiredSessionRoute({ user, rootSegment, nestedSegment, showActivation });
     if (required) router.replace(required);
-  }, [user, isLoading, rootSegment, nestedSegment, router]);
+  }, [user, isLoading, rootSegment, nestedSegment, showActivation, router]);
 
   if (isLoading) return <AppLoadingScreen />;
 

@@ -19,6 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null); // null until we check if user logged in or not
   const [isLoading, setIsLoading] = useState(true); // for initial session check when user opens the app
+  const [showActivation, setShowActivation] = useState(false); // for showing activation screen after onboarding
 
   /** 
    * Get the user information from supabase for the user with that userId (check if user authenticated)
@@ -286,7 +287,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           updateUser, 
           isLoading,
           updateAuthUserEmail,
-          updateAuthUserPassword, }}
+          updateAuthUserPassword, 
+          showActivation,
+          setShowActivation,
+        }}
     >
         {children}
     </AuthContext.Provider>

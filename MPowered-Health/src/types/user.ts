@@ -23,4 +23,6 @@ export interface AuthContextType {
   isLoading: boolean;
   updateAuthUserEmail: (email: string) => Promise<void>;
   updateAuthUserPassword: (currPassword: string, newPassword: string) => Promise<void>;
+  showActivation: boolean;
+  setShowActivation: (value: boolean) => void;
 }

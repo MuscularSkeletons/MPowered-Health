@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { useAuth } from '@/context/authcontext';
 import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
+import { useRouter } from 'expo-router';
 
 /** Saves the profile answers and marks onboarding complete */
 export default function CompleteOnboarding() {
   const [isLoading, setIsLoading] = useState(false);
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, setShowActivation } = useAuth();
+  const router = useRouter();
 
   const handleComplete = async () => {
     setIsLoading(true);
     try {
       if (!user) throw new Error('User not authenticated');
+
+      setShowActivation(true);
+      
       await updateUser({
         name: user.name,
         birthsex: user.birthsex,
@@ -21,7 +26,8 @@ export default function CompleteOnboarding() {
         otherCondition: user.otherCondition,
         onboardingComplete: true,
       });
-      // The session guard opens activation when the saved profile becomes complete.
+      
+      router.replace('/(auth)/activation');
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');

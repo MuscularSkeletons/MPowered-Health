@@ -9,10 +9,15 @@ import { useAuth } from '@/context/authcontext';
 /** Transition screen from onboarding to main app to indicate onboarding completed */
 export default function ActivationScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, setShowActivation } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => router.replace('/(tabs)/(assessment)'), 5000);
+    if (!user) throw new Error('User not authenticated');
+    const timer = setTimeout(() => {
+      setShowActivation(false); // Clear the activation flag so the user doesn't get stuck here on future app opens
+      router.replace('/(tabs)/(assessment)')
+    }, 5000);
+    
     return () => clearTimeout(timer);
   }, [router]);
 
