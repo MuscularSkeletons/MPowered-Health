@@ -15,7 +15,7 @@ import { useCallback, useState } from 'react';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 
 const CHART_SIDE_GUTTER = 24;
-const CHART_BASELINE = 82;
+const CHART_BASELINE = 96;
 const PIXELS_PER_SCORE = 6;
 const LINE_THICKNESS = 4;
 
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   trend: { width: '100%' },
   chart: {
-    height: 96,
+    height: 112,
     position: 'relative',
     marginTop: spacing.md,
     backgroundColor: palette.surface,
