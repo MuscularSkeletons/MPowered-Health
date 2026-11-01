@@ -19,7 +19,7 @@ export default function ActivationScreen() {
     }, 5000);
     
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [router, user, setShowActivation]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>

@@ -15,8 +15,6 @@ export default function CompleteOnboarding() {
     try {
       if (!user) throw new Error('User not authenticated');
 
-      setShowActivation(true);
-      
       await updateUser({
         name: user.name,
         birthsex: user.birthsex,
@@ -26,7 +24,7 @@ export default function CompleteOnboarding() {
         otherCondition: user.otherCondition,
         onboardingComplete: true,
       });
-      
+      setShowActivation(true);
       router.replace('/(auth)/activation');
     } catch (error) {
       console.error(error);
