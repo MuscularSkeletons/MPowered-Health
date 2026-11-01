@@ -24,8 +24,7 @@ export default function CompleteOnboarding() {
         otherCondition: user.otherCondition,
         onboardingComplete: true,
       });
-      setShowActivation(true);
-      router.replace('/(auth)/activation');
+      setShowActivation(true); // Trigger activation screen via the route guard
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to complete. Please try again.');

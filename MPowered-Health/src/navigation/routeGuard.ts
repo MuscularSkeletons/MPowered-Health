@@ -19,7 +19,7 @@ export function requiredSessionRoute({
 
   /**  
    * no user -> splashscreen
-   * unless currently in auth section, in which case stay there
+   * unless currently in auth section (but not onboarding or activation), in which case stay there
   */
   if (!user) {
     if (inAuthSection && !inOnboardingSection && !inActivationScreen) {
@@ -37,7 +37,7 @@ export function requiredSessionRoute({
   }
 
   /** 
-   * user created, onboarding completed but still in the onboarding section 
+   * user created, onboarding completed but showActivation is true (triggered from onboarding completion)
    * -> transition to activation screen first instead of skipping straight to the homepage
   */
   if (showActivation) {
