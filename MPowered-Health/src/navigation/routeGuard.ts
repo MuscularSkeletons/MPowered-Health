@@ -20,7 +20,10 @@ export function requiredSessionRoute({
    * unless currently in auth section, in which case stay there
   */
   if (!user) {
-    return inAuthSection ? null : '/(auth)/splashscreen';
+    if (inAuthSection && !inOnboardingSection && !inActivationScreen) {
+      return null;
+    }
+    return '/(auth)/splashscreen';
   } 
 
   /** 
