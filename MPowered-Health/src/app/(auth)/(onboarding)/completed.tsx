@@ -2,13 +2,11 @@ import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { useAuth } from '@/context/authcontext';
 import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
-import { useRouter } from 'expo-router';
 
 /** Saves the profile answers and marks onboarding complete */
 export default function CompleteOnboarding() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateUser, setShowActivation } = useAuth();
-  const router = useRouter();
 
   const handleComplete = async () => {
     setIsLoading(true);
