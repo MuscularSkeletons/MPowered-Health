@@ -206,6 +206,7 @@ describe("editing answers", () => {
     
     beforeEach(() => {
         jest.clearAllMocks();
+        mockQuestions = [mockQuestion];
     })
 
     test("edit a saved answer to the question", async() => {
@@ -223,13 +224,18 @@ describe("editing answers", () => {
             expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 8 hours of sleep");
         });
 
+        //reset the mock
+        mockUpdateAnswer.mockReset();
+
         //editing answer
         await fireEvent.press(screen.getByText("›"));
-        await fireEvent.changeText(answerInput, "Getting 10 hours of sleep");
+
+        await user.clear(screen.getByTestId("answer-input"));
+        await user.type(screen.getByTestId("answer-input"), "Getting 10 hours of sleep");
         
         await fireEvent.press(screen.getByText("Save"));
         await waitFor(() => {
-            expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 8 hours of sleep");
+            expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 10 hours of sleep");
         });       
     })     
 
