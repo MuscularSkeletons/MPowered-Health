@@ -10,6 +10,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("objects rendered on screen", () => {
     test("objects are rendered correctly", async() => {
         await render(<ManageNotifications/>);
@@ -21,6 +22,7 @@ describe("objects rendered on screen", () => {
     })
 })
 
+//navigation tests
 describe("navigation tests", () => {
     test("pressing back should navigate back to settings main page", async() => {
         await render(<ManageNotifications/>);

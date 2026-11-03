@@ -6,8 +6,11 @@ import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/
 import { Alert } from 'react-native';
 import { PrescriptionItem } from '@/types/prescriptions';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
+
+//dummy data for prescriptions
 const mockPrescriptions : PrescriptionItem[] = [
     {id: '1', name: 'Perindopril arginine', strength: "5", unit: "mg", form: "Tablet", frequency: 'day', repeat: "1"},
     {id: '2', name: 'Paracetamol', strength: "500", unit: "mg", form: "Tablet", frequency: 'day', repeat: "3"},
@@ -17,6 +20,7 @@ const mockPrescriptions : PrescriptionItem[] = [
 //3 items in the prescription list
 const medications = [mockPrescriptions[0], mockPrescriptions[1], mockPrescriptions[2]];
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -28,15 +32,17 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+//mocking use assessments hook
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 }))
  
+//mocking prescriptions context
 jest.mock('@/context/prescriptionsContext', () => ({
     usePrescriptions: jest.fn(),
 }))
 
-// rendering test
+// rendering tests
 describe("my management assessment questions are rendered on screen", () => {
     
     beforeEach(async() => {
@@ -227,6 +233,7 @@ describe("input validation for question 2 & 4", () => {
     });
 });
 
+//button tests
 describe("record button tests", () => {
 
     afterEach(jest.clearAllMocks);
@@ -322,6 +329,7 @@ describe("record button tests", () => {
     })
 })
 
+//summary screen tests
 describe("summary screen tests", () => {
 
     afterEach(jest.clearAllMocks);
@@ -443,7 +451,6 @@ describe("navigation", () => {
         //navigate through questions 1 - 4
     
         //question 1
-
         expect(screen.getByText("1/4")).toBeTruthy();
         await fireEvent.press(screen.getByText("Perindopril arginine 5 mg — Once daily"));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
@@ -478,7 +485,6 @@ describe("navigation", () => {
     test('pressing back on a question 1 should navigate to the homescreen', async() => {
         await fireEvent.press(screen.getByText('‹ Back'));
         expect(onBack).toHaveBeenCalled();
-        //homescreen
     })
 
     test('pressing close on summary screen should navigate to homescreen', async() => {
@@ -604,11 +610,11 @@ describe("submitting users answers to database", () => {
         //question 2
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-        // Rquestion 3
+        // question 3
         await fireEvent.press(screen.getByText('0 days'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
-        //question 4
+        // question 4
         await fireEvent.press(screen.getByRole('button', {name: 'Review' }));
 
         await waitFor(() => {

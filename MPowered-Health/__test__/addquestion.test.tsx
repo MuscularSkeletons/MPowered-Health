@@ -2,6 +2,7 @@ import AddQuestion from "@/app/(tabs)/(questions)/addquestion";
 import { fireEvent, render, screen, userEvent, waitFor } from "@testing-library/react-native";
 import { Alert } from "react-native";
 
+//mocks
 let mockAssessment: {
     pain_location: string[] | null,
     current_pain: number | null,
@@ -15,20 +16,20 @@ let mockAssessment: {
     worst_pain: 8,
     average_pain: 6,
 };
-
 const mockCreateQuestion = jest.fn();
 const mockRetrievePainAssessment = jest.fn();
 const mockAssessmentLoading = false;
 const mockReplace = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock('@/context/authcontext', () => ({
     useAuth: () => ({
-    user: jest.fn(),
-  }),
+        user: jest.fn(),
+    }),
 }));
 
-//questions hook
+//mocking questions hook
 jest.mock('@/hooks/useQuestions', () => ({
     useQuestions: () => ({
         createQuestion: mockCreateQuestion,
@@ -46,12 +47,13 @@ jest.mock('expo-router', () => ({
     })
 }))
 
-//add question screen rendering
+//rendering tests for add questions screen
 describe("add question screen", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
 
+        //dummy data from pain assessment
         mockAssessment = {
             pain_location: ['Head', 'Neck'],
             current_pain: 5,
@@ -78,6 +80,8 @@ describe("add question screen", () => {
     })
 
     test("default questions", async() => {
+        
+        //pain assessment not completed
         mockAssessment = {
             pain_location: null,
             current_pain: null,
@@ -116,7 +120,7 @@ describe("add question screen", () => {
     })
 })
 
-//selection + button tests
+//question selection + button tests
 describe("save button is enabled/disabled", () => {
 
     beforeEach(() => {
@@ -125,32 +129,50 @@ describe("save button is enabled/disabled", () => {
 
     test("save button is disabled if no question is selected", async() => {
         await render(<AddQuestion/>);
+
+        //save button is disabled by default
         expect(screen.getByRole("button", {name: "Save"})).toBeDisabled();
     })
 
     test("save button is enabled if a question is selected", async() => {
         await render(<AddQuestion/>);
+        
+        //select a question
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        
+        //save button is enabled
         expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
     })
 
     test("save button is enabled if multiple questions are selected", async() => {
         await render(<AddQuestion/>);
+        
+        //select questions
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));
         await fireEvent.press(screen.getByText('How can I prevent the pain from becoming severe again?'));
+        
+        //save button is enabled
         expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
     })
 
     test("deselecting a question should disable the save button", async() => {
         await render(<AddQuestion/>);
+
+        //select a question
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        
+        //save button is enabled
         expect(screen.getByRole("button", {name: "Save"})).toBeEnabled();
-        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));        
+        
+        //press the question again to de-select it
+        await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));  
+        
+        //save button is disabled
         expect(screen.getByRole("button", {name: "Save"})).toBeDisabled();      
     })
 })
 
-//custom questions
+//custom questions tests
 describe("custom question functionality", () => {
 
     beforeEach(() => {
@@ -160,6 +182,8 @@ describe("custom question functionality", () => {
     test("pressing on add question button should open a pop up", async() => {
         await render(<AddQuestion/>);
         await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
+
+        //pop up
         expect(screen.getByText("Add Question")).toBeTruthy();
         expect(screen.getByText("Question")).toBeTruthy();
         expect(screen.getByPlaceholderText("Enter your question")).toBeTruthy();
@@ -171,10 +195,12 @@ describe("custom question functionality", () => {
         await render(<AddQuestion/>);
         await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
 
+        //enter a question in the pop up
         const user = userEvent.setup();
         const questionInput = screen.getByPlaceholderText("Enter your question");
         await user.type(questionInput, "Why am I restless at night?");
 
+        //checking the value entered
         expect(questionInput.props.value).toBe("Why am I restless at night?");
     })
 
@@ -182,10 +208,12 @@ describe("custom question functionality", () => {
         await render(<AddQuestion/>);
         await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
 
+        //enter a question in the pop up
         const user = userEvent.setup();
         const questionInput = screen.getByPlaceholderText("Enter your question");
         await user.type(questionInput, "Why am I restless at night?");
 
+        //press save button and the question appears in the list
         await fireEvent.press(screen.getAllByRole("button", {name: "Save"})[0]);
         expect(screen.getByText("Why am I restless at night?")).toBeTruthy();
     })
@@ -196,12 +224,15 @@ describe("custom question functionality", () => {
         const spyAlert = jest.spyOn(Alert, 'alert');
         await fireEvent.press(screen.getByRole("button", {name: "Add your own question"}));
 
+        //press the save button
         await fireEvent.press(screen.getAllByRole("button", {name: "Save"})[0]);
+
+        //alert pop up
         expect(spyAlert).toHaveBeenCalledWith("Error", "Please enter a question");        
     })
 })
 
-//submission tests
+//submitting questions to the database tests
 describe('submission tests', () => {
 
     beforeEach(() => {
@@ -210,9 +241,12 @@ describe('submission tests', () => {
 
     test("successful submission to the database", async() => {
         await render(<AddQuestion/>);
+
+        //selecting a question and pressing save
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
         await fireEvent.press(screen.getByRole("button", {name: "Save"}));  
         
+        //call to the database
         await waitFor(() => {
             expect(mockCreateQuestion).toHaveBeenCalledWith(
                 'What can I do to better manage days when the pain is high?'
@@ -221,12 +255,15 @@ describe('submission tests', () => {
     })
 
     test("throw an error if submission to database fails", async() => {
+        //mock the error
         (mockCreateQuestion as jest.Mock).mockRejectedValue(new Error("Could not submit"));
         await render(<AddQuestion/>);
         const spyAlert = jest.spyOn(Alert, 'alert');
+
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
         await fireEvent.press(screen.getByRole("button", {name: "Save"}));  
         
+        //call to the database should throw an error
         await waitFor(() => {
             expect(spyAlert).toHaveBeenCalledWith(
                 'Error',
@@ -236,7 +273,7 @@ describe('submission tests', () => {
     })
 })
 
-//navigation
+//navigation tests
 describe("navigation tests", ()=> {
 
     beforeEach(() => {
@@ -246,8 +283,10 @@ describe("navigation tests", ()=> {
 
     test("pressing save after selecting a question should navigate to questions list", async() => {
         await render(<AddQuestion/>);
+
+        //select a question and press save
         await fireEvent.press(screen.getByText('What can I do to better manage days when the pain is high?'));   
-        await fireEvent.press(screen.getByRole("button", {name: "Save"}));      
+        await fireEvent.press(screen.getByRole("button", {name: "Save"}));   
         await waitFor(() => {
             expect(mockCreateQuestion).toHaveBeenCalledWith('What can I do to better manage days when the pain is high?');
             expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(questions)/questions');

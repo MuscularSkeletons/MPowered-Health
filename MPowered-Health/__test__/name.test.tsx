@@ -1,11 +1,13 @@
 import StoreName from '@/app/(auth)/(onboarding)/name';
 import {render, screen, fireEvent, userEvent} from '@testing-library/react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -26,6 +28,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("rendering objects on screen", () => {
 
     test("screen objects are rendered on screen", async() => {
@@ -43,6 +46,7 @@ describe("rendering objects on screen", () => {
 
 })
 
+//button tests + input field tests
 describe("input fields", () => {
 
     beforeEach(() => {
@@ -76,6 +80,7 @@ describe("input fields", () => {
     })
 })
 
+//entered text tests
 describe("name validation", () => {
     
     beforeEach(() => {
@@ -119,6 +124,7 @@ describe("name validation", () => {
     })
 })
 
+//navigation tests
 describe("navigation", () => {
 
     beforeEach(() => {

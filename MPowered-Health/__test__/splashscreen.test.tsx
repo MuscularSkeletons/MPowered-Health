@@ -2,6 +2,7 @@ import SplashScreen from '@/app/(auth)/splashscreen';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: null,
@@ -25,6 +26,7 @@ jest.mock('@/components/splash/artwork', () => ({
     SplashArtwork: () => null,
 }))
 
+//rendering tests
 describe('splash screen components render properly', () => {
 
     test("objects are rendered on screen properly", async() => {
@@ -36,6 +38,7 @@ describe('splash screen components render properly', () => {
     })
 });
 
+//navigation tests
 describe ("Navigation to the correct screen", () => {
 
     beforeEach(() => {

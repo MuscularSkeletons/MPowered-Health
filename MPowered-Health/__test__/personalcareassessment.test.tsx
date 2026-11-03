@@ -4,9 +4,11 @@ import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { fireEvent, render, screen, userEvent , waitFor} from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -18,17 +20,19 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+//mocking prescription context
 jest.mock('@/context/prescriptionsContext', () => ({
     usePrescriptions: jest.fn (() => ({
         list: [],
     })),
 }))
 
+//mocking use assessments hook
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 })) 
 
-// rendering test + some navigation
+// rendering tests + some navigation
 describe("personal care assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -231,11 +235,13 @@ describe("input validation for question 4", () => {
     });
 });
 
+//summary screen tests
 describe("summary screen tests", () => {
     
     afterEach(jest.clearAllMocks);
     
     test("objects are rendered on screen correctly", async() => {
+        //render with dummy data
         await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I am not doing any jobs that I usually do around the house',
             personal_care_impact: 'I can look after myself normally without causing extra pain',
@@ -288,6 +294,7 @@ describe("summary screen tests", () => {
 
     //tests for displaying the appropriate message according to the score
     test("score less than 5", async() => {
+        //render with dummy data
         await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I am not doing any jobs that I usually do around the house',
             personal_care_impact: 'I can look after myself normally without causing extra pain',
@@ -316,7 +323,8 @@ describe("summary screen tests", () => {
     })
 
     test("score less than 10 and more than 5", async() => {
-            await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
+        //render with dummy data
+        await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I get dressed more slowly than usual because of my pain',
             personal_care_impact: 'I can look after myself normally, but it causes extra pain',
             sleeping_impact: 'Because of pain I have less than 6 hours of sleep',
@@ -344,7 +352,8 @@ describe("summary screen tests", () => {
     })
 
     test("score less than 15 and more than 10", async() => {
-            await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
+        //render with dummy data
+        await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I am more irritable and bad tempered with people than usual',
             personal_care_impact: 'It is painful to look after myself and I am slow and careful',
             sleeping_impact: 'Because of pain I have less than 2 hours of sleep',
@@ -372,7 +381,8 @@ describe("summary screen tests", () => {
     })
 
     test("score more than 15", async() => {
-            await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
+        //render with dummy data
+        await render (<AssessmentScreen categoryData={personalCareQuestions} onBack={onBack} existingAnswers={{
             activities_impact: 'I try to get other people to do things for me because of my pain',
             personal_care_impact: 'I do not get dressed, wash with difficulty and stay in bed',
             sleeping_impact: 'Pain prevents me from sleeping at all',
@@ -495,7 +505,7 @@ describe("navigation", () => {
     })
 });
 
-//submission tests
+//submission to database tests
 describe("submitting users answers to database", () => {
 
     beforeEach(async() => {
@@ -521,6 +531,7 @@ describe("submitting users answers to database", () => {
         //question 4 (reflection)
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
 
+        //call to the database
         await waitFor(() => {
             expect(submitAssessmentAnswers).toHaveBeenCalledWith(
                 "My Personal Care",
@@ -560,6 +571,7 @@ describe("submitting users answers to database", () => {
         //question 4 (reflection)
         await fireEvent.press(screen.getByRole('button', {name: 'Review'}));
 
+        //call to the database
         await waitFor(() => {
             expect(spyAlert).toHaveBeenCalledWith('Could not save answers','Network error');
         });

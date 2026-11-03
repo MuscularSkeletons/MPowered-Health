@@ -1,9 +1,8 @@
 import Questions from "@/app/(tabs)/(questions)/questions";
-import { useQuestions } from "@/hooks/useQuestions";
 import { render, screen, fireEvent, waitFor, userEvent, act } from "@testing-library/react-native";
-import { useFocusEffect } from "expo-router";
 import { Alert } from "react-native";
 
+//mocks
 let mockQuestion : {
     id: string | null,
     user_id : string | null,
@@ -26,14 +25,14 @@ const mockRetrievePainAssessment = jest.fn();
 const mockRefreshQuestions = jest.fn();
 const mockPush = jest.fn();
 
-
+//mocking auth context
 jest.mock('@/context/authcontext', () => ({
     useAuth: () => ({
         user: jest.fn(),
-  }),
+    }),
 }));
 
-//questions hook
+//mocking questions hook
 jest.mock('@/hooks/useQuestions', () => ({
     useQuestions: () => ({
         questions : mockQuestions,
@@ -52,8 +51,7 @@ jest.mock('expo-router', () => ({
     useFocusEffect: jest.fn(),
 }))
 
-
-//questions main screen rendering
+//rendering tests for questions main screen
 describe("question main screen", () => {
 
     beforeEach(()=> {
@@ -71,7 +69,8 @@ describe("question main screen", () => {
     })
 })
 
-describe("adding questions", () => {
+//rendering tests for question cards
+describe("question cards", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -81,6 +80,7 @@ describe("adding questions", () => {
     test("when a question is added, it appears as a question card", async() => {
         await render (<Questions/>);
 
+        //press the + symbol
         await fireEvent.press(screen.getByText("+"));
         expect(screen.getByText("What options are available to improve my quality of life?")).toBeTruthy();
         expect(screen.getByText("No answer submitted yet")).toBeTruthy();
@@ -88,7 +88,9 @@ describe("adding questions", () => {
     })
 })
 
+//deleting a question tests
 describe("deleting questions", () => {
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockQuestions = [mockQuestion];
@@ -106,7 +108,11 @@ describe("deleting questions", () => {
             onPress: expect.anything(),
             style: 'destructive',
         }]
+
+        //press delete button
         await fireEvent.press(screen.getByRole('button', {name: 'Delete'}));
+
+        //alert pop up
         expect(spyAlert).toHaveBeenCalledWith("Delete Question", "Are you sure you want to delete this question?", expect.arrayContaining(alertButtons));
     })
 
@@ -114,14 +120,16 @@ describe("deleting questions", () => {
         await render(<Questions/>);
         const spyAlert = jest.spyOn(Alert, 'alert');
 
+        //press delete button
         await fireEvent.press(screen.getByRole('button', {name: 'Delete'}));
         
-        //press the cancel button
+        //press the cancel button on alert pop up
         const buttons = spyAlert.mock.calls?.[0]?.[2];
         await act(async() => {
            await buttons?.[0]?.onPress?.();
         }) 
 
+        //question should not be deleted
         expect(mockDeleteQuestions).not.toHaveBeenCalled();
     })
 
@@ -129,21 +137,23 @@ describe("deleting questions", () => {
         await render(<Questions/>);
         const spyAlert = jest.spyOn(Alert, 'alert');
 
+        //press delete button
         await fireEvent.press(screen.getByRole('button', {name: 'Delete'}));
         
-        //press the delete button
+        //press the delete button on alert pop up
         const buttons = spyAlert.mock.calls?.[0]?.[2];
         await act(async() => {
             await buttons?.[1]?.onPress?.();
         }) 
 
+        //question should be deleted
         await waitFor(() => {
             expect(mockDeleteQuestions).toHaveBeenCalled(); 
-        }) 
-
+        })
     })
 })
 
+//adding an answer for a question tests
 describe("recording answers", () => {
     
     beforeEach(() => {
@@ -153,22 +163,30 @@ describe("recording answers", () => {
     
     test("when add answer is pressed, a pop up opens to add an answer to the question", async() => {
         await render(<Questions/>);
+
         //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
+
+        //pop up
         expect(screen.getByText('Answer')).toBeTruthy();
         expect(screen.getByPlaceholderText("Enter your answer")).toBeTruthy();
     })
 
     test("user can add an answer to the question", async() => {
         await render(<Questions/>);
+
         //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
+
+        //pop up
         expect(screen.getByText('Answer')).toBeTruthy();
 
+        //enter an answer
         const user = userEvent.setup();
         const answerInput = screen.getByPlaceholderText("Enter your answer");
         await user.type(answerInput, "Getting 8 hours of sleep");
 
+        //checking the value entered
         expect(answerInput.props.value).toBe("Getting 8 hours of sleep");
     })
 
@@ -176,12 +194,16 @@ describe("recording answers", () => {
         await render(<Questions/>);
         //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
+
+        //pop up
         expect(screen.getByText('Answer')).toBeTruthy();
 
+        //enter an answer
         const user = userEvent.setup();
         const answerInput = screen.getByPlaceholderText("Enter your answer");
         await user.type(answerInput, "Getting 8 hours of sleep");
 
+        //press the save button
         await fireEvent.press(screen.getByText("Save"));
         await waitFor(() => {
             expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 8 hours of sleep");
@@ -194,14 +216,19 @@ describe("recording answers", () => {
 
         //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
+
+        //pop up
         expect(screen.getByText('Answer')).toBeTruthy();
 
+        //press the save button
         await fireEvent.press(screen.getByText("Save"));
+
+        //alert pop up
         expect(spyAlert).toHaveBeenCalledWith("Error", "Please enter an answer");
     })    
 })
 
-//edit asnwer tests
+//editing saved answers tests
 describe("editing answers", () => {
     
     beforeEach(() => {
@@ -211,14 +238,19 @@ describe("editing answers", () => {
 
     test("edit a saved answer to the question", async() => {
         await render(<Questions/>);
+
         //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
+
+        //pop up
         expect(screen.getByText('Answer')).toBeTruthy();
 
+        //enter an answer
         const user = userEvent.setup();
         const answerInput = screen.getByPlaceholderText("Enter your answer");
         await user.type(answerInput, "Getting 8 hours of sleep");
 
+        //press the save button to save the first answer
         await fireEvent.press(screen.getByText("Save"));
         await waitFor(() => {
             expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 8 hours of sleep");
@@ -227,20 +259,22 @@ describe("editing answers", () => {
         //reset the mock
         mockUpdateAnswer.mockReset();
 
-        //editing answer
+        //arrow next to add answer
         await fireEvent.press(screen.getByText("›"));
 
+        //enter the changed answer
         await user.clear(screen.getByTestId("answer-input"));
         await user.type(screen.getByTestId("answer-input"), "Getting 10 hours of sleep");
         
+        //press save to save the edit
         await fireEvent.press(screen.getByText("Save"));
         await waitFor(() => {
             expect(mockUpdateAnswer).toHaveBeenCalledWith("1", "Getting 10 hours of sleep");
         });       
     })     
-
 })
-//navigation
+
+//navigation tests
 describe("navigation tests", () => {
     
     beforeEach(() => {
@@ -249,6 +283,8 @@ describe("navigation tests", () => {
     
     test("pressing + should navigate to add questions page", async() => {
         await render (<Questions/>);
+        
+        //press the + button
         await fireEvent.press(screen.getByText("+"));
         expect(mockPush).toHaveBeenCalledWith("/(tabs)/(questions)/addquestion");        
     })

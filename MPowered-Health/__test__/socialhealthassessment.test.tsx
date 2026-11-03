@@ -1,12 +1,14 @@
-import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { socialHealthQuestions } from '@/constants/assessmentQuestions/socialHealthQuestions';
+import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -18,20 +20,23 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+//mocking prescriptions context
 jest.mock('@/context/prescriptionsContext', () => ({
     usePrescriptions: jest.fn (() => ({
         list: [],
     })),
 }))
 
+//mocking use assessments hook
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 })) 
 
-// rendering test
+// rendering tests
 describe("social health assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
+    //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
     });
 
@@ -143,7 +148,7 @@ describe("social health assessment questions are rendered on screen", () => {
         expect(screen.getByText('Mood')).toBeTruthy();
         expect(screen.getByText('Over the past week, how was your mood generally?')).toBeTruthy();
         expect(screen.getByText('Select the option that best describes your mood.')).toBeTruthy();
-        // options - to adjust to how it's actually implemented
+        // options 
         expect(screen.getByText('I was feeling frustrated')).toBeTruthy();
         expect(screen.getByText('I was feeling sad')).toBeTruthy();
         expect(screen.getByText('I was feeling okay')).toBeTruthy();
@@ -191,6 +196,8 @@ describe("record button tests", () => {
 
     test("record button is enabled when an option is selected for question 1", async() => {
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack}/>);
+
+        //selecting an option
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();        
     })
@@ -201,6 +208,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
 
+        //question 2 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();        
     })
 
@@ -210,6 +218,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
 
+        //select an option on question 2 screen
         await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();          
     })
@@ -222,10 +231,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
 
+        //question 3 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();  
     })
 
     test("record button is enabled when a value is selected for question 3", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 3
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -233,6 +244,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' })); 
 
+        //question 3 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();  
     })
 
@@ -245,10 +257,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
 
+        //question 4 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
     })
 
     test("record button is enabled when a value is selected for question 4", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 4
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -256,7 +270,8 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('I can travel anywhere without pain'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));  
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));        
-    
+        
+        //question 4 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();      
     })
     
@@ -270,10 +285,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));        
     
+        //question 5 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
     })
 
     test("record button is enabled when a value is selected for question 5", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 5
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -283,10 +300,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
     
+        //question 5 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();      
     })
 
     test("record button is disabled when no option is selected for question 6", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 6
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -297,10 +316,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));       
     
+        //question 6 screen
         expect(screen.getByRole("button", {name: "Record"})).toBeDisabled();      
     })
 
     test("record button is enabled when a value is selected for question 6", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 6
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -311,11 +332,13 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
+        //select an option on question 6 screen
         await fireEvent.press(screen.getByText('I was feeling frustrated'));
         expect(screen.getByRole("button", {name: "Record"})).toBeEnabled();     
     })
 
     test("review button is enabled when no text is entered for question 7", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 7
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -328,10 +351,12 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('I was feeling frustrated'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));     
     
+        //question 7 screen
         expect(screen.getByRole("button", {name: "Review"})).toBeEnabled();      
     })
 
     test("review button is enabled when text is entered for question 7", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 7
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -344,6 +369,7 @@ describe("record button tests", () => {
         await fireEvent.press(screen.getByText('I was feeling frustrated'));
         await fireEvent.press(screen.getByRole('button', { name: 'Record' }));
         
+        //enter text for question 7
         const user = userEvent.setup();
         const moodInput = screen.getByPlaceholderText('Write your mood trigger');
         await user.type(moodInput, "No friends :( ");
@@ -360,6 +386,7 @@ describe("input validation for question 7", () => {
     });
 
     test("text entered is within the character limit", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         //navigate to question 7
         await fireEvent.press(screen.getByText('My social life is normal and gives me no extra pain'));
@@ -383,6 +410,7 @@ describe("summary screen tests", () => {
     afterEach(jest.clearAllMocks);
     
     test("objects are rendered on screen correctly", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         
         //question 1
@@ -446,6 +474,7 @@ describe("summary screen tests", () => {
 
     //tests for displaying the appropriate message according to the score
     test("score less than 10", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 2, relation_impact: 2, enjoyment_impact: 2 }}/>);
         
         //question 1
@@ -478,6 +507,7 @@ describe("summary screen tests", () => {
     })
 
     test("score less than 19 and more than 10", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 4 }}/>);
         
         //question 1
@@ -510,6 +540,7 @@ describe("summary screen tests", () => {
     })
 
     test("score less than 30 and more than 20", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
         
         //question 1
@@ -542,6 +573,7 @@ describe("summary screen tests", () => {
     })
 
     test("score more than 30", async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 8, relation_impact: 9, enjoyment_impact: 9 }}/>);
         
         //question 1
@@ -578,6 +610,7 @@ describe("summary screen tests", () => {
 describe("navigation", () => {
 
     beforeEach(async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
     });
 
@@ -627,7 +660,6 @@ describe("navigation", () => {
     test('pressing back on a question 1 should navigate to the homescreen', async() => {
         await fireEvent.press(screen.getByText('‹ Back'));
         expect(onBack).toHaveBeenCalled();
-        //homescreen
     })
 
     test('pressing close on summary screen should navigate to homescreen', async() => {
@@ -699,6 +731,7 @@ describe("navigation", () => {
 describe("submitting users answers to database", () => {
 
     beforeEach(async() => {
+        //render with dummy data for slider questions
         await render (<AssessmentScreen categoryData={socialHealthQuestions} onBack={onBack} existingAnswers={{mood_impact: 5, relation_impact: 3, enjoyment_impact: 9 }}/>);
     });
 
@@ -733,6 +766,7 @@ describe("submitting users answers to database", () => {
         await user.type(moodInput, "No friends :( ");
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
+        //call to the database
         await waitFor(() => {
             expect(submitAssessmentAnswers).toHaveBeenCalledWith(
                 "My Social Health",
@@ -788,6 +822,7 @@ describe("submitting users answers to database", () => {
         await user.type(moodInput, "No friends :( ");
         await fireEvent.press(screen.getByRole("button", {name: "Review"}));
 
+        //call to the database
         await waitFor(() => {
             expect(spyAlert).toHaveBeenCalledWith('Could not save answers','Network error');
         });

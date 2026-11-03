@@ -3,6 +3,7 @@ import { getPainHistory, groupPainHistory} from "@/services/healthDataHelper";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
 import { router } from 'expo-router';
 
+//mocking expo router
 jest.mock("expo-router", () => ({
     router: {
         push: jest.fn(),
@@ -11,6 +12,7 @@ jest.mock("expo-router", () => ({
     useFocusEffect: jest.fn(),
 }));
 
+//mocking health data helper from services
 jest.mock('@/services/healthDataHelper', () => ({
     getPainHistory: jest.fn(),
     groupPainHistory: jest.fn(),
@@ -18,6 +20,7 @@ jest.mock('@/services/healthDataHelper', () => ({
     painMetricValue: jest.fn(),
 }))
 
+//mocking dummy pain assessment data for pain records
 const mockPainRecords = [
     {
         id: "1",
@@ -53,13 +56,14 @@ const mockPainRecords = [
     },
 ]
 
+//mocking dummy pain history
 const mockHistory = [
     {
         //key is the pain locations
         key: "Head", 
-        //label is the key?
+        //label is the key
         label: "Head",
-        //store the actual values?
+        //store the actual values
         records: mockPainRecords,
     }
 

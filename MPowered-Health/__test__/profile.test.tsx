@@ -4,6 +4,7 @@ import { diagnosisOptions, painConditionsOptions } from "@/constants/profile/pro
 import { render, screen, fireEvent, userEvent } from "@testing-library/react-native";
 import { Alert } from "react-native";
 
+//mocks
 const mockUser = {
     name: "Jane",
     email: "jane12@example.com",
@@ -13,10 +14,10 @@ const mockUser = {
     painConditions: [painConditionsOptions[0], painConditionsOptions[2]],
     otherCondition: "Frequent headaches",
 }
-
 const mockUpdateUser = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -39,6 +40,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("objects rendered on screen", () => {
 
     beforeEach(() => {
@@ -63,6 +65,7 @@ describe("objects rendered on screen", () => {
     })
 })
 
+//editing user name in profile tests
 describe("editing name tests", () => {
 
     beforeEach(() => {
@@ -77,13 +80,11 @@ describe("editing name tests", () => {
         await user.press(screen.getByText("Jane"));
 
         //modal should open
-        //console.log("open up name editor modal");
         expect(screen.getByText("Edit name")).toBeTruthy();
         expect(screen.getByText("Name")).toBeTruthy();
         expect(screen.getByText("Jane")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        //console.log("name editor pop up was opened");
         
     })
 
@@ -98,13 +99,11 @@ describe("editing name tests", () => {
         //get the input field and make the edit
         const nameInput = screen.getByTestId("name-input");
         fireEvent.changeText(nameInput, "John");
-        //console.log("name edited");
 
         //save the edit
         await user.press(screen.getByText("Save"));
 
-        expect(mockUpdateUser).toHaveBeenCalledWith({name: "John"});
-        //console.log("user name updated");        
+        expect(mockUpdateUser).toHaveBeenCalledWith({name: "John"});       
     })
 
     test("pressing cancel does not edit the name", async() => {
@@ -144,9 +143,9 @@ describe("editing name tests", () => {
 
         expect(spyAlert).toHaveBeenCalledWith('Error', 'Please enter your name');
     })
-
 })
 
+//editing user birthsex in profile tests
 describe("editing birthsex tests", () => {
 
     beforeEach(() => {
@@ -161,12 +160,10 @@ describe("editing birthsex tests", () => {
         await user.press(screen.getByText("Female"));
 
         //modal should open
-        //console.log("open up birthsex editor modal");
         expect(screen.getByText("Edit sex")).toBeTruthy();
         expect(screen.getByText("Male")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        //console.log("birthsex editor pop up was opened");
     })
     
     test("birthsex is edited successfully", async() => {
@@ -203,6 +200,7 @@ describe("editing birthsex tests", () => {
  
 })
 
+//editing user birthyear in profile tests
 describe("editing birth year tests", () => {
 
     beforeEach(() => {
@@ -217,13 +215,11 @@ describe("editing birth year tests", () => {
         await user.press(screen.getByText("1997"));
 
         //modal should open
-        //console.log("open up birth year modal");
         expect(screen.getByText("Edit year of birth")).toBeTruthy();
         expect(screen.getByText("Year of birth")).toBeTruthy();
         expect(screen.getByText("1997")).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        //console.log("birth year editor pop up was opened");
     })
 
     test("birthyear is changed successfully", async() => {
@@ -236,13 +232,11 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, "2000");
-        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
 
-        expect(mockUpdateUser).toHaveBeenCalledWith({birthyear: 2000});
-        //console.log("birth year updated");        
+        expect(mockUpdateUser).toHaveBeenCalledWith({birthyear: 2000});      
     })
 
     test("pressing cancel does not make edits", async() => {
@@ -255,7 +249,6 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, "2000");
-        //console.log("birth year changed");
 
         //cancel the edit
         await user.press(screen.getByText("Cancel"));
@@ -275,7 +268,6 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, String(BIRTH_YEAR_RANGE.LOWER_BOUND - 1));
-        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
@@ -294,7 +286,6 @@ describe("editing birth year tests", () => {
         //get the input field to edit 
         const yearInput = screen.getByTestId("birth-year-input");
         fireEvent.changeText(yearInput, String(BIRTH_YEAR_RANGE.UPPER_BOUND + 1));
-        //console.log("birth year changed");
 
         //save the edit
         await user.press(screen.getByText("Save"));
@@ -303,6 +294,7 @@ describe("editing birth year tests", () => {
     }) 
 })
 
+//editing user conditions in profile tests
 describe("editing conditions tests (scrollable list)", () => {
     
     beforeEach(() => {
@@ -335,8 +327,6 @@ describe("editing conditions tests (scrollable list)", () => {
 
         await user.press(screen.getByText(painConditionsOptions[5]));
         await user.press(screen.getByText(painConditionsOptions[10]));
-        //console.log("adding", painConditionsOptions[5], "to conditions list");
-        //console.log("adding", painConditionsOptions[10], "to conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -353,7 +343,6 @@ describe("editing conditions tests (scrollable list)", () => {
         expect(screen.getByText("Edit pain conditions")).toBeTruthy();
 
         await user.press(screen.getByText(painConditionsOptions[0]));
-        //console.log("removing", painConditionsOptions[0], "from conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -371,8 +360,6 @@ describe("editing conditions tests (scrollable list)", () => {
 
         await user.press(screen.getByText(painConditionsOptions[0]));
         await user.press(screen.getByText(painConditionsOptions[2]));
-        //console.log("removing", painConditionsOptions[0], "from conditions list");
-        //console.log("removing", painConditionsOptions[2], "from conditions list");
         
         await user.press(screen.getByText("Save"));
 
@@ -397,6 +384,7 @@ describe("editing conditions tests (scrollable list)", () => {
     })
 })
 
+//editing user diagnosis in profile tests
 describe("editing diagnosis tests", () => {
 
     beforeEach(() => {
@@ -411,13 +399,11 @@ describe("editing diagnosis tests", () => {
         await user.press(screen.getByText("Formal diagnosis recorded"));
 
         //modal should open
-        //console.log("open up diagnosis modal");
         expect(screen.getByText("Edit diagnosis")).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[0])).toBeTruthy();
         expect(screen.getByText(diagnosisOptions[1])).toBeTruthy()
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        //console.log("diagnosis pop up was opened");
 
     })
 
@@ -458,6 +444,7 @@ describe("editing diagnosis tests", () => {
     })
 })
 
+//editing user miscellaneous conditions in profile tests
 describe("editing other conditions tests (text input)", () => {
 
     beforeEach(() => {
@@ -472,13 +459,11 @@ describe("editing other conditions tests (text input)", () => {
         await user.press(screen.getByText("Frequent headaches"));
 
         //modal should open
-        //console.log("open up other conditions modal");
         expect(screen.getByText("Edit other condition")).toBeTruthy();
         expect(screen.getByText("Other condition")).toBeTruthy();
         expect(screen.getByText("Frequent headaches")).toBeTruthy();
         expect(screen.getByText("Cancel")).toBeTruthy();
         expect(screen.getByText("Save")).toBeTruthy();
-        //console.log("conditions pop up was opened");
     })
 
     test("other conditions is changed successfully", async() => {
@@ -536,6 +521,7 @@ describe("editing other conditions tests (text input)", () => {
     })
 })
 
+//editing user email in profile tests
 describe("editing email tests (rendering)", () => {
     test("pressing on email opens up the editor", async() => {
         const user = userEvent.setup();
@@ -545,7 +531,6 @@ describe("editing email tests (rendering)", () => {
         await user.press(screen.getByText("jane12@example.com"));
 
         //modal should open
-        //console.log("open up email editor modal");
         expect(screen.getByText("Change email address")).toBeTruthy();
         expect(screen.getByText("Email address")).toBeTruthy();
         expect(screen.getByText("jane12@example.com")).toBeTruthy();
@@ -556,6 +541,7 @@ describe("editing email tests (rendering)", () => {
     //email editing functionality will be tested manually
 })
 
+//password management location tests
 describe("password placement", () => {
     test("password controls are not mixed with profile details", async() => {
         await render(<ManageProfile/>);
@@ -564,6 +550,7 @@ describe("password placement", () => {
     })
 })
 
+//navigation tests
 describe("navigation tests", () => {
     test("pressing back should navigate back to settings main page", async() => {
         await render(<ManageProfile/>);

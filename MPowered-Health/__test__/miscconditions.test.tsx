@@ -1,11 +1,13 @@
 import StoreOtherConditions from "@/app/(auth)/(onboarding)/miscconditions";
 import { fireEvent, render, screen, userEvent } from "@testing-library/react-native";
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -26,6 +28,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("rendering objects", () => {
     test("objects are rendered on screen properly", async() => {
         await render(<StoreOtherConditions/>);
@@ -41,12 +44,12 @@ describe("rendering objects", () => {
     })
 })
 
+//input functionality tests
 describe("input functionality", () => {
     
     beforeEach(() => {
         jest.clearAllMocks();
     })
-
 
     test("continue button is disabled if no text is entered", async() => {
         await render(<StoreOtherConditions/>);
@@ -87,7 +90,7 @@ describe("input functionality", () => {
 
 })
 
-//todo: navigation
+//navigation tests
 describe("navigation tests", () => {
 
     beforeEach(() => {

@@ -3,10 +3,12 @@ import { getLatestAssessments } from "@/services/healthDataHelper";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import { router } from 'expo-router';
 
+//mocking health data helper from services
 jest.mock('@/services/healthDataHelper', () => ({
     getLatestAssessments: jest.fn(),
 }))
 
+//mocking expo router
 jest.mock("expo-router", () => ({
     router: {
         back: jest.fn(),
@@ -14,6 +16,7 @@ jest.mock("expo-router", () => ({
     useFocusEffect: jest.fn(),
 }));
 
+//mocking dummy assessment data for summaries
 let mockAssessment : {
     pain: {} | undefined,
     movement: {} | undefined,

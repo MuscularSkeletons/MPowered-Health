@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react-nativ
 import { painConditionsOptions } from "@/constants/profile/profileOptions";
 import { Alert } from "react-native";
 
+//mock a dummy user
 const mockUser = {
     name: "Jane",
     email: "jane12@example.com",
@@ -14,8 +15,10 @@ const mockUser = {
     onboardingComplete: true,
 }
 
+//mocks
 const mockUpdateUser = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -28,6 +31,7 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }))
 
+//rendering tests
 describe("rendering objects", () => {
     test("objects are rendered on screen correctly", async() => {
         await render(<CompleteOnboarding/>);
@@ -40,6 +44,7 @@ describe("rendering objects", () => {
     })
 })
 
+//submission tests
 describe("updating user profile", () => {
 
     beforeEach(() => {

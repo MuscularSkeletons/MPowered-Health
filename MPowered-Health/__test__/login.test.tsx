@@ -3,13 +3,16 @@ import Login from '@/app/(auth)/login';
 import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
+//remembering email for next login
 const SAVED_EMAIL_KEY = 'mpowered.saved-email';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockSignIn = jest.fn();
 const mockPush = jest.fn();
 const mockReplace = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -29,10 +32,11 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//mocking async storage for remembering the email id for next login
 jest.mock('@react-native-async-storage/async-storage', () => 
     require('@react-native-async-storage/async-storage/jest/async-storage-mock'))
 
-
+//rendering tests
 describe('The screen renders all the components properly', () => {
 
     beforeEach(() => {
@@ -62,6 +66,7 @@ describe('The screen renders all the components properly', () => {
     })    
 })
 
+//input functionality tests
 describe("input functionality", () => {
 
     beforeEach(() => {
@@ -87,6 +92,7 @@ describe("input functionality", () => {
     })
 })
 
+//button tests
 describe("checking empty input fields", () => {
 
     beforeEach(() => {
@@ -118,6 +124,7 @@ describe("checking empty input fields", () => {
     })
 })
 
+//remembering email functionality tests
 describe("sign in process and remembering email functionality", () => {
     
     beforeEach(() => {
@@ -161,6 +168,7 @@ describe("sign in process and remembering email functionality", () => {
     })
 })
 
+//password visibility tests
 describe("password visibility", () => {
 
     beforeEach(() => {
@@ -204,6 +212,7 @@ describe("password visibility", () => {
     })
 })
 
+//navigation tests
 describe("navigation tests", () => {
     
     beforeEach(() => {
@@ -223,7 +232,6 @@ describe("navigation tests", () => {
             expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
         })
         expect(mockReplace).toHaveBeenCalledWith('/(tabs)/(assessment)');
-
     })
 
     test("pressing get started navigates to sign up page", async() => {
@@ -240,7 +248,8 @@ describe("navigation tests", () => {
     })
 })
 
-describe('Authentication tests', () => {
+//authentication tests
+describe('authentication tests', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -259,7 +268,6 @@ describe('Authentication tests', () => {
             expect(mockSignIn).toHaveBeenCalledWith('email-test@example.com', 'Password123!');
         })
     })
-
 
     test("throw an error if login process fails", async() => {
         await render(<Login/>);

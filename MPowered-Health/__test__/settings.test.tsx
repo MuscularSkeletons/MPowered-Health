@@ -3,11 +3,13 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { openBrowserAsync } from 'expo-web-browser';
 import { Alert } from 'react-native';
 
+//mocks
 const mockSignOut = jest.fn();
 const mockDeleteUser = jest.fn();
 const mockPush = jest.fn();
 const mockReplace = jest.fn(); 
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: jest.fn(),
@@ -33,6 +35,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("objects rendering on screen", () => {
     test("objects are rendered on screen" , async() =>{
         await render(<Settings/>);
@@ -48,6 +51,7 @@ describe("objects rendering on screen", () => {
     })
 })
 
+//url link tests
 describe("url link tests", () => {
 
     beforeEach(() => {
@@ -89,7 +93,7 @@ describe("url link tests", () => {
     })
 })
 
-
+//navigation tests
 describe("navigation tests", () => {
 
     beforeEach(() => {
@@ -110,6 +114,7 @@ describe("navigation tests", () => {
     })
 })
 
+//signing out from the account tests
 describe("sign out tests", () => {
 
     beforeEach(() => {
@@ -153,7 +158,7 @@ describe("sign out tests", () => {
 
         //do not call sign out
         expect(mockSignOut).not.toHaveBeenCalled();
-        //console.log("sign out was not called");
+
         expect(screen.getByText("Settings")).toBeTruthy();
     })
 
@@ -168,14 +173,13 @@ describe("sign out tests", () => {
         await buttons?.[1]?.onPress?.();
 
         //call sign out
-        //console.log("calling sign out");
         expect(mockSignOut).toHaveBeenCalledTimes(1);
-        //console.log("sign out was called");
 
         expect(mockReplace).toHaveBeenCalledWith("/(auth)/login");
     })
 })
 
+//deleting account tests
 describe("delete account tests", () => {
 
     beforeEach(() => {
@@ -216,9 +220,8 @@ describe("delete account tests", () => {
         const buttons = spyAlert.mock.calls?.[0]?.[2];
         await buttons?.[0]?.onPress?.();
 
-        //do not call delete account
+        //do not call delete account and stay on screen
         expect(mockDeleteUser).not.toHaveBeenCalled();
-        //console.log("delete account was not called");
         expect(screen.getByText("Settings")).toBeTruthy();
     })
 
@@ -233,10 +236,9 @@ describe("delete account tests", () => {
         await buttons?.[1]?.onPress?.();
 
         //call delete
-        //console.log("calling delete");
         expect(mockDeleteUser).toHaveBeenCalledTimes(1);
-       //console.log("delete was called");
 
+        //navigate to splashscreen
         expect(mockReplace).toHaveBeenCalledWith("/(auth)/splashscreen");
     })
 })
