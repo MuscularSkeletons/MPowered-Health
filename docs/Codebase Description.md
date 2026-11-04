@@ -3,7 +3,7 @@
 The codebase can be accessed via GitHub in this repository: <https://github.com/MuscularSkeletons/MPowered-Health>.
 
 
-To run the app in the development server using the Expo Go app:
+##### To run the app in the development server using the Expo Go app:
 
 1. Install Git and the current [Node.js LTS](https://nodejs.org/en/download) release (which includes npm) if they are not already installed. On macOS, the setup script can install Node.js for you if [Homebrew](https://brew.sh/) is available.
 2. Clone the repository and run the setup script from the repository root:
@@ -19,24 +19,24 @@ cp MPowered-Health/.env.example MPowered-Health/.env
 3. The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
 
 
-To find the Supabase URL and publishable key:
+##### To find the Supabase URL and publishable key:
 
 1. The Supabase URL and publishable key can be found from the dashboard if you click ‘Connect’, then choose 'Server' and look under environmental variables.
-<p>
+<p align="center">
     <img src="images/supabase1.png" alt="click connect">
     <em>Click 'Connect'</em>
 </p>
-<p>
+<p align="center">
     <img src="images/supabase2.png" alt="click server">
     <em>Click 'Server'</em>
 </p>
-<p>
+<p align="center">
     <img src="images/supabase3.png" alt="locate .env variables">
     <em>The relevant .env variables are the first two!</em>
 </p>
 
 2. Create an .env inside the MPowered-Health folder on the same levels as src folder.
-<p>
+<p align="center">
     <img src="images/envlocation.png" alt="".env file location>
 </p>
 
@@ -51,7 +51,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
 4. Ensure the .env file is not committed.
 
 
-Troubleshooting Tips:
+##### Troubleshooting Tips:
 
 - Run `npx expo-doctor` to diagnose expo issues
 
@@ -189,7 +189,7 @@ There are five screens located in the `src/app/(tabs)/(myhealth)` folder. See be
 | `painrecords.tsx` | <img src="images/painrecords.png" alt="painrecords"> | Pain Records:Allows users to view their pain history through Chart and History tabs. Users can filter records by pain area and, in the Chart tab, switch between Average, Worst and Mildest pain measurements. The chart is accompanied by a table showing the recorded date and all three pain scores. The table initially displays the four most recent records, with an option to expand the list. The History tab displays records in reverse chronological order. Users can print a PDF report for the selected pain area. If no records are available, users can navigate to the Pain Tracker. |
 | `healthprofile.tsx` | <img src="images/healthprofile.png" alt="healthprofile"> | My Health Profile: Displays the latest recorded answers across the five assessment categories: My Pain, My Movement, My Personal Care, My Social Health and My Management. Each category displays its latest assessment date and recorded answers. If a category has no assessment, an empty state message is displayed. The screen also shows the most recent overall update date and provides options to print the profile as a PDF or share its summary. |
 | `(prescriptions)/index.tsx` | <img src="images/prescriptions.png" alt="prescriptions list"> | Prescriptions List:Displays the user's saved prescriptions, ordered from oldest to newest. Users can add a new prescription, edit an existing one or delete it. If prescriptions cannot be loaded, an error message and Retry option are displayed. If the list is empty, an empty-state message is shown. |
-| `(prescriptions)/edit.tsx` | <img src="images/prescriptionsedit.png" alt="prescriptions edit screen"> | Add/Edit Prescription:Uses the same screen for creating and editing prescriptions. The form collects medication name, strength, strength unit, form, repeat interval and unit of time. Required values are validated before saving. Duplicate prescriptions with the same name, strength and unit are prevented. If an existing prescription is no longer available, the screen displays a message and provides navigation back to the prescriptions list. |
+| `(prescriptions)/edit.tsx` | <img src="images/prescriptionsedit.jpg" alt="prescriptions edit screen"> | Add/Edit Prescription:Uses the same screen for creating and editing prescriptions. The form collects medication name, strength, strength unit, form, repeat interval and unit of time. Required values are validated before saving. Duplicate prescriptions with the same name, strength and unit are prevented. If an existing prescription is no longer available, the screen displays a message and provides navigation back to the prescriptions list. |
 
 The layout for my health is specified in the `_layout.tsx` in the `src/app/(tabs)/(myhealth)/` folder, and the layout for prescriptions is specified in the `_layout.tsx` in the `src/app/(tabs)/(myhealth)/(prescriptions)/` folder.
 
@@ -227,7 +227,7 @@ The following services and helper files handle data retrieval, transformation, v
 
 ##### 1. Health Assessment Data
 
-Health assessment data is stored in Supabase across the parent `assessment` table and five associated category tables:`pain_assessment, movement_assessment, personal_care_assessment, social_health_assessment, and management_assessment` Each assessment belongs to a user and is associated with a weekly assessment record.
+Health assessment data is stored in Supabase across the parent `assessment` table and five associated category tables:`pain_assessment`, `movement_assessment`, `personal_care_assessment`, `social_health_assessment`, and `management_assessment` Each assessment belongs to a user and is associated with a weekly assessment record.
 
 The My Health feature retrieves assessment records using `fetchHealthSnapshot()` in `useAssessments.tsx`. The query:
 
