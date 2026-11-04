@@ -106,7 +106,7 @@ Login and onboarding is connected to the database using functions specified in t
 
 | **Function(s)** | **Use** | **Notes** |
 | --- | --- | --- |
-| `updateUser``updateUserDraft` | Used in the `completed.tsx` screen to create user profile information from onboarding. |  |
+| `updateUser` <br> `updateUserDraft` | Used in the `completed.tsx` screen to create user profile information from onboarding. |  |
 | `signIn` | Used in sign-in page to log user in using email and password verification. |  |
 | `signUp` | Creates a new user using an email and password. | Email verification currently unimplemented. |
 
@@ -129,11 +129,11 @@ Assessments uses `common` components from the `shared` folder. Listed below are 
 |  |  |  |
 | --- | --- | --- |
 | **Component** | **Appearance** | **Description** |
-| `src/components/assessment` `/assessmentScreen.tsx` | Refer to `assessmentQuestion` or `assessmentSummary` for the appearance. | Manages client-side component state (such as step navigation, user input validation, and holding answer data in React state) before sending API requests to the backend server. |
-| `src/components/assessment` `/assessmentQuestion.tsx` | Single-selection questionMulti-selection questionSlider score questionText entry question | Renders the user interface (buttons, input fields, progress bar, score sliders) using React Native components to display question cards, options, and input controls to the user. |
-| `src/components/assessment` `/assessmentSummary.tsx` |  | Displays the final response overview once an assessment is completed. It displays organised answer and questions into logical sections, period timestamps, and provides options to edit the answers. |
-| `src/components/assessment` `/weeklyReflection.tsx` |  | This screen is for user to record their additional reflection on their weekly progress. |
-| `src/components/assessment` `/slider.tsx` |  | This is a custom 0-10 numeric rating slider built with React Native’s `PanResponder`. |
+| `src/components/assessment/assessmentScreen.tsx` | Refer to `assessmentQuestion` or `assessmentSummary` for the appearance. | Manages client-side component state (such as step navigation, user input validation, and holding answer data in React state) before sending API requests to the backend server. |
+| `src/components/assessment/assessmentQuestion.tsx` | Single-selection questionMulti-selection questionSlider score questionText entry question | Renders the user interface (buttons, input fields, progress bar, score sliders) using React Native components to display question cards, options, and input controls to the user. |
+| `src/components/assessment/assessmentSummary.tsx` |  | Displays the final response overview once an assessment is completed. It displays organised answer and questions into logical sections, period timestamps, and provides options to edit the answers. |
+| `src/components/assessment/weeklyReflection.tsx` |  | This screen is for user to record their additional reflection on their weekly progress. |
+| `src/components/assessment/slider.tsx` |  | This is a custom 0-10 numeric rating slider built with React Native’s `PanResponder`. |
 
 **Constants**
 
@@ -142,12 +142,12 @@ Assessments uses constants from the `assessmentQuestion` folder.
 |  |  |
 | --- | --- |
 | **Constants** | **Description** |
-| `src/constants/` `assessmentQuestions/` `/assessmentQuestions.ts` | Representative component renders dynamic question option cards, multi-select lists, and input controls based on active question data. |
-| `src/constants/` `assessmentQuestions/` `/managementQuestions.ts` | Defines questions for tracking medication, exercise, and mood. |
-| `src/constants/` `assessmentQuestions/` `/movementQuestions.ts` | Defines questions for tracking mobility impacts (e.g. walking, lifting, sitting, standing, and daily physical activity limits). |
-| `src/constants/` `assessmentQuestions/` `/painQuestions.ts` | Defines questions for tracking pain intensity, location, and severity over the past week. |
-| `src/constants/` `assessmentQuestions/` `/personalCareQuestions.ts` | Define questions and rating scales for tracking pain impact on daily living activities, self care routines (washing, dressing), and sleeping. |
-| `src/constants/` `assessmentQuestions/` `/socialHealthQuestions.ts` | Defines questions and scales for tracking well-being, mood, relationships, social activities, and travel constraints. |
+| `src/constants/assessmentQuestions/assessmentQuestions.ts` | Representative component renders dynamic question option cards, multi-select lists, and input controls based on active question data. |
+| `src/constants/assessmentQuestions/managementQuestions.ts` | Defines questions for tracking medication, exercise, and mood. |
+| `src/constants/assessmentQuestions/movementQuestions.ts` | Defines questions for tracking mobility impacts (e.g. walking, lifting, sitting, standing, and daily physical activity limits). |
+| `src/constants/assessmentQuestions/painQuestions.ts` | Defines questions for tracking pain intensity, location, and severity over the past week. |
+| `src/constants/assessmentQuestions/personalCareQuestions.ts` | Define questions and rating scales for tracking pain impact on daily living activities, self care routines (washing, dressing), and sleeping. |
+| `src/constants/assessmentQuestions/socialHealthQuestions.ts` | Defines questions and scales for tracking well-being, mood, relationships, social activities, and travel constraints. |
 
 #### Backend Integration
 
@@ -314,7 +314,7 @@ Settings is connected to the database using functions specified in the `authcont
 
 | **Function(s)** | **Use** | **Notes** |
 | --- | --- | --- |
-| `updateUser``updateUserDraft` | Used in the profile screen to update user profile information (the same as the profile information created during onboarding). |  |
+| `updateUser` <br> `updateUserDraft` | Used in the profile screen to update user profile information (the same as the profile information created during onboarding). |  |
 | `deleteUser` | Used in the main settings screen to sign the user out and add the user ID to a `delete_request` table. | Automated deletion is currently unimplemented. |
 | `signOut` | Used in the main settings screen to sign the user out. |  |
 | `updateAuthUserEmail` | Used in the profile screen to update the user’s email. |  |
