@@ -2,11 +2,13 @@ import StoreBirthSex from '@/app/(auth)/(onboarding)/birthsex';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { sexOptions } from "@/constants/profile/profileOptions";
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -27,6 +29,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe ("birthsex options are rendered on screen", () => {
 
     beforeEach(() => {
@@ -48,6 +51,7 @@ describe ("birthsex options are rendered on screen", () => {
     })
 })
 
+//option selection tests
 describe("Birthsex selection", () => {
 
     beforeEach(() => {
@@ -84,6 +88,7 @@ describe("Birthsex selection", () => {
     })
 })
 
+//navigation tests
 describe("navigation", () => {
 
     beforeEach(() => {

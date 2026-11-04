@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { openBrowserAsync } from 'expo-web-browser';
 import { Alert } from 'react-native';
 
+//mocks
 const mockPush = jest.fn();
 
 //mocking the web browser
@@ -17,6 +18,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("rendering objects", () => {
     test("objects are rendered on screen correctly", async() => {
         await render(<Onboarding/>);
@@ -30,6 +32,7 @@ describe("rendering objects", () => {
     })
 })
 
+//url link tests
 describe("url link tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -70,6 +73,7 @@ describe("url link tests", () => {
     })
 })
 
+//navigation tests
 describe("navigation test", () => {
     test("pressing continue button moves to the next screen", async() => {
         await render(<Onboarding/>);

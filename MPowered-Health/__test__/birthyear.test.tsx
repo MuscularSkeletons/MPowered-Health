@@ -3,11 +3,13 @@ import { fireEvent, render, screen, userEvent } from '@testing-library/react-nat
 import { Alert } from 'react-native';
 import { BIRTH_YEAR_RANGE } from "@/constants/profile/profileConstants";
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -28,6 +30,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe ("objects are rendered on screen", () => {
     
     beforeEach(() => {
@@ -48,6 +51,7 @@ describe ("objects are rendered on screen", () => {
     })
 })
 
+//input functionality tests
 describe("input fields for year", () => {
 
     beforeEach(() => {
@@ -64,6 +68,7 @@ describe("input fields for year", () => {
     })
 })
 
+//input validation tests
 describe("input validation", () => {
 
     beforeEach(() => {
@@ -132,6 +137,7 @@ describe("input validation", () => {
 
 })
 
+//navigation tests
 describe("navigation", () => {
 
     beforeEach(() => {
@@ -162,5 +168,3 @@ describe("navigation", () => {
         expect(mockBack).toHaveBeenCalled();
     })
 })
-
-//todo: user not authenticated test case

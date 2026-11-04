@@ -1,12 +1,14 @@
-import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 import AssessmentScreen from '@/components/assessment/assessmentScreen';
 import { submitAssessmentAnswers } from '@/hooks/useAssessments';
 import { painQuestions } from '@/constants/assessmentQuestions/painQuestions';
+import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -18,20 +20,23 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+//mocking prescription context
 jest.mock('@/context/prescriptionsContext', () => ({
     usePrescriptions: jest.fn (() => ({
         list: [],
     })),
 }))
 
+//mocking use assessments hook
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 })) 
 
-// rendering test
+// rendering tests
 describe("pain assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -172,6 +177,7 @@ describe("pain assessment questions are rendered on screen", () => {
     });
 });
 
+//button tests
 describe("record button tests", () => {
 
     afterEach(jest.clearAllMocks);
@@ -218,6 +224,7 @@ describe("record button tests", () => {
     })
 
     test("record button is enabled when a value is selected for question 3", async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -246,6 +253,7 @@ describe("record button tests", () => {
     })
 
     test("record button is enabled when a value is selected for question 4", async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -276,6 +284,7 @@ describe("record button tests", () => {
     })
 
     test("record button is enabled when a value is selected for question 5", async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -294,6 +303,7 @@ describe("record button tests", () => {
     })
 
     test("review button is disabled when no option is selected for question 6", async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -312,6 +322,7 @@ describe("record button tests", () => {
     })
 
     test("record button is enabled when a value is selected for question 6", async() => {
+        //render with dummy data for sliders
         await render (<AssessmentScreen categoryData={painQuestions} onBack={onBack} existingAnswers={{
             current_pain: 5, 
             mildest_pain: 7,
@@ -402,6 +413,7 @@ describe("input validation for question 1 other", () => {
     })
 });
 
+//summary screen tests
 describe('summary screen', () => {
 
     beforeEach(async() => {
@@ -628,6 +640,7 @@ describe("submitting users answers to database", () => {
         //question 6
         await fireEvent.press(screen.getByRole('button', { name: 'Review' })); 
 
+        //call to the database
         await waitFor(() => {
             expect(submitAssessmentAnswers).toHaveBeenCalledWith(
                 "My Pain",

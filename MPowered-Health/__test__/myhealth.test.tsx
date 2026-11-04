@@ -3,6 +3,7 @@ import MyHealthScreen from "@/app/(tabs)/(myhealth)";
 import { router } from "expo-router";
 import { getPainHistory, loadHealthRecords } from "@/services/healthDataHelper";
 
+//mocking expo router
 jest.mock("expo-router", () => ({
     router: {
         push: jest.fn(),
@@ -10,18 +11,21 @@ jest.mock("expo-router", () => ({
     useFocusEffect: jest.fn(),
 }));
 
+//mock health data helper from services
 jest.mock("@/services/healthDataHelper", () => ({
     getPainHistory: jest.fn(() => []),
     loadHealthRecords: jest.fn(() => Promise.resolve()),
     painRecordDate: jest.fn(() => "01/10/2026"),
 }));
 
+//mock dummy data for health records
 const mockHealthRecords = [
     {id: '1', completedAt: '01/10/2026', areas: ['Head', 'Leg'], current: 5, mildest: 3, worst: 9, average: 7},
     {id: '2', completedAt: '06/10/2026', areas: ['Head'], current: 8, mildest: 5, worst: 10, average: 8},
     {id: '3', completedAt: '06/10/2026', areas: ['Head'], current: 8, mildest: 5, worst: 10, average: 8},
   ]
 
+//rendering tests
 describe("objects rendering", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -46,7 +50,6 @@ describe("objects rendering", () => {
         expect(screen.getByText("Supported by ABBVIE")).toBeTruthy();
     });
 });
-
 
 // navigation tests
 describe("navigation tests", () => {

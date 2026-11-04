@@ -1,11 +1,13 @@
 import StoreDiagnosis from '@/app/(auth)/(onboarding)/diagnosis';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -26,6 +28,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe("objects are rendered on screen", () => {
 
     test('options are rendered on screen correctly', async() => {
@@ -41,6 +44,7 @@ describe("objects are rendered on screen", () => {
     })  
 })
 
+//options selection tests
 describe("selecting diagnosis options", () => {
 
     beforeEach(() => {
@@ -76,7 +80,7 @@ describe("selecting diagnosis options", () => {
     
 })
 
-//todo: navigation tests
+//navigation tests
 describe("navigation tests", () => {
 
     beforeEach(() => {

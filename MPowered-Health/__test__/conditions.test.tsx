@@ -2,11 +2,13 @@ import StorePainConditions from '@/app/(auth)/(onboarding)/conditions';
 import { fireEvent, render, screen, waitFor} from '@testing-library/react-native';
 import { painConditionsOptions } from "@/constants/profile/profileOptions";
 
+//mocks
 const mockUser = jest.fn();
 const mockUpdateUserDraft = jest.fn();
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -27,6 +29,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe ("objects are rendered on screen", () => {
 
     beforeEach(() => {
@@ -53,6 +56,7 @@ describe ("objects are rendered on screen", () => {
     })
 })
 
+//option selection tests
 describe('selecting options', () => {
 
     beforeEach(() => {
@@ -121,6 +125,7 @@ describe('selecting options', () => {
     })
 })
 
+//navigation tests
 describe("navigation tests", () => {
 
     beforeEach(() => {

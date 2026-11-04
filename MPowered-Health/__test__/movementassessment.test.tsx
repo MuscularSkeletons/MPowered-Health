@@ -4,9 +4,11 @@ import { movementQuestions } from '@/constants/assessmentQuestions/movementQuest
 import { fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const onBack = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -18,17 +20,19 @@ jest.mock("@/context/authcontext", () => ({
     }),
 }));
 
+//mocking prescriptions context
 jest.mock('@/context/prescriptionsContext', () => ({
     usePrescriptions: jest.fn (() => ({
         list: [],
     })),
 }))
 
+//mocking use assessments hook
 jest.mock('@/hooks/useAssessments', () => ({
     submitAssessmentAnswers: jest.fn(),
 })) 
 
-// rendering test
+// rendering tests
 describe("movement assessment questions are rendered on screen", () => {
 
     beforeEach(async() => {
@@ -423,6 +427,7 @@ describe("input validation for question 7", () => {
     });
 });
 
+//summary screen tests
 describe("summary screen tests", () => {
     
     afterEach(jest.clearAllMocks);
@@ -734,8 +739,6 @@ describe("navigation", () => {
     
         await fireEvent.press(screen.getByText('‹ Back'));
         expect(onBack).toHaveBeenCalled();
-    
-        //homescreen
     })
     
     test('pressing close on summary screen should navigate to homescreen', async() => {
@@ -876,14 +879,6 @@ describe("submitting users answers to database", () => {
                 undefined,
             )
         })
-
-        /*"My Movement", {"active_hour": "Less than 1 hour", "general_impacts": 
-            ["I walk more slowly than usual because of my pain"], "lifting_impact": "I can lift heavy
-             weights without extra pain", "movement_reflection": "I had no trouble walking the stairs today!",
-              "sitting_impact": "I can sit in any chair as long as I like", "standing_impact": "I can stand as
-               long as I want without increased pain", "walking_impact": "Pain does not prevent me walking any 
-               distance"}, {"impact_level": "Your answers indicate that pain does not really impact your movement."}, undefined
-*/
 
         expect(screen.getByText("My Movement Summary")).toBeTruthy();
     })

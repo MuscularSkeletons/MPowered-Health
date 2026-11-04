@@ -2,9 +2,9 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import PrescriptionsScreen from "@/app/(tabs)/(myhealth)/(prescriptions)";
 import { router } from "expo-router";
-import { PrescriptionProvider, usePrescriptions } from "@/context/prescriptionsContext";
-import { prescriptionLabel } from "@/services/prescriptionHelper";
+import { usePrescriptions } from "@/context/prescriptionsContext";
 
+//mock dummy prescriptions data
 const mockPrescriptions = [
     {   
         id: '1',
@@ -26,9 +26,11 @@ const mockPrescriptions = [
     }
 ]
 
+//mocks
 const mockRemove = jest.fn();
 const mockReload = jest.fn();
 
+//mocking expo router
 jest.mock("expo-router", () => ({
     router: {
         push: jest.fn(),
@@ -36,6 +38,7 @@ jest.mock("expo-router", () => ({
     },
 }));
 
+//mocking prescriptions context
 jest.mock("@/context/prescriptionsContext", () => ({
     usePrescriptions: jest.fn(),
 }));
@@ -99,7 +102,7 @@ describe("objects on screen", () => {
     })
 })
 
-//delete prescription
+//delete prescription tests
 describe("deleting prescriptions", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -120,7 +123,7 @@ describe("deleting prescriptions", () => {
     })
 })
 
-//reload screen
+//reload screen tests
 describe("reloading prescriptions list", () => {
     beforeEach(() => {
         jest.clearAllMocks();

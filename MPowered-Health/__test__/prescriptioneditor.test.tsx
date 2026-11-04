@@ -3,9 +3,11 @@ import PrescriptionEditorScreen from "@/app/(tabs)/(myhealth)/(prescriptions)/ed
 import { router, useLocalSearchParams } from "expo-router";
 import { usePrescriptionEditor } from "@/context/prescriptionsContext";
 
+//mocks
 const mockChange = jest.fn();
 const mockSave = jest.fn();
 
+//mocking expo router
 jest.mock("expo-router", () => ({
     router: {
         back: jest.fn(),
@@ -15,10 +17,12 @@ jest.mock("expo-router", () => ({
     useLocalSearchParams: jest.fn(),
 }));
 
+//mocking prescriptions context
 jest.mock("@/context/prescriptionsContext", () => ({
     usePrescriptionEditor: jest.fn(),
 }));
 
+//mock dummy prescription data
 const mockPrescriptions = [
     {   
         id: "1",
@@ -30,7 +34,6 @@ const mockPrescriptions = [
         frequency: "hour",
     }
 ]
-
 
 //rendering tests
 describe("objects on screen", () => {
@@ -163,7 +166,9 @@ describe("entering prescription information", () => {
     })
 })
 
-//manually test the dropdown options
+//dropdown options are tested manually
+
+//editing prescription information tests
 describe("editing prescription information", () => {
         
     beforeEach(() => {
@@ -234,7 +239,7 @@ describe("editing prescription information", () => {
     })
 })
 
-//valid submission
+//submission tests
 describe("submitting to database", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -281,7 +286,7 @@ describe("submitting to database", () => {
     })
 })
 
-//missing prescription
+//missing prescription tests
 describe("missing prescriptions", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -325,7 +330,7 @@ describe("missing prescriptions", () => {
     })
 })
 
-//navigation
+//navigation tests
 describe("navigation", () => {
     beforeEach(() => {
         jest.clearAllMocks();

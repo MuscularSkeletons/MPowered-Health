@@ -1,11 +1,13 @@
 import Signup from '@/app/(auth)/signup';
 import { fireEvent, render, screen, userEvent} from '@testing-library/react-native';
 
+//mocks
 const mockUser = jest.fn(() => Promise.resolve('mocked user'));
 const mockSignUp = jest.fn();
 const mockPush = jest.fn();
 const mockReplace = jest.fn();
 
+//mocking authcontext
 jest.mock("@/context/authcontext", () => ({
     useAuth: () => ({
         user: mockUser,
@@ -25,6 +27,7 @@ jest.mock('expo-router', () => ({
     })
 }))
 
+//rendering tests
 describe ('Sign up rendering', () => {
 
     beforeEach(() => {
@@ -54,6 +57,7 @@ describe ('Sign up rendering', () => {
     })
 })
 
+//input functionality tests
 describe("Input functionality", () => {
 
     beforeEach(() => {
@@ -88,6 +92,7 @@ describe("Input functionality", () => {
     })
 })
 
+//button tests
 describe("Checking required input fields", () => {
     test("create account button is disabled if all input fields are empty", async() => {
         await render(<Signup/>);
@@ -128,6 +133,7 @@ describe("Checking required input fields", () => {
     })
 })
 
+//password mismatch tests
 describe("Check password mismatches", () => {
 
     beforeEach(() => {
@@ -190,6 +196,7 @@ describe("Check password mismatches", () => {
     })
 })
 
+//password visibility tests
 describe("Password visibility", () => {
 
     test("password is hidden by default", async() => {
@@ -215,7 +222,6 @@ describe("Password visibility", () => {
 
         await fireEvent.press(visibilityIcon);
         expect(passwordInput.props.secureTextEntry).toBe(false);
-
     })
 
     test("clicking the eye button again hides the password", async() => {
@@ -266,6 +272,7 @@ describe("Password visibility", () => {
     })
 })
 
+//navigation tests
 describe ("Navigation to the correct screen", () => {
 
     test('navigate to login page when login in to another account is pressed', async() => {
