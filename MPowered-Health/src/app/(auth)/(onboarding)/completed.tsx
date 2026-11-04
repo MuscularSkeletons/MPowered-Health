@@ -1,0 +1,49 @@
+import { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
+import { useAuth } from '@/context/authcontext';
+import { Intro, Screen, PrimaryButton, commonStyles } from '@/components/shared/common';
+
+/** Saves the profile answers and marks onboarding complete */
+export default function CompleteOnboarding() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, updateUser, setShowActivation } = useAuth();
+
+  const handleComplete = async () => {
+    setIsLoading(true);
+    try {
+      if (!user) throw new Error('User not authenticated');
+
+      await updateUser({
+        name: user.name,
+        birthsex: user.birthsex,
+        birthyear: user.birthyear,
+        formalDiagnosis: user.formalDiagnosis,
+        painConditions: user.painConditions,
+        otherCondition: user.otherCondition,
+        onboardingComplete: true,
+      });
+      setShowActivation(true); // Trigger activation screen via the route guard
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Screen>
+      <Intro
+        sectionLabel="PROFILE COMPLETE"
+        title={`Thank you${user?.name ? `, ${user.name}` : ''} 😃`}
+        description="Your answers are ready to be linked to your account."
+      />
+      <Text style={[commonStyles.helper, { fontStyle: 'italic' }]}>
+        Continue to finish setup and prepare your MPowered Health experience.
+      </Text>
+      <View style={commonStyles.actions}>
+        <PrimaryButton label="Finish setup" loading={isLoading} onPress={() => void handleComplete()} />
+      </View>
+    </Screen>
+  );
+}

@@ -1,0 +1,208 @@
+import { palette, radius, spacing, textInputLength } from '@/constants/ui/styling';
+import { 
+    StyleSheet,
+    Text, 
+    TextInput, 
+    View,
+    Pressable,
+    Modal,
+} from 'react-native';
+import { 
+    Screen, 
+    Intro,
+    commonStyles,
+} from '@/components/shared/common';
+import { router } from 'expo-router';
+import { useState } from 'react';
+
+/**
+ * Contains UI components for form including input and drop down menus
+ * Currently only used by prescriptions feature
+*/
+
+/** Shared screen for prescriptions */
+export function PrescriptionScreen({
+  title,
+  children,
+  onBack = () => router.back(),
+}: {
+  title: string;
+  children: React.ReactNode;
+  onBack?: () => void;
+}) {
+  return (
+    <Screen>
+        <Text onPress={onBack} style={commonStyles.back}>‹ Back</Text>
+        <Intro
+            sectionLabel="PRESCRIPTIONS"
+            title={title}
+        />
+        {children}
+    </Screen>
+  );
+}
+
+/** Displays a labeled form input for either numeric or text values */
+export function Field({
+  label,
+  value,
+  set,
+  error,
+  editable = true,
+  input = 'text',
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  set: (v: string) => void;
+  error?: string;
+  editable?: boolean;
+  input?: 'text' | 'decimal';
+  multiline?: boolean;
+}) {
+
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        value={value}
+        editable={editable}
+        onChangeText={(text) => set(text)}
+        accessibilityLabel={label}
+        autoCapitalize={'sentences'}
+        keyboardType={input === 'decimal' ? 'decimal-pad' : 'default'}
+        inputMode={input === 'decimal' ? 'decimal' : 'text'}
+        placeholder={label}
+        placeholderTextColor={palette.muted}
+        style={[
+          styles.input,
+          multiline
+            ? {
+                minHeight: 130,
+              }
+            : null,
+        ]}
+        multiline={multiline}
+        maxLength={input === 'decimal' ? 3 : textInputLength.medium}
+      />
+      {error ? (
+        <Text accessibilityLiveRegion="polite" style={styles.fieldError}>
+          {error}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+/** Displays a drop down menu field */
+export function SelectField({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${label}: ${value}`}
+        accessibilityState={{ expanded: open }}
+        style={({ pressed }) => [styles.control, pressed && styles.pressed]}
+        onPress={() => setOpen(true)}
+      >
+        <Text style={styles.value}>{value}</Text>
+        <Text style={styles.chevron}>⌄</Text>
+      </Pressable>
+      <Modal transparent animationType="fade" visible={open} onRequestClose={() => setOpen(false)}>
+        <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
+          <View style={styles.sheet} accessibilityViewIsModal>
+            <Text accessibilityRole="header" style={styles.sheetTitle}>
+              {label}
+            </Text>
+            {options.map((option) => {
+              const selected = option === value;
+              return (
+                <Pressable
+                  key={option}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selected }}
+                  style={[styles.option, selected && styles.selected]}
+                  onPress={() => {
+                    onChange(option);
+                    setOpen(false);
+                  }}
+                >
+                  <Text style={[styles.optionText, selected && styles.selectedText]}>{option}</Text>
+                  {selected ? <Text style={styles.check}>✓</Text> : null}
+                </Pressable>
+              );
+            })}
+          </View>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+}
+
+export const styles = StyleSheet.create({
+  fieldError: { color: palette.error, fontSize: 12, marginTop: 6 },
+  input: {
+    minHeight: 56,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: '#fff',
+    padding: 15,
+    fontSize: 15,
+    color: palette.text,
+    textAlignVertical: 'top',
+  },
+  field: { marginBottom: spacing.lg },
+  label: { marginBottom: spacing.sm, fontSize: 14, fontWeight: '700', color: palette.text },
+  control: {
+    minHeight: 54,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.controlBorder,
+    backgroundColor: palette.surface,
+    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  pressed: { backgroundColor: palette.pressedBackground },
+  value: { fontSize: 15, color: palette.text },
+  chevron: { fontSize: 18, color: palette.muted },
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    padding: spacing.lg,
+    backgroundColor: '#00000066',
+  },
+  sheet: {
+    borderRadius: radius.xl,
+    backgroundColor: palette.surface,
+    padding: spacing.lg,
+  },
+  sheetTitle: { marginBottom: spacing.md, fontSize: 18, fontWeight: '800', color: palette.text },
+  option: {
+    minHeight: 50,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selected: { backgroundColor: palette.selectionBackground },
+  optionText: { fontSize: 15, color: palette.text },
+  selectedText: { fontWeight: '700', color: palette.success },
+  check: { fontSize: 16, fontWeight: '800', color: palette.success },
+});

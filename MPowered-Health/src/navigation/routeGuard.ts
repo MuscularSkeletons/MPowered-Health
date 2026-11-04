@@ -1,0 +1,52 @@
+export type SessionUser = { onboardingComplete?: boolean; } | null;
+
+/** Returns the required route for the current backend session, or null when the route is allowed */
+export function requiredSessionRoute({
+  user,
+  rootSegment,
+  nestedSegment,
+  showActivation,
+}: {
+  user: SessionUser;
+  rootSegment?: string;
+  nestedSegment?: string;
+  showActivation: boolean;
+}) {
+  const inAuthSection = rootSegment === '(auth)';
+  const inTabsSection = rootSegment === '(tabs)';
+  const inOnboardingSection = inAuthSection && nestedSegment === '(onboarding)';
+  const inActivationScreen = inAuthSection && nestedSegment === 'activation';
+
+  /**  
+   * no user -> splashscreen
+   * unless currently in auth section (but not onboarding or activation), in which case stay there
+  */
+  if (!user) {
+    if (inAuthSection && !inOnboardingSection && !inActivationScreen) {
+      return null;
+    }
+    return '/(auth)/splashscreen';
+  } 
+
+  /** 
+   * user created but onboarding incomplete -> first onboarding screen
+   * unless user currently completing onboarding, in which case stay there
+  */
+  if (!user.onboardingComplete) {
+    return inOnboardingSection ? null : '/(auth)/(onboarding)/onboarding';
+  }
+
+  /** 
+   * user created, onboarding completed but showActivation is true (triggered from onboarding completion)
+   * -> transition to activation screen first instead of skipping straight to the homepage
+  */
+  if (showActivation) {
+    return inActivationScreen ? null : '/(auth)/activation';
+  } 
+
+  /** 
+   * user created, onboarding completed, and no longer in onboarding section 
+   * -> stay where you are, or go to the homepage if reopening the app but session is still persisting
+  */
+  return inTabsSection || inActivationScreen ? null : '/(tabs)/(assessment)';
+}
