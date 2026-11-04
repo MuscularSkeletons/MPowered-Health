@@ -1,4 +1,4 @@
-[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/development/LICENSE)
+[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/main/LICENSE)
 # MPowered-Health
 
 ## About
@@ -11,7 +11,7 @@ Install Git and the current [Node.js LTS](https://nodejs.org/en/download) releas
 Clone the repository and run the setup script from the repository root:
 
 ```sh
-git clone --branch development https://github.com/MuscularSkeletons/MPowered-Health.git
+git clone --branch main https://github.com/MuscularSkeletons/MPowered-Health.git
 cd MPowered-Health
 cp MPowered-Health/.env.example MPowered-Health/.env
 # Fill in the team's Supabase URL and publishable key in MPowered-Health/.env.
