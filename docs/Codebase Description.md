@@ -62,7 +62,9 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
 
 Below is a diagram of the codebase.
 
-<img src="images/domainmodel.png" alt="domain model" width=360px height=640px>
+<p align="center">
+    <img src="images/domainmodel.png" alt="domain model" width=700px height=700px>
+</p>
 
 The repository structure is described below:
 
