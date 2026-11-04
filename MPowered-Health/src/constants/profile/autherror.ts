@@ -127,11 +127,13 @@ export function toUserError(error: unknown): AuthUserError {
   }
  
   // Unknown code: log for triage, show fallback
-  console.error('[auth] unhandled error', {
-    code: authError.code,
-    status: authError.status,
-    message: authError.message,
-  });
- 
+  if (__DEV__) {
+    console.error('[auth] unhandled error', {
+      code: authError.code,
+      status: authError.status,
+      message: authError.message,
+    });
+  }
+
   return FALLBACK;
 }
