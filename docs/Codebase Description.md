@@ -23,21 +23,24 @@ cp MPowered-Health/.env.example MPowered-Health/.env
 
 1. The Supabase URL and publishable key can be found from the dashboard if you click ‘Connect’, then choose 'Server' and look under environmental variables.
 <p align="center">
-    <img src="images/supabase1.png" alt="click connect">
+    <img src="images/supabase1.png" alt="click connect" width=400px height=640px>
+    <br>
     <em>Click 'Connect'</em>
 </p>
 <p align="center">
-    <img src="images/supabase2.png" alt="click server">
+    <img src="images/supabase2.png" alt="click server" width=400px height=640px>
+    <br>
     <em>Click 'Server'</em>
 </p>
 <p align="center">
-    <img src="images/supabase3.png" alt="locate .env variables">
+    <img src="images/supabase3.png" alt="locate .env variables" width=400px height=640px>
+    <br>
     <em>The relevant .env variables are the first two!</em>
 </p>
 
 2. Create an .env inside the MPowered-Health folder on the same levels as src folder.
 <p align="center">
-    <img src="images/envlocation.png" alt="".env file location>
+    <img src="images/envlocation.png" alt="".env file location width=400px height=640px>
 </p>
 
 
@@ -91,18 +94,18 @@ There are 4 login screens located in the `src/app/(auth)` folder and 8 onboardin
 
 | **Screen** | **Appearance** | **Description** |
 | --- | --- | --- |
-| `splashscreen.tsx` | <img src="images/splashscreen.png" alt="splashscreen"> | First screen the user sees. Introduces the main app functionalities.Has links to the sign in and sign up screen. |
-| `login.tsx` | <img src="images/login.png" alt="login"> | Sign in screen. Requires a correct email and password pair to gain access to the main app. |
-| `signup.tsx` | <img src="images/signup.png" alt="signup"> | Sign up screen. Requires email and password. |
-| `activation.tsx` | <img src="images/activation.png" alt="activation"> | Transition screen between account creation onboarding and seeing the main app for the first time. Displayed for 5000ms. |
-| `onboarding.tsx` | <img src="images/onboarding.png" alt="onboarding"> | Once user created via sign up screen, this screen is displayed as an introduction to onboarding where personal details can be gathered.Has external links to MHA’s terms & services and privacy policy. |
-| `name.tsx` | <img src="images/name.png" alt="name"> | This screen displays the field for users to enter their name or nickname. Whitespace is removed. |
-| `birthsex.tsx` | <img src="images/birthsex.png" alt="birthsex"> | This screen displays the field for users to select their birth sex. |
-| `birthyear.tsx` | <img src="images/birthyear.png" alt="birthyear"> | This screen displays the field for users to enter the date of birth. Valid range of years is defined in the `src/constants/profile/profileConstants.ts` file.This field can be skipped. |
-| `diagnosis.tsx` | <img src="images/diagnosis.png" alt="diagnosis"> | This screen displays the field for users to select the status of their chronic pain diagnosis. |
-| `conditions.tsx` | <img src="images/conditions.png" alt="conditions"> | This screen displays the field for users to select all conditions that apply to them.This field can be skipped. |
-| `miscconditions.tsx` | <img src="images/miscconditions.png" alt="miscconditions"> | This screen displays the field for users to enter any other conditions they may have.This field can be skipped. |
-| `completed.tsx` | <img src="images/completed.png" alt="completed"> | Final onboarding screen. Clicking finish setup uploads user’s profile information to Supabase database and displays the activation screen. |
+| `splashscreen.tsx` | <img src="images/splashscreen.png" alt="splashscreen" width=200px height=400px> | First screen the user sees. Introduces the main app functionalities.Has links to the sign in and sign up screen. |
+| `login.tsx` | <img src="images/login.png" alt="login" width=200px height=400px> | Sign in screen. Requires a correct email and password pair to gain access to the main app. |
+| `signup.tsx` | <img src="images/signup.png" alt="signup" width=200px height=400px> | Sign up screen. Requires email and password. |
+| `activation.tsx` | <img src="images/activation.png" alt="activation" width=200px height=400px> | Transition screen between account creation onboarding and seeing the main app for the first time. Displayed for 5000ms. |
+| `onboarding.tsx` | <img src="images/onboarding.png" alt="onboarding" width=200px height=400px> | Once user created via sign up screen, this screen is displayed as an introduction to onboarding where personal details can be gathered.Has external links to MHA’s terms & services and privacy policy. |
+| `name.tsx` | <img src="images/name.png" alt="name" width=200px height=400px> | This screen displays the field for users to enter their name or nickname. Whitespace is removed. |
+| `birthsex.tsx` | <img src="images/birthsex.png" alt="birthsex" width=200px height=400px> | This screen displays the field for users to select their birth sex. |
+| `birthyear.tsx` | <img src="images/birthyear.png" alt="birthyear" width=200px height=400px> | This screen displays the field for users to enter the date of birth. Valid range of years is defined in the `src/constants/profile/profileConstants.ts` file.This field can be skipped. |
+| `diagnosis.tsx` | <img src="images/diagnosis.png" alt="diagnosis" width=200px height=400px> | This screen displays the field for users to select the status of their chronic pain diagnosis. |
+| `conditions.tsx` | <img src="images/conditions.png" alt="conditions" width=200px height=400px> | This screen displays the field for users to select all conditions that apply to them.This field can be skipped. |
+| `miscconditions.tsx` | <img src="images/miscconditions.png" alt="miscconditions" width=200px height=400px> | This screen displays the field for users to enter any other conditions they may have.This field can be skipped. |
+| `completed.tsx` | <img src="images/completed.png" alt="completed" width=200px height=400px> | Final onboarding screen. Clicking finish setup uploads user’s profile information to Supabase database and displays the activation screen. |
 
 The general file layout for login and onboarding is specified in the `_layout.tsx` in the `(auth)` folder and the layout for onboarding is in the `_layout.tsx` in the `(auth)/(onboarding)` folder 
 
@@ -128,7 +131,7 @@ There is 1 assessment screen located in the `src/app/(tabs)/(assessment)` folder
 
 | **Screen** | **Appearance** | **Description** |
 | --- | --- | --- |
-| `src/app/(tabs)/(assessment)/index.tsx` | <img src="images/dashboard.png" alt="dashboard"> | This is the dashboard the user will see every time they open the app. |
+| `src/app/(tabs)/(assessment)/index.tsx` | <img src="images/dashboard.png" alt="dashboard" width=200px height=400px> | This is the dashboard the user will see every time they open the app. |
 
 The file layout is specified in the `_layout.tsx` in the `(assessment)` folder.
 
@@ -140,10 +143,10 @@ Assessments uses `common` components from the `shared` folder. Listed below are 
 | --- | --- | --- |
 | **Component** | **Appearance** | **Description** |
 | `src/components/assessment/assessmentScreen.tsx` | Refer to `assessmentQuestion` or `assessmentSummary` for the appearance. | Manages client-side component state (such as step navigation, user input validation, and holding answer data in React state) before sending API requests to the backend server. |
-| `src/components/assessment/assessmentQuestion.tsx` | Single-selection question <br> <img src="images/single.png" alt="single-selection question"> <br> Multi-selection question <br> <img src="images/multi.png" alt="multi-selection question"> <br> Slider score question <br> <img src="images/slider.png" alt="slider"> <br> Text entry question <br> <img src="images/text.png" alt="text entry question"> | Renders the user interface (buttons, input fields, progress bar, score sliders) using React Native components to display question cards, options, and input controls to the user. |
-| `src/components/assessment/assessmentSummary.tsx` | <img src="images/summary.png" alt="summary"> | Displays the final response overview once an assessment is completed. It displays organised answer and questions into logical sections, period timestamps, and provides options to edit the answers. |
-| `src/components/assessment/weeklyReflection.tsx` | <img src="images/weeklyreflection.png" alt="weeklyreflection"> | This screen is for user to record their additional reflection on their weekly progress. |
-| `src/components/assessment/slider.tsx` | <img src="images/slidercomponent.png" alt="slider"> | This is a custom 0-10 numeric rating slider built with React Native’s `PanResponder`. |
+| `src/components/assessment/assessmentQuestion.tsx` | Single-selection question <br> <img src="images/single.png" alt="single-selection question" width=200px height=400px> <br> Multi-selection question <br> <img src="images/multi.png" alt="multi-selection question" width=200px height=400px> <br> Slider score question <br> <img src="images/slider.png" alt="slider" width=200px height=400px> <br> Text entry question <br> <img src="images/text.png" alt="text entry question" width=200px height=400px> | Renders the user interface (buttons, input fields, progress bar, score sliders) using React Native components to display question cards, options, and input controls to the user. |
+| `src/components/assessment/assessmentSummary.tsx` | <img src="images/summary.png" alt="summary" width=200px height=400px> | Displays the final response overview once an assessment is completed. It displays organised answer and questions into logical sections, period timestamps, and provides options to edit the answers. |
+| `src/components/assessment/weeklyReflection.tsx` | <img src="images/weeklyreflection.png" alt="weeklyreflection" width=200px height=400px> | This screen is for user to record their additional reflection on their weekly progress. |
+| `src/components/assessment/slider.tsx` | <img src="images/slidercomponent.png" alt="slider" width=200px height=400px> | This is a custom 0-10 numeric rating slider built with React Native’s `PanResponder`. |
 
 **Constants**
 
@@ -185,11 +188,11 @@ There are five screens located in the `src/app/(tabs)/(myhealth)` folder. See be
 
 | **Screen** | **Appearance** | **Description** |
 | --- | --- | --- |
-| `index.tsx` | <img src="images/myhealth.png" alt="myhealth"> | My Health dashboard:Displays the five most recent pain assessments as an average pain trend, alongside the total number of pain records. Provides shortcuts to My Health Profile and My Prescriptions, as well as a link to view all pain records. If no pain records are available, an empty-state message prompts the user to complete a pain assessment. |
-| `painrecords.tsx` | <img src="images/painrecords.png" alt="painrecords"> | Pain Records:Allows users to view their pain history through Chart and History tabs. Users can filter records by pain area and, in the Chart tab, switch between Average, Worst and Mildest pain measurements. The chart is accompanied by a table showing the recorded date and all three pain scores. The table initially displays the four most recent records, with an option to expand the list. The History tab displays records in reverse chronological order. Users can print a PDF report for the selected pain area. If no records are available, users can navigate to the Pain Tracker. |
-| `healthprofile.tsx` | <img src="images/healthprofile.png" alt="healthprofile"> | My Health Profile: Displays the latest recorded answers across the five assessment categories: My Pain, My Movement, My Personal Care, My Social Health and My Management. Each category displays its latest assessment date and recorded answers. If a category has no assessment, an empty state message is displayed. The screen also shows the most recent overall update date and provides options to print the profile as a PDF or share its summary. |
-| `(prescriptions)/index.tsx` | <img src="images/prescriptions.png" alt="prescriptions list"> | Prescriptions List:Displays the user's saved prescriptions, ordered from oldest to newest. Users can add a new prescription, edit an existing one or delete it. If prescriptions cannot be loaded, an error message and Retry option are displayed. If the list is empty, an empty-state message is shown. |
-| `(prescriptions)/edit.tsx` | <img src="images/prescriptionsedit.jpg" alt="prescriptions edit screen"> | Add/Edit Prescription:Uses the same screen for creating and editing prescriptions. The form collects medication name, strength, strength unit, form, repeat interval and unit of time. Required values are validated before saving. Duplicate prescriptions with the same name, strength and unit are prevented. If an existing prescription is no longer available, the screen displays a message and provides navigation back to the prescriptions list. |
+| `index.tsx` | <img src="images/myhealth.png" alt="myhealth" width=200px height=400px> | My Health dashboard:Displays the five most recent pain assessments as an average pain trend, alongside the total number of pain records. Provides shortcuts to My Health Profile and My Prescriptions, as well as a link to view all pain records. If no pain records are available, an empty-state message prompts the user to complete a pain assessment. |
+| `painrecords.tsx` | <img src="images/painrecords.png" alt="painrecords" width=200px height=400px> | Pain Records:Allows users to view their pain history through Chart and History tabs. Users can filter records by pain area and, in the Chart tab, switch between Average, Worst and Mildest pain measurements. The chart is accompanied by a table showing the recorded date and all three pain scores. The table initially displays the four most recent records, with an option to expand the list. The History tab displays records in reverse chronological order. Users can print a PDF report for the selected pain area. If no records are available, users can navigate to the Pain Tracker. |
+| `healthprofile.tsx` | <img src="images/healthprofile.png" alt="healthprofile" width=200px height=400px> | My Health Profile: Displays the latest recorded answers across the five assessment categories: My Pain, My Movement, My Personal Care, My Social Health and My Management. Each category displays its latest assessment date and recorded answers. If a category has no assessment, an empty state message is displayed. The screen also shows the most recent overall update date and provides options to print the profile as a PDF or share its summary. |
+| `(prescriptions)/index.tsx` | <img src="images/prescriptions.png" alt="prescriptions list" width=200px height=400px> | Prescriptions List:Displays the user's saved prescriptions, ordered from oldest to newest. Users can add a new prescription, edit an existing one or delete it. If prescriptions cannot be loaded, an error message and Retry option are displayed. If the list is empty, an empty-state message is shown. |
+| `(prescriptions)/edit.tsx` | <img src="images/prescriptionsedit.jpg" alt="prescriptions edit screen" width=200px height=400px> | Add/Edit Prescription:Uses the same screen for creating and editing prescriptions. The form collects medication name, strength, strength unit, form, repeat interval and unit of time. Required values are validated before saving. Duplicate prescriptions with the same name, strength and unit are prevented. If an existing prescription is no longer available, the screen displays a message and provides navigation back to the prescriptions list. |
 
 The layout for my health is specified in the `_layout.tsx` in the `src/app/(tabs)/(myhealth)/` folder, and the layout for prescriptions is specified in the `_layout.tsx` in the `src/app/(tabs)/(myhealth)/(prescriptions)/` folder.
 
@@ -279,8 +282,8 @@ There are 2 questions screens located in the `src/app/(tabs)/(questions)` folder
 
 | **Screen** | **Appearance** | **Description** |
 | --- | --- | --- |
-| `questions.tsx` | <img src="images/questions.png" alt="questions"> | Main questions screen. What the user sees when they first navigate to the questions tab. Displays the list of questions that users have added to their plan.Has links to the add questions if the user clicks the '+' button. Users can add or update their answers from this screen.Users can also delete question and answer cards from this screen. |
-| `addquestion.tsx` | <img src="images/addquestion.png" alt="add question screen"> | Displays a list of questions generated from the user’s pain assessment for that week. If the assessment is not completed, displays a list of default questions.Custom questions can be added under the Other section.Multiple questions can be selected and added to the user’s plan. |
+| `questions.tsx` | <img src="images/questions.png" alt="questions" width=200px height=400px> | Main questions screen. What the user sees when they first navigate to the questions tab. Displays the list of questions that users have added to their plan.Has links to the add questions if the user clicks the '+' button. Users can add or update their answers from this screen.Users can also delete question and answer cards from this screen. |
+| `addquestion.tsx` | <img src="images/addquestion.png" alt="add question screen" width=200px height=400px> | Displays a list of questions generated from the user’s pain assessment for that week. If the assessment is not completed, displays a list of default questions.Custom questions can be added under the Other section.Multiple questions can be selected and added to the user’s plan. |
 
 The file layout is specified in the `_layout.tsx` in the `(questions)` folder.
 
@@ -308,9 +311,9 @@ There are 3 settings screens located in the `src/app/(tabs)/(settings)` folder. 
 
 | **Screen** | **Appearance** | **Description** |
 | --- | --- | --- |
-| `index.tsx` | <img src="images/settings.png" alt="settings"> | Main settings screen. What the user sees when they first navigate to the settings tab. Has links to the notification and profile screen. Also provides external links to MHA’s terms & services and privacy policy. Users can also update their password from this screen.Also where users can sign out and delete their account. |
-| `notifications.tsx` | <img src="images/notifications.png" alt="notifications"> | Placeholder screen where notification frequency can be configured. This feature was not implemented due to time constraints. |
-| `profile.tsx` | <img src="images/profile.png" alt="profile"> | Displays user profile information including their personal details, health information and email address. These fields can be updated from this screen. |
+| `index.tsx` | <img src="images/settings.png" alt="settings" width=200px height=400px> | Main settings screen. What the user sees when they first navigate to the settings tab. Has links to the notification and profile screen. Also provides external links to MHA’s terms & services and privacy policy. Users can also update their password from this screen.Also where users can sign out and delete their account. |
+| `notifications.tsx` | <img src="images/notifications.png" alt="notifications" width=200px height=400px> | Placeholder screen where notification frequency can be configured. This feature was not implemented due to time constraints. |
+| `profile.tsx` | <img src="images/profile.png" alt="profile" width=200px height=400px> | Displays user profile information including their personal details, health information and email address. These fields can be updated from this screen. |
 
 The file layout is specified in the `_layout.tsx` in the `(settings)` folder.
 
