@@ -1,7 +1,5 @@
 # Codebase
 
-# Codebase
-
 The codebase can be accessed via GitHub in this repository: <https://github.com/MuscularSkeletons/MPowered-Health>.
 
 
