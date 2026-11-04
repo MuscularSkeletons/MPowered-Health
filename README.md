@@ -75,11 +75,11 @@ MPowered-Health/
 
 ## Codebase Description
 
-Click [here]() to view the guide for this codebase.
+Click [here](docs/Codebase%20Description.md) to view the guide for this codebase.
 
 ## User Manual
 
-Click [here]() to view the user manual for this app.
+Click [here](docs/MPowered%20User%20Manual.pdf) to view the user manual for this app.
 
 ## Contributors
 - <a href="https://github.com/Sher-Wen">Sher-Wen Chan</a>: sherwenc@student.unimelb.edu.au
