@@ -4,11 +4,11 @@
     "slug": "MPowered-Health",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/green-m-icon.png",
+    "icon": "./assets/images/m-icon.png",
     "scheme": "mpoweredhealth",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/green-m-icon.png"
+      "icon": "./assets/images/m-icon.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/green-m-icon.png"
+      "favicon": "./assets/images/m-icon.png"
     },
     "plugins": [
       "expo-router",
@@ -29,7 +29,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FFFFFF",
-          "image": "./assets/images/green-m-icon.png",
+          "image": "./assets/images/m-icon.png",
           "imageWidth": 76
         }
       ],

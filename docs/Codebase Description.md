@@ -8,12 +8,23 @@ The codebase can be accessed via GitHub in this repository: <https://github.com/
 1. Install Git and the current [Node.js LTS](https://nodejs.org/en/download) release (which includes npm) if they are not already installed. On macOS, the setup script can install Node.js for you if [Homebrew](https://brew.sh/) is available.
 2. Clone the repository and run the setup script from the repository root:
 
-```text
-git clone --branch development https://github.com/MuscularSkeletons/MPowered-Health.git
-cd MPowered-Health
-cp MPowered-Health/.env.example MPowered-Health/.env
-# Fill in the team's Supabase URL and publishable key in MPowered-Health/.env.
+```sh
+# clone the repository
+git clone https://github.com/MuscularSkeletons/MPowered-Health.git
+
+# navigate to the correct directory
+cd MPowered-Health\MPowered-Health
+
+# Replace the command with the team's Supabase URL and publishable key - see below for further instructions in finding the URL and key
+echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+
+# run one of the following commands depending if you're using macOS or windows
+# for macOS, first navigate to the correct directory
+cd ..
 ./setup-and-run.sh
+
+# for windows
+./setup-and-run.bat
 ```
 
 3. The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
@@ -46,9 +57,9 @@ cp MPowered-Health/.env.example MPowered-Health/.env
 
 3. Paste the Supabase URL and publishable key into the .env folder. The file should look like: 
 
-```typescript
-EXPO_PUBLIC_SUPABASE_URL='YOUR SUPABASE PROJECT URL'
-EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
+```sh
+EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL]
+EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]
 ```
 
 4. Ensure the .env file is not committed.
@@ -62,11 +73,13 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
 
 Below is a diagram of the codebase.
 
-\[insert domain model\]
+<p align="center">
+    <img src="images/domainmodel.png" alt="domain model" width=700px height=700px>
+</p>
 
 The repository structure is described below:
 
-```
+```js
 MPowered-Health/
 ├── __test__/
 ├── assets/

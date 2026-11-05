@@ -1,4 +1,4 @@
-[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/development/LICENSE)
+[![Github](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/MuscularSkeletons/MPowered-Health/blob/main/LICENSE)
 # MPowered-Health
 
 ## About
@@ -11,11 +11,22 @@ Install Git and the current [Node.js LTS](https://nodejs.org/en/download) releas
 Clone the repository and run the setup script from the repository root:
 
 ```sh
-git clone --branch development https://github.com/MuscularSkeletons/MPowered-Health.git
-cd MPowered-Health
-cp MPowered-Health/.env.example MPowered-Health/.env
-# Fill in the team's Supabase URL and publishable key in MPowered-Health/.env.
+# clone the repository
+git clone https://github.com/MuscularSkeletons/MPowered-Health.git
+
+# navigate to the correct directory
+cd MPowered-Health\MPowered-Health
+
+# Replace the command with the team's Supabase URL and publishable key - see below for further instructions in finding the URL and key
+echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+
+# run one of the following commands depending if you're using macOS or windows
+# for macOS, first navigate to the correct directory
+cd ..
 ./setup-and-run.sh
+
+# for windows
+./setup-and-run.bat
 ```
 
 The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
@@ -37,8 +48,8 @@ MPowered-Health/
 Paste the Supabase URL and publishable key into the `.env` folder. The file should look like: 
 
 ```sh
-EXPO_PUBLIC_SUPABASE_URL='YOUR SUPABASE PROJECT URL'
-EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
+EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL]
+EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]
 ```
 
 Ensure the `.env` file is not committed.
