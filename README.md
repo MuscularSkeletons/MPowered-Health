@@ -12,9 +12,10 @@ Clone the repository and run the setup script from the repository root:
 
 ```sh
 git clone https://github.com/MuscularSkeletons/MPowered-Health.git
-cd MPowered-Health
-cp MPowered-Health/.env.example MPowered-Health/.env
-# Fill in the team's Supabase URL and publishable key in MPowered-Health/.env.
+cd MPowered-Health\MPowered-Health
+echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+# Replace the command with the team's Supabase URL and publishable key - see below for further instructions in finding the URL and key
+cd ..
 ./setup-and-run.sh
 ```
 
@@ -37,8 +38,8 @@ MPowered-Health/
 Paste the Supabase URL and publishable key into the `.env` folder. The file should look like: 
 
 ```sh
-EXPO_PUBLIC_SUPABASE_URL='YOUR SUPABASE PROJECT URL'
-EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
+EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL]
+EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]
 ```
 
 Ensure the `.env` file is not committed.
