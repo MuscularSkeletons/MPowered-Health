@@ -11,12 +11,21 @@ Install Git and the current [Node.js LTS](https://nodejs.org/en/download) releas
 Clone the repository and run the setup script from the repository root:
 
 ```sh
+# clone the repository
 git clone https://github.com/MuscularSkeletons/MPowered-Health.git
+
+# navigate to the correct directory
 cd MPowered-Health\MPowered-Health
-echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+
 # Replace the command with the team's Supabase URL and publishable key - see below for further instructions in finding the URL and key
+echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+
+# navigate to the current directory
 cd ..
-./setup-and-run.sh
+
+# run one of the following 2 commands depending if you're using macOS or windows
+./setup-and-run.sh # for macOS
+./setup-and-run.bat # for windows
 ```
 
 The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
