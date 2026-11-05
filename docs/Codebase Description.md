@@ -8,7 +8,7 @@ The codebase can be accessed via GitHub in this repository: <https://github.com/
 1. Install Git and the current [Node.js LTS](https://nodejs.org/en/download) release (which includes npm) if they are not already installed. On macOS, the setup script can install Node.js for you if [Homebrew](https://brew.sh/) is available.
 2. Clone the repository and run the setup script from the repository root:
 
-```text
+```sh
 # clone the repository
 git clone https://github.com/MuscularSkeletons/MPowered-Health.git
 
@@ -57,9 +57,9 @@ cd ..
 
 3. Paste the Supabase URL and publishable key into the .env folder. The file should look like: 
 
-```typescript
-EXPO_PUBLIC_SUPABASE_URL='YOUR SUPABASE PROJECT URL'
-EXPO_PUBLIC_SUPABASE_ANON_KEY='YOUR PUBLISHABLE KEY'
+```sh
+EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL]
+EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]
 ```
 
 4. Ensure the .env file is not committed.
@@ -79,7 +79,7 @@ Below is a diagram of the codebase.
 
 The repository structure is described below:
 
-```
+```js
 MPowered-Health/
 ├── __test__/
 ├── assets/
