@@ -9,11 +9,22 @@ The codebase can be accessed via GitHub in this repository: <https://github.com/
 2. Clone the repository and run the setup script from the repository root:
 
 ```text
-git clone --branch development https://github.com/MuscularSkeletons/MPowered-Health.git
-cd MPowered-Health
-cp MPowered-Health/.env.example MPowered-Health/.env
-# Fill in the team's Supabase URL and publishable key in MPowered-Health/.env.
+# clone the repository
+git clone https://github.com/MuscularSkeletons/MPowered-Health.git
+
+# navigate to the correct directory
+cd MPowered-Health\MPowered-Health
+
+# Replace the command with the team's Supabase URL and publishable key - see below for further instructions in finding the URL and key
+echo "EXPO_PUBLIC_SUPABASE_URL=[YOUR SUPABASE PROJECT URL] EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR PUBLISHABLE KEY]" > .env
+
+# run one of the following commands depending if you're using macOS or windows
+# for macOS, first navigate to the correct directory
+cd ..
 ./setup-and-run.sh
+
+# for windows
+./setup-and-run.bat
 ```
 
 3. The script will tell you if the Supabase settings are missing. Keep `.env` out of Git. Expo is installed with the app dependencies, so a global Expo installation is not needed. Once the server starts, scan its QR code with Expo Go on your phone, or use an installed simulator.
